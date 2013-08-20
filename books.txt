@@ -1,0 +1,3 @@
+Milton (online) --  http://dx.doi.org/10.1017/CBO9780511613357
+Allaire -- http://www.cmap.polytechnique.fr/~allaire/homog/transp1.pdf
+Allaire -- http://www.cmap.polytechnique.fr/~allaire/homog/lect1.pdf

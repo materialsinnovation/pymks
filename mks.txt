@@ -1,0 +1,347 @@
+
+ * Kalindindi - cement with grant money
+
+ * MinED materials group
+
+Kalindindi Presentation
+----------------------
+
+ * Materials Inovation Ecosystem
+
+   * Expertise in different areas -- workshops for integrated materials such as MKS and big data.
+
+ * MinED Materials group
+
+   * experimental datasets simulation datastes and produce MinED knowledge.
+
+   * invertible SPP (structure property) linkages
+
+ * MinED workflow
+
+   * data -> segmentation (microstructure descriptors) -> statistical models (N-point stats) -> data-mining (localization (MKS), homogenization, taxonomy) -> assessment -> data
+
+   * microstucture informatics
+
+ * scale-briding
+
+   * localization - homogenization
+
+   * \dot\epsilon = a < \dot\epsilon >
+
+   * obtain the localization tensor
+
+ * elastic localization tensor
+
+   * perturbation
+
+   * Lippman-Schwinger equation iterative using FFT, (Lebensohn, IJP, 32-33, 59-69, 2012)
+
+   * \epsilon\prime = a \avg\epsilon
+
+   * Kroner's book
+
+   * recursive equation for localization equation
+
+   * Issues
+
+     * multiscale requires doing this millions of times, very stiff, requires intensive computation
+ 
+     * no way to accumule results, not using previous information, start over each time
+
+ * Kroner's Statistical Continuum Theories
+
+   * principal value problem
+
+   * Green's function captures the physics
+
+   * all convolutions
+
+   * non-linear properties have to be dealt with carefully
+
+   * convergence is difficult for hight contrast composites
+
+ * analogies
+
+   * approach is broad, ising, potts, generalized configuration hamiltonian expansions, same sort of terms
+
+   * Volterra series are similar in signal processing
+
+ * Linear Time Invariant Systems
+
+   * x(t) -> f(x(t)) -> y(t)=f(x(t))            ==>         x(t-k) -> f(x(t-k)) -> y(t-k)
+
+   * x(t) = \sum x_k(k) \delta(t - k)
+
+   * MKS is space invariant similar
+
+   * break solution down to a set of impulse functions -- linearity and time invariance in the black box -- can always be represented as a convolution functions
+
+   * impulse input - output gives a set of convolution functions. Can then get answers quickly once the convolutioon functions are found
+
+ * Harmonic oscilator
+
+   * find the impulse function (Green's function or Fourier Transform)
+
+ * Elastic Localization Tensor
+
+   * Systems Theory
+
+   * Use Volterra series representations
+
+   * input signal is the microstructure
+
+   * output signal is the local strain tensor
+
+   * convolution base on Green's function 
+  
+   * m - mocrostructure
+  
+   * \alpha - convolution filters (Green's functions)
+
+   
+ * MKS approach
+
+   * 3 signal
+   
+     * microstructure signal
+
+     * response signal
+
+     * microstructure evolution
+
+Tony Fast - The Hub Platform
+============================
+
+  * Building a hub culture for materials science
+
+    * Change materials science culture
+
+    * information -> knowledge -> innovation
+
+ * MGI iniative
+
+   * sharing, retriaval, analysis
+   
+ * align acadmeic and industrial needs 
+
+   * better community interactions
+
+   * education, project management, data management, user experience, data visulization, social networks, tools & apps
+
+ * user experience at the forefront
+
+ * HUBZERO -- database element is missing
+
+ * structured materials science database
+
+   * raw sample -> segmented data -> sturcture metrics
+
+   * provence data
+
+   * visulization
+
+   * CSE deal with database engineering
+
+Tony Fast - Elementes of the Materials Knowledge Systems
+========================================================
+
+ * Make it faster not better
+
+ * MKS
+  
+   * ROBUS - structure property processing linkages
+
+   * PARALLEL - Fourier methods
+
+   * SCALABLE - NlogN complexity - FE N**3 versus FD N**2 complexity (what is FV?)
+
+ * problem of multiscale
+
+ * concurrent multiscale
+
+   * homogenization
+ 
+   * smaller scale simulation and then homogenize
+
+ * Data versus Knowledge
+
+   * Needs to be done for every position in the material (expensive)
+  
+   * extract numerical knowledge
+
+   * take on digital signal and look for response using Kroner's Green function
+
+   * use influence coefficients to quickly generate results
+
+     * influence coefficients  extract, store and recall material properties
+ 
+ * digital signal processing
+
+   * response field -> microstructure
+
+   * p_s (response), m microstructure signal, alpha is the mapping
+
+ * using MKS to blur image
+
+   * square filter convolved with image
+
+   * emboss, spinodal etc
+
+   * extract kernel for spinoidal decomp and look at how image evolves
+
+ * spectral efficiency of MKS
+
+   * coefficients calibrated to validate direct numerical simulations
+
+   * p_s -> FT -> P
+ 
+ * FE simulation of dual phase composite
+
+   * run sims and calibrate influence coefficients
+
+ * Stability of the influence coeffs
+
+   * reproduce FE calculation with MKS
+
+ * evolution of spinoidal
+
+   * use influence coeffs to predict spinoidal evolution
+
+   * numerically highly accurate for this problem
+
+   * sparsity of real space but after transform not sparse  
+
+Microstructures as Digital Signals
+==================================
+
+ * how good the influence coeffs depends on the microstructure characterization
+
+ * informatics workflow
+
+   * what is the input and output?
+
+   * segmentation creats digital signal
+
+ * segmentation extracts important features
+
+   * extract data from image
+
+ * the primative bases converts \muS to a digital signal
+
+   * first order
+
+   * m can be 0 or 1 for example
+
+   * discrete: m^h_s = 0 or 1 
+
+   * continuum: m is volume fraction
+
+   * \sum m v^h = \beta where \beta = 0 or 1
+
+   * this is interpolation in amplitude
+
+   * higher order convolution functions
+
+     * subset of HO Voltera kernels
+
+     * becomes intractable to bin higher order representations
+
+   * primitive basis, delta functions, pulse functions
+
+ * Use Euler function for description of microsturcture
+
+Why FT? -- Anne Hanna
+=====================
+
+ * calibrate microstrucures with MKS coefficients
+
+   * use least squares fit
+
+   * calibrate alphas
+
+   * all plausibe products
+
+   * big system need FT
+
+ * Fourier doconv
+
+   * FFT reduces first order MKS to a small matrix for least sqpuares
+     fitting
+
+   * P_s -> P_k
+
+   * normalization is unity
+
+ * Proof of convolution
+
+Calibrating the influence coefficients
+======================================
+
+ * ordinary least squares fitting
+
+ * S is huge for bos standard least squares
+
+ * reduces size of simulation because the important stuff only happens
+   in reduced space.
+
+ * calibration reduction with FE simulations
+
+ * multiple microstructures
+
+ * higher order terms increases accuracy with carefull choice of terms
+
+ *
+
+Converstation with Tony Fast
+----------------------------
+
+ * Data needs to be manipulated and tied back to original source.
+
+ * 2 data streams to solve domain specific problems.
+
+ * curation of the knowledge into collabritive domains.
+
+ * only knwoledge from domain specific, granularity is important
+
+ * provenance is an issue 
+
+ * scaling and machine learning, data discovery and knowledge discovery
+
+ * data curation group at NIST is thinking about versioning
+
+ * DANSE project
+
+Chat with Tony Fast
+===================
+
+ * What can we do to get money to Kalindindi?
+
+ * What opportunties for MGI?
+
+ * What about sponsering a student?
+
+ * Ask Jim about money and workshop.
+
+ * raw data, untagged info, data translation, tag data, agnosticated data is the digital signal.
+
+ * data can't be independent of the tools used.
+
+ * Workshop showing good workflows. Education.
+
+Collaboration
+-------------
+
+ * Python project on MKS.
+
+ * Paper on MKS with python.
+
+1 on 1 with Tony
+================
+
+ * Ipython
+
+ * FiPy, Trac, Github
+
+ * Markup languages
+
+ * Sumatra
