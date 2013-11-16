@@ -17,7 +17,9 @@ The details of the MKS are outlined in the notebooks. The main idea of
 the MKS relates is to calculate responses from microstructures using
 expensive calculations. The microstructures and responses are then
 linked with a linear relationship via a set of influence coefficients,
-which can then be used to make very fast calculations.
+which can then be used to make very fast calculations. See
+[Tony Fast's Thesis](http://idea.library.drexel.edu/bitstream/1860/4057/1/Fast_AnthonyPhD.pdf)
+for complete details.
 
 ## License
 
@@ -26,10 +28,11 @@ The repository is licensed with the FreeBSD License, see
 
 ## Requirements
 
-The `REQUIREMENTS.txt` file has a complete list of packages in the
-Python environment during development. The most important of these are
-listed. The version numbers are mostly not important within reason,
-but if you have problems the version numbers may help.
+The [REQUIREMENTS.txt](REQUIREMENTS.txt) file has a complete list of
+packages in the Python environment during development. The most
+important of these are listed. The version numbers are mostly not
+important within reason, but if you have problems the version numbers
+may help.
 
  * FiPy dev version `6e897df40012`
  * IPython dev version `b31eb2f2d951`
