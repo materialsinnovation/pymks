@@ -75,5 +75,5 @@ individual notebook via Figshare (or Authorea).
  * Daniel Wheeler
  * Tony Fast
 
- 
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script> 
  
