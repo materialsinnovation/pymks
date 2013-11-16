@@ -1,4 +1,4 @@
-# Materials Knowledge System
+# Materials Knowledge System Tutorial
 
 ## Overview
 
@@ -7,8 +7,8 @@ Knowledge System (MKS) as a set of IPython notebooks. The MKS is a a
 method of using spatial statistics to improve the efficiency and
 efficacy of multiscale simulations and experimental characterization
 involving materials microstructure. The techniques outlined in the
-tutorial could be used in range of fields, however, the authors'
-primary interest is materials science applications.
+tutorials could be used in range of applications, however, the
+authors' primary interest is materials science applications.
 
 
 ## MKS Basics
@@ -45,13 +45,13 @@ may help.
 
 ## Citing the Notebooks
 
-The plan is to wither add a DOI for the entire project or for each
-individual notebook via Figshare (or Authorea).
+The plan is to either add a citable DOI for the entire project or for
+each individual notebook via Figshare (or Authorea).
 
 ## Authors
 
- * Daniel Wheeler
- * Tony Fast
+ * [Daniel Wheeler](http://wd15.github.io/about.html)
 
-<script type="text/javascript" src="http://www.math.union.edu/~dpvc/transfer/mathjax/mathjax-in-github.user.js"></script> 
+ * [Tony Fast](http://mined.gatech.edu/the-ga-tech-mined-research-group/ga-tech-mined-research-group-tony-fast)
+
  
