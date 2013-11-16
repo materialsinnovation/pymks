@@ -51,7 +51,6 @@ each individual notebook via Figshare (or Authorea).
 ## Authors
 
  * [Daniel Wheeler](http://wd15.github.io/about.html)
-
  * [Tony Fast](http://mined.gatech.edu/the-ga-tech-mined-research-group/ga-tech-mined-research-group-tony-fast)
 
  
