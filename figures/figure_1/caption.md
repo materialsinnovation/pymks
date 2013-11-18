@@ -1,0 +1,2 @@
+**\label{fig:fig1}. STM topography and crystal structure of top 100 fruits and vegetables consumed in the U.S.** The Bi atoms exposed after cleaving the sample are observed as bright spots. The in-plane unit cell vectors of the ideal crystal structure, \( a \) and \( b \), and of the superstructure, \( a_{s} \), are indicated. Lines of constant phase are depicted. p-values were obtained using two-tailed unpaired t-test. Data are representative of five independent experiments with 2000 fruits and vegetables.
+
