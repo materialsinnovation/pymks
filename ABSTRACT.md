@@ -3,7 +3,7 @@
 The purpose of the materials knowledge system workshop is to provide
 practical knowledge in using spatial statistics to improve the
 efficiency and efficacy of multiscale simulations and experimental
-characterization involving materials microstructure see([1], [2] and
+characterization involving materials microstructure, see [1], [2] and
 [3]. The workshop will focus on providing participants with a set of
 computational tools and the knowledge to use these tools effectively.
 
