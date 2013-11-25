@@ -1,4 +1,4 @@
-# MKS Workshop 
+# MKS Workshop, 01/13/2014 and 01/14/2014
 
 Microstructure informatics is an emerging suite of signal processing
 techniques, advance statistical tools and data science methods
@@ -7,11 +7,9 @@ science. The Materials Knowledge System (MKS) forms an important
 element of microstructure informatics by employing spatial statistical
 methods to create meta-models of top-down localization relationships.
 
-## January 13 and 14, 2014
-
 This goal of the Materials Knowledge System (MKS) workshop will be to
 provide participants with a practical knowledge in using spatial
-statistics to improve the efficiency and efficacy of multiscale 
+statistics to improve the efficiency and efficacy of multiscale
 simulations and experimental simulations involving materials
 microstructure. Please see [ABSTRACT.md](ABSTRACT.md) for an extended
 workshop abstract.
