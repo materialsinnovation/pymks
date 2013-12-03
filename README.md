@@ -57,7 +57,7 @@ each individual notebook via Figshare (or Authorea).
 
 To install the `pymks` module use
 
-   $ python setup.py install
+    $ python setup.py install
 
 ## Testing
 
