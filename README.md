@@ -51,7 +51,7 @@ each individual notebook via Figshare (or Authorea).
 ## Viewing the Notebooks
 
 The Notebooks can be viewed at
-(nbviewer.ipython.org)[http://nbviewer.ipython.org/github/wd15/pymks/tree/master/notebooks/]
+[nbviewer.ipython.org](http://nbviewer.ipython.org/github/wd15/pymks/tree/master/notebooks/)
 and are automatically updated as changes are pushed to repository.
 
 ## Authors
