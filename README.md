@@ -53,4 +53,18 @@ each individual notebook via Figshare (or Authorea).
  * [Daniel Wheeler](http://wd15.github.io/about.html)
  * [Tony Fast](http://mined.gatech.edu/the-ga-tech-mined-research-group/ga-tech-mined-research-group-tony-fast)
 
- 
+## Installation
+
+To install the `pymks` module use
+
+   $ python setup.py install
+
+## Testing
+
+To run the tests use
+
+    $ python -c "import pymks; pymks.test()"
+
+Note that the above does not test the notebooks, only the modules
+under `pymks/`. Integrating the notebooks with the test harness is an
+ongoing concern.
