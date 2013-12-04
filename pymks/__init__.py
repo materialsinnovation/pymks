@@ -1,4 +1,6 @@
 from mksRegressionModel import MKSRegressionModel
+from fipyCHModel import FiPyCHModel
+
 import pymks.mksRegressionModel
 
 def test():
