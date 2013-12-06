@@ -1,6 +1,6 @@
 from mksRegressionModel import MKSRegressionModel
 from fipyCHModel import FiPyCHModel
-
+from tools import draw_microstructure_discretization
 import pymks.mksRegressionModel
 
 def test():
