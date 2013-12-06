@@ -136,13 +136,14 @@ class MKSRegressionModel(LinearRegression):
         Fy = np.fft.fftn(y, axes=self._axes(X))
         shape = X.shape[1:]
         self.Fcoeff = np.zeros(shape + (self.Nbin,), dtype=np.complex)
-        sl = (slice(None),)
+        s0 = (slice(None),)
         for ijk in np.ndindex(shape):
             if np.all(np.array(ijk) == 0):
-                self.Fcoeff[ijk + sl] = np.linalg.lstsq(FX[sl + ijk + sl], Fy[sl + ijk])[0]
+                s1 = s0
             else:
-                self.Fcoeff[ijk + sl][:-1] = np.linalg.lstsq(FX[sl + ijk + sl][...,:-1], Fy[sl + ijk])[0]
-                
+                s1 = (slice(-1),) 
+            self.Fcoeff[ijk + s1] = np.linalg.lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk])[0]
+            
     def predict(self, X):
         r"""
         Calculates a response from the microstructure `X`.
