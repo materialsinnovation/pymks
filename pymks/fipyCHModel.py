@@ -3,7 +3,7 @@ from fipy.solvers.scipy.linearLUSolver import LinearLUSolver
 import numpy as np
 
 class FiPyCHModel(object):
-    def __init__(self, dx=1., dy=None, dt=1.):
+    def __init__(self, dx=0.25, dy=None, dt=1e-3):
         self.dx = dx
         if dy is None:
             self.dy = dx

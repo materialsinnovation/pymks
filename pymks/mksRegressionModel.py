@@ -134,11 +134,14 @@ class MKSRegressionModel(LinearRegression):
         assert y.shape == X.shape
         FX = self._binfft(X)
         Fy = np.fft.fftn(y, axes=self._axes(X))
-        s = X.shape[1:]
-        self.Fcoeff = np.zeros(s + (self.Nbin,), dtype=np.complex)
+        shape = X.shape[1:]
+        self.Fcoeff = np.zeros(shape + (self.Nbin,), dtype=np.complex)
         sl = (slice(None),)
-        for ijk in np.ndindex(s):
-            self.Fcoeff[ijk + sl] = np.linalg.lstsq(FX[sl + ijk + sl], Fy[sl + ijk])[0]
+        for ijk in np.ndindex(shape):
+            if np.all(np.array(ijk) == 0):
+                self.Fcoeff[ijk + sl] = np.linalg.lstsq(FX[sl + ijk + sl], Fy[sl + ijk])[0]
+            else:
+                self.Fcoeff[ijk + sl][:-1] = np.linalg.lstsq(FX[sl + ijk + sl][...,:-1], Fy[sl + ijk])[0]
                 
     def predict(self, X):
         r"""
