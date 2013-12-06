@@ -1,5 +1,4 @@
 from mksRegressionModel import MKSRegressionModel
-from mksRegressionModelSlow import MKSRegressionModelSlow
 from fipyCHModel import FiPyCHModel
 
 import pymks.mksRegressionModel

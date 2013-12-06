@@ -12,7 +12,7 @@ class MKSRegressionModel(LinearRegression):
     The following demonstrates how to the viability of the
     `MKSRegressionModel` with a simple 1D filter.
 
-    >>> Nbin = 101
+    >>> Nbin = 2
     >>> Nspace = 81
     >>> Nsample = 400
 
@@ -48,8 +48,8 @@ class MKSRegressionModel(LinearRegression):
     >>> model.coeff = np.fft.ifft(model.Fcoeff, axis=0)
 
     Check the result
-    
-    >>> assert mse(coeff, model.coeff) < 1e-3
+
+    >>> assert np.allclose(coeff, model.coeff)
 
     """
     
@@ -119,8 +119,8 @@ class MKSRegressionModel(LinearRegression):
         >>> y = X.swapaxes(1, 2)
         >>> model = MKSRegressionModel(Nbin=2)
         >>> model.fit(X, y)
-        >>> assert np.allclose(model.Fcoeff, [[[ 0.5,  0.5 ],  [-1,  1  ]],
-        ...                                   [[-0.25, 0.25], [-0.5, 0.5]]])
+        >>> assert np.allclose(model.Fcoeff, [[[ 0.5,  0.5], [-2, 0]],
+        ...                                   [[-0.5,  0  ], [-1, 0]]])
 
 
         :Parameters:
