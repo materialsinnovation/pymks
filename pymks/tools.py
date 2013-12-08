@@ -38,7 +38,7 @@ def draw_microstructure_discretization(M, a=0, s=0, Nbin=6, bound=0.016, height=
 
     H = np.linspace(0, 1, Nbin)
     m = np.maximum(1 - abs(v - H) / dx, 0)
-    Mstring = r'$M_{{{a},{s}}}={v:1.2g}$'.format(a=a, s=s ,v=v)
+    Mstring = r'$m_{{{a},{s}}}={v:1.2g}$'.format(a=a, s=s ,v=v)
     arr = r'{0:1.2g}'.format(m[0])
     for i in range(1, len(m)):
         arr += r', {0:1.2g}'.format(m[i])
