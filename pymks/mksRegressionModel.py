@@ -168,6 +168,45 @@ class MKSRegressionModel(LinearRegression):
         Fy = np.sum(FX * self.Fcoeff[None,...], axis=-1)
         return np.fft.ifftn(Fy, axes=self._axes(X)).real
 
+    def resize_coeff(self, shape):
+        r"""
+        Scale the size of the coefficients and pad with zeros.
+
+        :Parameters:
+         - `shape`: the new shape of the coefficients
+        
+        >>> model = MKSRegressionModel()
+        >>> coeff = np.arange(20).reshape((5, 4, 1))
+        >>> model.Fcoeff = np.fft.fftn(coeff, axes=(0, 1))
+        >>> model.resize_coeff((10, 7))
+        >>> coeff = np.fft.ifftn(model.Fcoeff, axes=(0, 1))
+        >>> assert np.allclose(coeff[:,:,0],
+        ...                    [[0, 1, 0, 0, 0, 2, 3],
+        ...                     [4, 5, 0, 0, 0, 6, 7],
+        ...                     [8, 9, 0, 0, 0, 10, 11],
+        ...                     [0, 0, 0, 0, 0, 0, 0],
+        ...                     [0, 0, 0, 0, 0, 0, 0],
+        ...                     [0, 0, 0, 0, 0, 0, 0],
+        ...                     [0, 0, 0, 0, 0, 0, 0],
+        ...                     [0, 0, 0, 0, 0, 0, 0],
+        ...                     [12, 13, 0, 0, 0, 14, 15], 
+        ...                     [16, 17, 0, 0, 0, 18, 19]]) 
+        
+        """
+        assert len(shape) == len(self.Fcoeff.shape) - 1
+        assert np.all(shape >= self.Fcoeff.shape[:-1])
+        axes = np.arange(len(self.Fcoeff.shape) - 1)
+        coeff = np.fft.ifftn(self.Fcoeff, axes=axes)
+
+        for axis, size in enumerate(self.Fcoeff.shape[:-1]):
+            coeff_split = np.array_split(coeff, 2, axis=axis)
+            pad_shape = list(coeff.shape)
+            pad_shape[axis] = shape[axis] - coeff.shape[axis]
+            zeros = np.zeros(pad_shape, dtype=complex)
+            coeff = np.concatenate((coeff_split[0], zeros, coeff_split[1]), axis=axis)
+
+        self.Fcoeff = np.fft.fftn(coeff, axes=axes)
+        
     def _test(self):
         r"""
         Test with a Cahn-Hilliard model.
