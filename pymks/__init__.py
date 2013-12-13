@@ -1,7 +1,9 @@
 from mksRegressionModel import MKSRegressionModel
+from fastmksRegressionModel import FastMKSRegressionModel
 from fipyCHModel import FiPyCHModel
 from tools import draw_microstructure_discretization
 import pymks.mksRegressionModel
+import pymks.fastmksRegressionModel
 
 def test():
     r"""
@@ -9,6 +11,7 @@ def test():
     """
     import doctest
     doctest.testmod(pymks.mksRegressionModel)
+    doctest.testmod(pymks.fastmksRegressionModel)
 
 
 def _getVersion():
