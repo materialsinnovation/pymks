@@ -88,10 +88,8 @@ class MKSRegressionModel(LinearRegression):
         >>> assert np.allclose(X, Xtest)
 
         """
-        
         H = np.linspace(0, 1, self.Nbin)
-        dh = H[1] - H[0]
-        return np.maximum(1 - abs(X[..., None] - H) / dh, 0)
+        return np.maximum(1 - (abs(X[..., None] - H)) / (H[1] - H[0]) , 0)
 
     def _binfft(self, X):
         r"""
@@ -107,7 +105,7 @@ class MKSRegressionModel(LinearRegression):
         >>> assert np.allclose(X, Xtest)
 
         """
-        Xbin = np.array([self._bin(Xi) for Xi in X])
+        Xbin = self._bin(X)
         return np.fft.fftn(Xbin, axes=self._axes(X))
         
     def fit(self, X, y):
