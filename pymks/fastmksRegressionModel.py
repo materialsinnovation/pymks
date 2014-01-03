@@ -4,7 +4,16 @@ import numpy as np
 import pyfftw
 
 class FastMKSRegressionModel(MKSRegressionModel):
-    def __init__(self, Nbin=10, client=None, threads=1):
+    def __init__(self, Nbin=10, threads=1):
+        r"""
+        Create a `FastMKSRegressionModel`.
+
+        :Parameters:
+         - `Nbin`: is the number of discretization bins for the
+           "microstructure".
+         - `threads`: the number of threads to use for multi-threading.
+         
+        """
         super(FastMKSRegressionModel, self).__init__(Nbin=Nbin)
         self.threads = threads
         ne.set_num_threads(threads)

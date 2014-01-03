@@ -3,7 +3,7 @@ from fipy.solvers.scipy.linearLUSolver import LinearLUSolver
 import numpy as np
 
 class FiPyCHModel(object):
-    def __init__(self, dx=0.25, dy=None, dt=1e-3, a=1.):
+    def __init__(self, dx=0.25, dy=None, dt=1e-3, a=1., epsilon=1.):
         self.dx = dx
         if dy is None:
             self.dy = dx
@@ -11,6 +11,7 @@ class FiPyCHModel(object):
             self.dy = dy
         self.dt = dt
         self.a = a
+        self.epsilon = epsilon
 
     def fit(self, X, y):
         raise NotImplementedError
@@ -21,10 +22,10 @@ class FiPyCHModel(object):
         mesh = fp.PeriodicGrid2D(nx=nx, ny=ny, dx=self.dx, dy=self.dy)
         phi = fp.CellVariable(mesh=mesh, hasOld=True)
         PHI = phi.arithmeticFaceValue
-        D = epsilon = 1
+        D = 1
         eq = (fp.TransientTerm()
               == fp.DiffusionTerm(coeff=D * self.a**2 * (1 - 6 * PHI * (1 - PHI)))
-              - fp.DiffusionTerm(coeff=(D, epsilon**2)))
+              - fp.DiffusionTerm(coeff=(D, self.epsilon**2)))
 
         for i, x in enumerate(X):
             phi[:] = x.flatten()
@@ -38,8 +39,9 @@ class FiPyCHModel(object):
 
     def _solve(self, eq, phi, solver, dt):
         res = 1e+10
+        
         for sweep in range(5):
-            res = eq.sweep(phi, dt=dt, solver=solver)
+            res = eq.sweep(phi, dt=dt, solver=LinearLUSolver())
             #    print 'res',res
             
 
