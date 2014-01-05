@@ -215,7 +215,7 @@ class MKSRegressionModel(LinearRegression):
         >>> dt = 1e-3
         >>> np.random.seed(0 )
         >>> X = np.array([np.random.random((Nspace, Nspace)) for i in range(Nsample)])
-        >>> fipy_model = FiPyCHModel(dx=0.25, dy=0.25, dt=1e-3)
+        >>> fipy_model = FiPyCHModel(dx=0.25, dy=0.25, dt=1e-3, epsilon=1., a=1.)
         >>> y = fipy_model.predict(X)
         >>> model = MKSRegressionModel(Nbin=10)
         >>> model.fit(X, y)
