@@ -9,7 +9,7 @@ class MKSRegressionModel(LinearRegression):
     System in Fourier Space. Currently, the model assumes that the
     microstructure (`X`) must varies only between 0 and 1.
 
-    The following demonstrates how to the viability of the
+    The following demonstrates the viability of the
     `MKSRegressionModel` with a simple 1D filter.
 
     >>> Nbin = 2
