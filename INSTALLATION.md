@@ -2,11 +2,11 @@
 
 The workshop will have workstations available in the CTCMS with a
 correctly configured scientific Python environment already
-installed. However, it is often preferable to use one's own laptop,
-with a favored software and development environment. I much prefer
-this. If you have experience with scientific Python, you probably
-already have a satisfactory Python environment on your laptop, which
-won't need many alterations. Just skip over the
+installed. However, it is often preferable to use one's own laptop or
+your own CTCMS account, with your favored software and development
+environment. I much prefer this. If you have experience with
+scientific Python, you probably already have a satisfactory Python
+environment, which won't need many alterations. Just skip over the
 [Anaconda Python section](#anaconda-python) and install the packages
 in the [Regular Python section](#regular-python).
 
@@ -31,7 +31,7 @@ platform. To test whether Anaconda is working try
     '/home/wd15/anaconda/lib/python2.7/site-packages/numpy/__init__.pyc'
     
 and check that you are actually using Anaconda's Python. Once Anaconda
-is installed, install the following,
+is installed, install the following.
 
     $ conda install pyfftw
     $ conda install ez_setup
