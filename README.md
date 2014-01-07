@@ -1,5 +1,9 @@
 # Materials Knowledge System Tutorial
 
+## Schedule
+
+See https://github.com/wd15/pymks/wiki/Workshop-Schedule
+
 ## Overview
 
 The goal of this project is to provide a tutorial for the Materials
