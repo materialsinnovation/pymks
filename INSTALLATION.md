@@ -119,7 +119,11 @@ my Ubuntu laptop.
    [IPython Github repo](https://github.com/ipython/ipython.git) and
    installed it. This seemed to work.
 
+<<<<<<< HEAD
 [1]: http://nbviewer.ipython.org/github/wd15/pymks/blob/master/notebooks/01 - Python Intro
+=======
+[1]: "http://nbviewer.ipython.org/github/wd15/pymks/blob/master/notebooks/01 - Python Intro"
+>>>>>>> origin/issue37-installation_instructions
 
 
 
