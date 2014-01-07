@@ -18,10 +18,9 @@ recommend using the
 
 https://store.continuum.io/cshop/anaconda/
 
-Just follow the instructions on the website. I believe that it "just
-works" on all platforms and has mostly everything included. Just
-follow the instructions for your platform. To test whether Anaconda is
-working try
+I believe that it "just works" on all platforms and has mostly
+everything included. Just follow the instructions for your
+platform. To test whether Anaconda is working try
 
     $ python
     Python 2.7.6 |Anaconda 1.8.0 (64-bit)| (default, Nov 11 2013, 10:47:18) 
@@ -93,20 +92,22 @@ Check that you can launch and use the IPython notebooks
 
     $ cd /PATH/TO/PYMKS/pymks/notebooks
     $ ipython notebook
-    
-Click on the
-[`01 - Python Intro`](http://nbviewer.ipython.org/github/wd15/pymks/blob/master/notebooks/01\
--\ Python\ Intro).  Run the cells under the "Test your installation"
-heading near the top of the notebook. If this all works, you are set,
-if not, [let me know](#issues).
+
+This should fire up your browser with the notebook dashboard
+displayed. Click on the
+[`01 - Python Intro`](http://nbviewer.ipython.org/github/wd15/pymks/blob/master/notebooks/01
+- Python Intro) notebook.  Run the cells under the "Test your
+installation" heading near the top of the notebook. If this all works,
+you are set, if not,
+[let me know](https://github.com/wd15/pymks/issues?state=open).
 
 ## Issues
 
 If you have issues email me, daniel.wheeler@nist.gov, or better still
 submit an issue on the
 [issue tracker](https://github.com/wd15/pymks/issues?state=open) (it
-emails me). These are the issues I had when using Anaconda on my
-Ubuntu laptop.
+emails me). The following are the issues I had when using Anaconda on
+my Ubuntu laptop.
 
  - I had to change my backend in `.matplotlibrc` from `GTKAgg` to
    `TKAgg` when running `import matplotlib.pyplot as plt` from
