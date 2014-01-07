@@ -30,6 +30,10 @@ for complete details.
 The repository is licensed with the FreeBSD License, see
 [LICENSE.txt](LICENSE.txt).
 
+## Installation
+
+See [INSTALLATION.md](INSTALLATION.md).
+
 ## Requirements
 
 The [REQUIREMENTS.txt](REQUIREMENTS.txt) file has a complete list of
@@ -42,10 +46,12 @@ may help.
  * IPython dev version `b31eb2f2d951`
  * Matplotlib 1.2.1
  * Numpy 1.7.1
- * Pandas 0.12.0
  * Scikit-learn 0.13.1
  * Scipy 0.13.0
- * Tables 2.4.0
+ * pyFFTW 0.9.2
+ * ez-setup 0.9
+ * line-profiler 1.0b3
+ * numexpr 2.2.2
 
 ## Citing the Notebooks
 
@@ -62,12 +68,6 @@ and are automatically updated as changes are pushed to the repository.
 
  * [Daniel Wheeler](http://wd15.github.io/about.html)
  * [Tony Fast](http://mined.gatech.edu/the-ga-tech-mined-research-group/ga-tech-mined-research-group-tony-fast)
-
-## Installation
-
-To install the `pymks` module use
-
-    $ python setup.py install
 
 ## Testing
 
