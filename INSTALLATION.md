@@ -1,4 +1,4 @@
-# INSTALLATION
+# Installation
 
 The workshop will have workstations available in the CTCMS with a
 correctly configured scientific Python environment already
@@ -7,8 +7,8 @@ with a favored software and development environment. I much prefer
 this. If you have experience with scientific Python, you probably
 already have a satisfactory Python environment on your laptop, which
 won't need many alterations. Just skip over the
-[Anaconda Python section](.#anaconda-python) and install the packages
-in the [Regular Python section](.#regular-python).
+[Anaconda Python section](#anaconda-python) and install the packages
+in the [Regular Python section](#regular-python).
 
 ## Anaconda Python 
 
@@ -16,11 +16,12 @@ If you have no experience with scientific Python, I would highly
 recommend using the
 [Anaconda Python distribution](https://store.continuum.io/cshop/anaconda/),
 
-    https://store.continuum.io/cshop/anaconda/
-    
-I believe that it "just works" on all platforms and has mostly
-everything included. Just follow the instructions for your
-platform. To test whether Anaconda is working try
+https://store.continuum.io/cshop/anaconda/
+
+Just follow the instructions on the website. I believe that it "just
+works" on all platforms and has mostly everything included. Just
+follow the instructions for your platform. To test whether Anaconda is
+working try
 
     $ python
     Python 2.7.6 |Anaconda 1.8.0 (64-bit)| (default, Nov 11 2013, 10:47:18) 
@@ -65,8 +66,10 @@ You'll need to use Git to clone the Github
 GUI style clients for both [Mac](http://mac.github.com/) and
 [Windows](http://windows.github.com/). See,
 
-    https://help.github.com/articles/set-up-git
+https://help.github.com/articles/set-up-git
     
+for help.
+
 ## Install the `pymks` module
 
 Once you have Git installed, all you need to do is clone the
@@ -91,8 +94,11 @@ Check that you can launch and use the IPython notebooks
     $ cd /PATH/TO/PYMKS/pymks/notebooks
     $ ipython notebook
     
-Click on the `01 - Python Intro` notebook.  Run some of the cells in
-the notebook to check things are working.
+Click on the
+[`01 - Python Intro`](http://nbviewer.ipython.org/github/wd15/pymks/blob/master/notebooks/01\
+-\ Python\ Intro).  Run the cells under the "Test your installation"
+heading near the top of the notebook. If this all works, you are set,
+if not, [let me know](#issues).
 
 ## Issues
 
@@ -111,8 +117,8 @@ Ubuntu laptop.
    notebook. This may have been due to some dependency conflicts on my
    system as I have multiple versions of IPython. To overcome this, I
    cloned a development version of the notebook from the
-   [IPython Github repo](https://github.com/ipython/ipython.git). This
-   seemed to work.
+   [IPython Github repo](https://github.com/ipython/ipython.git) and
+   installed it. This seemed to work.
 
 
 
