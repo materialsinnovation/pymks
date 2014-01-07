@@ -94,11 +94,9 @@ Check that you can launch and use the IPython notebooks
     $ ipython notebook
 
 This should fire up your browser with the notebook dashboard
-displayed. Click on the
-[`01 - Python Intro`](http://nbviewer.ipython.org/github/wd15/pymks/blob/master/notebooks/01
-- Python Intro) notebook.  Run the cells under the "Test your
-installation" heading near the top of the notebook. If this all works,
-you are set, if not,
+displayed. Click on the [`01 - Python Intro`][1] notebook.  Run the
+cells under the "Test your installation" heading near the top of the
+notebook. If this all works, you are set, if not,
 [let me know](https://github.com/wd15/pymks/issues?state=open).
 
 ## Issues
@@ -121,7 +119,7 @@ my Ubuntu laptop.
    [IPython Github repo](https://github.com/ipython/ipython.git) and
    installed it. This seemed to work.
 
-
+[1]: http://nbviewer.ipython.org/github/wd15/pymks/blob/master/notebooks/01 - Python Intro
 
 
 
