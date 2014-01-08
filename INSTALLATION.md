@@ -2,11 +2,11 @@
 
 The workshop will have workstations available in the CTCMS with a
 correctly configured scientific Python environment already
-installed. However, it is often preferable to use one's own laptop or
-your own CTCMS account, with your favored software and development
-environment. I much prefer this. If you have experience with
-scientific Python, you probably already have a satisfactory Python
-environment, which won't need many alterations. Just skip over the
+installed. However, it is often preferable to use one's own laptop,
+with your favored software and development environment. I much prefer
+this. If you have experience with scientific Python, you probably
+already have a satisfactory Python environment, which won't need many
+alterations. Just skip over the
 [Anaconda Python section](#anaconda-python) and install the packages
 in the [Regular Python section](#regular-python).
 
@@ -30,14 +30,15 @@ platform. To test whether Anaconda is working try
     >>> import numpy; numpy.__file__
     '/home/wd15/anaconda/lib/python2.7/site-packages/numpy/__init__.pyc'
     
-and check that you are actually using Anaconda's Python. Once Anaconda
-is installed, install the following.
+and check that you are actually using Anaconda's Python. Then update Anaconda,
 
-    $ conda install pyfftw
+    $ conda update conda
+    
+Once Anaconda has updated, install the following.
+
     $ conda install ez_setup
     $ conda install fipy
     $ conda install scikit-learn
-    $ conda install line_profiler
     $ conda install numexpr
 
 ## Regular Python
@@ -51,13 +52,45 @@ want to update them anyway, just use `pip install package --upgrade`.
     $ pip install scipy
     $ pip install matplotlib
     $ pip install scikit-learn
-    $ pip install pyfftw
     $ pip install ez_setup
     $ pip install fipy
     $ pip install scikit-learn
     $ pip install line_profiler
     $ pip install numexpr
+
+## FFTW
+
+The main requirement for `pyfftw` is FFTW3, which can be installed
+via,
+
+    $ sudo apt-get install libfftw3-dev
     
+on Debian/Ubuntu. Windows and Mac users should consult
+
+https://github.com/hgomersall/pyFFTW#platform-specific-build-info
+
+Once this is installed, do
+
+    $ pip install pyfftw
+    
+If you have issues with `pyfftw` and can't install it, don't
+worry. Most of the notebooks do not require it and those that do are
+easily modified to work with `numpy.fft`. We can also try and get this
+working during the tutorial.
+
+## `line_profiler`
+
+One additional package is `line_profiler`. Unfortunately, this has an issue when installing with
+
+    $ pip install line_profiler
+    
+If will throw an error. To install it, go to
+
+https://pypi.python.org/pypi/line_profiler
+
+and download and install the package by hand (rather than using
+pip). If you have issues, we can get this working during the tutorial.
+
 ## Git
 
 You'll need to use Git to clone the Github
@@ -118,7 +151,5 @@ my Ubuntu laptop.
    cloned a development version of the notebook from the
    [IPython Github repo](https://github.com/ipython/ipython.git) and
    installed it. This seemed to work.
-
-
 
 
