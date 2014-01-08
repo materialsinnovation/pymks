@@ -90,8 +90,8 @@ https://pypi.python.org/pypi/line_profiler
 
 and download and install the package by hand (rather than using
 pip). On Windows, just run the `.exe` installer. On Mac and Linux,
-just get the `.tar.gz` unpack it, change to the base directory and run
-`python setup.py install`.
+download the `.tar.gz` and unpack it, change to the base directory and
+run `python setup.py install`.
 
 ## Git
 
