@@ -55,7 +55,6 @@ want to update them anyway, just use `pip install package --upgrade`.
     $ pip install ez_setup
     $ pip install fipy
     $ pip install scikit-learn
-    $ pip install line_profiler
     $ pip install numexpr
 
 ## FFTW
@@ -73,14 +72,15 @@ Once this is installed, do
 
     $ pip install pyfftw
     
-If you have issues with `pyfftw` and can't install it, don't
-worry. Most of the notebooks do not require it and those that do are
-easily modified to work with `numpy.fft`. We can also try and get this
-working during the tutorial.
+If you have issues installing the FFTW3 requirement, don't worry. Most
+of the notebooks do not require it and those that do are easily
+modified to work with `numpy.fft`. We can also try and make this work
+during the tutorial session.
 
 ## `line_profiler`
 
-One additional package is `line_profiler`. Unfortunately, this has an issue when installing with
+One additional package is `line_profiler`. Unfortunately, this has an
+issue when installing with
 
     $ pip install line_profiler
     
@@ -89,7 +89,9 @@ If will throw an error. To install it, go to
 https://pypi.python.org/pypi/line_profiler
 
 and download and install the package by hand (rather than using
-pip). If you have issues, we can get this working during the tutorial.
+pip). On Windows, just run the `.exe` installer. On Mac and Linux,
+just get the `.tar.gz` unpack it, change to the base directory and run
+`python setup.py install`.
 
 ## Git
 
