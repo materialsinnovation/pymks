@@ -154,4 +154,6 @@ my Ubuntu laptop.
    [IPython Github repo](https://github.com/ipython/ipython.git) and
    installed it. This seemed to work.
 
+ - Andrew had the same blank screen issue in the CTCMS and he just
+   switched to the Chrome browser and it worked.
 
