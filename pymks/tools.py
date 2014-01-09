@@ -47,3 +47,23 @@ def draw_microstructure_discretization(M, a=0, s=0, Nbin=6, bound=0.016, height=
     plt.plot((v, v), (0, dx * height), 'r--', lw=3)
     plt.text(v + 0.02, dx * (1 + 0.65 * (height - 1)), Mstring, fontsize=16, color='r')
     plt.text(v + 0.02, dx * (1 + 0.2 * (height - 1)), mstring, fontsize=16, color='r')
+
+def bin(arr, Nbin):
+    r"""
+    Discretize the array `arr`, which must be between 0 and 1.
+    
+    >>> res = bin(np.array((0.2, 0.5, 0.7)), 4)
+    >>> np.allclose(res,
+    ...             [[ 0.4,  0.6,  0. ,  0. ],
+    ...              [ 0. ,  0.5,  0.5,  0. ],
+    ...              [ 0. ,  0. ,  0.9,  0.1]])
+    True
+    
+    """
+    X = np.linspace(0, 1, Nbin)
+    dX = X[1] - X[0]
+    return np.maximum(1 - abs(arr[:,None] - X) / dX, 0)
+
+if __name__ == '__main__':
+    import fipy.tests.doctestPlus
+    exec(fipy.tests.doctestPlus._getScript())
