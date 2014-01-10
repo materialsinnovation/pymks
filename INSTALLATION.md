@@ -93,6 +93,22 @@ pip). On Windows, just run the `.exe` installer. On Mac and Linux,
 download the `.tar.gz` and unpack it, change to the base directory and
 run `python setup.py install`.
 
+## Java Script Animator
+
+This installation is not strictly necessary, but allows for nice
+animations in the IPython Notebook. Clone it from Github,
+
+    $ git clone https://github.com/jakevdp/JSAnimation
+    
+and then install with
+
+    $ cd JSAnimation
+    $ python setup.py install
+
+If there are any issues, don't worry, this is only used in one place
+near the end of the Python tutorial and there is an alternative way to
+render the animation.
+
 ## Git
 
 You'll need to use Git to clone the Github
