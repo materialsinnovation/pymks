@@ -1,5 +1,12 @@
 # Materials Knowledge System Tutorial
 
+## Authors
+
+ * [Daniel Wheeler](http://wd15.github.io/about.html)
+ * [Tony Fast](http://mined.gatech.edu/the-ga-tech-mined-research-group/ga-tech-mined-research-group-tony-fast)
+ * [Surya Kalidindi](http://www.me.gatech.edu/faculty/kalidindi)
+ * [Andrew Reid]()
+
 ## Schedule
 
 See https://github.com/wd15/pymks/wiki/Workshop-Schedule
@@ -14,16 +21,32 @@ involving materials microstructure. The techniques outlined in the
 tutorials could be used in range of applications, however, the
 authors' primary interest is materials science applications.
 
-
 ## MKS Basics
 
 The details of the MKS are outlined in the notebooks. The main idea of
-the MKS relates is to calculate responses from microstructures using
-expensive calculations. The microstructures and responses are then
-linked with a linear relationship via a set of influence coefficients,
-which can then be used to make very fast calculations. See
-[Tony Fast's Thesis](http://idea.library.drexel.edu/bitstream/1860/4057/1/Fast_AnthonyPhD.pdf)
-for complete details.
+the MKS is to calculate responses from microstructures using expensive
+calculations. The microstructures and responses are then linked with a
+linear relationship via a set of influence coefficients, which can
+then be used to make very fast calculations. See the reference section
+for further reading.
+
+## References
+
+ - *Computationally-Efficient Fully-Coupled Multi-Scale Modeling of
+   Materials Phenomena Using Calibrated Localization Linkages*,
+   S. R. Kalidindi; ISRN Materials Science, vol. 2012, Article ID
+   305692, 2012,
+   [doi:10.5402/2012/305692](http://dx.doi.org/10.5402/2012/305692).
+
+ - *Formulation and Calibration of Higher-Order Elastic Localization
+   Relationships Using the MKS Approach*, Tony Fast and
+   S. R. Kalidindi; Acta Materialia, vol. 59 (11), pp. 4595-4605,
+   2011,
+   [doi:10.1016/j.actamat.2011.04.005](http://dx.doi.org/10.1016/j.actamat.2011.04.005)
+
+ - *Developing higher-order materials knowledge systems*, T. N. Fast;
+   Thesis (PhD, Materials engineering)--Drexel University, 2011,
+   [doi:1860/4057](http://dx.doi.org/1860/4057).
 
 ## License
 
@@ -63,11 +86,6 @@ each individual notebook via Figshare (or Authorea).
 The Notebooks can be viewed at
 [nbviewer.ipython.org](http://nbviewer.ipython.org/github/wd15/pymks/tree/master/notebooks/)
 and are automatically updated as changes are pushed to the repository.
-
-## Authors
-
- * [Daniel Wheeler](http://wd15.github.io/about.html)
- * [Tony Fast](http://mined.gatech.edu/the-ga-tech-mined-research-group/ga-tech-mined-research-group-tony-fast)
 
 ## Testing
 
