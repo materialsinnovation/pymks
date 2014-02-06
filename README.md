@@ -27,8 +27,8 @@ The details of the MKS are outlined in the notebooks. The main idea of
 the MKS is to calculate responses from microstructures using expensive
 calculations. The microstructures and responses are then linked with a
 linear relationship via a set of influence coefficients, which can
-then be used to make very fast calculations. See the reference section
-for further reading.
+then be used to make very fast calculations. See
+[the reference section](#references) for further reading.
 
 ## References
 
