@@ -1,29 +1,28 @@
 import pandas as pd
 import numpy as np
 import scipy as sp
-from TransferFunction import dataAnalysis
-from TransferFunction import TFmodel
-from TransferFunction import coefAnalysis
-from TransferFunction import residPlots
-from TransferFunction import dfIntegrate
-from prewhitening import xtModel
-from prewhitening import prewhitening
+import TransferFunction as tf
+
 
 fileLocation = 'C:\\Users\\PC\\Desktop\\DDHO.2.csv'
-data = pd.io.parsers.read_csv(fileLocation)
-#print type(data)
+#calibrationData = pd.io.parsers.read_csv(fileLocation)
+#tf.dataAnalysis(calibrationData)
+calibrationData = pd.io.parsers.read_csv(fileLocation)
+AR = 4
+D = 0
+Exo = 0
+Delay = 0
 
-#names = data.columns
-#data.names = names
+model = tf.TFmodel(calibrationData,AR,D,Exo,Delay)
+calibrationData = pd.io.parsers.read_csv(fileLocation)
 
-#dataAnalysis(data)
-#data = pd.io.parsers.read_csv(fileLocation)
-TFmodel(data,4,0,0,0)
-
-
-#Best fit for (2,0,1,0)
-#xt roll = len(coef) yt roll = len(coef)-2
-#Best fit for (2,1,1,0)
-#xt roll = len(coef)-1 yt roll = len(coef)-1
-#Best fit for (2,2,1,0)
-#xt roll = len(coef)-2 yt roll = len(coef)-1
+tf.TFmodelAnalysis(calibrationData,model,AR,D,Exo,Delay)
+fileLoc1 = 'C:\\Users\\PC\\Desktop\\DDHO.3.csv'
+fileLoc2 = 'C:\\Users\\PC\\Desktop\\DDHO.4.csv'
+data1 = pd.io.parsers.read_csv(fileLoc1)
+data2 = pd.io.parsers.read_csv(fileLoc2)
+tf.plot_predict(data1,model.params,AR,D,Exo,Delay)
+tf.plot_predict(data2,model.params,AR,D,Exo,Delay)
+data2 = pd.io.parsers.read_csv(fileLoc2)
+predict = tf.yt_predict(data2,model.params,AR,D,Exo,Delay)
+print predict.values[100:150]
