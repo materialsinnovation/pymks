@@ -101,7 +101,7 @@ def createExoMat(Exo,q,name,Time,D):
         
 
 
-floc = 'C:\\Users\\PC\\Desktop\\PMMAdatashort.csv'
+floc = 'C:\\Users\\dbrough3\\Documents\\GitHub\\Time_MKS\\PMMAdatashort.csv'
 ARX(floc,3,2,0,0)
 
 #To Do
