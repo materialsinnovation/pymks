@@ -63,8 +63,9 @@ def coefAnalysis(model):
     print "P-Values"
     print model.pvalues
     print " "
-    print "Mean Squared Error"
-    print np.sqrt(model.sigma2)  
+    print "Mean Squared Error of Model"
+    print np.sqrt(model.sigma2)
+    print ' '
 
 
 def residPlots(resids,Time):
@@ -74,8 +75,6 @@ def residPlots(resids,Time):
     the model
     '''
     hist = plt.hist(resids)
-    l = len(resids)
-    scat = plt.scatter(Time.values[3:l],resids.values[3:l])
     sm.graphics.qqplot(resids)
     sm.graphics.tsa.plot_pacf(resids, lags = 40)
     sm.graphics.tsa.plot_acf(resids, lags = 40)
@@ -120,7 +119,6 @@ def plot_fitted(data,params,endoOrder,diffOrder,exoOrder,delayOrder):
     from a model fit to the data (params), t
     '''
     names = data.columns
-    print names
     time = data.pop(names[0])
     yt = data.pop(names[1])
     xt = data.pop(names[2])
@@ -137,18 +135,22 @@ def plot_fitted(data,params,endoOrder,diffOrder,exoOrder,delayOrder):
             dy = dy.diff()
     xtCoef = params[0:exoOrder+1].values
     arCoef = params[exoOrder+1:exoOrder+endoOrder+1].values
-    yp = np.convolve(arCoef,dy[1:ly])+np.delete(np.convolve(xtCoef,dx),0)
+    yp = seriesARConvolve(dy,arCoef)+seriesConvolve(dx,xtCoef)
     columnName = 'Predicted'+str(names[1])
     yp = pd.Series(yp,index = yt.index)
     yp.columns = columnName
     iy = yp
     if diffOrder > 0:
         iy = dfIntegrate(yp,ICy)
-    plt.plot(time[0:10],iy[0:10])
-    plt.plot(time[0:10],yt[0:10])
-    #plt.plot(time,yp-dy)
+    error = yt.values-iy.values
+    print "Standard Error "
+    print (sp.var(np.nan_to_num(iy.values-yt.values)))**(0.5)
+    print ' '
+    plt.plot(time.values,iy.values)
+    plt.plot(time.values,yt.values)
     plt.show()
-
+    plt.plot(time.values,(yt.values-iy.values))
+    plt.show()
     
 def dfIntegrate(df,IC):
     '''
@@ -177,10 +179,49 @@ def seriesConvolve(xt,coef):
     This funciton takes in to time series and computes the convolution between
     them.
     '''
-    np.convolve(arCoef,dy[1:ly])+np.delete(np.convolve(xtCoef,dx),0)
-    
+    #Check for Nans
+    numNan = 0
+    #7 was choosen with the assumption that diffOrder <= 7
+    xtNan = np.isnan(xt).values[0:7]
+    for ii in range(7): 
+        if xtNan[ii]:
+            numNan = numNan+1
+    zt = np.convolve(xt.values[numNan:len(xt)],coef)
+    zt = zt[len(coef)-1:len(zt)] #Truncate convolution signal to match original
+    zt = np.roll(zt,len(coef)) #Aliegn Signals
+    #Add Nans again
+    for ii in range(numNan):
+        np.insert(zt,0,0)
+    zt[0:numNan] = xt.values[0]
+    #Convert back to series
+    df = pd.Series(zt)
+    df.index = xt.index[0:len(zt)]
+    return df
+
+def seriesARConvolve(yt,coef):
+    '''
+    This funciton takes in to time series and computes the convolution between
+    them.
+    '''
+    #Check for Nans
+    numNan = 0
+    #7 was choosen with the assumption that diffOrder <= 7
+    ytNan = np.isnan(yt).values[0:7]
+    for ii in range(7):
+        if ytNan[ii]:
+            numNan = numNan+1
+    zt = np.convolve(np.insert(yt.values[numNan:len(yt)],0,0),coef) #Add 0 for AR process
+    zt = zt[len(coef):len(zt)] #Truncate convolution signal to match original
+    zt = np.roll(zt,len(coef)+numNan) #Aliegn Signals
+    #Add Nans again
+    for ii in range(numNan):
+        np.insert(zt,0,0)
+    zt[0:numNan] = yt.values[0]
+    #Convert back to series
+    df = pd.Series(zt)
+    df.index = yt.index[0:len(zt)]
+    return df
 
     
 #To Do
-#Look at how to preform the convolution for an AR(p) and a MA(q) process
-#Add them to the seriesConvolve function.
+#Add validation function
