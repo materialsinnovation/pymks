@@ -165,7 +165,7 @@ def plot_fitted(data,params,ARorder,diffOrder,exoOrder,exoDelay):
     yp = seriesARConvolve(dy,params[exoOrder+1:exoOrder+ARorder+1].values)\
          +seriesConvolve(dx,params[0:exoOrder+1].values,exoDelay)
     #Name series and create index
-    columnName = 'Predicted '+str(names[1])
+    columnName = 'Calibrated '+str(names[1])
     yp = pd.Series(yp,index = yt.index)
     yp.columns = columnName
     #Integrate series back to original form
