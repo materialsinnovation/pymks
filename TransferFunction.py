@@ -176,10 +176,12 @@ def plot_fitted(data,params,ARorder,diffOrder,exoOrder,exoDelay):
     print "Standard Error of Calibration"
     print (sp.var(np.nan_to_num(iy.values-yt.values)))**(0.5)
     print ' '
+    plt.subplot(211)
     plt.plot(time.values,iy.values, label = columnName)
     plt.plot(time.values,yt.values, label = names[1])
     plt.legend()
-    plt.show()
+    #plt.show()
+    plt.subplot(212)
     plt.plot(time.values,(yt.values-iy.values),label = 'Calibration Error')
     plt.legend()
     plt.show()
@@ -222,10 +224,12 @@ def plot_predict(dataset,params,ARorder,diffOrder,exoOrder,exoDelay):
     print (sp.var(np.nan_to_num(iy.values-yt.values)))**(0.5)
     print ' '
     #generate plots
+    plt.subplot(211)
     plt.plot(time.values,iy.values, label = columnName)
     plt.plot(time.values,yt.values, label = names[1])
     plt.legend()
-    plt.show()
+    #plt.show()
+    plt.subplot(212)
     plt.plot(time.values,(yt.values-iy.values), label = 'Prediction Error')
     plt.legend()
     plt.show()
