@@ -9,9 +9,9 @@ fileLocation = os.path.abspath('DDHO.2.csv')
 calibrationData = pd.io.parsers.read_csv(fileLocation)
 tf.dataAnalysis(calibrationData)
 calibrationData = pd.io.parsers.read_csv(fileLocation)
-AR = 4
-D = 0
-Exo = 0
+AR = 2
+D = 1
+Exo = 1
 Delay = 0
 
 model = tf.TFmodel(calibrationData,AR,D,Exo,Delay)

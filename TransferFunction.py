@@ -119,7 +119,7 @@ def createExoMat(Exo,q,name,Time,D):
     l = len(Exo)
     Time = Time[(q+D):l]
     #Shorten time series
-    X = pd.DataFrame(Exo[(D):l-q])
+    X = pd.DataFrame(Exo[(q+D):l])
     #Generate names
     if D != 0:
         x = X.pop(name)
@@ -130,11 +130,12 @@ def createExoMat(Exo,q,name,Time,D):
     #Create dataframe of terms
     for ii in range(q):
         columnName = 'L'+str(ii+1+D)+'.'+name
-        tempSeries = pd.Series(Exo[D+ii+1:l-(q-ii-1)])
+        tempSeries = pd.Series(Exo[D+q-ii-1:l-(ii+1)])
         tempSeries.name = columnName
         tempSeries.columns = columnName
         tempSeries.index = pd.to_datetime(Time)
         X[columnName] = tempSeries
+    print X[97:102]
     return X
         
 
