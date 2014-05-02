@@ -28,8 +28,8 @@ Basic administrative procedures.
  * In general make an issue before a major branch and call the branch
    "issueXX-my_branch".
 
- * Use Fix #XX, when merging the branch if issues is fixed and address
-   #XX for all commits.
+ * Use `Fix #XX`, when merging the branch if issues is fixed and
+   `address #XX` for all commits.
 
 ## Commit Messages
 
