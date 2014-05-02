@@ -14,14 +14,16 @@ Basic administrative procedures.
 
  * Run autopep8
 
- * Use the package `coverage` to check test coverage
+ * Use the package
+   ["coverage"](https://pypi.python.org/pypi/coverage/3.7.1) to check
+   test coverage
 
 ## Docs
 
  * Use Sphinx
 
- * All documentation with Google Python doc style,
-   http://google-styleguide.googlecode.com/svn/trunk/pyguide.html#Comments
+ * All documentation with
+   [Google Python doc styling](http://google-styleguide.googlecode.com/svn/trunk/pyguide.html#Comments).
 
 ## Branching
 
