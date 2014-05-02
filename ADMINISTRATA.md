@@ -6,6 +6,8 @@ Basic administrative procedures.
 
  * Push all branches for code review before merging to master.
 
+ * The reviewer should test [code integrity](#code-integrity).
+
  * The author of the branch should not merge.
 
 ## Code Integrity
@@ -35,7 +37,7 @@ Basic administrative procedures.
 
 ## Commit Messages
 
-Use the following template:
+Run tests before comitting. Use the following template:
 
 ```
 # Header, 50 characters or less
