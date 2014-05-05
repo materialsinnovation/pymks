@@ -8,10 +8,6 @@
  * [Surya Kalidindi](http://www.me.gatech.edu/faculty/kalidindi)
  * [Andrew Reid]()
 
-## Schedule
-
-See https://github.com/wd15/pymks/wiki/Workshop-Schedule
-
 ## Overview
 
 The goal of this project is to provide a Python repository code base
