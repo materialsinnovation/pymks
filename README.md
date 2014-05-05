@@ -1,8 +1,9 @@
-# Materials Knowledge System Tutorial
+# Materials Knowledge System Repository
 
 ## Authors
 
  * [Daniel Wheeler](http://wd15.github.io/about.html)
+ * [David Brough](https://github.com/davidbrough1)
  * [Tony Fast](http://mined.gatech.edu/the-ga-tech-mined-research-group/ga-tech-mined-research-group-tony-fast)
  * [Surya Kalidindi](http://www.me.gatech.edu/faculty/kalidindi)
  * [Andrew Reid]()
@@ -13,13 +14,14 @@ See https://github.com/wd15/pymks/wiki/Workshop-Schedule
 
 ## Overview
 
-The goal of this project is to provide a tutorial for the Materials
-Knowledge System (MKS) as a set of IPython notebooks. The MKS is a a
-method of using spatial statistics to improve the efficiency and
-efficacy of multiscale simulations and experimental characterization
-involving materials microstructure. The techniques outlined in the
-tutorials could be used in range of applications, however, the
-authors' primary interest is materials science applications.
+The goal of this project is to provide a Python repository code base
+for the Materials Knowledge System (MKS) as well as a set of example
+IPython notebooks. The MKS is a a method of using spatial statistics
+to improve the efficiency and efficacy of multiscale simulations and
+experimental characterization involving materials microstructure. The
+techniques outlined in the repository could be used in a range of
+applications, however, the authors' primary interest is materials
+science applications.
 
 ## MKS Basics
 
