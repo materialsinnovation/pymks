@@ -74,10 +74,9 @@ may help.
  * line-profiler 1.0b3
  * numexpr 2.2.2
 
-## Citing the Notebooks
+## Citing
 
-The plan is to either add a citable DOI for the entire project or for
-each individual notebook via Figshare (or Authorea).
+See [CITATION.md](CITATION.md).
 
 ## Viewing the Notebooks
 
