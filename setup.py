@@ -7,5 +7,6 @@ setup(name='pymks',
       author='Daniel Wheeler',
       author_email='daniel.wheeler2@gmail.com',
       url='http://wd15.github.com/pymks',
-      packages=find_packages()
+      packages=find_packages(),
+      package_data = {'' : ['tests/*.py']}
       )

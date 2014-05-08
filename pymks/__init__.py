@@ -1,3 +1,6 @@
+import os
+
+
 from mksRegressionModel import MKSRegressionModel
 from fastmksRegressionModel import FastMKSRegressionModel
 from fipyCHModel import FiPyCHModel
@@ -5,16 +8,14 @@ from tools import draw_microstructure_discretization
 import pymks.mksRegressionModel
 import pymks.fastmksRegressionModel
 from tools import bin
+import nose
 
-def test():
+def _test():
     r"""
     Run all the doctests available.
     """
-    import doctest
-    doctest.testmod(pymks.mksRegressionModel)
-    doctest.testmod(pymks.fastmksRegressionModel)
-    doctest.testmod(pymks.tools)
-
+    path = os.path.split(__file__)[0]
+    nose.main(argv=['-w', path, '--with-doctest'])
 
 def _getVersion():
     from pkg_resources import get_distribution, DistributionNotFound
