@@ -223,10 +223,8 @@ class MKSRegressionModel(LinearRegression):
         >>> y_test = fipy_model.predict(X_test)
         >>> y_pred = model.predict(X_test)
         >>> assert mse(y_test, y_pred) < 0.03
-
         """
         pass
-    
-if __name__ == '__main__':
-    import fipy.tests.doctestPlus
-    exec(fipy.tests.doctestPlus._getScript())
+
+
+
