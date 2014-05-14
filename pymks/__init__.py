@@ -9,8 +9,10 @@ import pymks.mksRegressionModel
 import pymks.fastmksRegressionModel
 from tools import bin
 import nose
+from nose.tools import nottest
 
-def _test():
+@nottest
+def test():
     r"""
     Run all the doctests available.
     """
