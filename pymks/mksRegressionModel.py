@@ -50,34 +50,46 @@ class MKSRegressionModel(LinearRegression):
     Check the result
 
     >>> assert np.allclose(coeff, model.coeff)
-
+    
+    Attributes:
+        Nbin: Interger value for number of local states
+        coef: Array of values that are the influence coefficients
+        Fcoef: Frequency space representation of coef
     """
     
     def __init__(self, Nbin=10):
         r"""
-        Create an `MKSRegressionModel`.
+        Inits an `MKSRegressionModel`.
 
-        :Parameters:
-         - `Nbin`: is the number of discretization bins for the
-           "microstructure".
+        Args:
+            Nbin: is the number of discretization bins in the local
+            state space.
         """
-        
         self.Nbin = Nbin
 
     def _axes(self, X):
         r"""
-        Return the axes argument for `fftn`.
+        
+        Generate argument for fftn.
 
         >>> X = np.zeros((5, 2, 2, 2))
         >>> print MKSRegressionModel()._axes(X)
         [1 2 3]
+
+        Args:
+            X: Array representing the microstructure.
+        Returns:
+            Array uses for axis argument in fftn.
+
         """
         
+
+
         return np.arange(len(X.shape) - 1) + 1
         
     def _bin(self, X):
         """
-        Bin the microstructure.
+        Generate the microstructure function.
 
         >>> Nbin = 10
         >>> np.random.seed(4)
@@ -86,7 +98,11 @@ class MKSRegressionModel(LinearRegression):
         >>> H = np.linspace(0, 1, Nbin)
         >>> Xtest = np.sum(X_ * H[None,None,None,:], axis=-1)
         >>> assert np.allclose(X, Xtest)
-
+        
+        Args:
+            X: Array representing the Microstructure
+        Returns:
+            Microstructure function
         """
         H = np.linspace(0, 1, self.Nbin)
         return np.maximum(1 - (abs(X[..., None] - H)) / (H[1] - H[0]) , 0)
@@ -103,6 +119,11 @@ class MKSRegressionModel(LinearRegression):
         >>> H = np.linspace(0, 1, Nbin)
         >>> Xtest = np.sum(X_ * H[None,None,None,:], axis=-1)
         >>> assert np.allclose(X, Xtest)
+        
+        Args:
+            X: Array representing the microstructure
+        Returns:
+            Microstructure function in frequency space
 
         """
         Xbin = self._bin(X)
@@ -121,11 +142,11 @@ class MKSRegressionModel(LinearRegression):
         ...                                   [[-0.5,  0  ], [-1, 0]]])
 
 
-        :Parameters:
-         - `X`: the microstructre, an `(S, N, ...)` shaped array where
-           `S` is the number of samples and `N` is the spatial
-           discretization.
-         - `y`: the response, same shape as 
+        Args:
+            X: the microstructre function, an `(S, N, ...)` shaped array where
+                `S` is the number of samples and `N` is the spatial
+               discretization.
+            y: The response field, same shape as as `X`. 
         """
         
         assert len(y.shape) > 1
@@ -144,7 +165,8 @@ class MKSRegressionModel(LinearRegression):
             
     def predict(self, X):
         r"""
-        Calculates a response from the microstructure `X`.
+        Calculate a new response from the microstructure function `X` with calibrated
+        influence coefficients.
 
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
         >>> y = X.swapaxes(1, 2)
@@ -152,13 +174,13 @@ class MKSRegressionModel(LinearRegression):
         >>> model.fit(X, y)
         >>> assert np.allclose(y, model.predict(X))
 
-        :Parameters:
-         - `X`: the microstructre, an `(S, N, ...)` shaped array where
-           `S` is the number of samples and `N` is the spatial
-           discretization.
+        Args:
+            X: The microstructre function, an `(S, N, ...)` shaped 
+                array where `S` is the number of samples and `N` 
+                is the spatial discretization.
 
-        :Return:
-         - the response, same shape as `X`
+        Returns:
+            The predicted response field the same shape as `X`.
            
         """
         assert X.shape[1:] == self.Fcoeff.shape[:-1]
@@ -170,8 +192,6 @@ class MKSRegressionModel(LinearRegression):
         r"""
         Scale the size of the coefficients and pad with zeros.
 
-        :Parameters:
-         - `shape`: the new shape of the coefficients
         
         >>> model = MKSRegressionModel()
         >>> coeff = np.arange(20).reshape((5, 4, 1))
@@ -190,6 +210,11 @@ class MKSRegressionModel(LinearRegression):
         ...                     [12, 13, 0, 0, 0, 14, 15], 
         ...                     [16, 17, 0, 0, 0, 18, 19]]) 
         
+        Args:
+            shape: The new shape of the influence coefficients.
+        Returns:
+            The resized influence coefficients to size 'shape'.
+
         """
         assert len(shape) == len(self.Fcoeff.shape) - 1
         assert np.all(shape >= self.Fcoeff.shape[:-1])

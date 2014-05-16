@@ -4,14 +4,18 @@ import numpy as np
 import pyfftw
 
 class FastMKSRegressionModel(MKSRegressionModel):
+    r"""
+    This class is an optimized version of MKSRegressionModel
+    """
+    
     def __init__(self, Nbin=10, threads=1):
         r"""
         Create a `FastMKSRegressionModel`.
 
-        :Parameters:
-         - `Nbin`: is the number of discretization bins for the
-           "microstructure".
-         - `threads`: the number of threads to use for multi-threading.
+        Args:
+            Nbin: is the number of discretization bins for the
+                "microstructure function".
+            threads: the number of threads to use for multi-threading.
          
         """
         super(FastMKSRegressionModel, self).__init__(Nbin=Nbin)
@@ -29,7 +33,11 @@ class FastMKSRegressionModel(MKSRegressionModel):
         >>> H = np.linspace(0, 1, Nbin)
         >>> Xtest = np.sum(X_ * H[None,None,None,:], axis=-1)
         >>> assert np.allclose(X, Xtest)
-
+        
+        Args:
+            X: Array representing the microstructure
+        Returns:
+            Array representing the microstructure function
         """
         H = np.linspace(0, 1, self.Nbin)
         dh = H[1] - H[0]
@@ -50,16 +58,42 @@ class FastMKSRegressionModel(MKSRegressionModel):
         >>> Xtest = np.sum(X_ * H[None,None,None,:], axis=-1)
         >>> assert np.allclose(X, Xtest)
 
+        Args:
+            X: Array representing the microstructure.
+        Returns:
+            Array representing the microstructure function in 
+            in frequency space.
+        
         """
         Xbin = self._bin(X)
         return self._fftn(Xbin, axes=self._axes(X))
 
     def _fftplan(self, a, axes, direction='FFTW_FORWARD'):
+        r"""
+        Helper function used 
+
+        Args:
+            a:
+            axes:
+            direction:
+        Returns:
+            
+        """
         input_array = pyfftw.n_byte_align_empty(a.shape, 16, 'complex128')
         output_array = pyfftw.n_byte_align_empty(a.shape, 16, 'complex128')
         return pyfftw.FFTW(input_array, output_array, threads=self.threads, axes=axes, direction=direction)
 
     def _calcfft(self, a, axes, direction='FFTW_FORWARD'):
+        r"""
+        
+        Args:
+            a:
+            axes:
+            direction:
+        Returns:
+        
+
+        """
         if hasattr(self, direction):
             input_array = getattr(self, direction).get_input_array()
             if input_array.shape != a.shape:
@@ -87,13 +121,13 @@ class FastMKSRegressionModel(MKSRegressionModel):
         >>> model.fit(X, y)
         >>> assert np.allclose(y, model.predict(X))
 
-        :Parameters:
-         - `X`: the microstructre, an `(S, N, ...)` shaped array where
-           `S` is the number of samples and `N` is the spatial
-           discretization.
+        Args:
+            X: The microstructre function, an `(S, N, ...)` shaped 
+                array where `S` is the number of samples and `N` 
+                is the spatial discretization.
 
-        :Return:
-         - the response, same shape as `X`
+        Returns:
+            The predicted response field the same shape as `X`
            
         """
         assert X.shape[1:] == self.Fcoeff.shape[:-1]

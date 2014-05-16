@@ -3,7 +3,30 @@ from fipy.solvers.scipy.linearLUSolver import LinearLUSolver
 import numpy as np
 
 class FiPyCHModel(object):
+    r"""
+    
+    This class 
+
+    Attributes:
+        dx: Grid spacing in the horizontal direction.
+        dy: Grid spacing in the vertical direction.
+        dt: Time step of the simulation.
+        a: Float value used to scale the 2nd-Order diffusion term.
+        epsilon: Float value used in the 4th-order diffusion term.
+
+    """
     def __init__(self, dx=0.005, dy=None, dt=1e-8, a=np.sqrt(200.), epsilon=0.1):
+        r"""
+        Inits a FiPyCHModel.
+
+
+        Args:
+            dx: Grid spacing in the horizontal direction.
+            dy: Grid spacing in the vertical direction.
+            dt: Time step of the simulation.
+            a: Float value used to scale the 2nd-Order diffusion term.
+            epsilon: Float value used in the 4th-order diffusion term.
+        """
         self.dx = dx
         if dy is None:
             self.dy = dx
@@ -17,6 +40,16 @@ class FiPyCHModel(object):
         raise NotImplementedError
     
     def predict(self, X):
+        r"""
+        Predict the simulation for the next time step using Fipy.
+
+        Args:
+            X: Array representing the microstructure.
+        Returns:
+            y: Array representing the microstructure at
+                at one time step ahead of 'X'.
+
+        """
         S, nx, ny = X.shape
         y = np.zeros(X.shape, dtype='d')
         mesh = fp.PeriodicGrid2D(nx=nx, ny=ny, dx=self.dx, dy=self.dy)
@@ -38,6 +71,15 @@ class FiPyCHModel(object):
         return y
 
     def _solve(self, eq, phi, solver, dt):
+        r"""
+        Helper function used in `predict`
+
+        Args:
+            eq: 
+            phi:
+            solver:
+            dt:
+        """
         res = 1e+10
         
         for sweep in range(5):

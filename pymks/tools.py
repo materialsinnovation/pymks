@@ -4,6 +4,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def draw_microstructure_discretization(M, a=0, s=0, Nbin=6, bound=0.016, height=1.7):
+    r"""
+    Creates a diagram of the 
+
+    Args:
+        M: Microstructure
+        a: 
+        s:
+        Nbin:
+        bound:
+        height:
+    """
+    
     ax = plt.axes()
     dx = 1. / (Nbin - 1.)
 
@@ -58,7 +70,13 @@ def bin(arr, Nbin):
     ...              [ 0. ,  0.5,  0.5,  0. ],
     ...              [ 0. ,  0. ,  0.9,  0.1]])
     True
-    
+
+    Args:
+        arr: Array that must be between 0 and 1.
+        Nbin: Integer value representing the number of local states
+             in the local state space of the microstructure function.
+    Returns:
+        Microstructure function for array `arr`.
     """
     X = np.linspace(0, 1, Nbin)
     dX = X[1] - X[0]
