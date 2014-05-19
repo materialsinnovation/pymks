@@ -17,6 +17,8 @@ from sfepy.solvers.ls import ScipyDirect
 from sfepy.solvers.nls import Newton
 from sfepy.postprocess import Viewer
 import sfepy.discrete.fem.periodic as per
+from sfepy.discrete import Functions
+
 
 def shift_u_fun(ts, coors, bc=None, problem=None, shift=0.0):
     """
@@ -94,8 +96,8 @@ def main():
     bc_fun = Function('shift_u_fun', shift_u_fun, extra_args={'shift' : 0.01})
     shift_u = EssentialBC('shift_u', gamma2, {'u.0' : bc_fun})
 
-    match_y_line = Function('match_y_line', per.match_y_line)
-    periodic_y = PeriodicBC('periodic_y', [gamma_top, gamma_bottom], {'u.all' : 'u.all'}, match=match_y_line)
+    match_x_line = Function('match_x_line', per.match_x_line)
+    periodic_y = PeriodicBC('periodic_y', [gamma_top, gamma_bottom], {'u.all' : 'u.all'}, match='match_x_line')
 
     ls = ScipyDirect({})
 
@@ -104,8 +106,10 @@ def main():
 
     pb = Problem('elasticity', equations=eqs, nls=nls, ls=ls)
     pb.save_regions_as_groups('regions')
-
-    pb.time_update(ebcs=Conditions([fix_u, shift_u, periodic_y]))
+    functions = Functions([bc_fun, match_x_line])
+    pb.time_update(ebcs=Conditions([fix_u, shift_u]),
+                   epbcs=Conditions([periodic_y]),
+                   functions=functions)
 
     vec = pb.solve()
     print nls_status
