@@ -5,6 +5,8 @@ import numpy as nm
 import sys
 sys.path.append('.')
 
+
+
 from sfepy.base.base import IndexedStruct
 from sfepy.discrete import (FieldVariable, Material, Integral, Function,
                             Equation, Equations, Problem)
@@ -55,13 +57,18 @@ def main():
     u = FieldVariable('u', 'unknown', field)
     v = FieldVariable('v', 'test', field, primary_var_name='u')
 
-    def lam_fun(ts, coors, bc=None, problem=None):
-        value = 9. * (coors[:,0] > .25) + 1.
-        return value
+    def lam_func_(ts, coors, mode=None, **kwargs):
+        if mode != 'qp':
+            return
+        else:
+            value = 100. * (coors[:, 0] > .25) + 0.01
+            value.shape = (coors.shape[0], 1, 1)
+            one = nm.ones_like(value)
+            return {'lam' : value, 'mu' : one}
 
-    lam_func = Function('lam_fun', lam_fun)
-    
-    m = Material('m', lam=lam_func, mu=1.0)
+    lam_func = Function('lam_func_', lam_func_)
+        
+    m = Material('m', function=lam_func)
     f = Material('f', val=[[0.02], [0.01]])
 
     integral = Integral('i', order=3)
