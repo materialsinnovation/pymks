@@ -11,8 +11,8 @@ class FiPyCHModel(object):
         dx: Grid spacing in the horizontal direction.
         dy: Grid spacing in the vertical direction.
         dt: Time step of the simulation.
-        a: Float value used to scale the 2nd-Order diffusion term.
-        epsilon: Float value used in the 4th-order diffusion term.
+        a: Float value used to scale the weight of the double well potential.
+        epsilon: Float value used to scale the weight of the gradient energy term
 
     """
     def __init__(self, dx=0.005, dy=None, dt=1e-8, a=np.sqrt(200.), epsilon=0.1):
@@ -24,8 +24,8 @@ class FiPyCHModel(object):
             dx: Grid spacing in the horizontal direction.
             dy: Grid spacing in the vertical direction.
             dt: Time step of the simulation.
-            a: Float value used to scale the 2nd-Order diffusion term.
-            epsilon: Float value used in the 4th-order diffusion term.
+            a: Float value used to scale the weight of the double well potential.
+            epsilon: Float value used to scale the weight of the gradient energy term.
         """
         self.dx = dx
         if dy is None:

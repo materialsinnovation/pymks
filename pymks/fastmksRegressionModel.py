@@ -5,7 +5,7 @@ import pyfftw
 
 class FastMKSRegressionModel(MKSRegressionModel):
     r"""
-    This class is an optimized version of MKSRegressionModel
+    This class is an optimized version of MKSRegressionModel class.
     """
     
     def __init__(self, Nbin=10, threads=1):
@@ -70,28 +70,25 @@ class FastMKSRegressionModel(MKSRegressionModel):
 
     def _fftplan(self, a, axes, direction='FFTW_FORWARD'):
         r"""
-        Helper function used 
-
-        Args:
-            a:
-            axes:
-            direction:
-        Returns:
-            
+        Helper function used in _calcfft
         """
+
         input_array = pyfftw.n_byte_align_empty(a.shape, 16, 'complex128')
         output_array = pyfftw.n_byte_align_empty(a.shape, 16, 'complex128')
         return pyfftw.FFTW(input_array, output_array, threads=self.threads, axes=axes, direction=direction)
 
     def _calcfft(self, a, axes, direction='FFTW_FORWARD'):
         r"""
-        
+        Helper function that does the performs the fast fourier
+        transform algorithm.
+
         Args:
-            a:
-            axes:
-            direction:
+            a: Array that will be transformed to frequency space.
+            axes: Dimension of `a` that will be transformed
+            direction: The direction of the transform
         Returns:
-        
+            An array that has the dimensions `axes` transformed to
+            frequency space.
 
         """
         if hasattr(self, direction):
@@ -106,9 +103,29 @@ class FastMKSRegressionModel(MKSRegressionModel):
         return getattr(self, direction)()
 
     def _fftn(self, a, axes):
+        r"""
+        Computes the FFT of `a` along dimensions `axes`.
+        
+        Args:
+            a: Array to be transformed
+            axes: Dimension where the transform will occur
+        Returns:
+            An array that has been transformed from real space
+            to frequency space along dimensions `axes`.
+        """
         return self._calcfft(a, axes, direction='FFTW_FORWARD')
 
     def _ifftn(self, a, axes):
+        r"""
+        Computes the iFFT of `a` along dimensions `axes`.
+
+        Args:
+            a: Array to be transformed
+            axes: Dimensions where the transform will occur
+        Returns:
+            An array that has been transformed from frequency space
+            to real space along dimensions `axes`.
+        """
         return self._calcfft(a, axes, direction='FFTW_BACKWARD')
     
     def predict(self, X):
@@ -122,7 +139,7 @@ class FastMKSRegressionModel(MKSRegressionModel):
         >>> assert np.allclose(y, model.predict(X))
 
         Args:
-            X: The microstructre function, an `(S, N, ...)` shaped 
+            X: The microstructure function, an `(S, N, ...)` shaped 
                 array where `S` is the number of samples and `N` 
                 is the spatial discretization.
 

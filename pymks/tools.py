@@ -5,15 +5,14 @@ import numpy as np
 
 def draw_microstructure_discretization(M, a=0, s=0, Nbin=6, bound=0.016, height=1.7):
     r"""
-    Creates a diagram of the 
+    Creates a diagram to illustrate the binning of a continues values in local state
+    space.
 
     Args:
-        M: Microstructure
-        a: 
-        s:
-        Nbin:
-        bound:
-        height:
+        Array representing a microstructure with a continuous variable.
+    Returns:
+        Image of the continuous local state binned discretely in the local
+        state space.
     """
     
     ax = plt.axes()

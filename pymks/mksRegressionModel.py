@@ -146,7 +146,7 @@ class MKSRegressionModel(LinearRegression):
             X: the microstructre function, an `(S, N, ...)` shaped array where
                 `S` is the number of samples and `N` is the spatial
                discretization.
-            y: The response field, same shape as as `X`. 
+            y: The response field, same shape as `X`. 
         """
         
         assert len(y.shape) > 1
