@@ -12,16 +12,17 @@ from sfepy.discrete import (FieldVariable, Material, Integral, Function,
                             Equation, Equations, Problem)
 from sfepy.discrete.fem import Mesh, Domain, Field
 from sfepy.terms import Term
-from sfepy.discrete.conditions import Conditions, EssentialBC
+from sfepy.discrete.conditions import Conditions, EssentialBC, PeriodicBC
 from sfepy.solvers.ls import ScipyDirect
 from sfepy.solvers.nls import Newton
 from sfepy.postprocess import Viewer
+import sfepy.discrete.fem.periodic as per
 
 def shift_u_fun(ts, coors, bc=None, problem=None, shift=0.0):
     """
     Define a displacement depending on the y coordinate.
     """
-    val = shift * coors[:,1]**2
+    val = shift * nm.ones_like(coors[:, 1])
     return val
 
 
@@ -32,7 +33,8 @@ help = {
 
 def main():
     from sfepy import data_dir
-
+    import pdb; pdb.set_trace()
+    
     parser = OptionParser(usage=usage, version='%prog')
     parser.add_option('-s', '--show',
                       action="store_true", dest='show',
@@ -44,6 +46,8 @@ def main():
 
     min_x, max_x = domain.get_mesh_bounding_box()[:,0]
     eps = 1e-8 * (max_x - min_x)
+    min_y, max_y = domain.get_mesh_bounding_box()[:,1]
+    
     omega = domain.create_region('Omega', 'all')
     gamma1 = domain.create_region('Gamma1',
                                   'vertices in x < %.10f' % (min_x + eps),
@@ -51,6 +55,12 @@ def main():
     gamma2 = domain.create_region('Gamma2',
                                   'vertices in x > %.10f' % (max_x - eps),
                                   'facet')
+    gamma_bottom = domain.create_region('Gamma_bottom',
+                                        'vertices in y < %.10f' % (min_y + eps),
+                                        'facet')
+    gamma_top = domain.create_region('Gamma_top',
+                                     'vertices in y > %.10f' % (max_y - eps),
+                                     'facet')
 
     field = Field.from_args('fu', nm.float64, 'vector', omega, approx_order=2)
 
@@ -61,7 +71,7 @@ def main():
         if mode != 'qp':
             return
         else:
-            value = 100. * (coors[:, 0] > .25) + 0.01
+            value = 1. * (coors[:, 0] > .25) + 1.
             value.shape = (coors.shape[0], 1, 1)
             one = nm.ones_like(value)
             return {'lam' : value, 'mu' : one}
@@ -69,7 +79,7 @@ def main():
     lam_func = Function('lam_func_', lam_func_)
         
     m = Material('m', function=lam_func)
-    f = Material('f', val=[[0.02], [0.01]])
+    f = Material('f', val=[[0.0], [0.0]])
 
     integral = Integral('i', order=3)
 
@@ -84,6 +94,9 @@ def main():
     bc_fun = Function('shift_u_fun', shift_u_fun, extra_args={'shift' : 0.01})
     shift_u = EssentialBC('shift_u', gamma2, {'u.0' : bc_fun})
 
+    match_y_line = Function('match_y_line', per.match_y_line)
+    periodic_y = PeriodicBC('periodic_y', [gamma_top, gamma_bottom], {'u.all' : 'u.all'}, match=match_y_line)
+
     ls = ScipyDirect({})
 
     nls_status = IndexedStruct()
@@ -92,7 +105,7 @@ def main():
     pb = Problem('elasticity', equations=eqs, nls=nls, ls=ls)
     pb.save_regions_as_groups('regions')
 
-    pb.time_update(ebcs=Conditions([fix_u, shift_u]))
+    pb.time_update(ebcs=Conditions([fix_u, shift_u, periodic_y]))
 
     vec = pb.solve()
     print nls_status
