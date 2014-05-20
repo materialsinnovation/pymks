@@ -1,5 +1,4 @@
-import fipy as fp
-from fipy.solvers.scipy.linearLUSolver import LinearLUSolver
+
 import numpy as np
 
 class FiPyCHModel(object):
@@ -17,6 +16,7 @@ class FiPyCHModel(object):
         raise NotImplementedError
     
     def predict(self, X):
+        import fipy as fp
         S, nx, ny = X.shape
         y = np.zeros(X.shape, dtype='d')
         mesh = fp.PeriodicGrid2D(nx=nx, ny=ny, dx=self.dx, dy=self.dy)
@@ -30,18 +30,16 @@ class FiPyCHModel(object):
         for i, x in enumerate(X):
             phi[:] = x.flatten()
             phi.updateOld()
-            self._solve(eq, phi, LinearLUSolver(), self.dt)
-            #            eq.solve(phi, dt=self.dt, solver=LinearLUSolver())
+            self._solve(eq, phi, self.dt)
             phi_ij = np.array(phi).reshape((nx, ny))
             y[i] = (phi_ij - x) / self.dt 
 
         return y
 
-    def _solve(self, eq, phi, solver, dt):
-        res = 1e+10
+    def _solve(self, eq, phi, dt):
+        from fipy.solvers.scipy.linearLUSolver import LinearLUSolver
         
         for sweep in range(5):
-            res = eq.sweep(phi, dt=dt, solver=LinearLUSolver())
-            #    print 'res',res
+            eq.sweep(phi, dt=dt, solver=LinearLUSolver())
             
 

@@ -1,7 +1,6 @@
 from mksRegressionModel import MKSRegressionModel
 import numexpr as ne
 import numpy as np
-import pyfftw
 
 class FastMKSRegressionModel(MKSRegressionModel):
     def __init__(self, Nbin=10, threads=1):
@@ -55,6 +54,7 @@ class FastMKSRegressionModel(MKSRegressionModel):
         return self._fftn(Xbin, axes=self._axes(X))
 
     def _fftplan(self, a, axes, direction='FFTW_FORWARD'):
+        import pyfftw
         input_array = pyfftw.n_byte_align_empty(a.shape, 16, 'complex128')
         output_array = pyfftw.n_byte_align_empty(a.shape, 16, 'complex128')
         return pyfftw.FFTW(input_array, output_array, threads=self.threads, axes=axes, direction=direction)
