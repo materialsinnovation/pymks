@@ -3,7 +3,9 @@ from sklearn.linear_model import LinearRegression
 from sklearn import metrics
 mse = metrics.mean_squared_error
 
+
 class MKSRegressionModel(LinearRegression):
+
     r"""
     The `MKSRegressionModel` fits data using the Materials Knowledge
     System in Fourier Space. Currently, the model assumes that the
@@ -50,13 +52,13 @@ class MKSRegressionModel(LinearRegression):
     Check the result
 
     >>> assert np.allclose(coeff, model.coeff)
-    
+
     Attributes:
         Nbin: Interger value for number of local states
         coef: Array of values that are the influence coefficients
         Fcoef: Frequency space representation of coef
     """
-    
+
     def __init__(self, Nbin=10):
         r"""
         Inits an `MKSRegressionModel`.
@@ -69,7 +71,7 @@ class MKSRegressionModel(LinearRegression):
 
     def _axes(self, X):
         r"""
-        
+
         Generate argument for fftn.
 
         >>> X = np.zeros((5, 2, 2, 2))
@@ -82,11 +84,9 @@ class MKSRegressionModel(LinearRegression):
             Array uses for axis argument in fftn.
 
         """
-        
-
 
         return np.arange(len(X.shape) - 1) + 1
-        
+
     def _bin(self, X):
         """
         Generate the microstructure function.
@@ -98,14 +98,14 @@ class MKSRegressionModel(LinearRegression):
         >>> H = np.linspace(0, 1, Nbin)
         >>> Xtest = np.sum(X_ * H[None,None,None,:], axis=-1)
         >>> assert np.allclose(X, Xtest)
-        
+
         Args:
             X: Array representing the Microstructure
         Returns:
             Microstructure function
         """
         H = np.linspace(0, 1, self.Nbin)
-        return np.maximum(1 - (abs(X[..., None] - H)) / (H[1] - H[0]) , 0)
+        return np.maximum(1 - (abs(X[..., None] - H)) / (H[1] - H[0]), 0)
 
     def _binfft(self, X):
         r"""
@@ -119,7 +119,7 @@ class MKSRegressionModel(LinearRegression):
         >>> H = np.linspace(0, 1, Nbin)
         >>> Xtest = np.sum(X_ * H[None,None,None,:], axis=-1)
         >>> assert np.allclose(X, Xtest)
-        
+
         Args:
             X: Array representing the microstructure
         Returns:
@@ -128,7 +128,7 @@ class MKSRegressionModel(LinearRegression):
         """
         Xbin = self._bin(X)
         return np.fft.fftn(Xbin, axes=self._axes(X))
-        
+
     def fit(self, X, y):
         r"""
         Fits the data by calculating a set of influence coefficients,
@@ -146,9 +146,9 @@ class MKSRegressionModel(LinearRegression):
             X: the microstructre function, an `(S, N, ...)` shaped array where
                 `S` is the number of samples and `N` is the spatial
                discretization.
-            y: The response field, same shape as `X`. 
+            y: The response field, same shape as `X`.
         """
-        
+
         assert len(y.shape) > 1
         assert y.shape == X.shape
         FX = self._binfft(X)
@@ -160,9 +160,10 @@ class MKSRegressionModel(LinearRegression):
             if np.all(np.array(ijk) == 0):
                 s1 = s0
             else:
-                s1 = (slice(-1),) 
-            self.Fcoeff[ijk + s1] = np.linalg.lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk])[0]
-            
+                s1 = (slice(-1),)
+            self.Fcoeff[
+                ijk + s1] = np.linalg.lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk])[0]
+
     def predict(self, X):
         r"""
         Calculate a new response from the microstructure function `X` with calibrated
@@ -175,24 +176,24 @@ class MKSRegressionModel(LinearRegression):
         >>> assert np.allclose(y, model.predict(X))
 
         Args:
-            X: The microstructre function, an `(S, N, ...)` shaped 
-                array where `S` is the number of samples and `N` 
+            X: The microstructre function, an `(S, N, ...)` shaped
+                array where `S` is the number of samples and `N`
                 is the spatial discretization.
 
         Returns:
             The predicted response field the same shape as `X`.
-           
+
         """
         assert X.shape[1:] == self.Fcoeff.shape[:-1]
         FX = self._binfft(X)
-        Fy = np.sum(FX * self.Fcoeff[None,...], axis=-1)
+        Fy = np.sum(FX * self.Fcoeff[None, ...], axis=-1)
         return np.fft.ifftn(Fy, axes=self._axes(X)).real
 
     def resize_coeff(self, shape):
         r"""
         Scale the size of the coefficients and pad with zeros.
 
-        
+
         >>> model = MKSRegressionModel()
         >>> coeff = np.arange(20).reshape((5, 4, 1))
         >>> model.Fcoeff = np.fft.fftn(coeff, axes=(0, 1))
@@ -207,9 +208,9 @@ class MKSRegressionModel(LinearRegression):
         ...                     [0, 0, 0, 0, 0, 0, 0],
         ...                     [0, 0, 0, 0, 0, 0, 0],
         ...                     [0, 0, 0, 0, 0, 0, 0],
-        ...                     [12, 13, 0, 0, 0, 14, 15], 
-        ...                     [16, 17, 0, 0, 0, 18, 19]]) 
-        
+        ...                     [12, 13, 0, 0, 0, 14, 15],
+        ...                     [16, 17, 0, 0, 0, 18, 19]])
+
         Args:
             shape: The new shape of the influence coefficients.
         Returns:
@@ -226,14 +227,15 @@ class MKSRegressionModel(LinearRegression):
             pad_shape = list(coeff.shape)
             pad_shape[axis] = shape[axis] - coeff.shape[axis]
             zeros = np.zeros(pad_shape, dtype=complex)
-            coeff = np.concatenate((coeff_split[0], zeros, coeff_split[1]), axis=axis)
+            coeff = np.concatenate(
+                (coeff_split[0], zeros, coeff_split[1]), axis=axis)
 
         self.Fcoeff = np.fft.fftn(coeff, axes=axes)
-        
+
     def _test(self):
         r"""
         Test with a Cahn-Hilliard model.
-        
+
         >>> from pymks import FiPyCHModel
         >>> Nsample = 100
         >>> Nspace = 21
@@ -247,11 +249,11 @@ class MKSRegressionModel(LinearRegression):
         >>> X_test = np.array([np.random.random((Nspace, Nspace)) for i in range(1)])
         >>> y_test = fipy_model.predict(X_test)
         >>> y_pred = model.predict(X_test)
-        >>> assert mse(y_test, y_pred) < 0.03
+        >>> assert mse(y_test[0], y_pred[0]) < 0.03
 
         """
         pass
-    
+
 if __name__ == '__main__':
     import fipy.tests.doctestPlus
     exec(fipy.tests.doctestPlus._getScript())

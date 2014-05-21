@@ -2,10 +2,12 @@ import fipy as fp
 from fipy.solvers.scipy.linearLUSolver import LinearLUSolver
 import numpy as np
 
+
 class FiPyCHModel(object):
+
     r"""
-    
-    This class 
+
+    This class
 
     Attributes:
         dx: Grid spacing in the horizontal direction.
@@ -15,7 +17,9 @@ class FiPyCHModel(object):
         epsilon: Float value used to scale the weight of the gradient energy term
 
     """
-    def __init__(self, dx=0.005, dy=None, dt=1e-8, a=np.sqrt(200.), epsilon=0.1):
+
+    def __init__(
+            self, dx=0.005, dy=None, dt=1e-8, a=np.sqrt(200.), epsilon=0.1):
         r"""
         Inits a FiPyCHModel.
 
@@ -38,7 +42,7 @@ class FiPyCHModel(object):
 
     def fit(self, X, y):
         raise NotImplementedError
-    
+
     def predict(self, X):
         r"""
         Predict the simulation for the next time step using Fipy.
@@ -57,8 +61,8 @@ class FiPyCHModel(object):
         PHI = phi.arithmeticFaceValue
         D = 1
         eq = (fp.TransientTerm()
-              == fp.DiffusionTerm(coeff=D * self.a**2 * (1 - 6 * PHI * (1 - PHI)))
-              - fp.DiffusionTerm(coeff=(D, self.epsilon**2)))
+              == fp.DiffusionTerm(coeff=D * self.a ** 2 * (1 - 6 * PHI * (1 - PHI)))
+              - fp.DiffusionTerm(coeff=(D, self.epsilon ** 2)))
 
         for i, x in enumerate(X):
             phi[:] = x.flatten()
@@ -66,7 +70,7 @@ class FiPyCHModel(object):
             self._solve(eq, phi, LinearLUSolver(), self.dt)
             #            eq.solve(phi, dt=self.dt, solver=LinearLUSolver())
             phi_ij = np.array(phi).reshape((nx, ny))
-            y[i] = (phi_ij - x) / self.dt 
+            y[i] = (phi_ij - x) / self.dt
 
         return y
 
@@ -75,15 +79,13 @@ class FiPyCHModel(object):
         Helper function used in `predict`
 
         Args:
-            eq: 
+            eq:
             phi:
             solver:
             dt:
         """
         res = 1e+10
-        
+
         for sweep in range(5):
             res = eq.sweep(phi, dt=dt, solver=LinearLUSolver())
             #    print 'res',res
-            
-
