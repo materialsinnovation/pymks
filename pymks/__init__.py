@@ -7,9 +7,11 @@ from fipyCHModel import FiPyCHModel
 from tools import draw_microstructure_discretization
 import pymks.mksRegressionModel
 import pymks.fastmksRegressionModel
+from elasticFEModel import ElasticFEModel
 from tools import bin
 import nose
 from nose.tools import nottest
+
 
 @nottest
 def test():
