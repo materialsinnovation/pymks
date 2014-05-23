@@ -18,91 +18,251 @@ from sfepy.discrete import Functions
 
 
 class ElasticFEModel(object):
-    def __init__(self, N, L=1.):
-        if N % 2 == 0:
-            raise ValueError, "N must be odd"
-        geo_string = self.createGEOstring(N, L=L)
-        self.createMSHfile(geo_string)
-        
-    def createGEOstring(self, N, L=1.):
-        dx = L / N
+    """
+    Use SfePy to solve a linear strain problem in 2D with a varying
+    microstructure.
+
+    """
+    def __init__(self, dx=1.):
+        """
+        Args:
+          dx: the grid spacing
+
+        """
         self.dx = dx
+        
+    def createGEOstring(self, Nx, Ny):
+        """
+        Construct a Gmsh .geo string to drive the creation of a 2D
+        grid mesh using Gmsh.
+
+        Args:
+          Nx: number of grid points in x direction
+          Ny: number of grid points in y direction
+
+        Returns:
+          the GEO string
+          
+        """
+        Lx = Nx * self.dx
+        Ly = Ny * self.dx
+
         # kludge: must offset cellSize by `eps` to work properly
-        eps = float(dx) / (N * 10) 
+        eps = float(self.dx) / (Nx * 10) 
 
         template_file = 'template.geo'
         template_path = os.path.split(__file__)[0]
         with open(os.path.join(template_path, template_file)) as f:
             template = f.read()
 
-        return template.format(N=N, dx=dx, L=L, eps=eps)
+        return template.format(Nx=Nx, Ny=Ny, dx=self.dx, Lx=Lx, Ly=Ly, eps=eps)
             
-    def createMSHfile(self, gmsh_string):
+    def createMSHfile(self, GEOstring):
         r"""
         Write a Gmsh MSH file from a .geo string
 
         Args:
-          gmsh_string: the geo file string
+          GEOstring: the GEO file string
 
         Returns:
           The name of the MSH file
         """
         dimensions = 2
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.geo', delete=False) as f_geo:
-            f_geo.writelines(gmsh_string)
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.geo', delete=False) as fGEO:
+            fGEO.writelines(GEOstring)
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.msh', delete=False) as f_msh:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.mesh', delete=False) as fMSH:
             pass
 
         gmshFlags = ["-%d" % dimensions, "-nopopup", "-format", "msh"]
-        p = Popen(["gmsh", f_geo.name] + gmshFlags + ["-o", f_msh.name], stdout=PIPE)
+        p = Popen(["gmsh", fGEO.name] + gmshFlags + ["-o", fMSH.name], stdout=PIPE)
         gmshOutput, gmshError = p.communicate()
         gmshOutput = gmshOutput.decode('ascii')
         print(gmshOutput)
 
-        os.remove(f_geo.name)
-        self.msh_file = f_msh.name
+        os.remove(fGEO.name)
+        self.removeMSHfile()
+        self.MSHfile = fMSH.name
 
-    def convert_properties(self, elastic_modulus, poissons_ratio):
-        E = elastic_modulus
-        nu = poissons_ratio
+    def convert_properties(self, X):
+        """
+        Convert from elastic modulus and Poisson's ratio to the Lame
+        parameter and shear modulus
+
+        Args:
+           X: array of material properties, X[...,0] is the elastic
+              modulus and X[...,1] is the Poisson's ratio
+
+        Returns:
+          returns a new array with the Lame parameter and the shear modulus
+        """
+        E = X[...,0]
+        nu = X[...,1]
         lame = E * nu / (1 + nu) / (1 - 2 * nu)
         K = E / 3 / (1 - 2 * nu)
-        shear = K - lame
-        return lame, shear
-                
-    def predict(self, strain, elastic_modulus, poissons_ratio):
-        if (len(elastic_modulus) != 2) or (len(poissons_ratio) == 2):
-            raise ValueError, 'elastic_modulus and poissons_ration must be length 2'
-        lame, shear_modulus = self.convert_properties(elastic_modulus, poissons_ratio)
+        mu = K - lame
+        return np.concatenate((lame[...,None], mu[...,None]), axis=-1)
 
-    def get_material(self, lame, shear_modulus, domain):
-        bbox = domain.get_mesh_bounding_box()
-        x0, y0 = (bbox[1,:] + bbox[0,:]) / 2.
-        eps = 1e-8 * (bbox[1,0] - bbox[0,0])
-        lx = self.dx / 2 + eps
+    def removeMSHfile(self):
+        """
+        Clean up the MSH file temp file if necessary.
+        """
+        if hasattr(self, 'MSHfile'):
+            print self.MSHfile
+            #            os.remove(self.MSHfile)
+            del self.MSHfile
 
+    def cell_to_node(self, X):
+        """
+        Maps the cell values given by X to node values. The values are
+        not interpolated, but mapped out from the center cell.
+
+        Args:
+          X: cell values with shape (Nsample, Nx, Ny, Nproperty)
+
+        Returns:
+          The nodal values with shape (Nsample, Nx + 1, Ny + 1, Nproperty)
+          
+        >>> X = np.arange(15).reshape((1, 5, 3))
+        >>> X_ = np.array([[[  0.,  1.,  1.,  2.],
+        ...                 [  3,   4,   4,   5.],
+        ...                 [  6,   7,   7,   8.],
+        ...                 [  6,   7,   7,   8.],
+        ...                 [  9,  10,  10,  11.],
+        ...                 [ 12,  13,  13,  14.]]])
+        >>> model = ElasticFEModel(1)
+        >>> assert np.all(np.equal(X_, model.cell_to_node(X)))
+        
+        """
+        Nsample, Nx, Ny = X.shape[:3]
+        X_ = np.zeros((Nsample, Nx + 1, Ny + 1) + X.shape[3:])
+        Mx = (Nx + 1) / 2
+        My = (Ny + 1) / 2
+        X_[:, Mx:, My:] = X[:, Mx - 1:, My - 1:]
+        X_[:, :Mx, My:] = X[:, :Mx, My - 1:]
+        X_[:, Mx:, :My] = X[:, Mx - 1:, :My]
+        X_[:, :Mx, :My] = X[:, :Mx, :My]
+        return X_
+            
+    def predict(self, X):
+        """
+        Predict the displacement field give an initial microstructure
+        and a strain in the x direction.
+
+        Args:
+          X: microstructre with shape (Nsample, Nx, Ny, Nproperty)
+             with len(Nproperty) = 2. X[..., 0] represents the elastic
+             modulus and X[..., 1] is the poisson's ratio.
+
+        Returns:
+          the strain field over each cell
+          
+        """
+        Nsample, Nx, Ny, Nproperty = X.shape
+        if (Nx % 2 == 0) or (Ny % 2 == 0) or (Nproperty != 2):
+            raise RuntimeError, 'the shape of X is incorrect'
+        
+        GEOstring = self.createGEOstring(Nx, Ny)
+        self.createMSHfile(GEOstring)
+
+        Xnode = self.cell_to_node(X)
+        
+        X_ = self.convert_properties(Xnode)
+
+        y = [self.solve(x) for x in X_]
+
+        return y
+        
+    def get_material(self, property_array, domain):
+        """
+        Creates a SfePy material from the material property fields
+
+        Args:
+          property_array: array of the properties with shape (Nx, Ny, 2)
+
+        Returns:
+          an SfePy material
+          
+        """
         def material_func_(ts, coors, mode=None, **kwargs):
             if mode != 'qp':
                 return
             else:
                 x, y = coors[:, 0], coors[:, 1]
-                mask_x = (x < (x0 + lx)) & (x > (x0 - lx))
-                mask_y = (y < (y0 + lx)) & (y > (y0 - lx))
-                mask = mask_x & mask_y
-                if np.sum(mask) != 4:
-                    raise RuntimeError, "mask should be length 4"
-                lam = np.ones_like(x) * lame[0]
-                lam[mask] = lame[1]
-                mu = np.ones_like(x) * shear_modulus[0]
-                my[mask] = shear_modulus[1]
-                return {'lam' : lam, 'mu' : mu}
+                i = np.floor((x + self.dx / 2) / self.dx)
+                j = np.floor((y + self.dx / 2) / self.dx)
+                property_array_ = property_array[i, j]
+                return {'lam' : property_array_[..., 0], 'mu' : property_array_[..., 1]}
 
         material_func = Function('material_func', material_func_)
         return Material('m', function=material_func)
 
-    def solve(self, strain, lame, shear_modulus):
-        mesh = Mesh.from_file(self.msh_file)
+    def subdomain_func(self, x=(), y=()):
+        eps = 1e-3 * self.dx
+
+        def func(coords, domain=None):
+            flag_x = len(x) == 0
+            flag_y = len(y) == 0
+
+            for x_ in x:
+                flag = (coords[:, 0] < (x_ + eps)) & (coords[:, 0] > (x_ - eps))
+                flag_x = flag_x | flag
+
+            for y_ in y:
+                flag = (coords[:, 1] < (y_ + eps)) & (coords[:, 1] > (y_ - eps))
+                flag_y = flag_y | flag
+
+            return np.where(flag_x & flag_y)[0]
+
+        return func
+
+    def get_periodicBCs(self, domain):
+        miny, maxy = domain.get_mesh_bounding_box()[:, 1]
+        yup_ = self.subdomain_func(y=(maxy,))
+        ydown_ = self.subdomain_func(y=(miny,))
+        yup = Function('yup', yup_)
+        ydown = Function('ydown', ydown_)
+        region_up = domain.create_region('region_up',
+                                         'vertices by yup',
+                                         'facet',
+                                         functions=Functions([yup]))
+        region_down = domain.create_region('region_down',
+                                           'vertices by ydown',
+                                           'facet',
+                                           functions=Functions([ydown]))
+        match_x_line = Function('match_x_line', per.match_x_line)
+        periodic_y = PeriodicBC('periodic_y', [region_up, region_down], {'u.all' : 'u.all'}, match='match_x_line')
+        return Conditions([periodic_y]), Functions([match_x_line])
+
+    def get_displacementBCs(self, domain):
+        minx, maxx = domain.get_mesh_bounding_box()[:, 0]
+        miny, maxy = domain.get_mesh_bounding_box()[:, 1]
+        xright_ = self.subdomain_func(x=(maxx,))
+        xleft_ = self.subdomain_func(x=(minx,))
+        yfix_ = self.subdomain_func(x=(minx,), y=(maxy, miny))
+        xright = Function('xright', xright_)
+        xleft = Function('xleft', xleft_)
+        yfix = Function('yfix', yfix_)
+        region_right = domain.create_region('region_right',
+                                            'vertices by xright',
+                                            'facet',
+                                            functions=Functions([xright]))
+        region_left = domain.create_region('region_left',
+                                           'vertices by xleft',
+                                           'facet',
+                                           functions=Functions([xleft]))
+        region_fix = domain.create_region('region_fix',
+                                          'vertices by yfix',
+                                          'vertex',
+                                          functions=Functions([yfix]))
+        fixed_BC = EssentialBC('fixed_BC', region_left, {'u.0' : 0.0})
+        displaced_BC = EssentialBC('displaced_BC', region_right, {'u.1' : 1.0})
+        fixy_BC = EssentialBC('fixy_BC', region_fix, {'u.1' : 0.0})
+
+        return Conditions([fixed_BC, displaced_BC, fixy_BC])
+        
+    def solve(self, property_array):
+        mesh = Mesh.from_file(self.MSHfile)
         domain = Domain('domain', mesh)
 
         region_all = domain.create_region('region_all', 'all')
@@ -112,7 +272,7 @@ class ElasticFEModel(object):
         u = FieldVariable('u', 'unknown', field)
         v = FieldVariable('v', 'test', field, primary_var_name='u')
 
-        m = self.get_material(lame, shear_modulus, domain)
+        m = self.get_material(property_array, domain)
         f = Material('f', val=[[0.0], [0.0]])
 
         integral = Integral('i', order=3)
@@ -130,19 +290,13 @@ class ElasticFEModel(object):
         pb = Problem('elasticity', equations=eqs, nls=nls, ls=ls)
         pb.save_regions_as_groups('regions')
 
-        functions = Functions([match_x_line,
-                               match_y_line,
-                               displaced_region,
-                               fixed_region,
-                               upper_region,
-                               lower_region,
-                               left_region,
-                               right_region,
-                               lam_func])
-
-        pb.time_update(ebcs=Conditions([displaced_BC, fixed_BC]),
-        epbcs=Conditions([periodic_y, periodic_x]),
-        functions=functions)
+        epbcs, functions = self.get_periodicBCs(domain)
+        
+        ebcs = self.get_displacementBCs(domain)
+        
+        pb.time_update(ebcs=ebcs,
+                       epbcs=epbcs,
+                       functions=functions)
 
         vec = pb.solve()
 
@@ -150,6 +304,6 @@ class ElasticFEModel(object):
 
         
     def __del__(self):
-        os.remove(self.msh_file)
+        self.removeMSHfile()
 
     
