@@ -12,9 +12,10 @@ from sfepy.terms import Term
 from sfepy.discrete.conditions import Conditions, EssentialBC, PeriodicBC
 from sfepy.solvers.ls import ScipyDirect
 from sfepy.solvers.nls import Newton
-from sfepy.postprocess import Viewer
+# from sfepy.postprocess import Viewer
 import sfepy.discrete.fem.periodic as per
 from sfepy.discrete import Functions
+from sfepy.mesh.mesh_generators import gen_block_mesh
 
 
 class ElasticFEModel(object):
@@ -30,59 +31,6 @@ class ElasticFEModel(object):
 
         """
         self.dx = dx
-        
-    def createGEOstring(self, Nx, Ny):
-        """
-        Construct a Gmsh .geo string to drive the creation of a 2D
-        grid mesh using Gmsh.
-
-        Args:
-          Nx: number of grid points in x direction
-          Ny: number of grid points in y direction
-
-        Returns:
-          the GEO string
-          
-        """
-        Lx = Nx * self.dx
-        Ly = Ny * self.dx
-
-        # kludge: must offset cellSize by `eps` to work properly
-        eps = float(self.dx) / (Nx * 10) 
-
-        template_file = 'template.geo'
-        template_path = os.path.split(__file__)[0]
-        with open(os.path.join(template_path, template_file)) as f:
-            template = f.read()
-
-        return template.format(Nx=Nx, Ny=Ny, dx=self.dx, Lx=Lx, Ly=Ly, eps=eps)
-            
-    def createMSHfile(self, GEOstring):
-        r"""
-        Write a Gmsh MSH file from a .geo string
-
-        Args:
-          GEOstring: the GEO file string
-
-        Returns:
-          The name of the MSH file
-        """
-        dimensions = 2
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.geo', delete=False) as fGEO:
-            fGEO.writelines(GEOstring)
-
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.mesh', delete=False) as fMSH:
-            pass
-
-        gmshFlags = ["-%d" % dimensions, "-nopopup", "-format", "msh"]
-        p = Popen(["gmsh", fGEO.name] + gmshFlags + ["-o", fMSH.name], stdout=PIPE)
-        gmshOutput, gmshError = p.communicate()
-        gmshOutput = gmshOutput.decode('ascii')
-        print(gmshOutput)
-
-        os.remove(fGEO.name)
-        self.removeMSHfile()
-        self.MSHfile = fMSH.name
 
     def convert_properties(self, X):
         """
@@ -102,15 +50,6 @@ class ElasticFEModel(object):
         K = E / 3 / (1 - 2 * nu)
         mu = K - lame
         return np.concatenate((lame[...,None], mu[...,None]), axis=-1)
-
-    def removeMSHfile(self):
-        """
-        Clean up the MSH file temp file if necessary.
-        """
-        if hasattr(self, 'MSHfile'):
-            print self.MSHfile
-            #            os.remove(self.MSHfile)
-            del self.MSHfile
 
     def cell_to_node(self, X):
         """
@@ -162,9 +101,6 @@ class ElasticFEModel(object):
         if (Nx % 2 == 0) or (Ny % 2 == 0) or (Nproperty != 2):
             raise RuntimeError, 'the shape of X is incorrect'
         
-        GEOstring = self.createGEOstring(Nx, Ny)
-        self.createMSHfile(GEOstring)
-
         Xnode = self.cell_to_node(X)
         
         X_ = self.convert_properties(Xnode)
@@ -184,15 +120,25 @@ class ElasticFEModel(object):
           an SfePy material
           
         """
+        minx, maxx = domain.get_mesh_bounding_box()[:, 0]
+        miny, maxy = domain.get_mesh_bounding_box()[:, 1]
+
         def material_func_(ts, coors, mode=None, **kwargs):
             if mode != 'qp':
                 return
             else:
                 x, y = coors[:, 0], coors[:, 1]
-                i = np.floor((x + self.dx / 2) / self.dx)
-                j = np.floor((y + self.dx / 2) / self.dx)
+                i_out = np.empty_like(x, dtype=np.int64)
+                j_out = np.empty_like(y, dtype=np.int64)
+                i = np.floor((x + self.dx / 2 - minx) / self.dx, i_out)
+                j = np.floor((y + self.dx / 2 - miny) / self.dx, j_out)
+                
                 property_array_ = property_array[i, j]
-                return {'lam' : property_array_[..., 0], 'mu' : property_array_[..., 1]}
+                lam = property_array_[..., 0]
+                mu = property_array_[..., 1]
+                lam = np.ascontiguousarray(lam.reshape((lam.shape[0], 1, 1)))
+                mu = np.ascontiguousarray(mu.reshape((mu.shape[0], 1, 1)))
+                return {'lam' : lam, 'mu' : mu}
 
         material_func = Function('material_func', material_func_)
         return Material('m', function=material_func)
@@ -260,9 +206,15 @@ class ElasticFEModel(object):
         fixy_BC = EssentialBC('fixy_BC', region_fix, {'u.1' : 0.0})
 
         return Conditions([fixed_BC, displaced_BC, fixy_BC])
-        
+
+    def get_mesh(self, shape):
+        Lx = (shape[0] - 1) * self.dx
+        Ly = (shape[1] - 1) * self.dx
+        center = (0., 0.)
+        return gen_block_mesh((Lx, Ly), shape, center)
+    
     def solve(self, property_array):
-        mesh = Mesh.from_file(self.MSHfile)
+        mesh = self.get_mesh(property_array.shape[:-1])
         domain = Domain('domain', mesh)
 
         region_all = domain.create_region('region_all', 'all')
@@ -302,8 +254,5 @@ class ElasticFEModel(object):
 
         return vec
 
-        
-    def __del__(self):
-        self.removeMSHfile()
 
     
