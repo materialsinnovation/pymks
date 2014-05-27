@@ -89,9 +89,9 @@ class ElasticFEModel(object):
         and a strain in the x direction.
 
         Args:
-          X: microstructre with shape (Nsample, Nx, Ny, Nproperty)
+          X: microstructure with shape (Nsample, Nx, Ny, Nproperty)
              with len(Nproperty) = 2. X[..., 0] represents the elastic
-             modulus and X[..., 1] is the poisson's ratio.
+             modulus and X[..., 1] is the Poisson's ratio
 
         Returns:
           the strain field over each cell
@@ -105,13 +105,46 @@ class ElasticFEModel(object):
         
         X_ = self.convert_properties(Xnode)
 
-        y = [self.solve(x) for x in X_]
+        y_disp = np.array([self.solve(x) for x in X_])
 
-        return y
+        y_strain = self.get_strain(y_disp)
         
+        return y_strain
+
+    def get_strain(self, y_disp):
+        """
+        Calculate the strain field from the displacement field.
+
+        Args:
+        y_disp: the displacement field with shape (Nsample, Nx, Ny, 2)
+                where the last index represents the x and y
+                displacement
+
+        Returns:
+          y_strain: the strain field with shape (Nsample, Nx, Ny, 3)
+          where the last index represents the e_xx, e_yy, e_xy strain
+          fields, respectively
+
+        """
+        
+        xx = (y_disp[:, 1:, :, 0] - y_disp[:, :-1, :, 0]) / self.dx
+        exx = (xx[:, :, 1:] + xx[:, :, :-1]) / 2
+        
+        yy = (y_disp[:, :, 1:, 1] - y_disp[:, :, :-1, 1]) / self.dx
+        eyy = (yy[:, 1:] + yy[:, :-1]) / 2
+
+        xy_ = (y_disp[:, 1:, :, 1] - y_disp[:, :-1, :, 1]) / self.dx
+        xy = (xy_[:, :, 1:] + xy_[:, :, :-1]) / 2.
+        yx_ = (y_disp[:, :, 1:, 0] - y_disp[:, :, :-1, 0]) / self.dx
+        yx = (yx_[:, 1:] + yx_[:, :-1]) / 2
+        exy = (xy + yx) / 2
+
+        return np.concatenate((exx[..., None], eyy[..., None], exy[..., None]), axis=-1)
+        
+    
     def get_material(self, property_array, domain):
         """
-        Creates a SfePy material from the material property fields
+        Creates an SfePy material from the material property fields
 
         Args:
           property_array: array of the properties with shape (Nx, Ny, 2)
@@ -144,6 +177,17 @@ class ElasticFEModel(object):
         return Material('m', function=material_func)
 
     def subdomain_func(self, x=(), y=()):
+        """
+        Creates a function to mask subdomains in Sfepy.
+
+        Args:
+          x: tuple of lines or points to be masked in the x-plane
+          y: tuple of lines or points to be masked in the y-plane
+
+        Returns:
+          array of masked location indices
+          
+        """
         eps = 1e-3 * self.dx
 
         def func(coords, domain=None):
@@ -163,6 +207,16 @@ class ElasticFEModel(object):
         return func
 
     def get_periodicBCs(self, domain):
+        """
+        Creates periodic boundary conditions with the top and bottom y-planes.
+
+        Args:
+          domain: an Sfepy domain
+
+        Returns:
+          a tuple of Sfepy boundary condition and associated matching functions
+
+        """
         miny, maxy = domain.get_mesh_bounding_box()[:, 1]
         yup_ = self.subdomain_func(y=(maxy,))
         ydown_ = self.subdomain_func(y=(miny,))
@@ -181,6 +235,18 @@ class ElasticFEModel(object):
         return Conditions([periodic_y]), Functions([match_x_line])
 
     def get_displacementBCs(self, domain):
+        """
+        Fix the left plane in x, displace the right plane by 1 and fix
+        the y-direction with the top and bottom points on the left x
+        plane.
+
+        Args:
+          domain: an Sfepy domain
+
+        Returns:
+          the Sfepy boundary conditions
+
+        """
         minx, maxx = domain.get_mesh_bounding_box()[:, 0]
         miny, maxy = domain.get_mesh_bounding_box()[:, 1]
         xright_ = self.subdomain_func(x=(maxx,))
@@ -202,19 +268,43 @@ class ElasticFEModel(object):
                                           'vertex',
                                           functions=Functions([yfix]))
         fixed_BC = EssentialBC('fixed_BC', region_left, {'u.0' : 0.0})
-        displaced_BC = EssentialBC('displaced_BC', region_right, {'u.1' : 1.0})
+        displaced_BC = EssentialBC('displaced_BC', region_right, {'u.0' : 1.0})
         fixy_BC = EssentialBC('fixy_BC', region_fix, {'u.1' : 0.0})
 
         return Conditions([fixed_BC, displaced_BC, fixy_BC])
 
     def get_mesh(self, shape):
+        """
+        Generate an Sfepy rectangular mesh
+
+        Args:
+          shape: proposed shape of domain (vertex shape) (Nx, Ny)
+
+        Returns:
+          Sfepy mesh
+          
+        """
         Lx = (shape[0] - 1) * self.dx
         Ly = (shape[1] - 1) * self.dx
         center = (0., 0.)
         return gen_block_mesh((Lx, Ly), shape, center)
     
     def solve(self, property_array):
-        mesh = self.get_mesh(property_array.shape[:-1])
+        """
+        Solve the Sfepy problem for one sample.
+
+        Args:
+          property_array: array of shape (Nx, Ny, 2) where the last
+          index is for Lame's parameter and shear modulus,
+          respectively.
+
+        Returns:
+          the displacement field of shape (Nx, Ny, 2) where the last
+          index represents the x and y displacements
+          
+        """
+        shape = property_array.shape[:-1]
+        mesh = self.get_mesh(shape)
         domain = Domain('domain', mesh)
 
         region_all = domain.create_region('region_all', 'all')
@@ -252,7 +342,7 @@ class ElasticFEModel(object):
 
         vec = pb.solve()
 
-        return vec
+        return vec.create_output_dict()['u'].data.reshape(shape + (2,))
 
 
     
