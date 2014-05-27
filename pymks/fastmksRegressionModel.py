@@ -158,6 +158,4 @@ class FastMKSRegressionModel(MKSRegressionModel):
         Fy = ne.evaluate("sum(tmp, axis={0})".format(axis))
         return self._ifftn(Fy, axes=self._axes(X)).real
 
-if __name__ == '__main__':
-    import fipy.tests.doctestPlus
-    exec(fipy.tests.doctestPlus._getScript())
+

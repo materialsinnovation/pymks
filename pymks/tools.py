@@ -90,8 +90,6 @@ def bin(arr, Nbin):
     """
     X = np.linspace(0, 1, Nbin)
     dX = X[1] - X[0]
+
     return np.maximum(1 - abs(arr[:, None] - X) / dX, 0)
 
-if __name__ == '__main__':
-    import fipy.tests.doctestPlus
-    exec(fipy.tests.doctestPlus._getScript())
