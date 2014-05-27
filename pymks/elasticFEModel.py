@@ -1,9 +1,6 @@
-import tempfile
-from subprocess import Popen, PIPE
-import os
-
-
 import numpy as np
+from sfepy.base.goptions import goptions
+goptions['verbose'] = False
 from sfepy.base.base import IndexedStruct
 from sfepy.discrete.fem import Mesh, Domain, Field
 from sfepy.discrete import (FieldVariable, Material, Integral, Function,
@@ -20,9 +17,34 @@ from sfepy.mesh.mesh_generators import gen_block_mesh
 
 class ElasticFEModel(object):
     """
-    Use SfePy to solve a linear strain problem in 2D with a varying
-    microstructure.
 
+    Use SfePy to solve a linear strain problem in 2D with a varying
+    microstructure on a rectangular grid. The rectangle is held at the
+    left edge and displaced by 1 on the right edge. Periodic boundary
+    conditions are applied to the upper and lower plains.
+
+    The microstructurs is of shape (Nsample, Nx, Ny, Nproperty) where
+    Nproperty is 2 for the elastic modulus and Poisson's ratio.
+
+    >>> X = np.ones((1, 5, 5, 2))
+
+    >>> model = ElasticFEModel(dx=0.2)
+    >>> y = model.predict(X)
+
+    y is the strain with compontents as follows
+
+    >>> exx = y[..., 0]
+    >>> eyy = y[..., 1]
+    >>> exy = y[..., 2]
+
+    Since there is no contrast in the microstructe the strain is only
+    in the x-direction and has a uniform value of 1 since the
+    displacement is always 1 and the size of the domain is 1.
+
+    >>> assert np.allclose(exx, 1)
+    >>> assert np.allclose(eyy, 0)
+    >>> assert np.allclose(exy, 0)
+    
     """
     def __init__(self, dx=1.):
         """
@@ -287,7 +309,7 @@ class ElasticFEModel(object):
         Lx = (shape[0] - 1) * self.dx
         Ly = (shape[1] - 1) * self.dx
         center = (0., 0.)
-        return gen_block_mesh((Lx, Ly), shape, center)
+        return gen_block_mesh((Lx, Ly), shape, center, verbose=False)
     
     def solve(self, property_array):
         """
@@ -335,7 +357,7 @@ class ElasticFEModel(object):
         epbcs, functions = self.get_periodicBCs(domain)
         
         ebcs = self.get_displacementBCs(domain)
-        
+
         pb.time_update(ebcs=ebcs,
                        epbcs=epbcs,
                        functions=functions)
