@@ -2,7 +2,7 @@ import matplotlib.colors as colors
 import matplotlib.cm as cmx
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.learning_curve import learning_curve
+
 
 
 def draw_microstructure_discretization(
@@ -134,6 +134,8 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
             A plot of the learning curves for both the training curve and the
             cross-validation curve.
     """
+    from sklearn.learning_curve import learning_curve
+    
     plt.figure()
     plt.title(title)
     if ylim is not None:

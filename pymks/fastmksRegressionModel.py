@@ -1,7 +1,6 @@
 from .mksRegressionModel import MKSRegressionModel
 import numexpr as ne
 import numpy as np
-import pyfftw
 
 
 class FastMKSRegressionModel(MKSRegressionModel):
@@ -74,7 +73,7 @@ class FastMKSRegressionModel(MKSRegressionModel):
         r"""
         Helper function used in _calcfft
         """
-
+        import pyfftw
         input_array = pyfftw.n_byte_align_empty(a.shape, 16, 'complex128')
         output_array = pyfftw.n_byte_align_empty(a.shape, 16, 'complex128')
         return pyfftw.FFTW(
