@@ -1,16 +1,14 @@
 import os
 
 
-from mksRegressionModel import MKSRegressionModel
-from fastmksRegressionModel import FastMKSRegressionModel
-from fipyCHModel import FiPyCHModel
-from tools import draw_microstructure_discretization
-import pymks.mksRegressionModel
-import pymks.fastmksRegressionModel
-from elasticFEModel import ElasticFEModel
-from tools import bin
 import nose
 from nose.tools import nottest
+from .mksRegressionModel import MKSRegressionModel
+from .fastmksRegressionModel import FastMKSRegressionModel
+from .fipyCHModel import FiPyCHModel
+from .tools import draw_microstructure_discretization
+from .elasticFEModel import ElasticFEModel
+from .tools import bin
 
 
 @nottest
@@ -28,7 +26,9 @@ def _getVersion():
         version = get_distribution(__name__).version
     except DistributionNotFound:
         version = "unknown, try running `python setup.py egg_info`"
-        
+
     return version
-    
-__version__ = _getVersion()           
+
+__version__ = _getVersion()
+
+
