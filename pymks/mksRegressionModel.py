@@ -45,11 +45,10 @@ class MKSRegressionModel(LinearRegression):
 
     >>> model = MKSRegressionModel(Nbin=Nbin)
     >>> model.fit(X, y)
-    >>> model.coeff = np.fft.ifft(model.Fcoeff, axis=0)
 
     Check the result
 
-    >>> assert np.allclose(coeff, model.coeff)
+    >>> assert np.allclose(np.fft.fftshift(coeff, axes=(0,)), model.coeff)
 
     """
     
