@@ -26,9 +26,8 @@ def test():
 
     model = MKSRegressionModel(Nbin=Nbin)
     model.fit(X, y)
-    model.coeff = np.fft.ifft(model.Fcoeff, axis=0)
 
-    assert np.allclose(coeff, model.coeff)
+    assert np.allclose(np.fft.fftshift(coeff, axes=(0,)), model.coeff)
 
 if __name__ == '__main__':
     test()

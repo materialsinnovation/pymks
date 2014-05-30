@@ -47,11 +47,10 @@ class MKSRegressionModel(LinearRegression):
 
     >>> model = MKSRegressionModel(Nbin=Nbin)
     >>> model.fit(X, y)
-    >>> model.coeff = np.fft.ifft(model.Fcoeff, axis=0)
 
     Check the result
 
-    >>> assert np.allclose(coeff, model.coeff)
+    >>> assert np.allclose(np.fft.fftshift(coeff, axes=(0,)), model.coeff)
 
     Attributes:
         Nbin: Interger value for number of local states
@@ -160,9 +159,14 @@ class MKSRegressionModel(LinearRegression):
             if np.all(np.array(ijk) == 0):
                 s1 = s0
             else:
-                s1 = (slice(-1),)
-            self.Fcoeff[
-                ijk + s1] = np.linalg.lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk])[0]
+                s1 = (slice(-1),) 
+            self.Fcoeff[ijk + s1] = np.linalg.lstsq(FX[s0 + ijk + s1],
+                                                    Fy[s0 + ijk])[0]
+
+    @property
+    def coeff(self):
+        axes = np.arange(len(self._axes(self.Fcoeff) - 1))
+        return np.real_if_close(np.fft.fftshift(np.fft.ifftn(self.Fcoeff, axes=axes), axes=axes))
 
     def predict(self, X):
         r"""

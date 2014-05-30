@@ -1,15 +1,14 @@
 import os
 
 
+import nose
+from nose.tools import nottest
 from .mksRegressionModel import MKSRegressionModel
 from .fastmksRegressionModel import FastMKSRegressionModel
 from .fipyCHModel import FiPyCHModel
 from .tools import draw_microstructure_discretization
-import pymks.mksRegressionModel
-import pymks.fastmksRegressionModel
+from .elasticFEModel import ElasticFEModel
 from .tools import bin
-import nose
-from nose.tools import nottest
 
 
 @nottest
