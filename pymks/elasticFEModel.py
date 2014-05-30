@@ -2,7 +2,11 @@ import numpy as np
 from sfepy.base.goptions import goptions
 goptions['verbose'] = False
 from sfepy.base.base import IndexedStruct
-from sfepy.discrete.fem import Mesh, Domain, Field
+from sfepy.discrete.fem import Field
+try:
+    from sfepy.discrete.fem import FEDomain as Domain
+except ImportError:
+    from sfepy.discrete.fem import Domain
 from sfepy.discrete import (FieldVariable, Material, Integral, Function,
                             Equation, Equations, Problem)
 from sfepy.terms import Term
