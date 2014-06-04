@@ -168,6 +168,10 @@ class MKSRegressionModel(LinearRegression):
         axes = np.arange(len(self._axes(self.Fcoeff) - 1))
         return np.real_if_close(np.fft.fftshift(np.fft.ifftn(self.Fcoeff, axes=axes), axes=axes))
 
+    def coeffToFcoeff(self, coeff):
+        axes = np.arange(len(self._axes(self.Fcoeff) - 1))
+        return np.fft.fftn(np.fft.ifftshift(coeff, axes=axes), axes=axes)
+
     def predict(self, X):
         r"""
         Calculate a new response from the microstructure function `X` with calibrated
@@ -197,23 +201,21 @@ class MKSRegressionModel(LinearRegression):
         r"""
         Scale the size of the coefficients and pad with zeros.
 
-
         >>> model = MKSRegressionModel()
-        >>> coeff = np.arange(20).reshape((5, 4, 1))
+        >>> coeff = np.fft.ifftshift(np.arange(20).reshape((5, 4, 1)), axes=(0, 1))
         >>> model.Fcoeff = np.fft.fftn(coeff, axes=(0, 1))
         >>> model.resize_coeff((10, 7))
-        >>> coeff = np.fft.ifftn(model.Fcoeff, axes=(0, 1))
-        >>> assert np.allclose(coeff[:,:,0],
-        ...                    [[0, 1, 0, 0, 0, 2, 3],
-        ...                     [4, 5, 0, 0, 0, 6, 7],
-        ...                     [8, 9, 0, 0, 0, 10, 11],
+        >>> assert np.allclose(model.coeff[:,:,0],
+        ...                    [[0, 0, 0, 0, 0, 0, 0],
+        ...                     [0, 0, 0, 0, 0, 0, 0],
+        ...                     [0, 0, 1, 2, 3, 0, 0],
+        ...                     [0, 4, 5, 6, 7, 0, 0],
+        ...                     [0, 8, 9,10,11, 0, 0],
+        ...                     [0,12,13,14,15, 0, 0],
+        ...                     [0,16,17,18,19, 0, 0],
         ...                     [0, 0, 0, 0, 0, 0, 0],
         ...                     [0, 0, 0, 0, 0, 0, 0],
-        ...                     [0, 0, 0, 0, 0, 0, 0],
-        ...                     [0, 0, 0, 0, 0, 0, 0],
-        ...                     [0, 0, 0, 0, 0, 0, 0],
-        ...                     [12, 13, 0, 0, 0, 14, 15],
-        ...                     [16, 17, 0, 0, 0, 18, 19]])
+        ...                     [0, 0, 0, 0, 0, 0, 0]])
 
         Args:
             shape: The new shape of the influence coefficients.
@@ -221,20 +223,21 @@ class MKSRegressionModel(LinearRegression):
             The resized influence coefficients to size 'shape'.
 
         """
-        assert len(shape) == len(self.Fcoeff.shape) - 1
-        assert np.all(shape >= self.Fcoeff.shape[:-1])
-        axes = np.arange(len(self.Fcoeff.shape) - 1)
-        coeff = np.fft.ifftn(self.Fcoeff, axes=axes)
+        if len(shape) != (len(self.Fcoeff.shape) - 1):
+            raise RuntimeError, 'length of resize shape is incorrect'
+        if not np.all(shape >= self.Fcoeff.shape[:-1]):
+             raise RuntimeError, 'resize shape is too small'
 
-        for axis, size in enumerate(self.Fcoeff.shape[:-1]):
-            coeff_split = np.array_split(coeff, 2, axis=axis)
-            pad_shape = list(coeff.shape)
-            pad_shape[axis] = shape[axis] - coeff.shape[axis]
-            zeros = np.zeros(pad_shape, dtype=complex)
-            coeff = np.concatenate(
-                (coeff_split[0], zeros, coeff_split[1]), axis=axis)
+        coeff = self.coeff
+        shape += coeff.shape[-1:]
+        padsize = np.array(shape) - np.array(coeff.shape)
+        padup = padsize / 2
+        paddown = padsize - padup
+        padarray = np.concatenate((padup[...,None], paddown[...,None]), axis=1) 
+        pads = tuple([tuple(p) for p in padarray])
+        coeff_pad = np.pad(coeff, pads, 'constant', constant_values=0)
 
-        self.Fcoeff = np.fft.fftn(coeff, axes=axes)
+        self.Fcoeff = self.coeffToFcoeff(coeff_pad)
 
     def _test(self):
         r"""
