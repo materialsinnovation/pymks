@@ -201,19 +201,28 @@ class MKSRegressionModel(LinearRegression):
         r"""
         Scale the size of the coefficients and pad with zeros.
 
+        Let's first instantitate a model and fabricate some
+        coefficients.
+
         >>> model = MKSRegressionModel()
-        >>> coeff = np.fft.ifftshift(np.arange(20).reshape((5, 4, 1)), axes=(0, 1))
+        >>> coeff = np.arange(20).reshape((5, 4, 1))
+        >>> coeff = np.concatenate((coeff , np.ones_like(coeff)), axis=2)
+        >>> coeff = np.fft.ifftshift(coeff, axes=(0, 1))
         >>> model.Fcoeff = np.fft.fftn(coeff, axes=(0, 1))
+
+        The coefficients can be reshaped by passing the new shape that
+        coefficients should have.
+
         >>> model.resize_coeff((10, 7))
         >>> assert np.allclose(model.coeff[:,:,0],
         ...                    [[0, 0, 0, 0, 0, 0, 0],
         ...                     [0, 0, 0, 0, 0, 0, 0],
-        ...                     [0, 0, 1, 2, 3, 0, 0],
-        ...                     [0, 4, 5, 6, 7, 0, 0],
-        ...                     [0, 8, 9,10,11, 0, 0],
-        ...                     [0,12,13,14,15, 0, 0],
-        ...                     [0,16,17,18,19, 0, 0],
         ...                     [0, 0, 0, 0, 0, 0, 0],
+        ...                     [0, 0, 0, 1, 2, 3, 0],
+        ...                     [0, 0, 4, 5, 6, 7, 0],
+        ...                     [0, 0, 8, 9,10,11, 0],
+        ...                     [0, 0,12,13,14,15, 0],
+        ...                     [0, 0,16,17,18,19, 0],
         ...                     [0, 0, 0, 0, 0, 0, 0],
         ...                     [0, 0, 0, 0, 0, 0, 0]])
 
@@ -231,13 +240,19 @@ class MKSRegressionModel(LinearRegression):
         coeff = self.coeff
         shape += coeff.shape[-1:]
         padsize = np.array(shape) - np.array(coeff.shape)
-        padup = padsize / 2
-        paddown = padsize - padup
+        paddown = padsize / 2
+        padup = padsize - paddown
         padarray = np.concatenate((padup[...,None], paddown[...,None]), axis=1) 
         pads = tuple([tuple(p) for p in padarray])
         coeff_pad = np.pad(coeff, pads, 'constant', constant_values=0)
-
-        self.Fcoeff = self.coeffToFcoeff(coeff_pad)
+        Fcoeff_pad = self.coeffToFcoeff(coeff_pad)
+        Fcoeff_pad[...,-1] = 0
+        scale = np.average(np.array(shape)[:-1]/np.array(coeff.shape)[:-1])
+        k0 = np.nonzero(self.Fcoeff[...,-1])
+        k0value = self.Fcoeff[...,0][k0]
+        Fcoeff_pad[...,-1][k0] = k0value/scale
+        
+        self.Fcoeff = Fcoeff_pad
 
     def _test(self):
         r"""
