@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 setup(name='pymks',
-      version='0.1',
+      version='0.1-dev',
       description='Package for Materials Knowledge System (MKS) regression tutorial',
       author='Daniel Wheeler',
       author_email='daniel.wheeler2@gmail.com',
