@@ -33,8 +33,9 @@ class ElasticFEModel(object):
     >>> X = np.ones((1, 5, 5, 2))
 
     >>> model = ElasticFEModel(dx=0.2)
-    >>> y = model.predict(X)
-
+    >>> y = model.predict(X) # doctest: +ELLIPSIS
+    sfepy: ...
+    
     y is the strain with compontents as follows
 
     >>> exx = y[..., 0]
