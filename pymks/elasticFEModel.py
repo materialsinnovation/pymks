@@ -50,12 +50,14 @@ class ElasticFEModel(object):
     >>> assert np.allclose(exy, 0)
     
     """
-    def __init__(self, dx=1.):
+    def __init__(self, dx=1., strain=1.):
         """
         Args:
           dx: the grid spacing
+          strain: Macroscopic strain
 
         """
+        self.strain = strain
         self.dx = dx
 
     def convert_properties(self, X):
@@ -226,7 +228,9 @@ class ElasticFEModel(object):
                                           'vertex',
                                           functions=Functions([yfix]))
         fixed_BC = EssentialBC('fixed_BC', region_left, {'u.0' : 0.0})
-        displaced_BC = EssentialBC('displaced_BC', region_right, {'u.0' : 1.0})
+        displaced_BC = EssentialBC('displaced_BC', region_right, {'u.0' : self.strain * (maxx - minx)})
+
+
         fixy_BC = EssentialBC('fixy_BC', region_fix, {'u.1' : 0.0})
 
         return Conditions([fixed_BC, displaced_BC, fixy_BC])
