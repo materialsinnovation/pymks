@@ -246,3 +246,6 @@ misc
 #Mr Developer
 .mr.developer.cfg
 
+#Sphinx
+doc/rst
+doc/_build
