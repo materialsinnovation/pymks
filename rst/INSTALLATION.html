@@ -1,0 +1,287 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installation &mdash; pymks 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="pymks 0.1 documentation" href="../index.html" />
+    <link rel="next" title="API" href="../API.html" />
+    <link rel="prev" title="Materials Knowledge System Repository" href="README.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../API.html" title="API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="README.html" title="Materials Knowledge System Repository"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">pymks 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation</a><ul>
+<li><a class="reference internal" href="#anaconda-python">Anaconda Python</a></li>
+<li><a class="reference internal" href="#regular-python">Regular Python</a></li>
+<li><a class="reference internal" href="#fftw">FFTW</a></li>
+<li><a class="reference internal" href="#line-profiler"><tt class="docutils literal"><span class="pre">line_profiler</span></tt></a></li>
+<li><a class="reference internal" href="#java-script-animator">Java Script Animator</a></li>
+<li><a class="reference internal" href="#git">Git</a></li>
+<li><a class="reference internal" href="#install-the-pymks-module">Install the <tt class="docutils literal"><span class="pre">pymks</span></tt> module</a></li>
+<li><a class="reference internal" href="#ipython-notebooks">IPython Notebooks</a></li>
+<li><a class="reference internal" href="#issues">Issues</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="README.html"
+                        title="previous chapter">Materials Knowledge System Repository</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../API.html"
+                        title="next chapter">API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/rst/INSTALLATION.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>The workshop will have workstations available in the CTCMS with a
+correctly configured scientific Python environment already installed.
+However, it is often preferable to use one&#8217;s own laptop, with your
+favored software and development environment. I much prefer this. If you
+have experience with scientific Python, you probably already have a
+satisfactory Python environment, which won&#8217;t need many alterations. Just
+skip over the <a class="reference external" href="#anaconda-python">Anaconda Python section</a> and install
+the packages in the <a class="reference external" href="#regular-python">Regular Python section</a>.</p>
+<div class="section" id="anaconda-python">
+<h2>Anaconda Python<a class="headerlink" href="#anaconda-python" title="Permalink to this headline">¶</a></h2>
+<p>If you have no experience with scientific Python, I would highly
+recommend using the <a class="reference external" href="https://store.continuum.io/cshop/anaconda/">Anaconda Python
+distribution</a>,</p>
+<p><a class="reference external" href="https://store.continuum.io/cshop/anaconda/">https://store.continuum.io/cshop/anaconda/</a></p>
+<p>I believe that it &#8220;just works&#8221; on all platforms and has mostly
+everything included. Just follow the instructions for your platform. To
+test whether Anaconda is working try</p>
+<div class="highlight-python"><pre>$ python
+Python 2.7.6 |Anaconda 1.8.0 (64-bit)| (default, Nov 11 2013, 10:47:18)
+...
+&gt;&gt;&gt; 1 + 1
+2
+&gt;&gt;&gt; import numpy; numpy.__file__
+'/home/wd15/anaconda/lib/python2.7/site-packages/numpy/__init__.pyc'</pre>
+</div>
+<p>and check that you are actually using Anaconda&#8217;s Python. Then update
+Anaconda,</p>
+<div class="highlight-python"><pre>$ conda update conda</pre>
+</div>
+<p>Once Anaconda has updated, install the following.</p>
+<div class="highlight-python"><pre>$ conda install ez_setup
+$ conda install fipy
+$ conda install scikit-learn
+$ conda install numexpr</pre>
+</div>
+</div>
+<div class="section" id="regular-python">
+<h2>Regular Python<a class="headerlink" href="#regular-python" title="Permalink to this headline">¶</a></h2>
+<p>Install the following (if you are not using Anaconda). If you are a
+seasoned Python user you probably have most of these, but you might want
+to update them anyway, just use <tt class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">package</span> <span class="pre">--upgrade</span></tt>.</p>
+<div class="highlight-python"><pre>$ pip install ipython
+$ pip install numpy
+$ pip install scipy
+$ pip install matplotlib
+$ pip install scikit-learn
+$ pip install ez_setup
+$ pip install fipy
+$ pip install scikit-learn
+$ pip install numexpr</pre>
+</div>
+</div>
+<div class="section" id="fftw">
+<h2>FFTW<a class="headerlink" href="#fftw" title="Permalink to this headline">¶</a></h2>
+<p>The main requirement for <tt class="docutils literal"><span class="pre">pyfftw</span></tt> is FFTW3, which can be installed
+via,</p>
+<div class="highlight-python"><pre>$ sudo apt-get install libfftw3-dev</pre>
+</div>
+<p>on Debian/Ubuntu. Windows and Mac users should consult</p>
+<p><a class="reference external" href="https://github.com/hgomersall/pyFFTW#platform-specific-build-info">https://github.com/hgomersall/pyFFTW#platform-specific-build-info</a></p>
+<p>Once this is installed, do</p>
+<div class="highlight-python"><pre>$ pip install pyfftw</pre>
+</div>
+<p>If you have issues installing the FFTW3 requirement, don&#8217;t worry. Most
+of the notebooks do not require it and those that do are easily modified
+to work with <tt class="docutils literal"><span class="pre">numpy.fft</span></tt>. We can also try and make this work during
+the tutorial session.</p>
+</div>
+<div class="section" id="line-profiler">
+<h2><tt class="docutils literal"><span class="pre">line_profiler</span></tt><a class="headerlink" href="#line-profiler" title="Permalink to this headline">¶</a></h2>
+<p>One additional package is <tt class="docutils literal"><span class="pre">line_profiler</span></tt>. Unfortunately, this has an
+issue when installing with</p>
+<div class="highlight-python"><pre>$ pip install line_profiler</pre>
+</div>
+<p>If will throw an error. To install it, go to</p>
+<p><a class="reference external" href="https://pypi.python.org/pypi/line_profiler">https://pypi.python.org/pypi/line_profiler</a></p>
+<p>and download and install the package by hand (rather than using pip). On
+Windows, just run the <tt class="docutils literal"><span class="pre">.exe</span></tt> installer. On Mac and Linux, download the
+<tt class="docutils literal"><span class="pre">.tar.gz</span></tt> and unpack it, change to the base directory and run
+<tt class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></tt>.</p>
+</div>
+<div class="section" id="java-script-animator">
+<h2>Java Script Animator<a class="headerlink" href="#java-script-animator" title="Permalink to this headline">¶</a></h2>
+<p>This installation is not strictly necessary, but allows for nice
+animations in the IPython Notebook. Clone it from Github,</p>
+<div class="highlight-python"><pre>$ git clone https://github.com/jakevdp/JSAnimation</pre>
+</div>
+<p>and then install with</p>
+<div class="highlight-python"><pre>$ cd JSAnimation
+$ python setup.py install</pre>
+</div>
+<p>If there are any issues, don&#8217;t worry, this is only used in one place
+near the end of the Python tutorial and there is an alternative way to
+render the animation.</p>
+</div>
+<div class="section" id="git">
+<h2>Git<a class="headerlink" href="#git" title="Permalink to this headline">¶</a></h2>
+<p>You&#8217;ll need to use Git to clone the Github
+<tt class="docutils literal"><span class="pre">`pymks</span></tt> &lt;<a class="reference external" href="https://github.com/wd15/pymks">https://github.com/wd15/pymks</a>&gt;`__ repository. There are
+Github GUI style clients for both <a class="reference external" href="http://mac.github.com/">Mac</a> and
+<a class="reference external" href="http://windows.github.com/">Windows</a>. See,</p>
+<p><a class="reference external" href="https://help.github.com/articles/set-up-git">https://help.github.com/articles/set-up-git</a></p>
+<p>for help.</p>
+</div>
+<div class="section" id="install-the-pymks-module">
+<h2>Install the <tt class="docutils literal"><span class="pre">pymks</span></tt> module<a class="headerlink" href="#install-the-pymks-module" title="Permalink to this headline">¶</a></h2>
+<p>Once you have Git installed, all you need to do is clone the repository.
+At the command line this would be</p>
+<div class="highlight-python"><pre>$ git clone https://github.com/wd15/pymks.git</pre>
+</div>
+<p>The above should create a <tt class="docutils literal"><span class="pre">pymks</span></tt> directory with a working copy of the
+repository. Next install <tt class="docutils literal"><span class="pre">pymks</span></tt> at the command line with,</p>
+<div class="highlight-python"><pre>$ cd /PATH/TO/PYMKS/pymks
+$ python setup.py install</pre>
+</div>
+<p>Check that you can import it and run the tests.</p>
+<div class="highlight-python"><pre>$ python -c "import pymks; pymks.test()"</pre>
+</div>
+</div>
+<div class="section" id="ipython-notebooks">
+<h2>IPython Notebooks<a class="headerlink" href="#ipython-notebooks" title="Permalink to this headline">¶</a></h2>
+<p>Check that you can launch and use the IPython notebooks</p>
+<div class="highlight-python"><pre>$ cd /PATH/TO/PYMKS/pymks/notebooks
+$ ipython notebook</pre>
+</div>
+<p>This should fire up your browser with the notebook dashboard displayed.
+Click on the <tt class="docutils literal"><span class="pre">01</span> <span class="pre">-</span> <span class="pre">Python</span> <span class="pre">Intro</span></tt> notebook. Run the cells under the
+&#8220;Test your installation&#8221; heading near the top of the notebook. If this
+all works, you are set, if not, <a class="reference external" href="https://github.com/wd15/pymks/issues?state=open">let me
+know</a>.</p>
+</div>
+<div class="section" id="issues">
+<h2>Issues<a class="headerlink" href="#issues" title="Permalink to this headline">¶</a></h2>
+<p>If you have issues email me, <a class="reference external" href="mailto:daniel&#46;wheeler&#37;&#52;&#48;nist&#46;gov">daniel<span>&#46;</span>wheeler<span>&#64;</span>nist<span>&#46;</span>gov</a>, or better still
+submit an issue on the <a class="reference external" href="https://github.com/wd15/pymks/issues?state=open">issue
+tracker</a> (it emails
+me). The following are the issues I had when using Anaconda on my Ubuntu
+laptop.</p>
+<ul class="simple">
+<li>I had to change my backend in <tt class="docutils literal"><span class="pre">.matplotlibrc</span></tt> from <tt class="docutils literal"><span class="pre">GTKAgg</span></tt> to
+<tt class="docutils literal"><span class="pre">TKAgg</span></tt> when running <tt class="docutils literal"><span class="pre">import</span> <span class="pre">matplotlib.pyplot</span> <span class="pre">as</span> <span class="pre">plt</span></tt> from
+Anaconda. This issue should be apparent when running
+<tt class="docutils literal"><span class="pre">pymks.test()</span></tt>.</li>
+<li>I had a blank screen in the browser when launching the IPython
+notebook. This may have been due to some dependency conflicts on my
+system as I have multiple versions of IPython. To overcome this, I
+cloned a development version of the notebook from the <a class="reference external" href="https://github.com/ipython/ipython.git">IPython Github
+repo</a> and installed it.
+This seemed to work.</li>
+<li>Andrew had the same blank screen issue in the CTCMS and he just
+switched to the Chrome browser and it worked.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../API.html" title="API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="README.html" title="Materials Knowledge System Repository"
+             >previous</a> |</li>
+        <li><a href="../index.html">pymks 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Daniel Wheeler.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

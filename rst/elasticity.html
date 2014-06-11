@@ -1,0 +1,214 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&lt;no title&gt; &mdash; pymks 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="pymks 0.1 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">pymks 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/rst/elasticity.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks</span> <span class="kn">import</span> <span class="n">ElasticFEModel</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">X</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.</span>
+<span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+<span class="n">X</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">ElasticFEModel</span><span class="p">()</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>sfepy: generating 144 vertices...
+sfepy: ...done
+sfepy: generating 121 cells...
+sfepy: ...done
+sfepy: saving regions as groups...
+sfepy:   region_all
+sfepy: ...done
+sfepy: updating variables...
+sfepy: ...done
+sfepy: setting up dof connectivities...
+sfepy: ...done in 0.00 s
+sfepy: matrix shape: (967, 967)
+sfepy: assembling matrix graph...
+sfepy: ...done in 0.00 s
+sfepy: matrix structural nonzeros: 29343 (3.14e-02% fill)
+sfepy: updating materials...
+sfepy:     m
+sfepy:     f
+sfepy: ...done in 0.00 s
+sfepy: nls: iter: 0, residual: 7.239688e+01 (rel: 1.000000e+00)
+sfepy:   rezidual:    0.00 [s]
+sfepy:      solve:    0.01 [s]
+sfepy:     matrix:    0.00 [s]
+sfepy: nls: iter: 1, residual: 7.816319e-14 (rel: 1.079649e-15)</pre>
+</div>
+<div class="highlight-python"><pre>/home/wd15/git/pymks/pymks/elasticFEModel.py:151: DeprecationWarning: Implicitly casting between incompatible kinds. In a future numpy release, this will raise an error. Use casting="unsafe" if this is intentional.
+  i = np.floor((x + self.dx / 2 - minx) / self.dx, i_out)
+/home/wd15/git/pymks/pymks/elasticFEModel.py:152: DeprecationWarning: Implicitly casting between incompatible kinds. In a future numpy release, this will raise an error. Use casting="unsafe" if this is intentional.
+  j = np.floor((y + self.dx / 2 - miny) / self.dx, j_out)</pre>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>&lt;matplotlib.image.AxesImage at 0x4cc5610&gt;</pre>
+</div>
+<img alt="../_images/elasticity_1_1.png" src="../_images/elasticity_1_1.png" />
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">y</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>&lt;matplotlib.contour.QuadContourSet instance at 0x5298200&gt;</pre>
+</div>
+<img alt="../_images/elasticity_3_1.png" src="../_images/elasticity_3_1.png" />
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>&lt;matplotlib.contour.QuadContourSet instance at 0x497b878&gt;</pre>
+</div>
+<img alt="../_images/elasticity_4_1.png" src="../_images/elasticity_4_1.png" />
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">displacement_flat</span> <span class="o">=</span> <span class="n">vec</span><span class="o">.</span><span class="n">create_output_dict</span><span class="p">()[</span><span class="s">&#39;u&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+<span class="n">displacement</span> <span class="o">=</span> <span class="n">displacement_flat</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
+<span class="k">print</span> <span class="n">displacement</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>[[ 0.   0.   0.   0.   0.   0. ]
+ [ 0.2  0.2  0.2  0.2  0.2  0.2]
+ [ 0.4  0.4  0.4  0.4  0.4  0.4]
+ [ 0.6  0.6  0.6  0.6  0.6  0.6]
+ [ 0.8  0.8  0.8  0.8  0.8  0.8]
+ [ 1.   1.   1.   1.   1.   1. ]]</pre>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">s</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">uu</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">uu</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>&lt;matplotlib.contour.QuadContourSet instance at 0xa825368&gt;</pre>
+</div>
+<img alt="../_images/elasticity_7_1.png" src="../_images/elasticity_7_1.png" />
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sfepy.postprocess</span> <span class="kn">import</span> <span class="n">Viewer</span>
+
+<span class="n">pb</span><span class="o">.</span><span class="n">save_state</span><span class="p">(</span><span class="s">&#39;linear_elasticity1.vtk&#39;</span><span class="p">,</span> <span class="n">vec</span><span class="p">)</span>
+
+<span class="n">view</span> <span class="o">=</span> <span class="n">Viewer</span><span class="p">(</span><span class="s">&#39;linear_elasticity1.vtk&#39;</span><span class="p">)</span>
+<span class="n">view</span><span class="p">(</span><span class="n">vector_mode</span><span class="o">=</span><span class="s">&#39;warp_norm&#39;</span><span class="p">,</span> <span class="n">rel_scaling</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+     <span class="n">is_scalar_bar</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">is_wireframe</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>sfepy: point vectors u at [ 0.  0.  0.]
+sfepy: range: -3.65e-15 1.00e+00 l2 norm range: 0.00e+00 1.00e+00</pre>
+</div>
+<div class="highlight-python"><pre>&lt;sfepy.postprocess.viewer.ViewerGUI at 0x990b590&gt;</pre>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="nb">max</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">()),</span> <span class="nb">min</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mf">0.050315655904084031</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.050315655904084912</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">vec</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()[</span><span class="s">&#39;vec&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>[ 0.          0.          0.         ...,  0.94301265  0.00128292
+  0.94334275]</pre>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">242</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">11.0</span>
+</pre></div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">pymks 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Daniel Wheeler.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

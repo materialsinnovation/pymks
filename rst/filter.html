@@ -1,0 +1,318 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>A Simple Filter &mdash; pymks 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="pymks 0.1 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">pymks 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">A Simple Filter</a><ul>
+<li><a class="reference internal" href="#the-filter">The filter</a></li>
+<li><a class="reference internal" href="#what-is-a-filter">What is a Filter?</a></li>
+<li><a class="reference internal" href="#exercise-03-0">Exercise 03-0</a></li>
+<li><a class="reference internal" href="#calculate-the-influence-coefficients-using-the-regression">Calculate the influence coefficients using the regression</a></li>
+<li><a class="reference internal" href="#introducing-the-mksregressionmodel">Introducing the <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt></a></li>
+<li><a class="reference internal" href="#exercise-03-1">Exercise 03-1</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/rst/filter.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="a-simple-filter">
+<h1>A Simple Filter<a class="headerlink" href="#a-simple-filter" title="Permalink to this headline">¶</a></h1>
+<p>This example will demonstrate the importance of removing the
+redundancies from the regression. This notebook will</p>
+<ul class="simple">
+<li>define a simple 1D filter,</li>
+<li>generate influence coefficients using the filter,</li>
+<li>use these coefficients to calculate a response from a microstructure,</li>
+<li>back calculate the influence coefficients,</li>
+<li>compare the back calculated influence coefficients with the original,</li>
+<li>introduce the <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> class and</li>
+<li>show how the this class deals with redundancies.</li>
+</ul>
+<div class="code python highlight-python"><pre>%matplotlib inline
+%load_ext autoreload
+%autoreload 2
+
+import numpy as np
+import matplotlib.pyplot as plt</pre>
+</div>
+<div class="highlight-python"><pre>The autoreload extension is already loaded. To reload it, use:
+  %reload_ext autoreload</pre>
+</div>
+<div class="section" id="the-filter">
+<h2>The filter<a class="headerlink" href="#the-filter" title="Permalink to this headline">¶</a></h2>
+<p>Create a filter.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">,</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">20</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="mi">20</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">filter</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</pre></div>
+</div>
+<img alt="../_images/filter_4_0.png" src="../_images/filter_4_0.png" />
+<div class="code python highlight-python"><pre>?np.linspace</pre>
+</div>
+<p>Construct the coefficients, <tt class="docutils literal"><span class="pre">coeff</span></tt></p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">Nbin</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">Nspace</span> <span class="o">=</span> <span class="mi">81</span>
+
+<span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Nbin</span><span class="p">)[</span><span class="bp">None</span><span class="p">,:]</span> <span class="o">*</span> <span class="nb">filter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">Nspace</span><span class="p">))[:,</span><span class="bp">None</span><span class="p">]</span>
+<span class="k">print</span> <span class="n">coeff</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">81</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Take the Fourier transform.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">Fcoeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">coeff</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Make some sample microstructures, <tt class="docutils literal"><span class="pre">X</span></tt></p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">Nsample</span> <span class="o">=</span> <span class="mi">400</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">Nsample</span><span class="p">,</span> <span class="n">Nspace</span><span class="p">))</span>
+<span class="k">print</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="mi">81</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Discretize the microstructure</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Nbin</span><span class="p">)</span>
+<span class="n">X_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">X</span><span class="p">[:,:,</span><span class="bp">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">H</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">H</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">H</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">X_</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="k">print</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>[ 0.5640051  0.4359949]
+0.435994902142</pre>
+</div>
+<p>Calculate the responses</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">FX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">X_</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">Fy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Fcoeff</span><span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">FX</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">Fy</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="what-is-a-filter">
+<h2>What is a Filter?<a class="headerlink" href="#what-is-a-filter" title="Permalink to this headline">¶</a></h2>
+<p>A convolution</p>
+<div class="math">
+<p><img src="../_images/math/bc69a7ff648285241865c15e14b514d5738fa3b4.png" alt="y_k = \sum_{i=0}^{N - 1} x_{k-i} h_i"/></p>
+</div><p>where <img class="math" src="../_images/math/8189a5b5a0917b8c93350827be4038af1839139d.png" alt="h"/> is filter and <img class="math" src="../_images/math/26eeb5258ca5099acf8fe96b2a1049c48c89a5e6.png" alt="x"/> is periodic in this case.</p>
+</div>
+<div class="section" id="exercise-03-0">
+<h2>Exercise 03-0<a class="headerlink" href="#exercise-03-0" title="Permalink to this headline">¶</a></h2>
+<p>Use the <tt class="docutils literal"><span class="pre">scipy.ndimage.convolve</span></tt> function to construct the <tt class="docutils literal"><span class="pre">y</span></tt>.</p>
+<ul class="simple">
+<li>look at <tt class="docutils literal"><span class="pre">scipy.ndimage.convove</span></tt> documentation</li>
+<li>just do the first sample</li>
+<li>the <tt class="docutils literal"><span class="pre">convolve</span></tt> function must be in <tt class="docutils literal"><span class="pre">wrap</span></tt> mode to be periodic</li>
+<li>use a small <tt class="docutils literal"><span class="pre">Nspace</span></tt> to test</li>
+<li>use <tt class="docutils literal"><span class="pre">np.roll</span></tt> to align the results</li>
+<li>check the answer with <tt class="docutils literal"><span class="pre">np.allclose</span></tt></li>
+</ul>
+<div class="code python highlight-python"><pre>import scipy.signal
+import scipy.ndimage
+?scipy.signal.fftconvolve
+
+y_alt = scipy.ndimage.convolve(X[0], filter(np.linspace(0, 20, Nspace)), mode='wrap')
+print np.allclose(np.roll(y_alt, 40), y[0])</pre>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="bp">True</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="calculate-the-influence-coefficients-using-the-regression">
+<h2>Calculate the influence coefficients using the regression<a class="headerlink" href="#calculate-the-influence-coefficients-using-the-regression" title="Permalink to this headline">¶</a></h2>
+<p>Use the binned microstructure, <tt class="docutils literal"><span class="pre">X_</span></tt>, and the repsonses, <tt class="docutils literal"><span class="pre">y</span></tt> to
+recalculate the coefficients.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">model_Fcoeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nspace</span><span class="p">,</span> <span class="n">Nbin</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nspace</span><span class="p">):</span>
+    <span class="n">model_Fcoeff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">X_</span><span class="p">[:,</span><span class="n">i</span><span class="p">],</span> <span class="n">y</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span> <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">model_coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">model_Fcoeff</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nbin</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">coeff</span><span class="p">[:,</span><span class="n">b</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;orignal&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_coeff</span><span class="p">[:,</span><span class="n">b</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;MKS&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/filter_20_0.png" src="../_images/filter_20_0.png" />
+<img alt="../_images/filter_20_1.png" src="../_images/filter_20_1.png" />
+<p>The calculated influence coefficients are not even close to the
+originals. What&#8217;s going on? The equation,</p>
+<div class="math">
+<p><img src="../_images/math/1adf7ab6d6c850ac6e1a8100514f52939f652bfe.png" alt="\sum\limits_{h=0}^{H-1} m^h_{a, s} = 1"/></p>
+</div><p>is not being taken into account. Using this, we can rewrite the
+convolution as</p>
+<div class="math">
+<p><img src="../_images/math/5dd5c5082ebb6398d286fc6ca73e7e7065c31184.png" alt="\begin{split}
+p_{a,s} &amp;= \sum\limits_{h=0}^{H - 1} \sum\limits_{t=0}^{S-1} \alpha_t^h m_{a,s + t}^h \\
+        &amp;= \sum\limits_{t=0}^{S-1} \left[ \sum\limits_{h=0}^{H - 2} \alpha_t^h m_{a,s + t}^h +
+           \alpha_t^{H-1} \left( 1 - \sum\limits_{h=0}^{H - 2} m_{a,s+t}^h \right) \right] \\
+        &amp;= \sum\limits_{t=0}^{S-1} \alpha_t^{H - 1} +
+           \sum\limits_{h=0}^{H - 2} \sum\limits_{t=0}^{S-1} \left(\alpha_t^h - \alpha_t^{H-1} \right) m_{a,s + t}^h \\
+        &amp;= b_0 + \sum\limits_{h=0}^{H - 2} \sum\limits_{t=0}^{S-1} b_t^h m_{a,s + t}^h
+\end{split}"/></p>
+</div><p>This removes the redundancies from the regression. Coding this in 1D is
+easy, we simply replace</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nspace</span><span class="p">):</span>
+    <span class="n">model_Fcoeff</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">X_</span><span class="p">[:,</span><span class="n">k</span><span class="p">],</span> <span class="n">y</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span> <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>with</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nspace</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">model_Fcoeff</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">X_</span><span class="p">[:,</span><span class="n">k</span><span class="p">],</span> <span class="n">y</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span> <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">model_Fcoeff</span><span class="p">[</span><span class="n">k</span><span class="p">,:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">X_</span><span class="p">[:,</span><span class="n">k</span><span class="p">,:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span> <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="introducing-the-mksregressionmodel">
+<h2>Introducing the <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt><a class="headerlink" href="#introducing-the-mksregressionmodel" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> takes a test microstructure <tt class="docutils literal"><span class="pre">X</span></tt> and a test
+response <tt class="docutils literal"><span class="pre">y</span></tt> in any dimension and does a linear regression to
+determine the influence coefficients. So,</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nbin</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After the fit, the <tt class="docutils literal"><span class="pre">predict</span></tt> method can be used to fit new data.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">y_predict</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_predict</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> inherits from Scikit-learn&#8217;s
+<tt class="docutils literal"><span class="pre">LinearRegression</span></tt> class so that we can start doing cross validation
+in the next tutorial.</p>
+<div class="code python highlight-python"><pre>from pymks import MKSRegressionModel
+
+??MKSRegressionModel</pre>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nbin</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">model</span><span class="o">.</span><span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Fcoeff</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">coeff</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">coeff</span> <span class="o">-</span> <span class="n">model</span><span class="o">.</span><span class="n">coeff</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])[:,::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nbin</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">coeff</span><span class="p">[:,</span><span class="n">b</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;MKSRegressionModel&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">coeff</span><span class="p">[:,</span><span class="n">b</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;original&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/filter_26_0.png" src="../_images/filter_26_0.png" />
+<img alt="../_images/filter_26_1.png" src="../_images/filter_26_1.png" />
+<p>The <tt class="docutils literal"><span class="pre">model.coeff</span></tt> needed rearranging as the <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt>
+coefficients are using the coefficients that have the redundancies
+removed.</p>
+</div>
+<div class="section" id="exercise-03-1">
+<h2>Exercise 03-1<a class="headerlink" href="#exercise-03-1" title="Permalink to this headline">¶</a></h2>
+<p>Create a random sample and check that using <tt class="docutils literal"><span class="pre">scipy.ndimage.convolve</span></tt>
+to create the responses gives the same result as the
+<tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt>.</p>
+<ul class="simple">
+<li>Use <tt class="docutils literal"><span class="pre">np.roll</span></tt> to align the result from <tt class="docutils literal"><span class="pre">scipy.ndimage.convolve</span></tt></li>
+<li>Use <tt class="docutils literal"><span class="pre">np.allclose</span></tt> to compare.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">pymks 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Daniel Wheeler.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

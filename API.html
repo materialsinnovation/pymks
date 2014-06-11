@@ -1,0 +1,504 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>API &mdash; pymks 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pymks 0.1 documentation" href="index.html" />
+    <link rel="next" title="Examples" href="EXAMPLES.html" />
+    <link rel="prev" title="Installation" href="rst/INSTALLATION.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="EXAMPLES.html" title="Examples"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="rst/INSTALLATION.html" title="Installation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pymks 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="rst/INSTALLATION.html"
+                        title="previous chapter">Installation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="EXAMPLES.html"
+                        title="next chapter">Examples</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/API.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pymks">
+<span id="api"></span><h1>API<a class="headerlink" href="#module-pymks" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="pymks.test">
+<tt class="descclassname">pymks.</tt><tt class="descname">test</tt><big>(</big><big>)</big><a class="headerlink" href="#pymks.test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run all the doctests available.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pymks.MKSRegressionModel">
+<em class="property">class </em><tt class="descclassname">pymks.</tt><tt class="descname">MKSRegressionModel</tt><big>(</big><em>Nbin=10</em><big>)</big><a class="headerlink" href="#pymks.MKSRegressionModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <cite>MKSRegressionModel</cite> fits data using the Materials Knowledge
+System in Fourier Space. Currently, the model assumes that the
+microstructure (<cite>X</cite>) must varies only between 0 and 1.</p>
+<p>The following demonstrates the viability of the
+<cite>MKSRegressionModel</cite> with a simple 1D filter.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Nbin</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Nspace</span> <span class="o">=</span> <span class="mi">81</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Nsample</span> <span class="o">=</span> <span class="mi">400</span>
+</pre></div>
+</div>
+<p>Define a filter function.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span>
+<span class="gp">... </span>                    <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">20</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="mi">20</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Use the filter function to construct some coefficients.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Nbin</span><span class="p">)[</span><span class="bp">None</span><span class="p">,:]</span> <span class="o">*</span> <span class="nb">filter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">Nspace</span><span class="p">))[:,</span><span class="bp">None</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Fcoeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">coeff</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Make some test samples.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">Nsample</span><span class="p">,</span> <span class="n">Nspace</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Construct a response with the <cite>Fcoeff</cite>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Nbin</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">X</span><span class="p">[:,:,</span><span class="bp">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">H</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">H</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">H</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">X_</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Fy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Fcoeff</span><span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">FX</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">Fy</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+</pre></div>
+</div>
+<p>Use the <cite>MKSRegressionModel</cite> to reconstruct the coefficients</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nbin</span><span class="o">=</span><span class="n">Nbin</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Check the result</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">coeff</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,)),</span> <span class="n">model</span><span class="o">.</span><span class="n">coeff</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Attributes:</dt>
+<dd>Nbin: Interger value for number of local states
+coef: Array of values that are the influence coefficients
+Fcoef: Frequency space representation of coef</dd>
+</dl>
+<dl class="method">
+<dt id="pymks.MKSRegressionModel.fit">
+<tt class="descname">fit</tt><big>(</big><em>X</em>, <em>y</em><big>)</big><a class="headerlink" href="#pymks.MKSRegressionModel.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fits the data by calculating a set of influence coefficients,
+<cite>Fcoeff</cite>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nbin</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Fcoeff</span><span class="p">,</span> <span class="p">[[[</span> <span class="mf">0.5</span><span class="p">,</span>  <span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span>
+<span class="gp">... </span>                                  <span class="p">[[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span>  <span class="mi">0</span>  <span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]])</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first docutils">
+<dt>X: the microstructre function, an <cite>(S, N, ...)</cite> shaped array where</dt>
+<dd><blockquote class="first">
+<div><cite>S</cite> is the number of samples and <cite>N</cite> is the spatial</div></blockquote>
+<p class="last">discretization.</p>
+</dd>
+</dl>
+<p class="last">y: The response field, same shape as <cite>X</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pymks.MKSRegressionModel.predict">
+<tt class="descname">predict</tt><big>(</big><em>X</em><big>)</big><a class="headerlink" href="#pymks.MKSRegressionModel.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate a new response from the microstructure function <cite>X</cite> with calibrated
+influence coefficients.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nbin</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>X: The microstructre function, an <cite>(S, N, ...)</cite> shaped</dt>
+<dd>array where <cite>S</cite> is the number of samples and <cite>N</cite>
+is the spatial discretization.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>The predicted response field the same shape as <cite>X</cite>.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pymks.MKSRegressionModel.resize_coeff">
+<tt class="descname">resize_coeff</tt><big>(</big><em>shape</em><big>)</big><a class="headerlink" href="#pymks.MKSRegressionModel.resize_coeff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale the size of the coefficients and pad with zeros.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">Fcoeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">coeff</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">resize_coeff</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Fcoeff</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">coeff</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                   <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="p">[</span><span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">19</span><span class="p">]])</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>shape: The new shape of the influence coefficients.</dd>
+<dt>Returns:</dt>
+<dd>The resized influence coefficients to size &#8216;shape&#8217;.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pymks.FastMKSRegressionModel">
+<em class="property">class </em><tt class="descclassname">pymks.</tt><tt class="descname">FastMKSRegressionModel</tt><big>(</big><em>Nbin=10</em>, <em>threads=1</em><big>)</big><a class="headerlink" href="#pymks.FastMKSRegressionModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class is an optimized version of MKSRegressionModel class.</p>
+<dl class="method">
+<dt id="pymks.FastMKSRegressionModel.predict">
+<tt class="descname">predict</tt><big>(</big><em>X</em><big>)</big><a class="headerlink" href="#pymks.FastMKSRegressionModel.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates a response from the microstructure <cite>X</cite>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">FastMKSRegressionModel</span><span class="p">(</span><span class="n">Nbin</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>X: The microstructure function, an <cite>(S, N, ...)</cite> shaped</dt>
+<dd>array where <cite>S</cite> is the number of samples and <cite>N</cite>
+is the spatial discretization.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>The predicted response field the same shape as <cite>X</cite></dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pymks.FiPyCHModel">
+<em class="property">class </em><tt class="descclassname">pymks.</tt><tt class="descname">FiPyCHModel</tt><big>(</big><em>dx=0.005</em>, <em>dy=None</em>, <em>dt=1e-08</em>, <em>a=14.142135623730951</em>, <em>epsilon=0.1</em><big>)</big><a class="headerlink" href="#pymks.FiPyCHModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class</p>
+<dl class="docutils">
+<dt>Attributes:</dt>
+<dd>dx: Grid spacing in the horizontal direction.
+dy: Grid spacing in the vertical direction.
+dt: Time step of the simulation.
+a: Float value used to scale the weight of the double well potential.
+epsilon: Float value used to scale the weight of the gradient energy term</dd>
+</dl>
+<dl class="method">
+<dt id="pymks.FiPyCHModel.predict">
+<tt class="descname">predict</tt><big>(</big><em>X</em><big>)</big><a class="headerlink" href="#pymks.FiPyCHModel.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict the simulation for the next time step using Fipy.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>X: Array representing the microstructure.</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>y: Array representing the microstructure at</dt>
+<dd>at one time step ahead of &#8216;X&#8217;.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pymks.draw_microstructure_discretization">
+<tt class="descclassname">pymks.</tt><tt class="descname">draw_microstructure_discretization</tt><big>(</big><em>M</em>, <em>a=0</em>, <em>s=0</em>, <em>Nbin=6</em>, <em>bound=0.016</em>, <em>height=1.7</em><big>)</big><a class="headerlink" href="#pymks.draw_microstructure_discretization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a diagram to illustrate the binning of a continues values in local state
+space.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>Array representing a microstructure with a continuous variable.</dd>
+<dt>Returns:</dt>
+<dd>Image of the continuous local state binned discretely in the local
+state space.</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="pymks.ElasticFEModel">
+<em class="property">class </em><tt class="descclassname">pymks.</tt><tt class="descname">ElasticFEModel</tt><big>(</big><em>dx=1.0</em><big>)</big><a class="headerlink" href="#pymks.ElasticFEModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use SfePy to solve a linear strain problem in 2D with a varying
+microstructure on a rectangular grid. The rectangle is held at the
+left edge and displaced by 1 on the right edge. Periodic boundary
+conditions are applied to the upper and lower plains.</p>
+<p>The microstructurs is of shape (Nsample, Nx, Ny, Nproperty) where
+Nproperty is 2 for the elastic modulus and Poisson&#8217;s ratio.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">ElasticFEModel</span><span class="p">(</span><span class="n">dx</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>y is the strain with compontents as follows</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">exx</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eyy</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exy</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Since there is no contrast in the microstructe the strain is only
+in the x-direction and has a uniform value of 1 since the
+displacement is always 1 and the size of the domain is 1.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">exx</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">eyy</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">exy</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="pymks.ElasticFEModel.convert_properties">
+<tt class="descname">convert_properties</tt><big>(</big><em>X</em><big>)</big><a class="headerlink" href="#pymks.ElasticFEModel.convert_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert from elastic modulus and Poisson&#8217;s ratio to the Lame
+parameter and shear modulus</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>X: array of material properties, X[...,0] is the elastic</dt>
+<dd>modulus and X[...,1] is the Poisson&#8217;s ratio</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>returns a new array with the Lame parameter and the shear modulus</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pymks.ElasticFEModel.get_displacementBCs">
+<tt class="descname">get_displacementBCs</tt><big>(</big><em>domain</em><big>)</big><a class="headerlink" href="#pymks.ElasticFEModel.get_displacementBCs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fix the left plane in x, displace the right plane by 1 and fix
+the y-direction with the top and bottom points on the left x
+plane.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>domain: an Sfepy domain</dd>
+<dt>Returns:</dt>
+<dd>the Sfepy boundary conditions</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pymks.ElasticFEModel.get_material">
+<tt class="descname">get_material</tt><big>(</big><em>property_array</em>, <em>domain</em><big>)</big><a class="headerlink" href="#pymks.ElasticFEModel.get_material" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an SfePy material from the material property fields</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>property_array: array of the properties with shape (Nx, Ny, 2)</dd>
+<dt>Returns:</dt>
+<dd>an SfePy material</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pymks.ElasticFEModel.get_mesh">
+<tt class="descname">get_mesh</tt><big>(</big><em>shape</em><big>)</big><a class="headerlink" href="#pymks.ElasticFEModel.get_mesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an Sfepy rectangular mesh</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>shape: proposed shape of domain (vertex shape) (Nx, Ny)</dd>
+<dt>Returns:</dt>
+<dd>Sfepy mesh</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pymks.ElasticFEModel.get_periodicBCs">
+<tt class="descname">get_periodicBCs</tt><big>(</big><em>domain</em><big>)</big><a class="headerlink" href="#pymks.ElasticFEModel.get_periodicBCs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates periodic boundary conditions with the top and bottom y-planes.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>domain: an Sfepy domain</dd>
+<dt>Returns:</dt>
+<dd>a tuple of Sfepy boundary condition and associated matching functions</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pymks.ElasticFEModel.predict">
+<tt class="descname">predict</tt><big>(</big><em>X</em><big>)</big><a class="headerlink" href="#pymks.ElasticFEModel.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict the displacement field given an initial microstructure
+and a strain in the x direction.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>X: microstructure with shape (Nsample, Nx, Ny, Nproperty)</dt>
+<dd>with len(Nproperty) = 2. X[..., 0] represents the elastic
+modulus and X[..., 1] is the Poisson&#8217;s ratio</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>the strain field over each cell</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pymks.ElasticFEModel.solve">
+<tt class="descname">solve</tt><big>(</big><em>property_array</em><big>)</big><a class="headerlink" href="#pymks.ElasticFEModel.solve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solve the Sfepy problem for one sample.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>property_array: array of shape (Nx, Ny, 2) where the last
+index is for Lame&#8217;s parameter and shear modulus,
+respectively.</dd>
+<dt>Returns:</dt>
+<dd>the displacement field of shape (Nx, Ny, 2) where the last
+index represents the x and y displacements</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pymks.ElasticFEModel.subdomain_func">
+<tt class="descname">subdomain_func</tt><big>(</big><em>x=()</em>, <em>y=()</em><big>)</big><a class="headerlink" href="#pymks.ElasticFEModel.subdomain_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a function to mask subdomains in Sfepy.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>x: tuple of lines or points to be masked in the x-plane
+y: tuple of lines or points to be masked in the y-plane</dd>
+<dt>Returns:</dt>
+<dd>array of masked location indices</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pymks.bin">
+<tt class="descclassname">pymks.</tt><tt class="descname">bin</tt><big>(</big><em>arr</em>, <em>Nbin</em><big>)</big><a class="headerlink" href="#pymks.bin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Discretize the array <cite>arr</cite>, which must be between 0 and 1.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="nb">bin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">)),</span> <span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">res</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="p">[[</span> <span class="mf">0.4</span><span class="p">,</span>  <span class="mf">0.6</span><span class="p">,</span>  <span class="mf">0.</span> <span class="p">,</span>  <span class="mf">0.</span> <span class="p">],</span>
+<span class="gp">... </span>             <span class="p">[</span> <span class="mf">0.</span> <span class="p">,</span>  <span class="mf">0.5</span><span class="p">,</span>  <span class="mf">0.5</span><span class="p">,</span>  <span class="mf">0.</span> <span class="p">],</span>
+<span class="gp">... </span>             <span class="p">[</span> <span class="mf">0.</span> <span class="p">,</span>  <span class="mf">0.</span> <span class="p">,</span>  <span class="mf">0.9</span><span class="p">,</span>  <span class="mf">0.1</span><span class="p">]])</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">arr: Array that must be between 0 and 1.
+Nbin: Integer value representing the number of local states</p>
+<blockquote class="last">
+<div>in the local state space of the microstructure function.</div></blockquote>
+</dd>
+<dt>Returns:</dt>
+<dd>Microstructure function for array <cite>arr</cite>.</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="EXAMPLES.html" title="Examples"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="rst/INSTALLATION.html" title="Installation"
+             >previous</a> |</li>
+        <li><a href="index.html">pymks 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Daniel Wheeler.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
