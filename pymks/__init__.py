@@ -31,4 +31,11 @@ def _getVersion():
 
 __version__ = _getVersion()
 
-
+__all__ = ['__version__',
+           'test',
+           'MKSRegressionModel',
+           'FastMKSRegressionModel',
+           'FiPyCHModel',
+           'draw_microstructure_discretization',
+           'ElasticFEModel',
+           'bin']
