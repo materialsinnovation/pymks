@@ -8,11 +8,13 @@ PAPER         =
 BUILDDIR      = _build
 
 RST_DIR = rst
+NOTEBOOK_DIR = ../notebooks
+MARKDOWN_DIR = ..
 
-NOTEBOOKS     = ../notebooks/MKSIntro.ipynb
+NOTEBOOKS     = $(wildcard $(NOTEBOOK_DIR)/*.ipynb)
 NOTEBOOKS_RST = $(patsubst ../notebooks/%.ipynb,$(RST_DIR)/%.rst,$(NOTEBOOKS))
 
-MARKDOWN      = ../INSTALLATION.md ../README.md
+MARKDOWN      = $(wildcard $(MARKDOWN_DIR)/*.md)
 RST           = $(patsubst ../%.md,$(RST_DIR)/%.rst,$(MARKDOWN))
 
 # Internal variables.
@@ -28,11 +30,11 @@ clean:
 	rm -rf $(BUILDDIR)/*
 	rm -rf $(RST_DIR)
 
-$(RST): $(MARKDOWN)
+$(RST_DIR)/%.rst: $(MARKDOWN_DIR)/%.md
 	mkdir -p $(RST_DIR)
 	pandoc -f markdown -t rst $< -o $@
 
-$(NOTEBOOKS_RST): $(NOTEBOOKS)
+$(RST_DIR)/%.rst: $(NOTEBOOK_DIR)/%.ipynb
 	mkdir -p $(RST_DIR)
 	cd $(RST_DIR); ipython nbconvert --to rst ../$<
 
