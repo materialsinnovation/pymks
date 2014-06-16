@@ -3,18 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-====================================
-Materials Knowledge System in Python
-====================================
+=====================================
+Materials Knowledge Systems in Python
+=====================================
 
 .. include:: rst/README.rst
 
-.. include:: rst/mks_intro.rst
+.. include:: mks_intro.rst
 
 .. toctree::
    :hidden:
 
-   rst/README.rst
    rst/INSTALLATION.rst
    EXAMPLES.rst
    API.rst
+   rst/CREDITS.rst
+   rst/LICENSE.rst
+   rst/CITATION.rst

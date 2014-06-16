@@ -10,6 +10,26 @@ alterations. Just skip over the
 [Anaconda Python section](#anaconda-python) and install the packages
 in the [Regular Python section](#regular-python).
 
+## Requirements
+
+The [REQUIREMENTS.txt](REQUIREMENTS.txt) file has a complete list of
+packages in the Python environment during development. The most
+important of these are listed. The version numbers are mostly not
+important within reason, but if you have problems the version numbers
+may help.
+
+ * FiPy dev version `6e897df40012`
+ * IPython dev version `b31eb2f2d951`
+ * Matplotlib 1.2.1
+ * Numpy 1.7.1
+ * Scikit-learn 0.13.1
+ * Scipy 0.13.0
+ * pyFFTW 0.9.2
+ * ez-setup 0.9
+ * line-profiler 1.0b3
+ * numexpr 2.2.2
+
+
 ## Anaconda Python 
 
 If you have no experience with scientific Python, I would highly
