@@ -7,4 +7,14 @@
 Materials Knowledge System in Python
 ====================================
 
+.. include:: rst/README.rst
 
+.. include:: rst/mks_intro.rst
+
+.. toctree::
+   :hidden:
+
+   rst/README.rst
+   rst/INSTALLATION.rst
+   EXAMPLES.rst
+   API.rst
