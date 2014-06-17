@@ -29,7 +29,7 @@ all: html
 clean:
 	rm -rf $(BUILDDIR)/*
 	rm -rf $(RST_DIR)
-	rm -rf mks_intro*
+	rm -rf intro*
 
 $(RST_DIR)/%.rst: $(MARKDOWN_DIR)/%.md
 	mkdir -p $(RST_DIR)
@@ -40,8 +40,8 @@ $(RST_DIR)/%.rst: $(NOTEBOOK_DIR)/%.ipynb
 	cd $(RST_DIR); ipython nbconvert --to rst ../$<
 
 html: $(RST) $(NOTEBOOKS_RST)
-	@cp rst/mks_intro.rst ./
-	@cp -r rst/mks_intro_files ./
+	@cp rst/intro.rst ./
+	@cp -r rst/intro_files ./
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."

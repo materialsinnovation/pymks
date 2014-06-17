@@ -4,7 +4,8 @@ Examples
 .. toctree::
    :maxdepth: 2
 
-   rst/mks_intro.rst
+   rst/elasticity.rst
+   rst/derivation.rst
    rst/filter.rst
    rst/cross_validation.rst
    rst/scaling_coefficients.rst
