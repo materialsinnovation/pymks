@@ -169,7 +169,7 @@ class ElasticFEModel(object):
 
     def get_periodicBCs(self, domain):
         """
-        Creates periodic boundary conditions with the top and bottom y-planes.
+        Creates periodic boundary conditions with the top and bottom y-plains.
 
         Args:
           domain: an Sfepy domain
@@ -263,7 +263,7 @@ class ElasticFEModel(object):
           respectively.
 
         Returns:
-          the displacement field of shape (Nx, Ny, 2) where the last
+          the strain field of shape (Nx, Ny, 2) where the last
           index represents the x and y displacements
           
         """
