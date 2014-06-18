@@ -1,0 +1,289 @@
+
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Derivation of Materials Knowledge System Equation using Linear Elasticity &mdash; PyMKS</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootswatch-3.1.0/cosmo/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pymks.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.1.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="../_static/pymks_logo.ico"/>
+    <link rel="top" title="PyMKS" href="../index.html" />
+    <link rel="up" title="Examples" href="../EXAMPLES.html" />
+    <link rel="next" title="A Simple Filter" href="filter.html" />
+    <link rel="prev" title="Linear Elasticity Simulations and the Materials Knowledge System" href="elasticity.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+                <li><a href="INSTALLATION.html">Installation</a></li>
+                <li><a href="../EXAMPLES.html">Examples</a></li>
+                <li><a href="../API.html">API</a></li>
+                <li><a href="https://github.com/wd15/pymks/">Github</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="INSTALLATION.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#anaconda-python">Anaconda Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#regular-python">Regular Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#fftw">FFTW</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#line-profiler"><tt class="docutils literal"><span class="pre">line_profiler</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#java-script-animator">Java Script Animator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#git">Git</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#install-the-pymks-module">Install the <tt class="docutils literal"><span class="pre">pymks</span></tt> module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#ipython-notebooks">IPython Notebooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#issues">Issues</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../EXAMPLES.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="elasticity.html">Linear Elasticity Simulations and the Materials Knowledge System</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Derivation of Materials Knowledge System Equation using Linear Elasticity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="filter.html">A Simple Filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_validation.html">Cross Validation and Hyperparameter Optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_validation.html#learning-curves">Learning Curves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scaling_coefficients.html">Scaling the Coefficients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="improving_performance.html">Improving Performance</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../API.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CREDITS.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CITATION.html">Citation</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="section" id="derivation-of-materials-knowledge-system-equation-using-linear-elasticity">
+<h1>Derivation of Materials Knowledge System Equation using Linear Elasticity<a class="headerlink" href="#derivation-of-materials-knowledge-system-equation-using-linear-elasticity" title="Permalink to this headline">¶</a></h1>
+<p>The goal of this notebook is to derivate the MKS equation from
+elastostatic equilibrium equation. Note that the MKS equation can be
+derivated from other partial differential equations.</p>
+<div class="section" id="definitions">
+<h2>Definitions<a class="headerlink" href="#definitions" title="Permalink to this headline">¶</a></h2>
+<p>Let <img class="math" src="../_images/math/5a72fb9d110028f25c7d5a5e5dd43cb2b9931ccc.png" alt="C(x)"/> be the local stiffness tensor for a two phase material
+with stiffness tensors <img class="math" src="../_images/math/c399ad774aa091062a1b7cf70c4c975b314fde82.png" alt="C_A"/> and <img class="math" src="../_images/math/bb812a1eae1107647af3b310dc714dd8050a7430.png" alt="C_B"/>. The stiffness tensor
+at location <img class="math" src="../_images/math/26eeb5258ca5099acf8fe96b2a1049c48c89a5e6.png" alt="x"/> can be represented at a perturbation from a
+reference stiffness tensor.</p>
+<div class="math">
+<p><img src="../_images/math/0b9ad06e3ec15355cdb0fc5e4e274f76c07d8b70.png" alt="C(x) = C^R + C'(x)"/></p>
+</div><p>The strain field at location <img class="math" src="../_images/math/b558769a96459d2be8d1b67f24da056bb02f6399.png" alt="(x)"/> can also be defined in terms of
+a simular perturbation.</p>
+<div class="math">
+<p><img src="../_images/math/9713af8e3ef59a3cc6794257d125080d1330b2ba.png" alt="\varepsilon(x) = \bar{\varepsilon} + \varepsilon '(x)"/></p>
+</div><p>where <img class="math" src="../_images/math/3c0f5eeb9ac0b575ede6353ce79545082e516957.png" alt="\bar{\varepsilon}"/> is the average strain and
+<img class="math" src="../_images/math/ea09e3b1e920a802d6e8a5d6e5a54d26185470cf.png" alt="\varepsilon '(x)"/> is the local strain perturbation from
+<img class="math" src="../_images/math/3c0f5eeb9ac0b575ede6353ce79545082e516957.png" alt="\bar{\varepsilon}"/>.</p>
+<p>The constitutive equation is therefore.</p>
+<div class="math">
+<p><img src="../_images/math/a3efb380f6e7c6c65492949c9aee511577ae5b52.png" alt="\sigma_{ij}(x) = \big(C^R_{ijlk} + C'_{ijlk}(x) \big ) \big (\bar{\varepsilon}_{lk} + \varepsilon'_{lk}(x) \big )"/></p>
+</div></div>
+<div class="section" id="equilibrium-condition">
+<h2>Equilibrium Condition<a class="headerlink" href="#equilibrium-condition" title="Permalink to this headline">¶</a></h2>
+<p>The equilibrium condition is defined below.</p>
+<div class="math">
+<p><img src="../_images/math/15d763c178b8a0a09c232f6de4e605d7a89a6309.png" alt="\sigma_{ij,j}(x) = \Big [\big(C^R_{ijlk} + C'_{ijlk}(x) \big ) \big (\bar{\varepsilon}_{lk} + \varepsilon'_{lk}(x) \big )\Big ]_{,j} = 0"/></p>
+</div><div class="math">
+<p><img src="../_images/math/1c303fe67ba36332b3483b64b3d401a0a9a86336.png" alt="\sigma_{ij,j}(x) = C^R_{ijlk}\varepsilon'_{lk,j}(x) + C'_{ijlk,j}(x)\bar{\varepsilon}_{lk} + \Big [C'_{ijlk}(x) \varepsilon'_{lk}(x)\Big ]_{,j} = 0"/></p>
+</div><p>Let</p>
+<div class="math">
+<p><img src="../_images/math/d490c16aad707162a9ba26a5504057597bdc7d47.png" alt="F_i(x) = C'_{ijlk,j}(x)\bar{\varepsilon}_{lk} + \Big [C'_{ijlk}(x) \varepsilon'_{lk}(x)\Big ]_{,j}"/></p>
+</div><p>Using the definitation of <img class="math" src="../_images/math/de8fdaa56ea5a8940d4bba79faa9e3dea0f6bf7c.png" alt="F(x)"/> above, the equilibrium equation
+above can be rearranged in the form of an inhomogenous differential
+equation.</p>
+<div class="math">
+<p><img src="../_images/math/1d0443d95ca941f8d666be745203a1e5323d982f.png" alt="C^R_{ijlk}\varepsilon'_{lk,j}(x) + F_i(x) = 0"/></p>
+</div></div>
+<div class="section" id="strain-displacement-and-green-s-functions">
+<h2>Strain, Displacement, and Green&#8217;s Functions<a class="headerlink" href="#strain-displacement-and-green-s-functions" title="Permalink to this headline">¶</a></h2>
+<p>By using the relationship between strain and displacement, the
+equilibrium equation can be rewritten as follows.</p>
+<div class="math">
+<p><img src="../_images/math/a05030044a0d2ba9092474abd59d19968cc87d82.png" alt="\varepsilon_{kl}(x) = \frac{\big (u_{k,l}(x) + u_{l,k}(x) \big)}{2}"/></p>
+</div><div class="math">
+<p><img src="../_images/math/e1d798d5c75b051fde4d40fb7a4dc095b12ddc9b.png" alt="C^R_{ijkl} \frac{\big (u'_{k,lj}(x) + u'_{l,kj}(x) \big)}{2} + F_i(x) = 0"/></p>
+</div><p>The solution to the displacements can be found using green&#8217;s functions.</p>
+<div class="math">
+<p><img src="../_images/math/033a54462350df5246dd91f5a67a797daa571da7.png" alt="C^R_{ijkl} G_{km,lj}(r) + \delta_{im}\delta(x-r) = 0"/></p>
+</div><div class="math">
+<p><img src="../_images/math/8fd99ffc3e5dfb105bcdea9703d25f56acbc3dd2.png" alt="u'_k(x) = \int_V  G_{ik}(r) F_i (x-r)dr = \int_V G_{ik}(r) \Big [C'_{ijlk}(x-r)\bar{\varepsilon}_{lk} + \big [C'_{ijlk}(x-r)\varepsilon'_{lk}(x-r)\big ]\Big ]_{,j}dr"/></p>
+</div><p>and</p>
+<div class="math">
+<p><img src="../_images/math/0811aba05e8a8561b1b48bd31bd95ef4b5204720.png" alt="u'_l(x) = \int_V  G_{il}(r) F_i (x - r)dr = \int_V G_{ik}(r) \Big [C'_{ijlk}(x-r)\bar{\varepsilon}_{lk} + \big [C'_{ijlk}(x-r)\varepsilon'_{lk}(x-r)\big ]\Big ]_{,j}dr"/></p>
+</div><p>therefore the strain can also be found interns of green&#8217;s functions.</p>
+<div class="math">
+<p><img src="../_images/math/b10c6f0cf6920a17d1e53c87e103c8d0a69167e0.png" alt="\varepsilon'_{kl}(x) = \int_V \frac{\big (G_{ik,l}(r) + G_{il,k}(r) \big)}{2}  F_i (x-r)dr = \int_V \frac{\big (G_{ik,l}(r) + G_{il,k}(r) \big)}{2} \Big [C'_{ijlk}(x-r)\bar{\varepsilon}_{lk} + \big [C'_{ijlk}(x-r)\varepsilon'_{lk}(x-r)\big ]\Big ]_{,j}dr"/></p>
+</div><p>Note that the <img class="math" src="../_images/math/d1e0ab2a2b9eda39402ed817f15b08a0ca61703c.png" alt="G(r)"/> terms depend on the reference medium
+<img class="math" src="../_images/math/5e4a1b76554b06e66e065a0e801dba6fca446835.png" alt="C^R"/>.</p>
+</div>
+<div class="section" id="integration-by-parts">
+<h2>Integration by Parts<a class="headerlink" href="#integration-by-parts" title="Permalink to this headline">¶</a></h2>
+<p>The equation above can be recast with all of the derivatives on the
+green&#8217;s functions by integrating by parts.</p>
+</div>
+<div class="section" id="principal-value-singularity">
+<h2>Principal Value Singularity<a class="headerlink" href="#principal-value-singularity" title="Permalink to this headline">¶</a></h2>
+<p>In the equation above, the surface term tending to zero is a principal
+value integral because of the singularity in the green&#8217;s functions at
+<img class="math" src="../_images/math/545933c25a1802d9dbcfc24ab4c013d07ef4ccbc.png" alt="r = 0"/>. As a result, the integrand is not differentiable.
+Torquato shows that by excluding a sphere at the origin and using
+integration by parts and the divergence theorem we can arrive at the
+following equation [1].</p>
+<div class="math">
+<p><img src="../_images/math/ca2c62e7e1b4e46a34969b255b5ba8995ad3a27a.png" alt="\varepsilon'_{kl}(x) = I_{ikjl} - E_{ikjl} + \int_V \Phi_{ikjl}(r) \Big [C'_{ijlk}(x-r)\bar{\varepsilon}_{lk} + \big [C'_{ijlk}(x-r)\varepsilon'_{lk}(x-r)\big ]\Big ]dr"/></p>
+</div><p>where</p>
+<div class="math">
+<p><img src="../_images/math/7564042cde01c9bad18f647f0cf75d6b6d24dec2.png" alt="\Phi_{ikjl}(r) = - \frac{\big (G_{ik,lj}(r) + G_{il,kj}(r) \big)}{2}"/></p>
+</div><p>is the green&#8217;s function terms, and</p>
+<div class="math">
+<p><img src="../_images/math/cb9f92afb06dd85fa919f3281f70d091ac4625d5.png" alt="I_{ikjl}^{\infty} = \lim_{r \rightarrow \infty} \int_S\frac{\big (G_{ik,l}(r) + G_{il,k}(r)\big)}{2} \Big [C'_{ijlk}(x-r)\bar{\varepsilon}_{lk} + \big [C'_{ijlk}(x-r)\varepsilon'_{lk}(x-r)\big ]\Big ]n_l dS"/></p>
+</div><div class="math">
+<p><img src="../_images/math/9698832574d91f41328323b04f6442d0887c4d38.png" alt="E_{ikjl}(x) = \Big [C'_{ijlk}(x)\bar{\varepsilon}_{lk} + \big [C'_{ijlk}(x)\varepsilon'_{lk}(x)\big ]\Big ]\lim_{r \rightarrow 0} \int_S\frac{\big (G_{ik,l}(r) + G_{il,k}(r)\big)}{2} n_l dS"/></p>
+</div><p>are the contribution from the surface integrals at <img class="math" src="../_images/math/b671f1bb7e4ee86584347d5d22f1dc8abdb5bef2.png" alt="\infty"/> and
+from the singularity. The MKS assumes periodic boundary conditions,
+there fore the contribution from infinty disappears.</p>
+<p>Finally let</p>
+<div class="math">
+<p><img src="../_images/math/ad346123820c46e62c788a06fffbc315b2b522e9.png" alt="\Gamma_{iklj}(r) = -E_{ikjl}(x-r)\delta(r) + \Phi_{ikjl}(r)"/></p>
+</div><p>the strain can then be written in the following form.</p>
+<div class="math">
+<p><img src="../_images/math/2a937958b38fff8331a39e4eea89cf3b6f9caaec.png" alt="\varepsilon'_{kl}(x) = \int_V \Gamma_{ikjl}(r) \Big [C'_{ijlk}(x-r)\bar{\varepsilon}_{lk} + \big [C'_{ijlk}(x-r)\varepsilon'_{lk}(x-r)\big ]\Big ]dr"/></p>
+</div></div>
+<div class="section" id="kroner-s-expansion">
+<h2>Kroner&#8217;s Expansion<a class="headerlink" href="#kroner-s-expansion" title="Permalink to this headline">¶</a></h2>
+<div class="math">
+<p><img src="../_images/math/f72258ffa2d6091acfb23f87728591b820c7bacb.png" alt="\varepsilon'(x) =\int_V \Gamma(r) C'(x-r) [ \bar{\varepsilon} + \varepsilon'(x-r)]dr"/></p>
+</div><p>By recursively inserting <img class="math" src="../_images/math/c8b2f7775a4786542d9367112451a607836a0123.png" alt="\varepsilon'(x)"/> into the LHS of the
+equation, we get the following series.</p>
+<p>As long as</p>
+<div class="math">
+<p><img src="../_images/math/dff5ad5d94fa00a7aa9dc889d2eaef537ce17649.png" alt="\Gamma(r) C'(x)\bar{\varepsilon} &lt;&lt; 1"/></p>
+</div><p>the series can be truncated after a few terms and still provide
+resonable accuracy.</p>
+</div>
+<div class="section" id="materials-knowledge-system">
+<h2>Materials Knowledge System<a class="headerlink" href="#materials-knowledge-system" title="Permalink to this headline">¶</a></h2>
+<p>Let</p>
+<div class="math">
+<p><img src="../_images/math/d6c6454554ca9cd5b01de3cb8502c17e127a9930.png" alt="C'(x-r) = C_h m_h(x-r)"/></p>
+</div><p>where the summation over <img class="math" src="../_images/math/8189a5b5a0917b8c93350827be4038af1839139d.png" alt="h"/> discribes all of the local states of
+the stiffness tensor <img class="math" src="../_images/math/432c31954b35fbd87e2b55e28a2aeeae4f53d40d.png" alt="C'(r)"/>. <img class="math" src="../_images/math/cc35ee7af8a66eb5423b7fea1a638a80e340edb4.png" alt="m_h(r)"/> is the microstructure
+function and is an indicator function for each of the local states.</p>
+<p>Also let</p>
+<div class="math">
+<p><img src="../_images/math/b7e3cc84c18e5857573213ca0fab959d6f1dce49.png" alt="\alpha_h(r) = \Gamma(r)C_h\bar{\varepsilon}"/></p>
+</div><div class="math">
+<p><img src="../_images/math/6f0317cdb99e7e7cab51125598de5cd5a602acdc.png" alt="\alpha_{hh'}(r,r') = \Gamma(r)C_h\bar{\varepsilon} \Gamma(r') C_{h'} \bar{\varepsilon}"/></p>
+</div><div class="math">
+<p><img src="../_images/math/e55fca1b5e6825200a0f6ebb623d92f8b85eb924.png" alt="etc..."/></p>
+</div><p>where again <img class="math" src="../_images/math/8189a5b5a0917b8c93350827be4038af1839139d.png" alt="h"/> is the local state.</p>
+<p>Plugging these definitations into Kroner&#8217;s expansion recasts the series
+in the following form.</p>
+<div class="math">
+<p><img src="../_images/math/171432bb8fcc48d9e94ddeb0b1b6c8a2224940ac.png" alt="\varepsilon'(x) =\int_V \alpha_h(r) m_h(x-r) dr +\int_V \int_V \alpha_{hh'}(r,r') m_h(x-r) m_{h'}(x-r') dr'dr+ \int_V \int_V \int_V \alpha_{hh'h''}(r,r',r'')m_h(x-r) m_{h'}(x-r') m_{h''}(x-r'')dr''dr'dr + ..."/></p>
+</div><p>The discrete version of this equation is the MKS.</p>
+<div class="math">
+<p><img src="../_images/math/502604fe8ffad2d9ee2cdc6816943b071fdbcd45.png" alt="\varepsilon'[x] =\sum_{r=1}^S \alpha_h[r] m_h[x-r] +\sum_{r=1}^S \sum_{r'=1}^S \alpha_{hh'}[r,r'] m_h[x-r] m_{h'}[x-r'] + \sum_{r=1}^S \sum_{r'=1}^S \sum_{r''=1}^S \alpha_{hh'h''}[r,r',r'']m_h(x-r) m_{h'}[x-r'] m_{h''}[x-r'']+ ..."/></p>
+</div><div class="section" id="references">
+<h3>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h3>
+<p>[1] Torquato, S., 1997. <em>Effective stiffness tensor of composite media.
+I. Exact series expansions.</em> J. Mech. Phys. Solids 45, 1421–1448.</p>
+<p>[2] Brent L.Adams, Surya Kalidindi, David T. Fullwood. <em>Microstructure
+Sensitive Design for Performance Optimization.</em></p>
+<p>[3] David T. Fullwood, Brent L.Adams, Surya Kalidindi. <em>A strong
+contrast homogenization formulation for multi-phase anisotropic
+materials.</em></p>
+</div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

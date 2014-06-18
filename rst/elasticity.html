@@ -1,17 +1,19 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>&lt;no title&gt; &mdash; pymks 0.1 documentation</title>
+    <title>Linear Elasticity Simulations and the Materials Knowledge System &mdash; PyMKS</title>
     
-    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootswatch-3.1.0/cosmo/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pymks.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -25,190 +27,447 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="pymks 0.1 documentation" href="../index.html" /> 
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.1.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="../_static/pymks_logo.ico"/>
+    <link rel="top" title="PyMKS" href="../index.html" />
+    <link rel="up" title="Examples" href="../EXAMPLES.html" />
+    <link rel="next" title="Derivation of Materials Knowledge System Equation using Linear Elasticity" href="derivation.html" />
+    <link rel="prev" title="Examples" href="../EXAMPLES.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
   </head>
   <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li><a href="../index.html">pymks 0.1 documentation</a> &raquo;</li> 
-      </ul>
-    </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/rst/elasticity.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
       </div>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
             
-  <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks</span> <span class="kn">import</span> <span class="n">ElasticFEModel</span>
+                <li><a href="INSTALLATION.html">Installation</a></li>
+                <li><a href="../EXAMPLES.html">Examples</a></li>
+                <li><a href="../API.html">API</a></li>
+                <li><a href="https://github.com/wd15/pymks/">Github</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="INSTALLATION.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#anaconda-python">Anaconda Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#regular-python">Regular Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#fftw">FFTW</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#line-profiler"><tt class="docutils literal"><span class="pre">line_profiler</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#java-script-animator">Java Script Animator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#git">Git</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#install-the-pymks-module">Install the <tt class="docutils literal"><span class="pre">pymks</span></tt> module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#ipython-notebooks">IPython Notebooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#issues">Issues</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../EXAMPLES.html">Examples</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">Linear Elasticity Simulations and the Materials Knowledge System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="derivation.html">Derivation of Materials Knowledge System Equation using Linear Elasticity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="filter.html">A Simple Filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_validation.html">Cross Validation and Hyperparameter Optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_validation.html#learning-curves">Learning Curves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scaling_coefficients.html">Scaling the Coefficients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="improving_performance.html">Improving Performance</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../API.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CREDITS.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CITATION.html">Citation</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
 
-<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-<span class="n">X</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.</span>
-<span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
-<span class="n">X</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span>
+          
 
-<span class="n">model</span> <span class="o">=</span> <span class="n">ElasticFEModel</span><span class="p">()</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><pre>sfepy: generating 144 vertices...
-sfepy: ...done
-sfepy: generating 121 cells...
-sfepy: ...done
-sfepy: saving regions as groups...
-sfepy:   region_all
-sfepy: ...done
-sfepy: updating variables...
-sfepy: ...done
-sfepy: setting up dof connectivities...
-sfepy: ...done in 0.00 s
-sfepy: matrix shape: (967, 967)
-sfepy: assembling matrix graph...
-sfepy: ...done in 0.00 s
-sfepy: matrix structural nonzeros: 29343 (3.14e-02% fill)
-sfepy: updating materials...
-sfepy:     m
-sfepy:     f
-sfepy: ...done in 0.00 s
-sfepy: nls: iter: 0, residual: 7.239688e+01 (rel: 1.000000e+00)
-sfepy:   rezidual:    0.00 [s]
-sfepy:      solve:    0.01 [s]
-sfepy:     matrix:    0.00 [s]
-sfepy: nls: iter: 1, residual: 7.816319e-14 (rel: 1.079649e-15)</pre>
-</div>
-<div class="highlight-python"><pre>/home/wd15/git/pymks/pymks/elasticFEModel.py:151: DeprecationWarning: Implicitly casting between incompatible kinds. In a future numpy release, this will raise an error. Use casting="unsafe" if this is intentional.
-  i = np.floor((x + self.dx / 2 - minx) / self.dx, i_out)
-/home/wd15/git/pymks/pymks/elasticFEModel.py:152: DeprecationWarning: Implicitly casting between incompatible kinds. In a future numpy release, this will raise an error. Use casting="unsafe" if this is intentional.
-  j = np.floor((y + self.dx / 2 - miny) / self.dx, j_out)</pre>
-</div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">])</span>
-</pre></div>
-</div>
-<div class="highlight-python"><pre>&lt;matplotlib.image.AxesImage at 0x4cc5610&gt;</pre>
-</div>
-<img alt="../_images/elasticity_1_1.png" src="../_images/elasticity_1_1.png" />
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">y</span><span class="o">.</span><span class="n">shape</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">])</span>
-</pre></div>
-</div>
-<div class="highlight-python"><pre>&lt;matplotlib.contour.QuadContourSet instance at 0x5298200&gt;</pre>
-</div>
-<img alt="../_images/elasticity_3_1.png" src="../_images/elasticity_3_1.png" />
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">])</span>
-</pre></div>
-</div>
-<div class="highlight-python"><pre>&lt;matplotlib.contour.QuadContourSet instance at 0x497b878&gt;</pre>
-</div>
-<img alt="../_images/elasticity_4_1.png" src="../_images/elasticity_4_1.png" />
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">displacement_flat</span> <span class="o">=</span> <span class="n">vec</span><span class="o">.</span><span class="n">create_output_dict</span><span class="p">()[</span><span class="s">&#39;u&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
-<span class="n">displacement</span> <span class="o">=</span> <span class="n">displacement_flat</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
-<span class="k">print</span> <span class="n">displacement</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
-</pre></div>
-</div>
-<div class="highlight-python"><pre>[[ 0.   0.   0.   0.   0.   0. ]
- [ 0.2  0.2  0.2  0.2  0.2  0.2]
- [ 0.4  0.4  0.4  0.4  0.4  0.4]
- [ 0.6  0.6  0.6  0.6  0.6  0.6]
- [ 0.8  0.8  0.8  0.8  0.8  0.8]
- [ 1.   1.   1.   1.   1.   1. ]]</pre>
-</div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">s</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
-</pre></div>
-</div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">uu</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">uu</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><pre>&lt;matplotlib.contour.QuadContourSet instance at 0xa825368&gt;</pre>
-</div>
-<img alt="../_images/elasticity_7_1.png" src="../_images/elasticity_7_1.png" />
-<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sfepy.postprocess</span> <span class="kn">import</span> <span class="n">Viewer</span>
-
-<span class="n">pb</span><span class="o">.</span><span class="n">save_state</span><span class="p">(</span><span class="s">&#39;linear_elasticity1.vtk&#39;</span><span class="p">,</span> <span class="n">vec</span><span class="p">)</span>
-
-<span class="n">view</span> <span class="o">=</span> <span class="n">Viewer</span><span class="p">(</span><span class="s">&#39;linear_elasticity1.vtk&#39;</span><span class="p">)</span>
-<span class="n">view</span><span class="p">(</span><span class="n">vector_mode</span><span class="o">=</span><span class="s">&#39;warp_norm&#39;</span><span class="p">,</span> <span class="n">rel_scaling</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-     <span class="n">is_scalar_bar</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">is_wireframe</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><pre>sfepy: point vectors u at [ 0.  0.  0.]
-sfepy: range: -3.65e-15 1.00e+00 l2 norm range: 0.00e+00 1.00e+00</pre>
-</div>
-<div class="highlight-python"><pre>&lt;sfepy.postprocess.viewer.ViewerGUI at 0x990b590&gt;</pre>
-</div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="nb">max</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">()),</span> <span class="nb">min</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mf">0.050315655904084031</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.050315655904084912</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">vec</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()[</span><span class="s">&#39;vec&#39;</span><span class="p">]</span>
-</pre></div>
-</div>
-<div class="highlight-python"><pre>[ 0.          0.          0.         ...,  0.94301265  0.00128292
-  0.94334275]</pre>
-</div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">242</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="mf">11.0</span>
-</pre></div>
-</div>
-
-
-          </div>
         </div>
-      </div>
-      <div class="clearer"></div>
     </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li><a href="../index.html">pymks 0.1 documentation</a> &raquo;</li> 
-      </ul>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="section" id="linear-elasticity-simulations-and-the-materials-knowledge-system">
+<h1>Linear Elasticity Simulations and the Materials Knowledge System<a class="headerlink" href="#linear-elasticity-simulations-and-the-materials-knowledge-system" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>This notebook provides an example of using the Materials Knowledge
+System (MKS) to compute the local strain field of a composite material.
+The notebook first provides some background information on linear
+elasticity as well as the boundary conditions of the example. Sfepy was
+used to compute the calibration and the validation datasets. The
+notebook then demonstrates the functions and processes need to calibrate
+and validate the MKS frame for a material system.</p>
+<div class="section" id="elastostatics-equations">
+<h3>Elastostatics Equations<a class="headerlink" href="#elastostatics-equations" title="Permalink to this headline">¶</a></h3>
+<p>The constitutive equation that describes the linear elastic phenomena is
+Hook&#8217;s law.</p>
+<div class="math">
+<p><img src="../_images/math/718a27b00b9be80aff844b37e8d5756750c285d6.png" alt="\sigma_{ij} = C_{ijkl}\varepsilon_{kl}"/></p>
+</div><p><img class="math" src="../_images/math/fa35d9fc104207e09a712110ac81612c5b279a6c.png" alt="\sigma"/> is the stress, <img class="math" src="../_images/math/e2a63918a6fa75b62ad87ad17aaf65f782d71546.png" alt="\varepsilon"/> is the strain, and
+<img class="math" src="../_images/math/c3355896da590fc491a10150a50416687626d7cc.png" alt="C"/> is the stiffness tensor that relates the stress to the strain.
+For an isotropic material the stiffness tensor can be represented by
+lower dimension terms which can relate the stress and the strain as
+follows.</p>
+<div class="math">
+<p><img src="../_images/math/3f136cb1153bc74a8671a0660d9f2a95094c1e32.png" alt="\sigma_{ij} = \lambda \delta_{ij} \varepsilon{kk} + 2\mu \varepsilon_{ij}"/></p>
+</div><p>$ $ and <img class="math" src="../_images/math/2d8c833ed800824727cd7bd2fb9de1a12ad7e674.png" alt="\mu"/> are the first and second lam<img class="math" src="../_images/math/449384655f6c1d3246229070c747d9ddb2617774.png" alt="\acute{e}"/>
+parameters and can be defined in terms of the Young&#8217;s modulus <img class="math" src="../_images/math/fa2fa899f0afb05d6837885523503a2d4df434f9.png" alt="E"/>
+and Poisson&#8217;s ratio <img class="math" src="../_images/math/d6a7ccf879c4a4fe694033606332cb83806db296.png" alt="\nu"/>.</p>
+<div class="math">
+<p><img src="../_images/math/89d3d5d815646b48fed9abb0afa8eb5edb85e5fb.png" alt="\lambda = \frac{E\nu}{(1-\nu)(1-2\nu)}"/></p>
+</div><div class="math">
+<p><img src="../_images/math/67478ce1c9dca6d218d43896f8527e0a9882b5fc.png" alt="\mu = \frac{E}{2(1+\nu)}"/></p>
+</div><p>Strain is related to displacement using the following equation.</p>
+<div class="math">
+<p><img src="../_images/math/b801bf9b351d59f2b9da2fd7c97438c8cdff9c86.png" alt="\varepsilon_{ij} = \frac{u_{i,j}+u_{j,i}}{2}"/></p>
+</div><p>Plugging the equation above back into our expression for stress, we get
+an equation that relates displacement to stress.</p>
+<div class="math">
+<p><img src="../_images/math/3e5547ea19f48cc5850323a57f9719d00fe7952b.png" alt="\sigma_{ij} = \lambda u_{k,k} + \mu( u_{i,j}+u_{j,i})"/></p>
+</div><p>The equilibrium equation is defined as</p>
+<div class="math">
+<p><img src="../_images/math/720b33e7cb2ed5eb2461e621ef749ea8d5e81aae.png" alt="\sigma_{ij,j} = 0"/></p>
+</div><p>and can be cast in terms of displacement as follows.</p>
+<div class="math">
+<p><img src="../_images/math/ddf4f5c0c1728d350639470f8c952983e16ba3dd.png" alt="\mu u_{i,jj}+(\mu + \lambda)u_{j,ij}=0"/></p>
+</div><p>In this example, a displacement controlled simulation is used to
+calculated the strain and the following boundary conditions for square
+box of length <img class="math" src="../_images/math/859ccf4cd60c7bc6b8fa1afc9a42dc811a826d6f.png" alt="L"/> and macroscopic strain <img class="math" src="../_images/math/3c0f5eeb9ac0b575ede6353ce79545082e516957.png" alt="\bar{\varepsilon}"/>
+are imposed.</p>
+<div class="math">
+<p><img src="../_images/math/7d8ec9a0be3bfae8dfbee8b610b916ae236f7232.png" alt="u(L, y) = u(0, y) + L\bar{\varepsilon}"/></p>
+</div><div class="math">
+<p><img src="../_images/math/64175865514fd29c614ecb024ab2e53ad602ba8b.png" alt="u(0, L) = u(0, 0) = 0"/></p>
+</div><div class="math">
+<p><img src="../_images/math/eea36c8510b93e2d3c9205f5f0a7d9fd3af9008c.png" alt="u(x, 0) = u(x, L)"/></p>
+</div></div>
+<div class="section" id="sfepy-simple-finite-elements-in-python">
+<h3>Sfepy - Simple Finite Elements in Python<a class="headerlink" href="#sfepy-simple-finite-elements-in-python" title="Permalink to this headline">¶</a></h3>
+<p>In this example, the an instance of the class <tt class="docutils literal"><span class="pre">ElasticFEModel</span></tt> is used
+to generate both the calibration strain response field to fit the MKS
+model and the validation strain response field used to evaluate the MKS
+model&#8217;s accuracy. The class utilizes the module Sfepy to calculated the
+local response strain field though finite element methods. More
+information can be found their
+<a class="reference external" href="http://sfepy.org/doc-devel/index.html">website</a>.</p>
+</div>
+<div class="section" id="import-modules-and-helper-functions">
+<h3>Import Modules and Helper Functions<a class="headerlink" href="#import-modules-and-helper-functions" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-python"><pre>%matplotlib inline
+%load_ext autoreload
+%autoreload 2
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+E1 = 80 #Young's modules for material 1
+E2 = 120 #Young's modules for material 2
+nu1 = 0.3 #Poisson's ratio for material 1
+nu2 = nu1 #Poisson's ratio for material 2
+
+def getDelta((nx, ny)):
+    X = np.zeros((2, nx, ny))
+    X[0, (nx - 1) / 2, (ny - 1) / 2] = 1
+    X[1] = np.abs(X[0] - 1)
+    return X
+
+def getProp(X):
+    X_prop = np.zeros((X.shape + (2,)))
+    X_prop[...,0] = np.where(X == 1, E2, E1)
+    X_prop[...,1] = np.where(X == 1, nu2, nu1)
+    return X_prop
+
+def getPlot(X, title='title', fontsize=20):
+    plt.figure()
+    plt.imshow(X, interpolation='none')
+    plt.title(title, fontsize=fontsize)
+    plt.colorbar()</pre>
+</div>
+</div>
+</div>
+<div class="section" id="simulation">
+<h2>Simulation<a class="headerlink" href="#simulation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="calibration-data-and-delta-microstructures">
+<h3>Calibration Data and Delta Microstructures<a class="headerlink" href="#calibration-data-and-delta-microstructures" title="Permalink to this headline">¶</a></h3>
+<p>It has been shown that the first order MKS influence coefficients are
+sufficient to compute a strain field of a random microstructure with a
+contrast of less than 1.5 with a mean absolute error on the order of 2%
+relative to the strain field computed using finite element methods
+<a class="reference external" href="#ref_1">[1]</a>.</p>
+<p>The first order coefficients can be efficiently calibrated using delta
+microstructures which are analogous to unit impulses in signal
+processing <a class="reference external" href="#ref_2">[2]</a>. Delta microstructures are composed of only
+two phases. One phase can be found throughout the entire microstructure
+except at the very center which contains a different phase. For this
+example (and any two phase system) only two delta microstructures are
+needed to capture the first order coefficients.</p>
+</div>
+<div class="section" id="generating-calibration-data">
+<h3>Generating Calibration Data<a class="headerlink" href="#generating-calibration-data" title="Permalink to this headline">¶</a></h3>
+<p>Generate two delta microstructures, and the property array that contains
+the Young&#8217;s modulus <tt class="docutils literal"><span class="pre">E</span></tt> and Poission&#8217;s ratio <tt class="docutils literal"><span class="pre">nu</span></tt> for 2 <tt class="docutils literal"><span class="pre">L</span></tt> by
+<tt class="docutils literal"><span class="pre">L</span></tt> delta microstructures.</p>
+<p>What units does Sfepy expect the Young&#8217;s modulus to have?</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">L</span> <span class="o">=</span> <span class="mi">21</span>
+
+<span class="n">Delta</span> <span class="o">=</span> <span class="n">getDelta</span><span class="p">((</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">))</span>
+<span class="n">Delta_prop</span> <span class="o">=</span> <span class="n">getProp</span><span class="p">(</span><span class="n">Delta</span><span class="p">)</span>
+<span class="n">getPlot</span><span class="p">(</span><span class="n">Delta_prop</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span><span class="s">&#39;Delta Microstructure&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/elasticity_7_0.png" src="../_images/elasticity_7_0.png" />
+<p>Strain field responses must be computed for the delta microstructures
+for calibration. This can be done by importing <tt class="docutils literal"><span class="pre">ElasticFEModel</span></tt> from
+<tt class="docutils literal"><span class="pre">pymks</span></tt>, or though another FE tool of your choice.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks</span> <span class="kn">import</span> <span class="n">ElasticFEModel</span>
+
+<span class="n">FEmodel</span> <span class="o">=</span> <span class="n">ElasticFEModel</span><span class="p">()</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">FEmodel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Delta_prop</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>sfepy: matrix shape: (3527, 3527)
+sfepy: assembling matrix graph...
+sfepy: ...done in 0.01 s
+sfepy: matrix structural nonzeros: 109823 (8.83e-03% fill)
+sfepy: matrix shape: (3527, 3527)
+sfepy: assembling matrix graph...
+sfepy: ...done in 0.01 s
+sfepy: matrix structural nonzeros: 109823 (8.83e-03% fill)</pre>
+</div>
+<p>Let&#8217;s take a look that the <img class="math" src="../_images/math/5cbe2485685a2f1dcfce0c0179cb14f37908e8bf.png" alt="\varepsilon_{xx}"/>,
+<img class="math" src="../_images/math/61356a6fb28be1a65dc45eb3c29d445f02f28825.png" alt="\varepsilon_{yy}"/>, and <img class="math" src="../_images/math/6d1e70a63e22b0190e7245886657ee64aaaead8f.png" alt="\varepsilon_{xy}"/> strain fields
+produced by the <tt class="docutils literal"><span class="pre">FEmodel</span></tt>.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">getPlot</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;FE Calculated xx-Strain Field&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">getPlot</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;FE Calculated yy-Strain Field&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">getPlot</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;FE Calculated xy-Strain Field&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/elasticity_11_0.png" src="../_images/elasticity_11_0.png" />
+<img alt="../_images/elasticity_11_1.png" src="../_images/elasticity_11_1.png" />
+<img alt="../_images/elasticity_11_2.png" src="../_images/elasticity_11_2.png" />
+</div>
+<div class="section" id="calibrating-first-order-influence-coefficients">
+<h3>Calibrating First Order Influence Coefficients<a class="headerlink" href="#calibrating-first-order-influence-coefficients" title="Permalink to this headline">¶</a></h3>
+<p>Create an instance of MKSRegressionModel with the number of bins
+<tt class="docutils literal"><span class="pre">Nbin</span></tt> equal to 2.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks</span> <span class="kn">import</span> <span class="n">MKSRegressionModel</span>
+<span class="n">MKSmodel</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nbin</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The rest of this example will only use the <img class="math" src="../_images/math/5cbe2485685a2f1dcfce0c0179cb14f37908e8bf.png" alt="\varepsilon_{xx}"/>
+strain field, but the others can be calculated using obvious
+substitutions.</p>
+<p>The first order influence coefficients can be calibrated by passing the
+microstructure and the calculated strain field from the FE simulation
+and as arguments into the <tt class="docutils literal"><span class="pre">fit()</span></tt> method.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">MKSmodel</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Delta</span><span class="p">,</span> <span class="n">y</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Let&#8217;s take a look at the influence coefficients.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">getPlot</span><span class="p">(</span><span class="n">MKSmodel</span><span class="o">.</span><span class="n">coeff</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="s">&#39;Influence Coefficients 1&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">getPlot</span><span class="p">(</span><span class="n">MKSmodel</span><span class="o">.</span><span class="n">coeff</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s">&#39;Influence Coefficients 2&#39;</span> <span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>/home/dbb1/anaconda/lib/python2.7/site-packages/matplotlib/colorbar.py:829: RuntimeWarning: invalid value encountered in divide
+  z = np.take(y, i0) + (xn - np.take(b, i0)) * dy / db
+/home/dbb1/anaconda/lib/python2.7/site-packages/matplotlib/colorbar.py:581: RuntimeWarning: invalid value encountered in greater
+  inrange = (ticks &gt; -0.001) &amp; (ticks &lt; 1.001)
+/home/dbb1/anaconda/lib/python2.7/site-packages/matplotlib/colorbar.py:581: RuntimeWarning: invalid value encountered in less
+  inrange = (ticks &gt; -0.001) &amp; (ticks &lt; 1.001)</pre>
+</div>
+<img alt="../_images/elasticity_17_1.png" src="../_images/elasticity_17_1.png" />
+<img alt="../_images/elasticity_17_2.png" src="../_images/elasticity_17_2.png" />
+<p>The first set of influence coefficients have a Gaussian shape while the
+second influence coefficients are constant-valued. The constant-valued
+influence coefficients may seem superfluous, but are analogous to the
+constant value found doing multiple linear regression with <a class="reference external" href="http://en.wikipedia.org/wiki/Dummy_variable_%28statistics%29">categorical
+variables</a>.</p>
+</div>
+<div class="section" id="validation-of-the-calibrated-influence-coefficients">
+<h3>Validation of the Calibrated Influence Coefficients<a class="headerlink" href="#validation-of-the-calibrated-influence-coefficients" title="Permalink to this headline">¶</a></h3>
+<p>Now let&#8217;s use the calibrated influence coefficients to compute the local
+strain response for a random two phase microstructure. First create a
+random microstructure.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">101</span><span class="p">)</span>
+<span class="n">RandMicro</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">))</span>
+<span class="n">getPlot</span><span class="p">(</span><span class="n">RandMicro</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&#39;Random Microstructure&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/elasticity_20_0.png" src="../_images/elasticity_20_0.png" />
+<p>Create a property array that assigns the Young&#8217;s modulus <tt class="docutils literal"><span class="pre">E</span></tt> and the
+Possion&#8217;s ratio <tt class="docutils literal"><span class="pre">nu</span></tt> for both of the phases.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">RandMicro_prop</span> <span class="o">=</span> <span class="n">getProp</span><span class="p">(</span><span class="n">RandMicro</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Compute the local strain field for the random microstructure using the
+FE model.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">yFE</span> <span class="o">=</span> <span class="n">FEmodel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">RandMicro_prop</span><span class="p">)</span>
+<span class="n">getPlot</span><span class="p">(</span><span class="n">yFE</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="s">&#39;FE Computed Local Strain Field&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>sfepy: matrix shape: (3527, 3527)
+sfepy: assembling matrix graph...
+sfepy: ...done in 0.01 s
+sfepy: matrix structural nonzeros: 109823 (8.83e-03% fill)</pre>
+</div>
+<img alt="../_images/elasticity_24_1.png" src="../_images/elasticity_24_1.png" />
+<p>The local strain field can be computed by passing the random
+microstructure as an argument to the <tt class="docutils literal"><span class="pre">predict()</span></tt> method of the MKS
+model.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">yMKS</span> <span class="o">=</span> <span class="n">MKSmodel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">RandMicro</span><span class="p">)</span>
+<span class="n">getPlot</span><span class="p">(</span><span class="n">yMKS</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&#39;MKS Computed Local Strain Field&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/elasticity_26_0.png" src="../_images/elasticity_26_0.png" />
+<p>Calculate the mean absolute error.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">Error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">yMKS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">yFE</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">yFE</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Mean Absolute </span><span class="si">% E</span><span class="s">rror&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">Error</span><span class="p">)</span>
+<span class="n">getPlot</span><span class="p">(</span><span class="n">Error</span><span class="p">,</span> <span class="s">&#39;Absolute </span><span class="si">% E</span><span class="s">rror&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>Mean Absolute % Error 1.41851652896</pre>
+</div>
+<img alt="../_images/elasticity_28_1.png" src="../_images/elasticity_28_1.png" />
+</div>
+</div>
+<div class="section" id="application-to-larger-microstructures-by-resizing-the-coefficeints">
+<h2>Application to Larger Microstructures by Resizing the Coefficeints<a class="headerlink" href="#application-to-larger-microstructures-by-resizing-the-coefficeints" title="Permalink to this headline">¶</a></h2>
+<p>It has been shown that the coefficients calibrated on a smaller
+microstructure can be used on a larger micorsturture though spectral
+interpolation <a class="reference external" href="#ref_3">[3]</a>. To demonstrate this let&#8217;s generate a new
+larger random microstructure and its propetry matrix.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">N</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">L</span>
+
+<span class="n">BigRandMicro</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
+<span class="n">BigRandMicro_prop</span> <span class="o">=</span> <span class="n">getProp</span><span class="p">(</span><span class="n">BigRandMicro</span><span class="p">)</span>
+<span class="n">getPlot</span><span class="p">(</span><span class="n">BigRandMicro</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&#39;Large Microstructure&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/elasticity_30_0.png" src="../_images/elasticity_30_0.png" />
+<p>Compute the strain field for the new microstructure using the instance
+of <tt class="docutils literal"><span class="pre">ElasticFEModel</span></tt> we already have.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">yFEbig</span> <span class="o">=</span> <span class="n">FEmodel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">BigRandMicro_prop</span><span class="p">)</span>
+<span class="n">getPlot</span><span class="p">(</span><span class="n">FEmodel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">BigRandMicro_prop</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="s">&#39;FE Computed Local Strain Field&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>sfepy: matrix shape: (31751, 31751)
+sfepy: assembling matrix graph...
+sfepy: ...done in 0.07 s
+sfepy: matrix structural nonzeros: 1006943 (9.99e-04% fill)
+sfepy: matrix shape: (31751, 31751)
+sfepy: assembling matrix graph...
+sfepy: ...done in 0.07 s
+sfepy: matrix structural nonzeros: 1006943 (9.99e-04% fill)</pre>
+</div>
+<img alt="../_images/elasticity_32_1.png" src="../_images/elasticity_32_1.png" />
+<p>The coefficients that have already been calibrated need to be resized to
+match the shape of the new larger microstructure.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">MKSmodel</span><span class="o">.</span><span class="n">resize_coeff</span><span class="p">(</span><span class="n">BigRandMicro</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">yMKSbig</span> <span class="o">=</span> <span class="n">MKSmodel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">BigRandMicro</span><span class="p">)</span>
+<span class="n">getPlot</span><span class="p">(</span><span class="n">yMKSbig</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&#39;MKS Computed Local Strain Field&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">0j</span><span class="p">)</span>
+<span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">0j</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/elasticity_34_1.png" src="../_images/elasticity_34_1.png" />
+<p>Calculate the error between the FE model and the MKS model.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">ErrorBig</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">yMKSbig</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">yFEbig</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">yFEbig</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Mean Absolute </span><span class="si">% E</span><span class="s">rror&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">ErrorBig</span><span class="p">),</span><span class="s">&#39;%&#39;</span>
+<span class="n">getPlot</span><span class="p">(</span><span class="n">ErrorBig</span><span class="p">,</span> <span class="s">&#39;Absolute </span><span class="si">% E</span><span class="s">rror&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>Mean Absolute % Error 1.67533988698 %</pre>
+</div>
+<img alt="../_images/elasticity_36_1.png" src="../_images/elasticity_36_1.png" />
+<p>The error for original <img class="math" src="../_images/math/859ccf4cd60c7bc6b8fa1afc9a42dc811a826d6f.png" alt="L"/> by <img class="math" src="../_images/math/859ccf4cd60c7bc6b8fa1afc9a42dc811a826d6f.png" alt="L"/> microstructure is smaller
+than the error for the larger microstructure as is expected when using
+spectral interpolation <a class="reference external" href="#ref_4">[4]</a>.</p>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>[1] Binci M., Fullwood D., Kalidindi S.R., <a href="#id1"><span class="problematic" id="id2">`</span></a><a href="#id3"><span class="problematic" id="id4">*</span></a>A new spectral framework</div></blockquote>
+<p>for establishing localization relationships for elastic behav ior of
+composites and their calibration to finite-element
+models* &lt;<a class="reference external" href="http://ac.els-cdn.com/S1359645408000475/1-s2.0-S1359645408000475-main.pdf?_tid=8a22a430-e83d-11e3-b21e-00000aab0f26&amp;acdnat=1401483856_13e0e9036d72ed68934ce00f70b122a6">http://ac.els-cdn.com/S1359645408000475/1-s2.0-S1359645408000475-main.pdf?_tid=8a22a430-e83d-11e3-b21e-00000aab0f26&amp;acdnat=1401483856_13e0e9036d72ed68934ce00f70b122a6</a>&gt;`__.
+Acta Materialia, 2008. 56 (10): p. 2272-2282.</p>
+<blockquote>
+<div>[2] Landi, G., S.R. Niezgoda, S.R. Kalidindi, <a href="#id5"><span class="problematic" id="id6">`</span></a><a href="#id7"><span class="problematic" id="id8">*</span></a>Multi-scale modeling of</div></blockquote>
+<p>elastic response of three-dimensional voxel-based microstructure
+datasets using novel DFT-based knowledge
+systems* &lt;<a class="reference external" href="http://www.sciencedirect.com/science/article/pii/S1359645410000108">http://www.sciencedirect.com/science/article/pii/S1359645410000108</a>&gt;`__.
+Acta Materialia, 2009. 58 (7): p. 2716-2725.</p>
+<blockquote>
+<div>[3] Marko, K., Kalidindi S.R., Fullwood D., <a href="#id9"><span class="problematic" id="id10">`</span></a><a href="#id11"><span class="problematic" id="id12">*</span></a>Computationally efficient</div></blockquote>
+<p>database and spectral interpolation for fully plastic Taylor-type
+crystal plasticity calculations of face-centered cubic
+polycrystals* &lt;<a class="reference external" href="http://www.sciencedirect.com/science/article/pii/S0749641907001702">http://www.sciencedirect.com/science/article/pii/S0749641907001702</a>&gt;`__.
+International Journal of Plasticity 24 (2008) 1264–1276.</p>
+<blockquote>
+<div>[4] Marko, K. Al-Harbi H. F. , Kalidindi S.R., <a href="#id13"><span class="problematic" id="id14">`</span></a><a href="#id15"><span class="problematic" id="id16">*</span></a>Crystal plasticity</div></blockquote>
+<p>simulations using discrete Fourier
+transforms* &lt;<a class="reference external" href="http://www.sciencedirect.com/science/article/pii/S1359645408008902">http://www.sciencedirect.com/science/article/pii/S1359645408008902</a>&gt;`__.
+Acta Materialia 57 (2009) 1777–1784.</p>
+</div>
+</div>
+
+
     </div>
-    <div class="footer">
-        &copy; Copyright 2014, Daniel Wheeler.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
-    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.<br/>
+    </p>
+  </div>
+</footer>
   </body>
 </html>
