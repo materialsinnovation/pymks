@@ -4,12 +4,9 @@ The Materials Knowledge Systems (MKS) is a novel data science approach
 for solving multiscale materials science problems. It uses techniques
 from machine learning, regression analysis, signal processing, and
 spatial statistics to create structure-property-processing
-relationships. An important component of the MKS is a fast regression
-technique that predicts local material response for a given
-microstructure (also known as localization). The MKS carries the
-potential to both bridge multiple length scales (using localization)
-and provide a framework for solving the inverse material design
-problem.
+relationships. The MKS carries the potential to both bridge multiple
+length scales (using localization) and provide a framework for solving
+the inverse material design problem.
 
 See these references for further reading:
 
@@ -34,9 +31,9 @@ See these references for further reading:
 The PyMKS framework is an object oriented set of tools and examples
 written in Python that provides high level access to the MKS method
 for rapid analysis of microstructure-property relationships. A
-description of how to use PyMKS is outlined below and examples cases
-can be found [in the examples section](). Both code and example
-contributions are welcome.
+description of how to use PyMKS is outlined below and example cases
+can be found [in the examples section](EXAMPLES.html). Both code and
+example contributions are welcome.
 
 
 
