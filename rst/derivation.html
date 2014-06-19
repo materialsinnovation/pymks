@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1',
+        VERSION:     '0.1-dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -34,9 +34,9 @@
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="shortcut icon" href="../_static/pymks_logo.ico"/>
     <link rel="top" title="PyMKS" href="../index.html" />
-    <link rel="up" title="Examples" href="../EXAMPLES.html" />
-    <link rel="next" title="A Simple Filter" href="filter.html" />
-    <link rel="prev" title="Linear Elasticity Simulations and the Materials Knowledge System" href="elasticity.html" />
+    <link rel="up" title="Theory" href="../THEORY.html" />
+    <link rel="next" title="Authors" href="CREDITS.html" />
+    <link rel="prev" title="Theory" href="../THEORY.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -57,7 +57,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -75,37 +75,18 @@
      id="dLabelGlobalToc"
      data-toggle="dropdown"
      data-target="#"
-     href="../index.html">Site <b class="caret"></b></a>
+     href="../index.html">More <b class="caret"></b></a>
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="INSTALLATION.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#anaconda-python">Anaconda Python</a></li>
-<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#regular-python">Regular Python</a></li>
-<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#fftw">FFTW</a></li>
-<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#line-profiler"><tt class="docutils literal"><span class="pre">line_profiler</span></tt></a></li>
-<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#java-script-animator">Java Script Animator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#git">Git</a></li>
-<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#install-the-pymks-module">Install the <tt class="docutils literal"><span class="pre">pymks</span></tt> module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#ipython-notebooks">IPython Notebooks</a></li>
-<li class="toctree-l2"><a class="reference internal" href="INSTALLATION.html#issues">Issues</a></li>
-</ul>
-</li>
-<li class="toctree-l1 current"><a class="reference internal" href="../EXAMPLES.html">Examples</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="elasticity.html">Linear Elasticity Simulations and the Materials Knowledge System</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../THEORY.html">Theory</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="">Derivation of Materials Knowledge Systems Equation using Linear Elasticity</a></li>
-<li class="toctree-l2"><a class="reference internal" href="filter.html">A Simple Filter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cross_validation.html">Cross Validation and Hyperparameter Optimization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cross_validation.html#learning-curves">Learning Curves</a></li>
-<li class="toctree-l2"><a class="reference internal" href="scaling_coefficients.html">Scaling the Coefficients</a></li>
-<li class="toctree-l2"><a class="reference internal" href="improving_performance.html">Improving Performance</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../API.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CREDITS.html">Authors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
-<li class="toctree-l1"><a class="reference internal" href="CITATION.html">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CITATION.html">Citing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="REQUIREMENTS.html">Requirements</a></li>
 </ul>
 </ul>
 </li>
@@ -193,6 +174,8 @@ equilibrium equation can be rewritten as follows.</p>
 <h2>Integration by Parts<a class="headerlink" href="#integration-by-parts" title="Permalink to this headline">¶</a></h2>
 <p>The equation above can be recast with all of the derivatives on the
 green&#8217;s functions by integrating by parts.</p>
+<div class="math">
+\[\varepsilon'_{kl}(x) = \Bigg [ \int_S \frac{\big (G_{ik,l}(r) + G_{il,k}(r) \big)}{2} \Big [C'_{ijlk}(x-r)\bar{\varepsilon}_{lk} + \big [C'_{ijlk}(x-r)\varepsilon'_{lk}(x-r)\big ]\Big ] n_j dS\Bigg ]_{r \rightarrow 0}^{r \rightarrow \infty} -  \int_V \frac{\big (G_{ik,lj}(r) + G_{il,kj}(r) \big)}{2} \Big [C'_{ijlk}(x-r)\bar{\varepsilon}_{lk} + \big [C'_{ijlk}(x-r)\varepsilon'_{lk}(x-r)\big ]\Big ]dr\]</div>
 </div>
 <div class="section" id="principal-value-singularity">
 <h2>Principal Value Singularity<a class="headerlink" href="#principal-value-singularity" title="Permalink to this headline">¶</a></h2>
@@ -213,11 +196,10 @@ following equation [1].</p>
 <div class="math">
 \[E_{ikjl}(x) = \Big [C'_{ijlk}(x)\bar{\varepsilon}_{lk} + \big [C'_{ijlk}(x)\varepsilon'_{lk}(x)\big ]\Big ]\lim_{r \rightarrow 0} \int_S\frac{\big (G_{ik,l}(r) + G_{il,k}(r)\big)}{2} n_l dS\]</div>
 <p>are the contribution from the surface integrals at <span class="math">\(\infty\)</span> and
-from the singularity. The MKS assumes periodic boundary conditions,
-there fore the contribution from infinty disappears.</p>
+from the singularity.</p>
 <p>Finally let</p>
 <div class="math">
-\[\Gamma_{iklj}(r) = -E_{ikjl}(x-r)\delta(r) + \Phi_{ikjl}(r)\]</div>
+\[\Gamma_{iklj}(r) = I_{ikjl}^{\infty}\delta(r)-E_{ikjl}\delta(r) + \Phi_{ikjl}(r)\]</div>
 <p>the strain can then be written in the following form.</p>
 <div class="math">
 \[\varepsilon'_{kl}(x) = \int_V \Gamma_{ikjl}(r) \Big [C'_{ijlk}(x-r)\bar{\varepsilon}_{lk} + \big [C'_{ijlk}(x-r)\varepsilon'_{lk}(x-r)\big ]\Big ]dr\]</div>
@@ -228,6 +210,8 @@ there fore the contribution from infinty disappears.</p>
 \[\varepsilon'(x) =\int_V \Gamma(r) C'(x-r) [ \bar{\varepsilon} + \varepsilon'(x-r)]dr\]</div>
 <p>By recursively inserting <span class="math">\(\varepsilon'(x)\)</span> into the LHS of the
 equation, we get the following series.</p>
+<div class="math">
+\[\varepsilon'(x) =\int_V \Gamma(r) C'(x-r) \bar{\varepsilon} dr +\int_V \int_V \Big[ \Gamma(r) C'(x-r)\bar{\varepsilon}\Big ]\Big [\Gamma(r')  C'(x-r') \bar{\varepsilon}\Big] dr'dr + \int_V \int_V \int_V \Big[ \Gamma(r) C'(x-r)\bar{\varepsilon}\Big] \Big[  \Gamma(r')C'(x-r') \bar{\varepsilon}\Big] \Big[  \Gamma(r'')  C'(x-r'')\bar{\varepsilon} \Big]dr''dr'dr + ...\]</div>
 <p>As long as</p>
 <div class="math">
 \[\begin{split}\Gamma(r) C'(x)\bar{\varepsilon} &lt;&lt; 1\end{split}\]</div>

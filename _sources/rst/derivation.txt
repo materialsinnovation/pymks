@@ -81,11 +81,10 @@ Integration by Parts
 The equation above can be recast with all of the derivatives on the
 green's functions by integrating by parts.
 
-.. raw:: latex
+.. math::
 
-   \begin{eqnarray}
-   \varepsilon'_{kl}(x) = \Bigg [ \int_V \frac{\big (G_{ik,l}(r) + G_{il,k}(r) \big)}{2} && \Big [C'_{ijlk}(x-r)\bar{\varepsilon}_{lk} + \big [C'_{ijlk}(x-r)\varepsilon'_{lk}(x-r)\big ]\Big ] n_j dS\Bigg ]_{r \rightarrow 0}^{r \rightarrow \infty} \\ - &&  \int_V \frac{\big (G_{ik,lj}(r) + G_{il,kj}(r) \big)}{2} \Big [C'_{ijlk}(x-r)\bar{\varepsilon}_{lk} + \big [C'_{ijlk}(x-r)\varepsilon'_{lk}(x-r)\big ]\Big ]dr
-   \end{eqnarray}
+
+   \varepsilon'_{kl}(x) = \Bigg [ \int_S \frac{\big (G_{ik,l}(r) + G_{il,k}(r) \big)}{2} \Big [C'_{ijlk}(x-r)\bar{\varepsilon}_{lk} + \big [C'_{ijlk}(x-r)\varepsilon'_{lk}(x-r)\big ]\Big ] n_j dS\Bigg ]_{r \rightarrow 0}^{r \rightarrow \infty} -  \int_V \frac{\big (G_{ik,lj}(r) + G_{il,kj}(r) \big)}{2} \Big [C'_{ijlk}(x-r)\bar{\varepsilon}_{lk} + \big [C'_{ijlk}(x-r)\varepsilon'_{lk}(x-r)\big ]\Big ]dr
 
 Principal Value Singularity
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -110,12 +109,11 @@ is the green's function terms, and
 .. math:: E_{ikjl}(x) = \Big [C'_{ijlk}(x)\bar{\varepsilon}_{lk} + \big [C'_{ijlk}(x)\varepsilon'_{lk}(x)\big ]\Big ]\lim_{r \rightarrow 0} \int_S\frac{\big (G_{ik,l}(r) + G_{il,k}(r)\big)}{2} n_l dS 
 
 are the contribution from the surface integrals at :math:`\infty` and
-from the singularity. The MKS assumes periodic boundary conditions,
-there fore the contribution from infinty disappears.
+from the singularity.
 
 Finally let
 
-.. math:: \Gamma_{iklj}(r) = -E_{ikjl}(x-r)\delta(r) + \Phi_{ikjl}(r)
+.. math:: \Gamma_{iklj}(r) = I_{ikjl}^{\infty}\delta(r)-E_{ikjl}\delta(r) + \Phi_{ikjl}(r)
 
 the strain can then be written in the following form.
 
@@ -129,11 +127,10 @@ Kroner's Expansion
 By recursively inserting :math:`\varepsilon'(x)` into the LHS of the
 equation, we get the following series.
 
-.. raw:: latex
+.. math::
 
-   \begin{eqnarray}
-   \varepsilon'(x) =\int_V \Gamma(r) C'(x-r) \bar{\varepsilon} dr && +\int_V \int_V \Big[ \Gamma(r) C'(x-r)\bar{\varepsilon}\Big ]\Big [\Gamma(r')  C'(x-r') \bar{\varepsilon}\Big] dr'dr \\ && + \int_V \int_V \int_V \Big[ \Gamma(r) C'(x-r)\bar{\varepsilon}\Big] \Big[  \Gamma(r')C'(x-r') \bar{\varepsilon}\Big] \Big[  \Gamma(r'')  C'(x-r'')\bar{\varepsilon} \Big]dr''dr'dr + ...
-   \end{eqnarray}
+
+   \varepsilon'(x) =\int_V \Gamma(r) C'(x-r) \bar{\varepsilon} dr +\int_V \int_V \Big[ \Gamma(r) C'(x-r)\bar{\varepsilon}\Big ]\Big [\Gamma(r')  C'(x-r') \bar{\varepsilon}\Big] dr'dr + \int_V \int_V \int_V \Big[ \Gamma(r) C'(x-r)\bar{\varepsilon}\Big] \Big[  \Gamma(r')C'(x-r') \bar{\varepsilon}\Big] \Big[  \Gamma(r'')  C'(x-r'')\bar{\varepsilon} \Big]dr''dr'dr + ...
 
 As long as
 

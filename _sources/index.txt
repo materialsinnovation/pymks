@@ -14,9 +14,8 @@ Materials Knowledge Systems in Python
 .. toctree::
    :hidden:
 
-   rst/INSTALLATION.rst
-   EXAMPLES.rst
-   API.rst
+   THEORY.rst
    rst/CREDITS.rst
    rst/LICENSE.rst
    rst/CITATION.rst
+   rst/REQUIREMENTS.rst

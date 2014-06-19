@@ -1,6 +1,6 @@
 
 Technical Overview
-==================
+------------------
 
 An important component of the MKS is the regression technique for rapid
 calculation of a response feild :math:`p_i` based on a microstructure
@@ -11,7 +11,7 @@ modulus or Poisson's ratio while the response might be the stress or
 strain field.
 
 Discretize in State Space
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The first step in the MKS is to bin (or discretize) the state space. To
 so this, the microstructure :math:`m_i` and is discretized and then
@@ -39,7 +39,7 @@ interval of 0 to 1.
 
 
 The Influence Coefficients
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once the state space is discretized, the relationship between the
 response :math:`p_i` and microstructure :math:`m_i^h` can be written as,
@@ -57,7 +57,7 @@ the samples for simplicity. Generally the MKS is calibrated using many
 samples. \*\*\*
 
 The Convolution
----------------
+~~~~~~~~~~~~~~~
 
 The efficiency of the MKS is due to solving the linear regression in
 Fourier space. For a 2D problem of size :math:`N^2`, the size of the
@@ -81,7 +81,7 @@ with a linear regression at each discretization location in :math:`k` to
 calculate the :math:`\beta_{k,h}`.
 
 A PyMKS Example
-===============
+---------------
 
 One important application of the MKS is to accurately and rapidly
 reproduce finite element simulations based on microstructure. Let's
