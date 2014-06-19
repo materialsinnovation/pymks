@@ -32,6 +32,6 @@ PyMKS
 The PyMKS framework is an object oriented set of tools and examples
 written in Python that provides high level access to the MKS method for
 rapid analysis of microstructure-property relationships. A description
-of how to use PyMKS is outlined below and examples cases can be found
-`in the examples section <EXAMPLES.html>`__. Both code and example
+of how to use PyMKS is outlined below and example cases can be found `in
+the examples section <EXAMPLES.html>`__. Both code and example
 contributions are welcome.

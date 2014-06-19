@@ -1,6 +1,6 @@
 
-Derivation of Materials Knowledge System Equation using Linear Elasticity
-=========================================================================
+Derivation of Materials Knowledge Systems Equation using Linear Elasticity
+==========================================================================
 
 The goal of this notebook is to derivate the MKS equation from
 elastostatic equilibrium equation. Note that the MKS equation can be
@@ -142,8 +142,8 @@ As long as
 the series can be truncated after a few terms and still provide
 resonable accuracy.
 
-Materials Knowledge System
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Materials Knowledge Systems
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Let
 

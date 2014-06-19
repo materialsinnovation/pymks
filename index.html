@@ -91,7 +91,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="EXAMPLES.html">Examples</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="rst/elasticity.html">Linear Elasticity Simulations and the Materials Knowledge System</a></li>
-<li class="toctree-l2"><a class="reference internal" href="rst/derivation.html">Derivation of Materials Knowledge System Equation using Linear Elasticity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/derivation.html">Derivation of Materials Knowledge Systems Equation using Linear Elasticity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rst/filter.html">A Simple Filter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rst/cross_validation.html">Cross Validation and Hyperparameter Optimization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rst/cross_validation.html#learning-curves">Learning Curves</a></li>
@@ -156,12 +156,11 @@ Thesis (PhD, Materials engineering)&#8211;Drexel University, 2011,
 <p>The PyMKS framework is an object oriented set of tools and examples
 written in Python that provides high level access to the MKS method for
 rapid analysis of microstructure-property relationships. A description
-of how to use PyMKS is outlined below and examples cases can be found
-<a class="reference external" href="EXAMPLES.html">in the examples section</a>. Both code and example
+of how to use PyMKS is outlined below and example cases can be found <a class="reference external" href="EXAMPLES.html">in
+the examples section</a>. Both code and example
 contributions are welcome.</p>
-</div>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="technical-overview">
+<h3>Technical Overview<a class="headerlink" href="#technical-overview" title="Permalink to this headline">¶</a></h3>
 <p>An important component of the MKS is the regression technique for rapid
 calculation of a response feild <img class="math" src="_images/math/245a5501248a6ea24f520f76d4140cedf08e1674.png" alt="p_i"/> based on a microstructure
 <img class="math" src="_images/math/796159ab6e186e3675497b6d219b5389ea56175c.png" alt="m_i"/>, where the index <img class="math" src="_images/math/34857b3ba74ce5cd8607f3ebd23e9015908ada71.png" alt="i"/> refers to a spatial location
@@ -169,6 +168,7 @@ often in 2D or 3D. For example, the microstructure might represent
 values of material properties that vary based on phase such as elastic
 modulus or Poisson&#8217;s ratio while the response might be the stress or
 strain field.</p>
+</div>
 </div>
 <div class="section" id="discretize-in-state-space">
 <h2>Discretize in State Space<a class="headerlink" href="#discretize-in-state-space" title="Permalink to this headline">¶</a></h2>
@@ -212,20 +212,19 @@ regression is reduced from $ (N^2 N_{} N^2 H )$ to
 <img class="math" src="_images/math/46dc0e4861bd3b450e47e57e8cb41639237bb1ee.png" alt="\left(N_{\text{sample}} \times H \right)"/> for each point in the
 Fourier space of size <img class="math" src="_images/math/46aa1fb4a215adc468fe8cb9d2ec17bdb72bf1e6.png" alt="N^2"/>. The convolution,</p>
 <div class="math">
-<p><img src="_images/math/b319739c338a7f5bab08644c73fbe9828ff392ef.png" alt="\sum_h \sum_j \alpha_j^h m_{i + j}^h"/></p>
+<p><img src="_images/math/2b801a79c82bfcd13210343d7711267c1e8d2465.png" alt="\sum_h \sum_j \alpha_{j,h} m_{i + j,h}"/></p>
 </div><p>can be deconvolved in Fourier space using <a class="reference external" href="http://en.wikipedia.org/wiki/Discrete_Fourier_transform#Circular_convolution_theorem_and_cross-correlation_theorem">circular convolution
 theorem</a></p>
-<p>If we write <img class="math" src="_images/math/d205e2c9e99faeb1e41098699497661385979801.png" alt="P_{k} =  \mathcal{F}_k \left( p_{s} \right)"/>,
-<img class="math" src="_images/math/dde5735deb40d53ba5bba5863e47961d23207745.png" alt="M_{k}^h = \mathcal{F}_k  \left( m_{s}^h \right)"/> and
-<img class="math" src="_images/math/0a88d9aea508521d755dfe348d73b038ad8034f8.png" alt="\beta_k^h = \mathcal{F}_k \left(  \alpha_s^h \right)"/>, then we
-just need to solve</p>
+<p>If we write <img class="math" src="_images/math/048999c66a2f2f9153fbf927bf0c5bbb6e25968e.png" alt="P_{k} =  \mathcal{F}_k \left( p_{i} \right)"/>,
+<img class="math" src="_images/math/d6bacbe8dde16dfee86850b0cbc0967f318093b2.png" alt="M_{k,h} = \mathcal{F}_k  \left( m_{i,h} \right)"/> and
+<img class="math" src="_images/math/1ae6806a0d9ee24dfa72f1b8214f892343c6377c.png" alt="\beta_{k,h} = \mathcal{F}_k \left(  \alpha_{i,h} \right)"/>, then
+we just need to solve</p>
 <div class="math">
-<p><img src="_images/math/43d7a5a213848c624e1880b83ccd0e5b7aa49339.png" alt="P_{k} = \sum\limits_{h=0}^{h-1} \beta_k^h M_{k}^h"/></p>
+<p><img src="_images/math/e9e829c2ad2f9709f09c7afc45b27141154c61e6.png" alt="P_{k} = \sum_h \beta_{k,h} M_{k,h}"/></p>
 </div><p>with a linear regression at each discretization location in <img class="math" src="_images/math/8c325612684d41304b9751c175df7bcc0f61f64f.png" alt="k"/> to
-calculate the <img class="math" src="_images/math/0030790462c62d3a5e053ef944f18480c1d37166.png" alt="\beta_k^h"/>.</p>
-</div>
-<div class="section" id="pymks-example">
-<h2>PyMKS Example<a class="headerlink" href="#pymks-example" title="Permalink to this headline">¶</a></h2>
+calculate the <img class="math" src="_images/math/96621fbc3889845b109eca3307e78f242dfd1176.png" alt="\beta_{k,h}"/>.</p>
+<div class="section" id="a-pymks-example">
+<h3>A PyMKS Example<a class="headerlink" href="#a-pymks-example" title="Permalink to this headline">¶</a></h3>
 <p>One important application of the MKS is to accurately and rapidly
 reproduce finite element simulations based on microstructure. Let&#8217;s
 start by running a finite element simulation on a random microstructure
@@ -256,12 +255,9 @@ elastic modulus of 80 and the other a value of 120.</p>
 <span class="n">draw_microstructure_strain</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">strains</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>/home/wd15/anaconda/lib/python2.7/site-packages/matplotlib/figure.py:1595: UserWarning: This figure includes Axes that are not compatible with tight_layout, so its results might be incorrect.
-  warnings.warn("This figure includes Axes that are not "</pre>
-</div>
-<img alt="_images/intro_5_1.png" src="_images/intro_5_1.png" />
+<img alt="_images/intro_5_0.png" src="_images/intro_5_0.png" />
 <div class="section" id="create-the-delta-microstructures">
-<h3>Create the Delta Microstructures<a class="headerlink" href="#create-the-delta-microstructures" title="Permalink to this headline">¶</a></h3>
+<h4>Create the Delta Microstructures<a class="headerlink" href="#create-the-delta-microstructures" title="Permalink to this headline">¶</a></h4>
 <p>The goal of the MKS it to reproduce the above simulation. In the case of
 linear elasticity the MKS model can be seeded with a delta
 microstructure. The following code snippet creates a delta
@@ -279,7 +275,7 @@ microstructure with two samples.</p>
 <img alt="_images/intro_7_0.png" src="_images/intro_7_0.png" />
 </div>
 <div class="section" id="create-the-responses">
-<h3>Create the Responses<a class="headerlink" href="#create-the-responses" title="Permalink to this headline">¶</a></h3>
+<h4>Create the Responses<a class="headerlink" href="#create-the-responses" title="Permalink to this headline">¶</a></h4>
 <p>We now create the responses from the microstructure using the
 <tt class="docutils literal"><span class="pre">ElasticFEModel</span></tt>.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="n">X_delta_prop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">X_delta</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="p">,)))</span>
@@ -295,7 +291,7 @@ microstructure with two samples.</p>
 <img alt="_images/intro_9_0.png" src="_images/intro_9_0.png" />
 </div>
 <div class="section" id="calibrate-the-mks-model">
-<h3>Calibrate the MKS Model<a class="headerlink" href="#calibrate-the-mks-model" title="Permalink to this headline">¶</a></h3>
+<h4>Calibrate the MKS Model<a class="headerlink" href="#calibrate-the-mks-model" title="Permalink to this headline">¶</a></h4>
 <p>The <tt class="docutils literal"><span class="pre">fit</span></tt> method from the <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> is used to calibrate
 the coefficients.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks</span> <span class="kn">import</span> <span class="n">MKSRegressionModel</span>
@@ -307,7 +303,7 @@ the coefficients.</p>
 </div>
 </div>
 <div class="section" id="predict-the-fe-simulation">
-<h3>Predict the FE Simulation<a class="headerlink" href="#predict-the-fe-simulation" title="Permalink to this headline">¶</a></h3>
+<h4>Predict the FE Simulation<a class="headerlink" href="#predict-the-fe-simulation" title="Permalink to this headline">¶</a></h4>
 <p>When the <tt class="docutils literal"><span class="pre">model</span></tt> is calibrated it stores the influence coefficients,
 which are then be used by the <tt class="docutils literal"><span class="pre">predict</span></tt> method to return the predicted
 strains.</p>
@@ -324,13 +320,14 @@ original FE simulation using only the delta microstructue to calibrate
 the influence coefficients.</p>
 </div>
 <div class="section" id="comments">
-<h3>Comments<a class="headerlink" href="#comments" title="Permalink to this headline">¶</a></h3>
+<h4>Comments<a class="headerlink" href="#comments" title="Permalink to this headline">¶</a></h4>
 <p>The MKS coefficients can then be scaled up to reproduce larger FE
 simulations using only the small FE simulation to seed the MKS model.</p>
 <p>** Note that the cells close to the left and right side of the domain
 are not well predicited. This is due to issues with the SfePy FE solver
 and periodic boundary conditions. This should be ironed out soon. **</p>
 <div class="toctree-wrapper compound">
+</div>
 </div>
 </div>
 </div>

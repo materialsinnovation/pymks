@@ -1,6 +1,6 @@
 
-Introduction
-------------
+Technical Overview
+==================
 
 An important component of the MKS is the regression technique for rapid
 calculation of a response feild :math:`p_i` based on a microstructure
@@ -65,23 +65,23 @@ regression is reduced from $ (N^2 N\_{} N^2 H )$ to
 :math:`\left(N_{\text{sample}} \times H \right)` for each point in the
 Fourier space of size :math:`N^2`. The convolution,
 
-.. math::  \sum_h \sum_j \alpha_j^h m_{i + j}^h 
+.. math::  \sum_h \sum_j \alpha_{j,h} m_{i + j,h} 
 
 can be deconvolved in Fourier space using `circular convolution
 theorem <http://en.wikipedia.org/wiki/Discrete_Fourier_transform#Circular_convolution_theorem_and_cross-correlation_theorem>`__
 
-If we write :math:`P_{k} =  \mathcal{F}_k \left( p_{s} \right)`,
-:math:`M_{k}^h = \mathcal{F}_k  \left( m_{s}^h \right)` and
-:math:`\beta_k^h = \mathcal{F}_k \left(  \alpha_s^h \right)`, then we
-just need to solve
+If we write :math:`P_{k} =  \mathcal{F}_k \left( p_{i} \right)`,
+:math:`M_{k,h} = \mathcal{F}_k  \left( m_{i,h} \right)` and
+:math:`\beta_{k,h} = \mathcal{F}_k \left(  \alpha_{i,h} \right)`, then
+we just need to solve
 
-.. math::  P_{k} = \sum\limits_{h=0}^{h-1} \beta_k^h M_{k}^h 
+.. math::  P_{k} = \sum_h \beta_{k,h} M_{k,h} 
 
 with a linear regression at each discretization location in :math:`k` to
-calculate the :math:`\beta_k^h`.
+calculate the :math:`\beta_{k,h}`.
 
-PyMKS Example
--------------
+A PyMKS Example
+===============
 
 One important application of the MKS is to accurately and rapidly
 reproduce finite element simulations based on microstructure. Let's
@@ -117,14 +117,8 @@ elastic modulus of 80 and the other a value of 120.
     
 
 
-.. parsed-literal::
 
-    /home/wd15/anaconda/lib/python2.7/site-packages/matplotlib/figure.py:1595: UserWarning: This figure includes Axes that are not compatible with tight_layout, so its results might be incorrect.
-      warnings.warn("This figure includes Axes that are not "
-
-
-
-.. image:: intro_files/intro_5_1.png
+.. image:: intro_files/intro_5_0.png
 
 
 Create the Delta Microstructures
