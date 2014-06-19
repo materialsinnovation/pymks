@@ -39,7 +39,7 @@ $(RST_DIR)/%.rst: $(NOTEBOOK_DIR)/%.ipynb
 	mkdir -p $(RST_DIR)
 	cd $(RST_DIR); ipython nbconvert --to rst ../$<
 
-html: $(RST) $(NOTEBOOKS_RST)
+html: $(RST) $(NOTEBOOKS_RST) *.rst
 	@cp rst/intro.rst ./
 	@cp -r rst/intro_files ./
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html

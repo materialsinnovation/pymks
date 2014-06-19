@@ -103,6 +103,7 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # documentation.
 html_theme_options = {
     'navbar_title': " ",
+    'navbar_site_name': "More",
     'navbar_links': [
         ("Installation", "rst/INSTALLATION.html", True),
         ("Examples", "EXAMPLES.html", True),
