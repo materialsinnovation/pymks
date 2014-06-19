@@ -43,9 +43,9 @@ See the
 [SfePy installation instructions](http://sfepy.org/doc-devel/installation.html)
 for more details.
 
-## [FFTW](fftw) 
+## [FFTW][fftw]
 
-[FFTW](fftw) is not necessary to use PyMKS, but it does give improved
+[FFTW][fftw] is not necessary to use PyMKS, but it does give improved
 performance. The main requirement for `pyfftw` is FFTW3, which can be
 installed via,
 
@@ -61,9 +61,9 @@ Once this is installed, do
     
 ## Requirements
 
-The [REQUIREMENTS.md](REQUIREMENTS.html) file has a complete list
-of packages in the Python environment during development. However,
-most of these are certainly not required for running PyMKS.
+The [REQUIREMENTS.md](REQUIREMENTS.html) file has a complete list of
+packages in the Python environment during development. However, most
+of these are certainly not required for running PyMKS.
 
 [sfepy]: http://sfepy.org 
 [fftw]: http://www.fftw.org/
