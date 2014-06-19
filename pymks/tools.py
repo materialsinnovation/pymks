@@ -5,8 +5,9 @@ import numpy as np
 
 
 
+
 def draw_microstructure_discretization(
-        M, a=0, s=0, Nbin=6, bound=0.016, height=1.7):
+        M, a=0, s=0, Nbin=6, bound=0.016, height=1.7, ax=None):
     r"""
     Creates a diagram to illustrate the binning of a continues values in local state
     space.
@@ -17,8 +18,8 @@ def draw_microstructure_discretization(
         Image of the continuous local state binned discretely in the local
         state space.
     """
-
-    ax = plt.axes()
+    if ax is not None:
+        ax = plt.axes()
     dx = 1. / (Nbin - 1.)
 
     cm = plt.get_cmap('cubehelix')
@@ -69,6 +70,60 @@ def draw_microstructure_discretization(
              mstring,
              fontsize=16,
              color='r')
+
+def draw_microstructure_strain(microstructure, strain):
+    plt.close('all')
+    fig = plt.figure(figsize=(8, 4))
+    ax0 = plt.subplot(1,2,1)
+    ax0.imshow(microstructure.swapaxes(0, 1), cmap=plt.cm.gray, interpolation='none')
+    ax0.set_xticks(())
+    ax0.set_yticks(())
+    ax1 = plt.subplot(1,2,2)
+    im1 = ax1.imshow(strain.swapaxes(0, 1), cmap=plt.cm.hot, interpolation='none');
+    ax1.set_xticks(())
+    ax1.set_yticks(())
+    ax1.set_title(r'$\mathbf{\varepsilon_{xx}}$', fontsize=20)
+    ax0.set_title('Microstructure', fontsize=20)
+    
+    fig.subplots_adjust(right=0.8)
+    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
+    fig.colorbar(im1, cax=cbar_ax)
+
+    plt.tight_layout()
+
+def draw_microstructures(microstructure1, microstructure2):
+    plt.close('all')
+    plt.figure(figsize=(8, 4))
+    ax0 = plt.subplot(1,2,1)
+    ax0.imshow(microstructure1.swapaxes(0, 1), cmap=plt.cm.gray, interpolation='none')
+    ax0.set_xticks(())
+    ax0.set_yticks(())
+    ax1 = plt.subplot(1,2,2)
+    ax1.imshow(microstructure2.swapaxes(0, 1), cmap=plt.cm.gray, interpolation='none');
+    ax1.set_xticks(())
+    ax1.set_yticks(())
+    
+    plt.tight_layout()
+
+def draw_strains(strain1, strain2):
+    plt.close('all')
+
+    vmin = min((strain1.flatten().min(), strain2.flatten().min()))
+    vmax = min((strain1.flatten().max(), strain2.flatten().max()))
+    fig, axs = plt.subplots(1, 2, figsize=(8, 4))
+    titles = ['Finite Element', 'MKS']
+    strains = (strain1, strain2)
+    for strain, ax, title in zip(strains, axs, titles):
+        im = ax.imshow(strain.swapaxes(0, 1), cmap=plt.cm.hot, interpolation='none', vmin=vmin, vmax=vmax)
+        ax.set_xticks(())
+        ax.set_yticks(())
+        ax.set_title(r'$\mathbf{\varepsilon_{xx}}$ (%s)' % title, fontsize=20)
+        
+    fig.subplots_adjust(right=0.8)
+    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
+    fig.colorbar(im, cax=cbar_ax)
+
+    plt.tight_layout()
 
 
 def bin(arr, Nbin):

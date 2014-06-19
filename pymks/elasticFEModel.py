@@ -123,8 +123,8 @@ class ElasticFEModel(object):
                 x, y = coors[:, 0], coors[:, 1]
                 i_out = np.empty_like(x, dtype=np.int64)
                 j_out = np.empty_like(y, dtype=np.int64)
-                i = np.floor((x - minx) / self.dx, i_out)
-                j = np.floor((y - miny) / self.dx, j_out)
+                i = np.floor((x - minx) / self.dx, i_out, casting='unsafe')
+                j = np.floor((y - miny) / self.dx, j_out, casting='unsafe')
                 property_array_ = property_array[i, j]
                 lam = property_array_[..., 0]
                 mu = property_array_[..., 1]
@@ -297,7 +297,7 @@ class ElasticFEModel(object):
         pb.save_regions_as_groups('regions')
 
         epbcs, functions = self.get_periodicBCs(domain)
-        
+
         ebcs = self.get_displacementBCs(domain)
 
         pb.time_update(ebcs=ebcs,
