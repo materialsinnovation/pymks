@@ -30,7 +30,7 @@ class ElasticFEModel(object):
     The microstructurs is of shape (Nsample, Nx, Ny, Nproperty) where
     Nproperty is 2 for the elastic modulus and Poisson's ratio.
 
-    >>> X = np.ones((1, 5, 5, 2))
+    >>> X = np.ones((1, 3, 3, 2))
 
     >>> model = ElasticFEModel(dx=0.2)
     >>> y = model.predict(X) # doctest: +ELLIPSIS
@@ -41,6 +41,9 @@ class ElasticFEModel(object):
     >>> exx = y[..., 0]
     >>> eyy = y[..., 1]
     >>> exy = y[..., 2]
+    >>> print exx
+    >>> print eyy
+    >>> print exy
 
     Since there is no contrast in the microstructe the strain is only
     in the x-direction and has a uniform value of 1 since the
@@ -137,13 +140,14 @@ class ElasticFEModel(object):
         material_func = Function('material_func', material_func_)
         return Material('m', function=material_func)
 
-    def subdomain_func(self, x=(), y=()):
+    def subdomain_func(self, x=(), y=(), z=()):
         """
         Creates a function to mask subdomains in Sfepy.
 
         Args:
           x: tuple of lines or points to be masked in the x-plane
           y: tuple of lines or points to be masked in the y-plane
+          z: tuple of lines or points to be masked in the z-plane
 
         Returns:
           array of masked location indices
@@ -154,6 +158,7 @@ class ElasticFEModel(object):
         def func(coords, domain=None):
             flag_x = len(x) == 0
             flag_y = len(y) == 0
+            flag_z = len(z) == 0
 
             for x_ in x:
                 flag = (coords[:, 0] < (x_ + eps)) & (coords[:, 0] > (x_ - eps))
@@ -163,7 +168,11 @@ class ElasticFEModel(object):
                 flag = (coords[:, 1] < (y_ + eps)) & (coords[:, 1] > (y_ - eps))
                 flag_y = flag_y | flag
 
-            return np.where(flag_x & flag_y)[0]
+            for z_ in z:
+                flag = (coords[:, 2] < (z_ + eps)) & (coords[:, 2] > (z_ - eps))
+                flag_z = flag_z | flag
+            
+            return np.where(flag_x & flag_y & flag_z)[0]
 
         return func
 
@@ -192,7 +201,7 @@ class ElasticFEModel(object):
                                            'facet',
                                            functions=Functions([ydown]))
         match_x_line = Function('match_x_line', per.match_x_line)
-        periodic_y = PeriodicBC('periodic_y', [region_up, region_down], {'u.all' : 'u.all'}, match='match_x_line')
+        periodic_y = PeriodicBC('periodic_y', [region_up, region_down], {'u.1' : 'u.1'}, match='match_x_line')
         return Conditions([periodic_y]), Functions([match_x_line])
 
     def get_displacementBCs(self, domain):
@@ -303,12 +312,16 @@ class ElasticFEModel(object):
         pb.time_update(ebcs=ebcs,
                        epbcs=epbcs,
                        functions=functions)
+        
+        #pb.time_update(ebcs=ebcs, functions=functions)
+        vec = pb.solve()
+       
+        #pb.solve()
+        #strain = np.squeeze(pb.evaluate('ev_cauchy_strain.3.region_all(u)', mode='el_avg'))
 
-        pb.solve()
-
-        strain = np.squeeze(pb.evaluate('ev_cauchy_strain.2.region_all(u)', mode='el_avg'))
-
-        return np.reshape(strain, (shape + strain.shape[-1:]))
+        #return np.reshape(strain, (shape + strain.shape[-1:]))
+        print shape
+        return vec.create_output_dict()['u'].data
 
 
 
