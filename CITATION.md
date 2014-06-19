@@ -1,4 +1,6 @@
-# Citation
+# Citing
+
+To cite PyMKS, please use the following citation:
 
 Wheeler, Daniel; Brough, David; Fast, Tony; Kalidindi, Surya; Reid,
 Andrew (2014): PyMKS: Materials Knowledge System in Python. figshare.
