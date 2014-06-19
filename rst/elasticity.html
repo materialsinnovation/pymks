@@ -27,6 +27,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.1.0/js/bootstrap.min.js"></script>
@@ -142,45 +143,45 @@ and validate the MKS frame for a material system.</p>
 <p>The constitutive equation that describes the linear elastic phenomena is
 Hook&#8217;s law.</p>
 <div class="math">
-<p><img src="../_images/math/718a27b00b9be80aff844b37e8d5756750c285d6.png" alt="\sigma_{ij} = C_{ijkl}\varepsilon_{kl}"/></p>
-</div><p><img class="math" src="../_images/math/fa35d9fc104207e09a712110ac81612c5b279a6c.png" alt="\sigma"/> is the stress, <img class="math" src="../_images/math/e2a63918a6fa75b62ad87ad17aaf65f782d71546.png" alt="\varepsilon"/> is the strain, and
-<img class="math" src="../_images/math/c3355896da590fc491a10150a50416687626d7cc.png" alt="C"/> is the stiffness tensor that relates the stress to the strain.
+\[\sigma_{ij} = C_{ijkl}\varepsilon_{kl}\]</div>
+<p><span class="math">\(\sigma\)</span> is the stress, <span class="math">\(\varepsilon\)</span> is the strain, and
+<span class="math">\(C\)</span> is the stiffness tensor that relates the stress to the strain.
 For an isotropic material the stiffness tensor can be represented by
 lower dimension terms which can relate the stress and the strain as
 follows.</p>
 <div class="math">
-<p><img src="../_images/math/3f136cb1153bc74a8671a0660d9f2a95094c1e32.png" alt="\sigma_{ij} = \lambda \delta_{ij} \varepsilon{kk} + 2\mu \varepsilon_{ij}"/></p>
-</div><p>$ $ and <img class="math" src="../_images/math/2d8c833ed800824727cd7bd2fb9de1a12ad7e674.png" alt="\mu"/> are the first and second lam<img class="math" src="../_images/math/449384655f6c1d3246229070c747d9ddb2617774.png" alt="\acute{e}"/>
-parameters and can be defined in terms of the Young&#8217;s modulus <img class="math" src="../_images/math/fa2fa899f0afb05d6837885523503a2d4df434f9.png" alt="E"/>
-and Poisson&#8217;s ratio <img class="math" src="../_images/math/d6a7ccf879c4a4fe694033606332cb83806db296.png" alt="\nu"/>.</p>
+\[\sigma_{ij} = \lambda \delta_{ij} \varepsilon{kk} + 2\mu \varepsilon_{ij}\]</div>
+<p>$ $ and <span class="math">\(\mu\)</span> are the first and second lam<span class="math">\(\acute{e}\)</span>
+parameters and can be defined in terms of the Young&#8217;s modulus <span class="math">\(E\)</span>
+and Poisson&#8217;s ratio <span class="math">\(\nu\)</span>.</p>
 <div class="math">
-<p><img src="../_images/math/89d3d5d815646b48fed9abb0afa8eb5edb85e5fb.png" alt="\lambda = \frac{E\nu}{(1-\nu)(1-2\nu)}"/></p>
-</div><div class="math">
-<p><img src="../_images/math/67478ce1c9dca6d218d43896f8527e0a9882b5fc.png" alt="\mu = \frac{E}{2(1+\nu)}"/></p>
-</div><p>Strain is related to displacement using the following equation.</p>
+\[\lambda = \frac{E\nu}{(1-\nu)(1-2\nu)}\]</div>
 <div class="math">
-<p><img src="../_images/math/b801bf9b351d59f2b9da2fd7c97438c8cdff9c86.png" alt="\varepsilon_{ij} = \frac{u_{i,j}+u_{j,i}}{2}"/></p>
-</div><p>Plugging the equation above back into our expression for stress, we get
+\[\mu = \frac{E}{2(1+\nu)}\]</div>
+<p>Strain is related to displacement using the following equation.</p>
+<div class="math">
+\[\varepsilon_{ij} = \frac{u_{i,j}+u_{j,i}}{2}\]</div>
+<p>Plugging the equation above back into our expression for stress, we get
 an equation that relates displacement to stress.</p>
 <div class="math">
-<p><img src="../_images/math/3e5547ea19f48cc5850323a57f9719d00fe7952b.png" alt="\sigma_{ij} = \lambda u_{k,k} + \mu( u_{i,j}+u_{j,i})"/></p>
-</div><p>The equilibrium equation is defined as</p>
+\[\sigma_{ij} = \lambda u_{k,k} + \mu( u_{i,j}+u_{j,i})\]</div>
+<p>The equilibrium equation is defined as</p>
 <div class="math">
-<p><img src="../_images/math/720b33e7cb2ed5eb2461e621ef749ea8d5e81aae.png" alt="\sigma_{ij,j} = 0"/></p>
-</div><p>and can be cast in terms of displacement as follows.</p>
+\[\sigma_{ij,j} = 0\]</div>
+<p>and can be cast in terms of displacement as follows.</p>
 <div class="math">
-<p><img src="../_images/math/ddf4f5c0c1728d350639470f8c952983e16ba3dd.png" alt="\mu u_{i,jj}+(\mu + \lambda)u_{j,ij}=0"/></p>
-</div><p>In this example, a displacement controlled simulation is used to
+\[\mu u_{i,jj}+(\mu + \lambda)u_{j,ij}=0\]</div>
+<p>In this example, a displacement controlled simulation is used to
 calculated the strain and the following boundary conditions for square
-box of length <img class="math" src="../_images/math/859ccf4cd60c7bc6b8fa1afc9a42dc811a826d6f.png" alt="L"/> and macroscopic strain <img class="math" src="../_images/math/3c0f5eeb9ac0b575ede6353ce79545082e516957.png" alt="\bar{\varepsilon}"/>
+box of length <span class="math">\(L\)</span> and macroscopic strain <span class="math">\(\bar{\varepsilon}\)</span>
 are imposed.</p>
 <div class="math">
-<p><img src="../_images/math/7d8ec9a0be3bfae8dfbee8b610b916ae236f7232.png" alt="u(L, y) = u(0, y) + L\bar{\varepsilon}"/></p>
-</div><div class="math">
-<p><img src="../_images/math/64175865514fd29c614ecb024ab2e53ad602ba8b.png" alt="u(0, L) = u(0, 0) = 0"/></p>
-</div><div class="math">
-<p><img src="../_images/math/eea36c8510b93e2d3c9205f5f0a7d9fd3af9008c.png" alt="u(x, 0) = u(x, L)"/></p>
-</div></div>
+\[u(L, y) = u(0, y) + L\bar{\varepsilon}\]</div>
+<div class="math">
+\[u(0, L) = u(0, 0) = 0\]</div>
+<div class="math">
+\[u(x, 0) = u(x, L)\]</div>
+</div>
 <div class="section" id="sfepy-simple-finite-elements-in-python">
 <h3>Sfepy - Simple Finite Elements in Python<a class="headerlink" href="#sfepy-simple-finite-elements-in-python" title="Permalink to this headline">¶</a></h3>
 <p>In this example, the an instance of the class <tt class="docutils literal"><span class="pre">ElasticFEModel</span></tt> is used
@@ -274,8 +275,8 @@ sfepy: assembling matrix graph...
 sfepy: ...done in 0.01 s
 sfepy: matrix structural nonzeros: 109823 (8.83e-03% fill)</pre>
 </div>
-<p>Let&#8217;s take a look that the <img class="math" src="../_images/math/5cbe2485685a2f1dcfce0c0179cb14f37908e8bf.png" alt="\varepsilon_{xx}"/>,
-<img class="math" src="../_images/math/61356a6fb28be1a65dc45eb3c29d445f02f28825.png" alt="\varepsilon_{yy}"/>, and <img class="math" src="../_images/math/6d1e70a63e22b0190e7245886657ee64aaaead8f.png" alt="\varepsilon_{xy}"/> strain fields
+<p>Let&#8217;s take a look that the <span class="math">\(\varepsilon_{xx}\)</span>,
+<span class="math">\(\varepsilon_{yy}\)</span>, and <span class="math">\(\varepsilon_{xy}\)</span> strain fields
 produced by the <tt class="docutils literal"><span class="pre">FEmodel</span></tt>.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="n">getPlot</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;FE Calculated xx-Strain Field&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
 <span class="n">getPlot</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;FE Calculated yy-Strain Field&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
@@ -294,7 +295,7 @@ produced by the <tt class="docutils literal"><span class="pre">FEmodel</span></t
 <span class="n">MKSmodel</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nbin</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The rest of this example will only use the <img class="math" src="../_images/math/5cbe2485685a2f1dcfce0c0179cb14f37908e8bf.png" alt="\varepsilon_{xx}"/>
+<p>The rest of this example will only use the <span class="math">\(\varepsilon_{xx}\)</span>
 strain field, but the others can be calculated using obvious
 substitutions.</p>
 <p>The first order influence coefficients can be calibrated by passing the
@@ -421,7 +422,7 @@ match the shape of the new larger microstructure.</p>
 <div class="highlight-python"><pre>Mean Absolute % Error 1.67533988698 %</pre>
 </div>
 <img alt="../_images/elasticity_36_1.png" src="../_images/elasticity_36_1.png" />
-<p>The error for original <img class="math" src="../_images/math/859ccf4cd60c7bc6b8fa1afc9a42dc811a826d6f.png" alt="L"/> by <img class="math" src="../_images/math/859ccf4cd60c7bc6b8fa1afc9a42dc811a826d6f.png" alt="L"/> microstructure is smaller
+<p>The error for original <span class="math">\(L\)</span> by <span class="math">\(L\)</span> microstructure is smaller
 than the error for the larger microstructure as is expected when using
 spectral interpolation <a class="reference external" href="#ref_4">[4]</a>.</p>
 </div>

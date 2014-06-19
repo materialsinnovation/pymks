@@ -27,6 +27,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.1.0/js/bootstrap.min.js"></script>
@@ -213,8 +214,8 @@ import matplotlib.pyplot as plt</pre>
 <h2>What is a Filter?<a class="headerlink" href="#what-is-a-filter" title="Permalink to this headline">¶</a></h2>
 <p>A convolution</p>
 <div class="math">
-<p><img src="../_images/math/bc69a7ff648285241865c15e14b514d5738fa3b4.png" alt="y_k = \sum_{i=0}^{N - 1} x_{k-i} h_i"/></p>
-</div><p>where <img class="math" src="../_images/math/8189a5b5a0917b8c93350827be4038af1839139d.png" alt="h"/> is filter and <img class="math" src="../_images/math/26eeb5258ca5099acf8fe96b2a1049c48c89a5e6.png" alt="x"/> is periodic in this case.</p>
+\[y_k = \sum_{i=0}^{N - 1} x_{k-i} h_i\]</div>
+<p>where <span class="math">\(h\)</span> is filter and <span class="math">\(x\)</span> is periodic in this case.</p>
 </div>
 <div class="section" id="exercise-03-0">
 <h2>Exercise 03-0<a class="headerlink" href="#exercise-03-0" title="Permalink to this headline">¶</a></h2>
@@ -259,19 +260,19 @@ recalculate the coefficients.</p>
 <p>The calculated influence coefficients are not even close to the
 originals. What&#8217;s going on? The equation,</p>
 <div class="math">
-<p><img src="../_images/math/1adf7ab6d6c850ac6e1a8100514f52939f652bfe.png" alt="\sum\limits_{h=0}^{H-1} m^h_{a, s} = 1"/></p>
-</div><p>is not being taken into account. Using this, we can rewrite the
+\[\sum\limits_{h=0}^{H-1} m^h_{a, s} = 1\]</div>
+<p>is not being taken into account. Using this, we can rewrite the
 convolution as</p>
 <div class="math">
-<p><img src="../_images/math/5dd5c5082ebb6398d286fc6ca73e7e7065c31184.png" alt="\begin{split}
+\[\begin{split} \begin{split}
 p_{a,s} &amp;= \sum\limits_{h=0}^{H - 1} \sum\limits_{t=0}^{S-1} \alpha_t^h m_{a,s + t}^h \\
         &amp;= \sum\limits_{t=0}^{S-1} \left[ \sum\limits_{h=0}^{H - 2} \alpha_t^h m_{a,s + t}^h +
            \alpha_t^{H-1} \left( 1 - \sum\limits_{h=0}^{H - 2} m_{a,s+t}^h \right) \right] \\
         &amp;= \sum\limits_{t=0}^{S-1} \alpha_t^{H - 1} +
            \sum\limits_{h=0}^{H - 2} \sum\limits_{t=0}^{S-1} \left(\alpha_t^h - \alpha_t^{H-1} \right) m_{a,s + t}^h \\
         &amp;= b_0 + \sum\limits_{h=0}^{H - 2} \sum\limits_{t=0}^{S-1} b_t^h m_{a,s + t}^h
-\end{split}"/></p>
-</div><p>This removes the redundancies from the regression. Coding this in 1D is
+\end{split}\end{split}\]</div>
+<p>This removes the redundancies from the regression. Coding this in 1D is
 easy, we simply replace</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nspace</span><span class="p">):</span>
     <span class="n">model_Fcoeff</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">X_</span><span class="p">[:,</span><span class="n">k</span><span class="p">],</span> <span class="n">y</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span> <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>

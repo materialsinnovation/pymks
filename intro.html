@@ -27,6 +27,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.1.0/js/bootstrap.min.js"></script>
@@ -126,8 +127,8 @@
   <div class="section" id="technical-overview">
 <h1>Technical Overview<a class="headerlink" href="#technical-overview" title="Permalink to this headline">¶</a></h1>
 <p>An important component of the MKS is the regression technique for rapid
-calculation of a response feild <img class="math" src="_images/math/245a5501248a6ea24f520f76d4140cedf08e1674.png" alt="p_i"/> based on a microstructure
-<img class="math" src="_images/math/796159ab6e186e3675497b6d219b5389ea56175c.png" alt="m_i"/>, where the index <img class="math" src="_images/math/34857b3ba74ce5cd8607f3ebd23e9015908ada71.png" alt="i"/> refers to a spatial location
+calculation of a response feild <span class="math">\(p_i\)</span> based on a microstructure
+<span class="math">\(m_i\)</span>, where the index <span class="math">\(i\)</span> refers to a spatial location
 often in 2D or 3D. For example, the microstructure might represent
 values of material properties that vary based on phase such as elastic
 modulus or Poisson&#8217;s ratio while the response might be the stress or
@@ -135,11 +136,11 @@ strain field.</p>
 <div class="section" id="discretize-in-state-space">
 <h2>Discretize in State Space<a class="headerlink" href="#discretize-in-state-space" title="Permalink to this headline">¶</a></h2>
 <p>The first step in the MKS is to bin (or discretize) the state space. To
-so this, the microstructure <img class="math" src="_images/math/796159ab6e186e3675497b6d219b5389ea56175c.png" alt="m_i"/> and is discretized and then
-represented by <img class="math" src="_images/math/b7316e5669a09fe6b36818af540ae85f132e7a62.png" alt="m^h_i"/> such that</p>
+so this, the microstructure <span class="math">\(m_i\)</span> and is discretized and then
+represented by <span class="math">\(m^h_i\)</span> such that</p>
 <div class="math">
-<p><img src="_images/math/812f985ba740879a8f96001269e7ccabd870a2dd.png" alt="m_i = \sum_h m_{i,h} \chi_h"/></p>
-</div><p>where <img class="math" src="_images/math/535cef4892647772d139142a3b7f037a5f8c863c.png" alt="\chi_h"/> is the basis representation for the microstructure.</p>
+\[m_i = \sum_h m_{i,h} \chi_h\]</div>
+<p>where <span class="math">\(\chi_h\)</span> is the basis representation for the microstructure.</p>
 <p>The following images represent simplest form of discretization. State
 space discrtization is analogous to splitting the data into channels in
 signal processing. For example, a value of 0.049 is represented by
@@ -154,14 +155,14 @@ interval of 0 to 1.</p>
 <div class="section" id="the-influence-coefficients">
 <h2>The Influence Coefficients<a class="headerlink" href="#the-influence-coefficients" title="Permalink to this headline">¶</a></h2>
 <p>Once the state space is discretized, the relationship between the
-response <img class="math" src="_images/math/245a5501248a6ea24f520f76d4140cedf08e1674.png" alt="p_i"/> and microstructure <img class="math" src="_images/math/bd53a481e2f1570f2c9e570bc7b95762295130cf.png" alt="m_i^h"/> can be written as,</p>
+response <span class="math">\(p_i\)</span> and microstructure <span class="math">\(m_i^h\)</span> can be written as,</p>
 <div class="math">
-<p><img src="_images/math/c11ba894eafb44b92303de11b038039606c1f718.png" alt="p_i = \sum_h \sum_j \alpha_{j,h} m_{i + j,h}"/></p>
-</div><p>where the <img class="math" src="_images/math/4d11474ff0475e0d563bd29ca22ace8caca2398c.png" alt="\alpha_{j,h}"/> are known as the influence coefficients
-and describe the relationship between <img class="math" src="_images/math/245a5501248a6ea24f520f76d4140cedf08e1674.png" alt="p_i"/> and <img class="math" src="_images/math/a3b6fdde42687171914da0afc722d11670fc5b0c.png" alt="m_j"/>. The
-<img class="math" src="_images/math/245a5501248a6ea24f520f76d4140cedf08e1674.png" alt="p_i"/> are a spatial convolution of <img class="math" src="_images/math/4d11474ff0475e0d563bd29ca22ace8caca2398c.png" alt="\alpha_{j,h}"/> and
-<img class="math" src="_images/math/a3b6fdde42687171914da0afc722d11670fc5b0c.png" alt="m_j"/>. In general, it is assumed that both <img class="math" src="_images/math/a3b6fdde42687171914da0afc722d11670fc5b0c.png" alt="m_j"/> and
-<img class="math" src="_images/math/245a5501248a6ea24f520f76d4140cedf08e1674.png" alt="p_i"/> are periodic.</p>
+\[p_i = \sum_h \sum_j \alpha_{j,h} m_{i + j,h}\]</div>
+<p>where the <span class="math">\(\alpha_{j,h}\)</span> are known as the influence coefficients
+and describe the relationship between <span class="math">\(p_i\)</span> and <span class="math">\(m_j\)</span>. The
+<span class="math">\(p_i\)</span> are a spatial convolution of <span class="math">\(\alpha_{j,h}\)</span> and
+<span class="math">\(m_j\)</span>. In general, it is assumed that both <span class="math">\(m_j\)</span> and
+<span class="math">\(p_i\)</span> are periodic.</p>
 <p>*** Note that the formulation above has dropped an index representing
 the samples for simplicity. Generally the MKS is calibrated using many
 samples. ***</p>
@@ -169,22 +170,22 @@ samples. ***</p>
 <div class="section" id="the-convolution">
 <h2>The Convolution<a class="headerlink" href="#the-convolution" title="Permalink to this headline">¶</a></h2>
 <p>The efficiency of the MKS is due to solving the linear regression in
-Fourier space. For a 2D problem of size <img class="math" src="_images/math/46aa1fb4a215adc468fe8cb9d2ec17bdb72bf1e6.png" alt="N^2"/>, the size of the
+Fourier space. For a 2D problem of size <span class="math">\(N^2\)</span>, the size of the
 regression is reduced from $ (N^2 N_{} N^2 H )$ to
-<img class="math" src="_images/math/46dc0e4861bd3b450e47e57e8cb41639237bb1ee.png" alt="\left(N_{\text{sample}} \times H \right)"/> for each point in the
-Fourier space of size <img class="math" src="_images/math/46aa1fb4a215adc468fe8cb9d2ec17bdb72bf1e6.png" alt="N^2"/>. The convolution,</p>
+<span class="math">\(\left(N_{\text{sample}} \times H \right)\)</span> for each point in the
+Fourier space of size <span class="math">\(N^2\)</span>. The convolution,</p>
 <div class="math">
-<p><img src="_images/math/2b801a79c82bfcd13210343d7711267c1e8d2465.png" alt="\sum_h \sum_j \alpha_{j,h} m_{i + j,h}"/></p>
-</div><p>can be deconvolved in Fourier space using <a class="reference external" href="http://en.wikipedia.org/wiki/Discrete_Fourier_transform#Circular_convolution_theorem_and_cross-correlation_theorem">circular convolution
+\[\sum_h \sum_j \alpha_{j,h} m_{i + j,h}\]</div>
+<p>can be deconvolved in Fourier space using <a class="reference external" href="http://en.wikipedia.org/wiki/Discrete_Fourier_transform#Circular_convolution_theorem_and_cross-correlation_theorem">circular convolution
 theorem</a></p>
-<p>If we write <img class="math" src="_images/math/048999c66a2f2f9153fbf927bf0c5bbb6e25968e.png" alt="P_{k} =  \mathcal{F}_k \left( p_{i} \right)"/>,
-<img class="math" src="_images/math/d6bacbe8dde16dfee86850b0cbc0967f318093b2.png" alt="M_{k,h} = \mathcal{F}_k  \left( m_{i,h} \right)"/> and
-<img class="math" src="_images/math/1ae6806a0d9ee24dfa72f1b8214f892343c6377c.png" alt="\beta_{k,h} = \mathcal{F}_k \left(  \alpha_{i,h} \right)"/>, then
+<p>If we write <span class="math">\(P_{k} =  \mathcal{F}_k \left( p_{i} \right)\)</span>,
+<span class="math">\(M_{k,h} = \mathcal{F}_k  \left( m_{i,h} \right)\)</span> and
+<span class="math">\(\beta_{k,h} = \mathcal{F}_k \left(  \alpha_{i,h} \right)\)</span>, then
 we just need to solve</p>
 <div class="math">
-<p><img src="_images/math/e9e829c2ad2f9709f09c7afc45b27141154c61e6.png" alt="P_{k} = \sum_h \beta_{k,h} M_{k,h}"/></p>
-</div><p>with a linear regression at each discretization location in <img class="math" src="_images/math/8c325612684d41304b9751c175df7bcc0f61f64f.png" alt="k"/> to
-calculate the <img class="math" src="_images/math/96621fbc3889845b109eca3307e78f242dfd1176.png" alt="\beta_{k,h}"/>.</p>
+\[P_{k} = \sum_h \beta_{k,h} M_{k,h}\]</div>
+<p>with a linear regression at each discretization location in <span class="math">\(k\)</span> to
+calculate the <span class="math">\(\beta_{k,h}\)</span>.</p>
 </div>
 </div>
 <div class="section" id="a-pymks-example">
