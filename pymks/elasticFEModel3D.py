@@ -317,8 +317,7 @@ class ElasticFE3DModel(ElasticFEModel):
         m = self.get_material(property_array, domain)
 
         integral = Integral('i', order=3)
-    
-        t1 = Term.new('dw_lin_elastic_iso(m.lam, m.mu, v, u)', 
+        t1 = Term.new('dw_lin_elastic_iso(m.lam, m.mu, v, u)',
                       integral, region_all, m=m, v=v, u=u)
 
         eq = Equation('balance_of_forces', t1)
