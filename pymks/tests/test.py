@@ -4,25 +4,27 @@ import numpy as np
 from sklearn import metrics
 mse = metrics.mean_squared_error
 
-def test_ElasticFEModel():
+def test_ElasticFEModel_2D():
     nx = 5
     ii = (nx - 1) / 2
-    X = np.zeros((1, nx, nx, 2))
-    X[..., 0] = 1.
-    X[0, ii, ii, 0] = 10.
-    X[..., 1] = 0.3
-    
-    model = ElasticFEModel(dx=1. / nx)
-    strains = model.predict(X)
+    X = np.zeros((1, nx, nx), dtype=int)
+    X[0, ii, ii] = 1
+    model = ElasticFEModel(elastic_modulus=(1., 10.), poisson_ratio=(0.3, 0.3))
+    strains = model.get_response(X, slice(None))
     solution = (1.518e-1, -1.672e-2, 0.)
     assert np.allclose(strains[0, ii, ii], solution, rtol=1e-3)
 
-def get_delta_data(nx, ny):
-    Lx = 1.
-    dx = Lx / nx
-    elastic_modulus = np.array((1., 1.1))
-    poissons_ratio = np.array((0.3, 0.3))
+def test_ElasticFEModel_3D():
+    nx = 4
+    ii = (nx - 1) / 2
+    X = np.zeros((1, nx, nx, nx), dtype=int)
+    X[0, :, ii] = 1
+    model = ElasticFEModel(elastic_modulus=(1., 10.), poisson_ratio=(0., 0.))
+    strains = model.get_response(X, slice(None))
+    solution = [1., 0., 0., 0., 0., 0.]
+    assert np.allclose([np.mean(strains[0,...,i]) for i in range(6)], solution)
 
+def get_delta_data(nx, ny):
     ii = (nx - 1) / 2
     jj = (ny - 1) / 2
     
@@ -30,25 +32,16 @@ def get_delta_data(nx, ny):
     X[0, ii, jj] = 1
     X[1] = 1 - X[0]
 
-    X_prop = np.concatenate((elastic_modulus[X][...,None], poissons_ratio[X][...,None]), axis=-1)
-    elastic_model = ElasticFEModel(dx=dx)
-    strains = elastic_model.predict(X_prop)
+    elastic_model = ElasticFEModel(elastic_modulus=(1, 1.1), poisson_ratio=(0.3, 0.3))
+    strains = elastic_model.get_response(X, slice(None))
 
     return X, strains
 
 def get_random_data(nx, ny):
-    Lx = 1.
-    dx = Lx / nx
-    elastic_modulus = np.array((1., 1.1))
-    poissons_ratio = np.array((0.3, 0.3))
-
     np.random.seed(8)
     X = np.random.randint(2, size=(1, nx, ny))
-
-    X_prop = np.concatenate((elastic_modulus[X][...,None], poissons_ratio[X][...,None]), axis=-1)
-    elastic_model = ElasticFEModel(dx=dx)
-    strains = elastic_model.predict(X_prop)
-
+    elastic_model = ElasticFEModel(elastic_modulus=(1., 1.1), poisson_ratio=(0.3, 0.3))
+    strains = elastic_model.get_response(X, slice(None))
     return X, strains
 
 def rollzip(*args):
