@@ -4,6 +4,7 @@ import numpy as np
 from sklearn import metrics
 mse = metrics.mean_squared_error
 from pymks.datasets import make_elasticFEstrain_delta
+from pymks.datasets import make_elasticFEstrain_random
 
 def test_ElasticFESimulation_2D():
     nx = 5
@@ -34,10 +35,9 @@ def get_delta_data(nx, ny):
 
 def get_random_data(nx, ny):
     np.random.seed(8)
-    X = np.random.randint(2, size=(1, nx, ny))
-    elastic_model = ElasticFESimulation(elastic_modulus=(1., 1.1), poissons_ratio=(0.3, 0.3))
-    strains = elastic_model.get_response(X, slice(None))
-    return X, strains
+    return make_elasticFEstrain_random(elastic_modulus=(1., 1.1),
+                                poissons_ratio=(0.3, 0.3), n_samples=1,
+                                size=(nx, ny), strain_index=slice(None))
 
 def rollzip(*args):
     return zip(*tuple(np.rollaxis(x, -1) for x in args))
