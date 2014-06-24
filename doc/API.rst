@@ -8,10 +8,10 @@ MKS Models
 .. autoclass:: pymks.mksRegressionModel.MKSRegressionModel
    :members:
 
-Data Generation Models
-======================
+Data Generation
+===============
 
-.. autoclass:: pymks.elasticFEModel.ElasticFEModel
+.. automodule:: pymks.datasets
    :members:
 
 Testing

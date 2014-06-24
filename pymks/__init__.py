@@ -10,7 +10,6 @@ from .tools import draw_microstructure_discretization
 from .elasticFESimulation import ElasticFESimulation
 from .tools import bin
 
-
 @nottest
 def test():
     r"""

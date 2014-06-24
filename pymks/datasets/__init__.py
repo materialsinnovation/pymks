@@ -2,12 +2,16 @@ import numpy as np
 from pymks import ElasticFESimulation
 from pymks import MKSRegressionModel
 
+__all__ = ['make_delta_microstructures', 'make_elasticFEstrain_delta', 'ElasticFESimulation']
+
 def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio, size, strain_index=0):
-    """This function provides a simple interface to generate delta
-    microstructures and their strain response fields that can be used
-    for the fit method in the `MKSRegressionModel`. The length of
-    `elastic_modulus` and `poissons_ratio` indicates the number of phases
-    in the microstructure. The following example is or a two phase
+    """Generate delta microstructures and responses
+
+    Simple interface to generate delta microstructures and their
+    strain response fields that can be used for the fit method in the
+    `MKSRegressionModel`. The length of `elastic_modulus` and
+    `poissons_ratio` indicates the number of phases in the
+    microstructure. The following example is or a two phase
     microstructure with dimensions of `(5, 5)`.
 
     >>> elastic_modulus = (1., 2.)
@@ -21,13 +25,12 @@ def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio, size, strain_ind
     strain response fields.
 
     Args:
-      `elastic_modulus`: list of elastic moduli for the phases
-      `poissons_ratio`: list of Poisson's ratios for the phases
-      `size`: size of the microstructure `strain_index`: interger
-              value to return a particular strain field.  0
-              returns exx, 1 returns eyy, etc. To return all
-              strain fields set `strain_index` equal to
-              `slice(None)`.
+      elastic_modulus: list of elastic moduli for the phases
+      poissons_ratio: list of Poisson's ratios for the phases
+      size: size of the microstructure
+      strain_index: interger value to return a particular strain
+        field.  0 returns exx, 1 returns eyy, etc. To return all
+        strain fields set strain_index equal to slice(None).
 
     Returns:
       tuple containing delta microstructures and their strain fields
@@ -36,19 +39,24 @@ def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio, size, strain_ind
     FEsim = ElasticFESimulation(elastic_modulus=elastic_modulus,
                                 poissons_ratio=poissons_ratio)
 
-    X = _get_delta_microstructures(len(elastic_modulus), size=size)
+    X = make_delta_microstructures(len(elastic_modulus), size=size)
     return X, FEsim.get_response(X, strain_index=strain_index)
 
-def _get_delta_microstructures(Nphases, size):
-    """
+def make_delta_microstructures(Nphases, size):
+    """Constructs delta microstructures
+
+    Constructs delta microstructures for an arbitrary number of phases
+    given the size of the domain.
+
     Args:
-      Nphases: number of phases
-      size: dimension of microstructure
+        Nphases: number of phases
+        size: dimension of microstructure
 
     Returns:
-      delta microstructures for the system of shape
-      (Nsamples, Nx, Ny, ...)
+        delta microstructures for the system of shape
+        (Nsamples, Nx, Ny, ...)
 
+  
     >>> X = np.array([[[[0, 0, 0],
     ...                 [0, 0, 0],
     ...                 [0, 0, 0]],
@@ -67,7 +75,8 @@ def _get_delta_microstructures(Nphases, size):
     ...                [[1, 1, 1],
     ...                 [1, 1, 1],
     ...                 [1, 1, 1]]]])
-    >>> assert(np.allclose(X,_get_delta_microstructures(2, size=(3, 3, 3))))
+
+    >>> assert(np.allclose(X, make_delta_microstructures(2, size=(3, 3, 3))))
 
     """
     shape = (Nphases, Nphases) + size
