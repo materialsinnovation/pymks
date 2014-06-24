@@ -1,0 +1,79 @@
+import numpy as np
+from pymks import ElasticFESimulation
+from pymks import MKSRegressionModel
+
+def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio, size, strain_index=0):
+    """This function provides a simple interface to generate delta
+    microstructures and their strain response fields that can be used
+    for the fit method in the `MKSRegressionModel`. The length of
+    `elastic_modulus` and `poissons_ratio` indicates the number of phases
+    in the microstructure. The following example is or a two phase
+    microstructure with dimensions of `(5, 5)`.
+
+    >>> elastic_modulus = (1., 2.)
+    >>> poissons_ratio = (0.3, 0.3)
+    >>> X, y = make_elasticFEstrain_delta(elastic_modulus=elastic_modulus,
+    ...                                   poissons_ratio=poissons_ratio,
+    ...                                   size=(5, 5)) #doctest: +ELLIPSIS
+    sfepy: ...
+
+    `X` is the delta microstructures, and `y` is the
+    strain response fields.
+
+    Args:
+      `elastic_modulus`: list of elastic moduli for the phases
+      `poissons_ratio`: list of Poisson's ratios for the phases
+      `size`: size of the microstructure `strain_index`: interger
+              value to return a particular strain field.  0
+              returns exx, 1 returns eyy, etc. To return all
+              strain fields set `strain_index` equal to
+              `slice(None)`.
+
+    Returns:
+      tuple containing delta microstructures and their strain fields
+
+    """
+    FEsim = ElasticFESimulation(elastic_modulus=elastic_modulus,
+                                poissons_ratio=poissons_ratio)
+
+    X = _get_delta_microstructures(len(elastic_modulus), size=size)
+    return X, FEsim.get_response(X, strain_index=strain_index)
+
+def _get_delta_microstructures(Nphases, size):
+    """
+    Args:
+      Nphases: number of phases
+      size: dimension of microstructure
+
+    Returns:
+      delta microstructures for the system of shape
+      (Nsamples, Nx, Ny, ...)
+
+    >>> X = np.array([[[[0, 0, 0],
+    ...                 [0, 0, 0],
+    ...                 [0, 0, 0]],
+    ...                [[0, 0, 0],
+    ...                 [0, 1, 0],
+    ...                 [0, 0, 0]],
+    ...                [[0, 0, 0],
+    ...                 [0, 0, 0],
+    ...                 [0, 0, 0]]],
+    ...               [[[1, 1, 1],
+    ...                 [1, 1, 1],
+    ...                 [1, 1, 1]],
+    ...                [[1, 1, 1],
+    ...                 [1, 0, 1],
+    ...                 [1, 1, 1]],
+    ...                [[1, 1, 1],
+    ...                 [1, 1, 1],
+    ...                 [1, 1, 1]]]])
+    >>> assert(np.allclose(X,_get_delta_microstructures(2, size=(3, 3, 3))))
+
+    """
+    shape = (Nphases, Nphases) + size
+    center = tuple((np.array(size) - 1) / 2)
+    X = np.zeros(shape=shape, dtype=int)
+    X[:] = np.arange(Nphases)[(slice(None), None) + (None,) * len(size)]
+    X[(slice(None), slice(None)) + center] = np.arange(Nphases)
+    mask = ~np.identity(Nphases, dtype=bool)
+    return X[mask]

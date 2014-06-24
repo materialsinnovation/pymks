@@ -18,7 +18,7 @@ from sfepy.discrete import Functions
 from sfepy.mesh.mesh_generators import gen_block_mesh
 from sfepy.mechanics.matcoefs import ElasticConstants
 
-class ElasticFEModel(object):
+class ElasticFESimulation(object):
     """
 
     Use SfePy to solve a linear strain problem in 2D with a varying
@@ -31,11 +31,11 @@ class ElasticFEModel(object):
 
     >>> X = np.zeros((1, 3, 3), dtype=int)
     >>> X[0, :, 1] = 1
-  
-    >>> model = ElasticFEModel(elastic_modulus=(1.0, 10.0), poisson_ratio=(0., 0.))
+
+    >>> model = ElasticFESimulation(elastic_modulus=(1.0, 10.0), poissons_ratio=(0., 0.))
     >>> y = model.get_response(X, slice(None)) # doctest: +ELLIPSIS
     sfepy: ...
-    
+
     y is the strain with components as follows
 
     >>> exx = y[..., 0]
@@ -51,27 +51,27 @@ class ElasticFEModel(object):
     >>> assert np.allclose(exy, 0)
 
     """
-    def __init__(self, elastic_modulus, poisson_ratio, strain=1.,):
+    def __init__(self, elastic_modulus, poissons_ratio, strain=1.,):
         """
         Args:
           elastic_modulus: array of elastic moduli for phases
-          poisson_ratio: array of possion ratios for phases
+          poissons_ratio: array of possion ratios for phases
           strain: Scalar for macroscopic strain
 
         """
         self.strain = strain
         self.dx = 1.0
         self.elastic_modulus = elastic_modulus
-        self.poisson_ratio = poisson_ratio
-        if len(elastic_modulus) != len(poisson_ratio):
-            raise RuntimeError, 'elastic_modulus and poisson_ratio must be the same length'
+        self.poissons_ratio = poissons_ratio
+        if len(elastic_modulus) != len(poissons_ratio):
+            raise RuntimeError, 'elastic_modulus and poissons_ratio must be the same length'
 
     def _convert_properties(self, dim):
         """
         Convert from elastic modulus and Poisson's ratio to the Lame
         parameter and shear modulus
 
-        >>> model = ElasticFEModel(elastic_modulus=(1., 2.), poisson_ratio=(1., 1.))
+        >>> model = ElasticFESimulation(elastic_modulus=(1., 2.), poissons_ratio=(1., 1.))
         >>> result = model._convert_properties(2)
         >>> answer = np.array([[-0.5, 1. / 6.], [-1., 1. / 3.]])
         >>> assert(np.allclose(result, answer))
@@ -89,18 +89,18 @@ class ElasticFEModel(object):
             lame = ec.lam
             return lame, mu
 
-        return np.array([_convert(E, nu) for E, nu in zip(self.elastic_modulus, self.poisson_ratio)])
+        return np.array([_convert(E, nu) for E, nu in zip(self.elastic_modulus, self.poissons_ratio)])
 
     def _get_property_array(self, X):
         """
-        Generate property array with elastic_modulus and poisson_ratio for each phase.
+        Generate property array with elastic_modulus and poissons_ratio for each phase.
 
         Test case for 2D with 3 phases.
 
         >>> X2D = np.array([[[0, 1, 2, 1],
         ...                  [2, 1, 0, 0],
         ...                  [1, 0, 2, 2]]])
-        >>> model2D = ElasticFEModel(elastic_modulus=(1., 2., 3.), poisson_ratio=(1., 1., 1.))
+        >>> model2D = ElasticFESimulation(elastic_modulus=(1., 2., 3.), poissons_ratio=(1., 1., 1.))
         >>> lame = lame0, lame1, lame2 = -0.5, -1., -1.5
         >>> mu = mu0, mu1, mu2 = 1. / 6, 1. / 3, 1. / 2
         >>> lm = zip(lame, mu)
@@ -112,7 +112,7 @@ class ElasticFEModel(object):
 
         Test case for 3D with 2 phases.
 
-        >>> model3D = ElasticFEModel(elastic_modulus=(1., 2.), poisson_ratio=(1., 1.))
+        >>> model3D = ElasticFESimulation(elastic_modulus=(1., 2.), poissons_ratio=(1., 1.))
         >>> X3D = np.array([[[0, 1],
         ...                  [0, 0]],
         ...                 [[1, 1],
@@ -137,17 +137,17 @@ class ElasticFEModel(object):
         return self._convert_properties(dim)[X]
 
     def get_response(self, X, strain_index=0):
-        """Predict the strain fields given an initial microstructure
+        """
+        Get the strain fields given an initial microstructure
         with a macroscopic strain applied in the x direction.
 
-        Args: 
+        Args:
           X: microstructure with shape (Nsample, Nx, Ny) or
              (Nsample, Nx, Ny, Nz) 
           strain_index: interger value to return
              a particular strain field.  0 returns exx, 1 returns eyy,
              etc. To return all strain fields set `strain_index` equal to
              `slice(None)`.
-        
 
         Returns:
           the strain fields over each cell
@@ -241,17 +241,17 @@ class ElasticFEModel(object):
                                             functions=Functions([minus]))
         match_plane = Function('match_{0}_plane'.format(dim_string), match_plane)
         bc = PeriodicBC('periodic_{0}'.format(dim_string),
-                        [region_plus, region_minus], 
+                        [region_plus, region_minus],
                         {'u.all' : 'u.all'},
                         match='match_{0}_plane'.format(dim_string))
         return bc, match_plane
-        
+
     def _get_periodicBCs(self, domain):
         dims = domain.get_mesh_bounding_box().shape[1]
-        
+
         bc_list, func_list = zip(*[self._get_periodicBC(domain, i) for i in range(1, dims)])
         return Conditions(bc_list), Functions(func_list)
-            
+
     def _get_displacementBCs(self, domain):
         """
         Fix the left plane in x, displace the right plane by 1 and fix
@@ -273,7 +273,7 @@ class ElasticFEModel(object):
         kwargs = {}
         if len(min_xyz) == 3:
             kwargs = {'z' : (max_xyz[2], min_xyz[2])}
-        fix_x_points_ = self._subdomain_func(x=(min_xyz[0],), 
+        fix_x_points_ = self._subdomain_func(x=(min_xyz[0],),
                                              y=(max_xyz[1], min_xyz[1]),
                                              **kwargs)
 
@@ -293,7 +293,7 @@ class ElasticFEModel(object):
                                           'vertex',
                                            functions=Functions([fix_x_points]))
         fixed_BC = EssentialBC('fixed_BC', region_left, {'u.0' : 0.0})
-        displaced_BC = EssentialBC('displaced_BC', region_x_plus, 
+        displaced_BC = EssentialBC('displaced_BC', region_x_plus,
                                    {'u.0' : self.strain * (max_xyz[0] - min_xyz[0])})
         fix_points_BC = EssentialBC('fix_points_BC', region_fix_points, {'u.1' : 0.0})
         return Conditions([fixed_BC, displaced_BC, fix_points_BC])
@@ -307,11 +307,11 @@ class ElasticFEModel(object):
 
         Returns:
           Sfepy mesh
-          
+
         """
         center = np.zeros_like(shape)
         return gen_block_mesh(shape, np.array(shape) + 1, center, verbose=False)
-    
+
     def _solve(self, property_array):
         """
         Solve the Sfepy problem for one sample.
@@ -324,7 +324,7 @@ class ElasticFEModel(object):
         Returns:
           the strain field of shape (Nx, Ny, 2) where the last
           index represents the x and y displacements
-          
+
         """
         shape = property_array.shape[:-1]
         mesh = self._get_mesh(shape)
@@ -361,7 +361,3 @@ class ElasticFEModel(object):
 
         strain = np.squeeze(pb.evaluate('ev_cauchy_strain.3.region_all(u)', mode='el_avg'))
         return np.reshape(strain, (shape + strain.shape[-1:]))
-
-
-
-    

@@ -7,7 +7,7 @@ from .mksRegressionModel import MKSRegressionModel
 from .fastmksRegressionModel import FastMKSRegressionModel
 from .fipyCHModel import FiPyCHModel
 from .tools import draw_microstructure_discretization
-from .elasticFEModel import ElasticFEModel
+from .elasticFESimulation import ElasticFESimulation
 from .tools import bin
 
 
@@ -37,5 +37,5 @@ __all__ = ['__version__',
            'FastMKSRegressionModel',
            'FiPyCHModel',
            'draw_microstructure_discretization',
-           'ElasticFEModel',
+           'ElasticFESimulation',
            'bin']

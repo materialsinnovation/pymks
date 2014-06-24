@@ -1,46 +1,41 @@
 from pymks import MKSRegressionModel
-from pymks import ElasticFEModel
+from pymks import ElasticFESimulation
 import numpy as np
 from sklearn import metrics
 mse = metrics.mean_squared_error
+from pymks.datasets import make_elasticFEstrain_delta
 
-def test_ElasticFEModel_2D():
+def test_ElasticFESimulation_2D():
     nx = 5
     ii = (nx - 1) / 2
     X = np.zeros((1, nx, nx), dtype=int)
     X[0, ii, ii] = 1
-    model = ElasticFEModel(elastic_modulus=(1., 10.), poisson_ratio=(0.3, 0.3))
+    model = ElasticFESimulation(elastic_modulus=(1., 10.), poissons_ratio=(0.3, 0.3))
     strains = model.get_response(X, slice(None))
     solution = (1.518e-1, -1.672e-2, 0.)
     assert np.allclose(strains[0, ii, ii], solution, rtol=1e-3)
 
-def test_ElasticFEModel_3D():
+def test_ElasticFESimulation_3D():
     nx = 4
     ii = (nx - 1) / 2
     X = np.zeros((1, nx, nx, nx), dtype=int)
     X[0, :, ii] = 1
-    model = ElasticFEModel(elastic_modulus=(1., 10.), poisson_ratio=(0., 0.))
+    model = ElasticFESimulation(elastic_modulus=(1., 10.), poissons_ratio=(0., 0.))
     strains = model.get_response(X, slice(None))
     solution = [1., 0., 0., 0., 0., 0.]
     assert np.allclose([np.mean(strains[0,...,i]) for i in range(6)], solution)
 
 def get_delta_data(nx, ny):
-    ii = (nx - 1) / 2
-    jj = (ny - 1) / 2
-    
-    X = np.zeros((2, nx, ny), dtype=int)
-    X[0, ii, jj] = 1
-    X[1] = 1 - X[0]
 
-    elastic_model = ElasticFEModel(elastic_modulus=(1, 1.1), poisson_ratio=(0.3, 0.3))
-    strains = elastic_model.get_response(X, slice(None))
-
-    return X, strains
+    return make_elasticFEstrain_delta(elastic_modulus=(1, 1.1), 
+                                      poissons_ratio=(0.3, 0.3), 
+                                      size=(nx, ny),
+                                      strain_index=slice(None))
 
 def get_random_data(nx, ny):
     np.random.seed(8)
     X = np.random.randint(2, size=(1, nx, ny))
-    elastic_model = ElasticFEModel(elastic_modulus=(1., 1.1), poisson_ratio=(0.3, 0.3))
+    elastic_model = ElasticFESimulation(elastic_modulus=(1., 1.1), poissons_ratio=(0.3, 0.3))
     strains = elastic_model.get_response(X, slice(None))
     return X, strains
 
