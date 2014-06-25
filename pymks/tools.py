@@ -71,6 +71,32 @@ def draw_microstructure_discretization(
              fontsize=16,
              color='r')
 
+def draw_coeff(coeff0, coeff1, title1=r'$h=0$', title2=r'$h=1$'):
+    vmin = min((coeff0.flatten().min(), coeff1.flatten().min()))
+    vmax = min((coeff0.flatten().max(), coeff1.flatten().max()))
+    print vmin
+    print vmax
+
+    plt.close('all')
+    fig = plt.figure(figsize=(8, 4))
+    ax0 = plt.subplot(1,2,1)
+    im0 = ax0.imshow(coeff0.swapaxes(0, 1), cmap=plt.cm.hot, interpolation='none',
+               vmin=vmin, vmax=vmax)
+    ax0.set_xticks(())
+    ax0.set_yticks(())
+    ax1 = plt.subplot(1,2,2)
+    ax1.imshow(coeff1.swapaxes(0, 1), cmap=plt.cm.hot, interpolation='none')
+    ax1.set_xticks(())
+    ax1.set_yticks(())
+    ax1.set_title(r'Influence Coefficients, ' + title2, fontsize=15)
+    ax0.set_title(r'Influence Coefficients, ' + title1, fontsize=15)
+
+    fig.subplots_adjust(right=0.8)
+    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
+    fig.colorbar(im0, cax=cbar_ax)
+
+    plt.tight_layout()
+
 def draw_microstructure_strain(microstructure, strain):
     plt.close('all')
     fig = plt.figure(figsize=(8, 4))
@@ -82,9 +108,9 @@ def draw_microstructure_strain(microstructure, strain):
     im1 = ax1.imshow(strain.swapaxes(0, 1), cmap=plt.cm.hot, interpolation='none');
     ax1.set_xticks(())
     ax1.set_yticks(())
-    ax1.set_title(r'$\mathbf{\varepsilon_{xx}}$', fontsize=20)
+    ax1.set_title(r'$\mathbf{\varepsilon_{xx}}$', fontsize=25)
     ax0.set_title('Microstructure', fontsize=20)
-    
+
     fig.subplots_adjust(right=0.8)
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
     fig.colorbar(im1, cax=cbar_ax)
@@ -102,10 +128,10 @@ def draw_microstructures(microstructure1, microstructure2):
     ax1.imshow(microstructure2.swapaxes(0, 1), cmap=plt.cm.gray, interpolation='none');
     ax1.set_xticks(())
     ax1.set_yticks(())
-    
+
     plt.tight_layout()
 
-def draw_strains(strain1, strain2):
+def draw_strains_compare(strain1, strain2):
     plt.close('all')
 
     vmin = min((strain1.flatten().min(), strain2.flatten().min()))
@@ -118,13 +144,32 @@ def draw_strains(strain1, strain2):
         ax.set_xticks(())
         ax.set_yticks(())
         ax.set_title(r'$\mathbf{\varepsilon_{xx}}$ (%s)' % title, fontsize=20)
-        
+
     fig.subplots_adjust(right=0.8)
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
     fig.colorbar(im, cax=cbar_ax)
 
     plt.tight_layout()
 
+def draw_strains(strain1, strain2, title1='title1', title2='title2'):
+    plt.close('all')
+
+    vmin = min((strain1.flatten().min(), strain2.flatten().min()))
+    vmax = min((strain1.flatten().max(), strain2.flatten().max()))
+    fig, axs = plt.subplots(1, 2, figsize=(8, 4))
+    titles = [title1, title2]
+    strains = (strain1, strain2)
+    for strain, ax, title in zip(strains, axs, titles):
+        im = ax.imshow(strain.swapaxes(0, 1), cmap=plt.cm.hot, interpolation='none', vmin=vmin, vmax=vmax)
+        ax.set_xticks(())
+        ax.set_yticks(())
+        ax.set_title(r'$\mathbf{\varepsilon_{%s}}$' % title, fontsize=25)
+
+    fig.subplots_adjust(right=0.8)
+    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
+    fig.colorbar(im, cax=cbar_ax)
+
+    plt.tight_layout()
 
 def bin(arr, Nbin):
     r"""
