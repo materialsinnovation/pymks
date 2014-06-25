@@ -2,9 +2,11 @@ import numpy as np
 from pymks import ElasticFESimulation
 from pymks import MKSRegressionModel
 
-__all__ = ['make_delta_microstructures', 'make_elasticFEstrain_delta', 'make_elasticFEstrain_random', 'ElasticFESimulation']
+__all__ = ['make_delta_microstructures', 'make_elasticFEstrain_delta',
+           'make_elasticFEstrain_random', 'ElasticFESimulation']
 
-def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio, size, strain_index=0):
+def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio, 
+                               size, strain=1.0, strain_index=0):
     """Generate delta microstructures and responses
 
     Simple interface to generate delta microstructures and their
@@ -37,7 +39,8 @@ def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio, size, strain_ind
 
     """
     FEsim = ElasticFESimulation(elastic_modulus=elastic_modulus,
-                                poissons_ratio=poissons_ratio)
+                                poissons_ratio=poissons_ratio,
+                                strain=strain)
 
     X = make_delta_microstructures(len(elastic_modulus), size=size)
     return X, FEsim.get_response(X, strain_index=strain_index)
@@ -87,7 +90,7 @@ def make_delta_microstructures(Nphases, size):
     return X[mask]
 
 def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
-                                size, strain_index=0):
+                                size, strain=1.0, strain_index=0):
     """Generate delta microstructures and responses
 
     Simple interface to generate delta microstructures and their
@@ -122,7 +125,8 @@ def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
 
     """
     FEsim = ElasticFESimulation(elastic_modulus=elastic_modulus,
-                                poissons_ratio=poissons_ratio)
+                                poissons_ratio=poissons_ratio,
+                                strain=strain)
 
     X = np.random.randint(len(elastic_modulus), size=((n_samples,)+size))
     return X, FEsim.get_response(X, strain_index=strain_index)
