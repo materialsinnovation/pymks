@@ -17,6 +17,8 @@ import sfepy.discrete.fem.periodic as per
 from sfepy.discrete import Functions
 from sfepy.mesh.mesh_generators import gen_block_mesh
 from sfepy.mechanics.matcoefs import ElasticConstants
+from sfepy.base.base import output
+output.set_output(quiet=True)
 
 class ElasticFESimulation(object):
     """
