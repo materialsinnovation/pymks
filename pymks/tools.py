@@ -4,13 +4,40 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+def _set_colors():
+    HighRGB = np.array([26,152,80])/255.
+    MediumRGB = np.array([255,255,191])/255.
+    LowRGB = np.array([0,0,0])/255.
+    cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
+    plt.register_cmap(name='PyMKS', data=cdict)
+    plt.set_cmap('PyMKS')
 
+def _set_cdict(HighRGB, MediumRGB, LowRGB):
+    cdict = {'red':   ((0.0,    LowRGB[0],    LowRGB[0]),
+                       (0.5, MediumRGB[0], MediumRGB[0]),
+                       (1.0,   HighRGB[0],   HighRGB[0])),
 
-def draw_microstructure_discretization(
-        M, a=0, s=0, Nbin=6, bound=0.016, height=1.7, ax=None):
-    r"""
-    Creates a diagram to illustrate the binning of a continues values in local state
-    space.
+             'green': ((0.0,    LowRGB[1],    LowRGB[1]),
+                       (0.5, MediumRGB[1], MediumRGB[1]),
+                       (1.0,   HighRGB[1],   HighRGB[1])),
+
+             'blue':  ((0.0,    LowRGB[2],    LowRGB[2]),
+                       (0.5, MediumRGB[2], MediumRGB[2]),
+                       (1.0,   HighRGB[2],   HighRGB[2]))}
+
+    return cdict
+
+def _get_coeff_cmap():
+    HighRGB = np.array([244,109,67])/255.
+    MediumRGB = np.array([255,255,191])/255.
+    LowRGB = np.array([0,0,0])/255.
+    cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
+    return colors.LinearSegmentedColormap('coeff_cmap', cdict, 256)
+
+def draw_microstructure_discretization(M, a=0, s=0, Nbin=6,
+                                       bound=0.016, height=1.7, ax=None):
+    r""" Creates a diagram to illustrate the binning of a continues values
+    in local state space.
 
     Args:
         Array representing a microstructure with a continuous variable.
@@ -74,18 +101,16 @@ def draw_microstructure_discretization(
 def draw_coeff(coeff0, coeff1, title1=r'$h=0$', title2=r'$h=1$'):
     vmin = min((coeff0.flatten().min(), coeff1.flatten().min()))
     vmax = min((coeff0.flatten().max(), coeff1.flatten().max()))
-    print vmin
-    print vmax
-
+    coeff_cmap = _get_coeff_cmap()
     plt.close('all')
     fig = plt.figure(figsize=(8, 4))
     ax0 = plt.subplot(1,2,1)
-    im0 = ax0.imshow(coeff0.swapaxes(0, 1), cmap=plt.cm.hot, interpolation='none',
+    im0 = ax0.imshow(coeff0.swapaxes(0, 1), cmap=coeff_cmap, interpolation='none',
                vmin=vmin, vmax=vmax)
     ax0.set_xticks(())
     ax0.set_yticks(())
     ax1 = plt.subplot(1,2,2)
-    ax1.imshow(coeff1.swapaxes(0, 1), cmap=plt.cm.hot, interpolation='none')
+    ax1.imshow(coeff1.swapaxes(0, 1), cmap=coeff_cmap, interpolation='none')
     ax1.set_xticks(())
     ax1.set_yticks(())
     ax1.set_title(r'Influence Coefficients, ' + title2, fontsize=15)
@@ -99,13 +124,14 @@ def draw_coeff(coeff0, coeff1, title1=r'$h=0$', title2=r'$h=1$'):
 
 def draw_microstructure_strain(microstructure, strain):
     plt.close('all')
+    _set_colors()
     fig = plt.figure(figsize=(8, 4))
     ax0 = plt.subplot(1,2,1)
     ax0.imshow(microstructure.swapaxes(0, 1), cmap=plt.cm.gray, interpolation='none')
     ax0.set_xticks(())
     ax0.set_yticks(())
     ax1 = plt.subplot(1,2,2)
-    im1 = ax1.imshow(strain.swapaxes(0, 1), cmap=plt.cm.hot, interpolation='none');
+    im1 = ax1.imshow(strain.swapaxes(0, 1), interpolation='none');
     ax1.set_xticks(())
     ax1.set_yticks(())
     ax1.set_title(r'$\mathbf{\varepsilon_{xx}}$', fontsize=25)
@@ -117,7 +143,7 @@ def draw_microstructure_strain(microstructure, strain):
 
     plt.tight_layout()
 
-def draw_microstructures(microstructure1, microstructure2):
+def _2D_draw_microstructures(microstructure1, microstructure2):
     plt.close('all')
     plt.figure(figsize=(8, 4))
     ax0 = plt.subplot(1,2,1)
@@ -131,16 +157,26 @@ def draw_microstructures(microstructure1, microstructure2):
 
     plt.tight_layout()
 
+def draw_microstructures(microstructure1, microstructure2):
+    shape1 = microstructure1.shape
+    shape2 = microstructure2.shape
+    if shape1 != shape2:
+        raise RuntimeError("Microstures must have the same size.")
+    if len(shape1) == 2:
+        _2D_draw_microstructures(microstructure1, microstructure2)
+    else:
+        raise NotImplementedError
+
 def draw_strains_compare(strain1, strain2):
     plt.close('all')
-
+    _set_colors()
     vmin = min((strain1.flatten().min(), strain2.flatten().min()))
     vmax = min((strain1.flatten().max(), strain2.flatten().max()))
     fig, axs = plt.subplots(1, 2, figsize=(8, 4))
     titles = ['Finite Element', 'MKS']
     strains = (strain1, strain2)
     for strain, ax, title in zip(strains, axs, titles):
-        im = ax.imshow(strain.swapaxes(0, 1), cmap=plt.cm.hot, interpolation='none', vmin=vmin, vmax=vmax)
+        im = ax.imshow(strain.swapaxes(0, 1), interpolation='none', vmin=vmin, vmax=vmax)
         ax.set_xticks(())
         ax.set_yticks(())
         ax.set_title(r'$\mathbf{\varepsilon_{xx}}$ (%s)' % title, fontsize=20)
@@ -153,14 +189,14 @@ def draw_strains_compare(strain1, strain2):
 
 def draw_strains(strain1, strain2, title1='title1', title2='title2'):
     plt.close('all')
-
+    _set_colors()
     vmin = min((strain1.flatten().min(), strain2.flatten().min()))
     vmax = min((strain1.flatten().max(), strain2.flatten().max()))
     fig, axs = plt.subplots(1, 2, figsize=(8, 4))
     titles = [title1, title2]
     strains = (strain1, strain2)
     for strain, ax, title in zip(strains, axs, titles):
-        im = ax.imshow(strain.swapaxes(0, 1), cmap=plt.cm.hot, interpolation='none', vmin=vmin, vmax=vmax)
+        im = ax.imshow(strain.swapaxes(0, 1), interpolation='none', vmin=vmin, vmax=vmax)
         ax.set_xticks(())
         ax.set_yticks(())
         ax.set_title(r'$\mathbf{\varepsilon_{%s}}$' % title, fontsize=25)
