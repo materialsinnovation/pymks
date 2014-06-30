@@ -7,7 +7,7 @@ from .mksRegressionModel import MKSRegressionModel
 from .fastmksRegressionModel import FastMKSRegressionModel
 from .fipyCHModel import FiPyCHModel
 from .tools import draw_microstructure_discretization
-from .elasticFESimulation import ElasticFESimulation
+from .datasets.elasticFESimulation import ElasticFESimulation
 from .tools import bin
 
 @nottest

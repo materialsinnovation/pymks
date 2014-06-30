@@ -1,12 +1,11 @@
 import numpy as np
-from pymks import ElasticFESimulation
-from pymks import MKSRegressionModel
+from pymks.datasets.elasticFESimulation import ElasticFESimulation
 
 __all__ = ['make_delta_microstructures', 'make_elasticFEstrain_delta',
            'make_elasticFEstrain_random', 'ElasticFESimulation']
 
 def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio, 
-                               size, strain=1.0, strain_index=0):
+                               size, macro_strain=1.0, strain_index=0):
     """Generate delta microstructures and responses
 
     Simple interface to generate delta microstructures and their
@@ -30,6 +29,7 @@ def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio,
       elastic_modulus: list of elastic moduli for the phases
       poissons_ratio: list of Poisson's ratios for the phases
       size: size of the microstructure
+      macro_strain: Scalar for macroscopic strain applied 
       strain_index: interger value to return a particular strain
         field.  0 returns exx, 1 returns eyy, etc. To return all
         strain fields set strain_index equal to slice(None).
@@ -40,7 +40,7 @@ def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio,
     """
     FEsim = ElasticFESimulation(elastic_modulus=elastic_modulus,
                                 poissons_ratio=poissons_ratio,
-                                strain=strain)
+                                macro_strain=macro_strain)
 
     X = make_delta_microstructures(len(elastic_modulus), size=size)
     return X, FEsim.get_response(X, strain_index=strain_index)
@@ -90,7 +90,7 @@ def make_delta_microstructures(Nphases, size):
     return X[mask]
 
 def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
-                                size, strain=1.0, strain_index=0):
+                                size, macro_strain=1.0, strain_index=0):
     """Generate delta microstructures and responses
 
     Simple interface to generate delta microstructures and their
@@ -116,6 +116,7 @@ def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
       poissons_ratio: list of Poisson's ratios for the phases
       n_samples: number of microstructure samples
       size: size of the microstructure
+      macro_strain: Scalar for macroscopic strain applied
       strain_index: interger value to return a particular strain
         field.  0 returns exx, 1 returns eyy, etc. To return all
         strain fields set strain_index equal to slice(None).
@@ -126,7 +127,7 @@ def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
     """
     FEsim = ElasticFESimulation(elastic_modulus=elastic_modulus,
                                 poissons_ratio=poissons_ratio,
-                                strain=strain)
+                                macro_strain=macro_strain)
 
     X = np.random.randint(len(elastic_modulus), size=((n_samples,)+size))
     return X, FEsim.get_response(X, strain_index=strain_index)

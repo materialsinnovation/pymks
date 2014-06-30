@@ -53,15 +53,15 @@ class ElasticFESimulation(object):
     >>> assert np.allclose(exy, 0)
 
     """
-    def __init__(self, elastic_modulus, poissons_ratio, strain=1.,):
+    def __init__(self, elastic_modulus, poissons_ratio, macro_strain=1.,):
         """
         Args:
           elastic_modulus: array of elastic moduli for phases
           poissons_ratio: array of possion ratios for phases
-          strain: Scalar for macroscopic strain
+          macro_strain: Scalar for macroscopic strain
 
         """
-        self.strain = strain
+        self.macro_strain = macro_strain
         self.dx = 1.0
         self.elastic_modulus = elastic_modulus
         self.poissons_ratio = poissons_ratio
@@ -296,7 +296,7 @@ class ElasticFESimulation(object):
                                            functions=Functions([fix_x_points]))
         fixed_BC = EssentialBC('fixed_BC', region_left, {'u.0' : 0.0})
         displaced_BC = EssentialBC('displaced_BC', region_x_plus,
-                                   {'u.0' : self.strain * (max_xyz[0] - min_xyz[0])})
+                                   {'u.0' : self.macro_strain * (max_xyz[0] - min_xyz[0])})
         fix_points_BC = EssentialBC('fix_points_BC', region_fix_points, {'u.1' : 0.0})
         return Conditions([fixed_BC, displaced_BC, fix_points_BC])
 
