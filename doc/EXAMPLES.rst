@@ -4,6 +4,6 @@ Examples
 .. toctree::
    :maxdepth: 1
 
-   rst/elasticity.rst
-
+   rst/elasticity_2D.rst
+   rst/elasticity_3D.rst
 
