@@ -9,17 +9,17 @@ class FastMKSRegressionModel(MKSRegressionModel):
     This class is an optimized version of MKSRegressionModel class.
     """
 
-    def __init__(self, Nbin=10, threads=1):
+    def __init__(self, Nstate=10, threads=1):
         r"""
         Create a `FastMKSRegressionModel`.
 
         Args:
-            Nbin: is the number of discretization bins for the
+            Nstate: is the number of discretization bins for the
                 "microstructure function".
             threads: the number of threads to use for multi-threading.
 
         """
-        super(FastMKSRegressionModel, self).__init__(Nbin=Nbin)
+        super(FastMKSRegressionModel, self).__init__(Nstate=Nstate)
         self.threads = threads
         ne.set_num_threads(threads)
 
@@ -27,11 +27,11 @@ class FastMKSRegressionModel(MKSRegressionModel):
         """
         Bin the microstructure.
 
-        >>> Nbin = 10
+        >>> Nstate = 10
         >>> np.random.seed(4)
         >>> X = np.random.random((2, 5, 3, 2))
-        >>> X_ = FastMKSRegressionModel(Nbin)._bin(X)
-        >>> H = np.linspace(0, 1, Nbin)
+        >>> X_ = FastMKSRegressionModel(Nstate)._bin(X)
+        >>> H = np.linspace(0, 1, Nstate)
         >>> Xtest = np.sum(X_ * H[None,None,None,:], axis=-1)
         >>> assert np.allclose(X, Xtest)
 
@@ -40,7 +40,7 @@ class FastMKSRegressionModel(MKSRegressionModel):
         Returns:
             Array representing the microstructure function
         """
-        H = np.linspace(0, 1, self.Nbin)
+        H = np.linspace(0, 1, self.Nstate)
         dh = H[1] - H[0]
         Xtmp = X[..., None]
         tmp = ne.evaluate("1. - abs(Xtmp - H) / dh")
@@ -50,12 +50,12 @@ class FastMKSRegressionModel(MKSRegressionModel):
         r"""
         Bin the microstructure and take the Fourier transform.
 
-        >>> Nbin = 10
+        >>> Nstate = 10
         >>> np.random.seed(3)
         >>> X = np.random.random((2, 5, 3))
-        >>> FX_ = FastMKSRegressionModel(Nbin)._binfft(X)
+        >>> FX_ = FastMKSRegressionModel(Nstate)._binfft(X)
         >>> X_ = np.fft.ifftn(FX_, axes=(1, 2))
-        >>> H = np.linspace(0, 1, Nbin)
+        >>> H = np.linspace(0, 1, Nstate)
         >>> Xtest = np.sum(X_ * H[None,None,None,:], axis=-1)
         >>> assert np.allclose(X, Xtest)
 
@@ -136,7 +136,7 @@ class FastMKSRegressionModel(MKSRegressionModel):
 
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
         >>> y = X.swapaxes(1, 2)
-        >>> model = FastMKSRegressionModel(Nbin=2)
+        >>> model = FastMKSRegressionModel(Nstate=2)
         >>> model.fit(X, y)
         >>> assert np.allclose(y, model.predict(X))
 

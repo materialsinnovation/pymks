@@ -47,7 +47,7 @@ def test_MKSelastic_delta():
     X, y_prop = get_delta_data(nx, ny)
     
     for y_test in np.rollaxis(y_prop, -1):
-        model = MKSRegressionModel(Nbin=2)
+        model = MKSRegressionModel(Nstate=2)
         model.fit(X, y_test)
         y_pred = model.predict(X)
         assert np.allclose(y_pred, y_test, rtol=1e-3, atol=1e-3)
@@ -59,7 +59,7 @@ def test_MKSelastic_random():
     X_test, strains_test = get_random_data(nx, ny)
 
     for y_delta, y_test in rollzip(strains_delta, strains_test):
-        model = MKSRegressionModel(Nbin=2)
+        model = MKSRegressionModel(Nstate=2)
         model.fit(X_delta, y_delta)
         y_pred = model.predict(X_test)
         assert np.allclose(y_pred[0, i:-i], y_test[0, i:-i], rtol=1e-2, atol=6.1e-3)
@@ -73,7 +73,7 @@ def test_resize_pred():
     X_big_test, strains_big_test = get_random_data(resize * nx, resize * ny)
 
     for y_delta, y_test, y_big_test in rollzip(strains_delta, strains_test, strains_big_test):
-        model = MKSRegressionModel(Nbin=2)
+        model = MKSRegressionModel(Nstate=2)
         model.fit(X_delta, y_delta)
         y_pred = model.predict(X_test)
         assert np.allclose(y_pred[0, i:-i], y_test[0, i:-i], rtol=1e-2, atol=6.1e-3)
@@ -89,13 +89,34 @@ def test_resize_coeff():
    
     
     for y_delta, y_big_delta in rollzip(strains_delta, strains_big_delta):
-         model = MKSRegressionModel(Nbin=2)
-         big_model = MKSRegressionModel(Nbin=2)
+         model = MKSRegressionModel(Nstate=2)
+         big_model = MKSRegressionModel(Nstate=2)
          model.fit(X_delta, y_delta)
          big_model.fit(X_big_delta, y_big_delta)
          model.resize_coeff((resize * nx, resize * ny))
          assert np.allclose(model.coeff, big_model.coeff, rtol=1e-2, atol=2.1e-3)
     
+def test_multiphase():
+    L = 21
+    i = 3
+    elastic_modulus = (80, 100, 120)
+    poissons_ratio = (0.3, 0.3, 0.3)
+    macro_strain = 0.02
+    size = (L, L)
+
+    X_delta, strains_delta = make_elasticFEstrain_delta(elastic_modulus=elastic_modulus,
+                                                        poissons_ratio=poissons_ratio,
+                                                        size=size, macro_strain=macro_strain)
+    MKSmodel = MKSRegressionModel()
+    MKSmodel.fit(X_delta, strains_delta)
+    np.random.seed(99)
+    X, strain = make_elasticFEstrain_random(n_samples=1, elastic_modulus=elastic_modulus,
+                                   poissons_ratio=poissons_ratio, size=size, 
+                                   macro_strain=macro_strain)
+    strain_pred = MKSmodel.predict(X)
+    print strain[0]
+    print strain_pred[0]
+    assert np.allclose(strain_pred[0, i:-i], strain[0, i:-i], rtol=1e-2, atol=6.1e-3)
 
 if __name__ == '__main__':
     test_MKSelastic_random()
