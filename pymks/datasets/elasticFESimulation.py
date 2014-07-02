@@ -175,7 +175,7 @@ class ElasticFESimulation(object):
         def _material_func_(ts, coors, mode=None, **kwargs):
             if mode == 'qp':
                 ijk_out = np.empty_like(coors, dtype=int)
-                ijk = np.floor((coors - min_xyz[None]) / self.dx, ijk_out)
+                ijk = np.floor((coors - min_xyz[None]) / self.dx, ijk_out, casting="unsafe")
                 ijk_tuple = tuple(ijk.swapaxes(0, 1))
                 property_array_qp = property_array[ijk_tuple]
                 lam = property_array_qp[..., 0]
