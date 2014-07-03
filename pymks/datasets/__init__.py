@@ -2,7 +2,7 @@ import numpy as np
 from pymks.datasets.elasticFESimulation import ElasticFESimulation
 
 __all__ = ['make_delta_microstructures', 'make_elasticFEstrain_delta',
-           'make_elasticFEstrain_random', 'ElasticFESimulation']
+           'make_elasticFEstrain_random']
 
 def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio, 
                                size, macro_strain=1.0, strain_index=0):
