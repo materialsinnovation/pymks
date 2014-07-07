@@ -1,6 +1,7 @@
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import numpy as np
 
 
@@ -109,14 +110,18 @@ def draw_microstructure_discretization(M, a=0, s=0, Nbin=6,
 def draw_coeff(coeff):
     coeff_cmap = _get_coeff_cmap()
     plt.close('all')
+    vmin = np.min(coeff)
+    vmax = np.max(coeff)
     Ncoeff = coeff.shape[-1]
     fig, axs = plt.subplots(1, Ncoeff, figsize=(Ncoeff * 4, 4))
     ii = 0
     for ax in axs:
         if ii == 0:
-            im = ax.imshow(coeff[..., ii].swapaxes(0, 1), cmap=coeff_cmap, interpolation='none')
+            im = ax.imshow(coeff[..., ii].swapaxes(0, 1), cmap=coeff_cmap,
+                           interpolation='none', vmin=vmin, vmax=vmax)
         else:
-            ax.imshow(coeff[..., ii].swapaxes(0, 1), cmap=coeff_cmap, interpolation='none')
+            ax.imshow(coeff[..., ii].swapaxes(0, 1), cmap=coeff_cmap,
+                      interpolation='none', vmin=vmin, vmax=vmax)
         ax.set_xticks(())
         ax.set_yticks(())
         ax.set_title(r'Influence Coefficients $h = %s$' % ii, fontsize=15)
@@ -149,19 +154,26 @@ def draw_microstructure_strain(microstructure, strain):
 
 def draw_microstructures(*microstructures):
     Nmicros = len(microstructures)
+    vmin = np.min(microstructures)
+    vmax = np.max(microstructures)
     plt.close('all')
     fig, axs = plt.subplots(1, Nmicros, figsize=(Nmicros * 4, 4))
     if Nmicros > 1:
-        for micro, ax in zip(microstructures, axs):
-            ax.imshow(micro.swapaxes(0, 1), cmap=plt.cm.gray, interpolation='none')
+        for micro, ax in zip(microstructures, axs.flat):
+            im = ax.imshow(micro.swapaxes(0, 1), cmap=plt.cm.gray,
+                           interpolation='none', vmin=vmin, vmax=vmax)
             ax.set_xticks(())
             ax.set_yticks(())
     else:
         micro = np.array(microstructures)[0]
-        axs.imshow(micro.swapaxes(0, 1), cmap=plt.cm.gray, interpolation='none')
+        im = axs.imshow(micro.swapaxes(0, 1), cmap=plt.cm.gray,
+                        interpolation='none', vmin=vmin, vmax=vmax)
         axs.set_xticks(())
         axs.set_yticks(())
     fig.subplots_adjust(right=0.8)
+    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
+    #cbar_ax, kw = mpl.colorbar.make_axes([ax for ax in axs.flat])
+    fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
 
 def draw_strains(*strains, **titles):
