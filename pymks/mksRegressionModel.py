@@ -234,8 +234,10 @@ class MKSRegressionModel(LinearRegression):
         the predict method can be used.
 
         >>> MKSmodel = MKSRegressionModel()
-        >>> MKSmodel.predict(X)
-        AttributeError, "fit() method must be run before predict()."
+        >>> MKSmodel.predict(X) 
+        Traceback (most recent call last):
+        ...
+        AttributeError: fit() method must be run before predict().
 
         Args:
             X: The microstructre function, an `(S, N, ...)` shaped
