@@ -311,23 +311,3 @@ class MKSRegressionModel(LinearRegression):
         
         self.Fcoeff = Fcoeff_pad
 
-    def _test(self):
-        r"""
-        Test with a Cahn-Hilliard model.
-
-        >>> from pymks import FiPyCHModel
-        >>> Nsample = 100
-        >>> Nspace = 21
-        >>> dt = 1e-3
-        >>> np.random.seed(0 )
-        >>> X = np.array([np.random.random((Nspace, Nspace)) for i in range(Nsample)])
-        >>> fipy_model = FiPyCHModel(dx=0.25, dy=0.25, dt=1e-3, epsilon=1., a=1.)
-        >>> y = fipy_model.predict(X)
-        >>> model = MKSRegressionModel(Nstate=10)
-        >>> model.fit(X, y)
-        >>> X_test = np.array([np.random.random((Nspace, Nspace)) for i in range(1)])
-        >>> y_test = fipy_model.predict(X_test)
-        >>> y_pred = model.predict(X_test)
-        >>> assert mse(y_test, y_pred) < 0.03
-        """
-        pass

@@ -1,10 +1,12 @@
 from pymks import MKSRegressionModel
-from pymks import ElasticFESimulation
+from pymks.datasets.elasticFESimulation import ElasticFESimulation
 import numpy as np
 from sklearn import metrics
 mse = metrics.mean_squared_error
 from pymks.datasets import make_elasticFEstrain_delta
 from pymks.datasets import make_elasticFEstrain_random
+from pymks.datasets.cahnHilliardSimulation import CahnHilliardSimulation
+from pymks.datasets import make_cahnHilliard
 
 def test_ElasticFESimulation_2D():
     nx = 5
@@ -117,6 +119,20 @@ def test_multiphase():
     print strain[0]
     print strain_pred[0]
     assert np.allclose(strain_pred[0, i:-i], strain[0, i:-i], rtol=1e-2, atol=6.1e-3)
+
+    def test_cahnHilliard():
+        Nsample = 100
+        Nspace = 20
+        dt = 1e-3
+        np.random.seed(0 )
+        X, y = make_cahnHilliard(n_samples=Nsample, size=(Nspace, Nspace), dt=dt)
+        model = MKSRegressionModel(Nstate=10)
+        model.fit(X, y)
+        X_test = np.array([np.random.random((Nspace, Nspace)) for i in range(1)])
+        CHSim = CahnHilliardSimulation(dt=dt)
+        y_test = CHSim.get_response(X_test)
+        y_pred = model.predict(X_test)
+        assert mse(y_test, y_pred) < 0.03
 
 if __name__ == '__main__':
     test_MKSelastic_random()

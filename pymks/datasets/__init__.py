@@ -1,8 +1,9 @@
 import numpy as np
 from pymks.datasets.elasticFESimulation import ElasticFESimulation
+from pymks.datasets.cahnHilliardSimulation import CahnHilliardSimulation
 
 __all__ = ['make_delta_microstructures', 'make_elasticFEstrain_delta',
-           'make_elasticFEstrain_random']
+           'make_elasticFEstrain_random', 'make_cahnHilliard']
 
 def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio, 
                                size, macro_strain=1.0, strain_index=0):
@@ -91,13 +92,11 @@ def make_delta_microstructures(Nphases, size):
 
 def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
                                 size, macro_strain=1.0, strain_index=0):
-    """Generate delta microstructures and responses
+    """Generate random microstructures and responses
 
-    Simple interface to generate delta microstructures and their
+    Simple interface to generate random microstructures and their
     strain response fields that can be used for the fit method in the
-    `MKSRegressionModel`. The length of `elastic_modulus` and
-    `poissons_ratio` indicates the number of phases in the
-    microstructure. The following example is or a two phase
+    `MKSRegressionModel`. The following example is or a two phase
     microstructure with dimensions of `(5, 5)`.
 
     >>> elastic_modulus = (1., 2.)
@@ -131,3 +130,33 @@ def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
 
     X = np.random.randint(len(elastic_modulus), size=((n_samples,)+size))
     return X, FEsim.get_response(X, strain_index=strain_index)
+
+def make_cahnHilliard(n_samples, size, dx=1.0, width=1., dt=1.):
+    """Generate delta microstructures and responses
+
+    Simple interface to generate random concentration fields and their
+    evolution after one time step that can be used for the fit method in the
+    `MKSRegressionModel`.  The following example is or a two phase
+    microstructure with dimensions of `(5, 5)`.
+
+    >>> X, y = make_cahnHilliard(n_samples=1, size=(5, 5))
+
+    `X` is the initial concentration fields, and `y` is the
+    strain response fields (the concentration after one time step).
+
+    Args:
+      n_samples: number of microstructure samples
+      size: size of the microstructure
+      dx: grid spacing
+      dt: time step size
+      width: interface width between phases.
+
+    Returns:
+      Array representing the microstructures at one time step ahead
+      of 'X'
+
+    """
+    CHsim = CahnHilliardSimulation(dx=dx, dt=dt, width=width)
+
+    X = np.random.random((n_samples,) + size)
+    return X, CHsim.get_response(X)
