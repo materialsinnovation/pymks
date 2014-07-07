@@ -5,9 +5,7 @@ import nose
 from nose.tools import nottest
 from .mksRegressionModel import MKSRegressionModel
 from .fastmksRegressionModel import FastMKSRegressionModel
-from .fipyCHModel import FiPyCHModel
 from .tools import draw_microstructure_discretization
-from .datasets.elasticFESimulation import ElasticFESimulation
 from .tools import bin
 
 @nottest
@@ -36,5 +34,4 @@ __all__ = ['__version__',
            'FastMKSRegressionModel',
            'FiPyCHModel',
            'draw_microstructure_discretization',
-           'ElasticFESimulation',
            'bin']
