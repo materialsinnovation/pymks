@@ -1,0 +1,413 @@
+
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Linear Elasticity in 3D &mdash; PyMKS</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootswatch-3.1.0/cosmo/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pymks.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1-dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.1.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="../_static/pymks_logo.ico"/>
+    <link rel="top" title="PyMKS" href="../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+                <li><a href="INSTALLATION.html">Installation</a></li>
+                <li><a href="../EXAMPLES.html">Examples</a></li>
+                <li><a href="../API.html">API</a></li>
+                <li><a href="https://github.com/wd15/pymks/">Github</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">More <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../THEORY.html">Theory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="derivation.html">Derivation of Materials Knowledge Systems Equation using Linear Elasticity</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="CREDITS.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CITATION.html">Citing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="REQUIREMENTS.html">Requirements</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="section" id="linear-elasticity-in-3d">
+<h1>Linear Elasticity in 3D<a class="headerlink" href="#linear-elasticity-in-3d" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>This example provides a demonstration of using PyMKS to compute the
+linear strain field for a two phase composite material, and presents the
+computation efficiency of MKS over finite element methods. The example
+first provides information on the boundary conditions used in MKS. Next,
+delta microstructures are used to calibrate the first order influence
+coefficients. The influence coefficients are then used to compute the
+strain field for a random microstructure. Lastly, the calibrated
+influence coefficients are scaled up and are used to compute the strain
+field for a larger microstructure and compared with results computed
+using finite element analysis.</p>
+<div class="section" id="elastostatics-equations-and-boundary-conditions">
+<h3>Elastostatics Equations and Boundary Conditions<a class="headerlink" href="#elastostatics-equations-and-boundary-conditions" title="Permalink to this headline">¶</a></h3>
+<p>A review of the governing field equations for elastostatics can be found
+in the Linear Elasticity in 2D example. The same equations are used in
+the example with the exception that the second lame parameter (shear
+modulus) <span class="math">\(\mu\)</span> is defined differently in 3D.</p>
+<div class="math">
+\[\mu = \frac{E}{2(1+\nu)}\]</div>
+<p>In general, generateing the calibration data for the MKS requires
+boundary conditions that are both periodic and displaced, which are
+quite unusual boundary conditions. The ideal boundary conditions are
+given by,</p>
+<div class="math">
+\[u(L, y, z) = u(0, y, z) + L\bar{\varepsilon}_{xx}\]</div>
+<div class="math">
+\[u(0, L, L) = u(0, 0, L) = u(0, L, 0) = u(0, 0, 0) = 0\]</div>
+<div class="math">
+\[u(x, 0, z) = u(x, L, z)\]</div>
+<div class="math">
+\[u(x, y, 0) = u(x, y, L)\]</div>
+<p>Unfortunaltely, we can&#8217;t implement these boundary conditions with
+<a class="reference external" href="http://sfepy.org">SfePy</a>, the closest we can get is</p>
+<div class="math">
+\[u(L, y, z) = L\bar{\varepsilon}_{xx}\]</div>
+<div class="math">
+\[u(0, y, z) = 0\]</div>
+<div class="math">
+\[u(0, L, L) = u(0, 0, L) = u(0, L, 0) = u(0, 0, 0) = 0\]</div>
+<div class="math">
+\[u(x, 0, z) = u(x, L, z)\]</div>
+<div class="math">
+\[u(x, y, 0) = u(x, y, L)\]</div>
+<p>This leads to some issues near the edges of the domain and introduces
+errors into the resizing of the coefficients. We are working to fix this
+issue, but note that the problem is not with the MKS regression itself,
+but with the calibration data used. The finite element package ABAQUS
+includes the displaced periodic boundary condition and can be used to
+calibrate the MKS regression correctly.</p>
+<div class="code python highlight-python"><pre>%matplotlib inline
+%load_ext autoreload
+%autoreload 2
+
+import numpy as np
+import matplotlib.pyplot as plt
+import timeit as tm</pre>
+</div>
+</div>
+</div>
+<div class="section" id="modeling-with-mks">
+<h2>Modeling with MKS<a class="headerlink" href="#modeling-with-mks" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="calibration-data-and-delta-microstructures">
+<h3>Calibration Data and Delta Microstructures<a class="headerlink" href="#calibration-data-and-delta-microstructures" title="Permalink to this headline">¶</a></h3>
+<p>The first order MKS influence coefficients are all that is needed to
+compute a strain field of a random microstructure as long as the ratio
+between the elastic moduli (also known as the contrast) is less than
+1.5. If this condition is met we can expect a mean absolute error of 2%
+or less when comparing the MKS results with those computed using finite
+element methods <a class="reference external" href="#ref_1">[1]</a>.</p>
+<p>Because we are using distinct phases and the contrast is low enough to
+only need the first order coefficients, delta microstructures and their
+strain fields are all that we need to calibrate the first order
+influence coefficients<a class="reference external" href="#ref_2">[2]</a>.</p>
+<p>The <tt class="docutils literal"><span class="pre">make_delta_microstructure</span></tt> function from <tt class="docutils literal"><span class="pre">pymks.datasets</span></tt> can
+be used to create the two delta microstructures needed to calibrate the
+first order influence coefficients for a two phase microstructure. This
+function uses the python module
+<a class="reference external" href="http://sfepy.org/doc-devel/index.html">SfePy</a> to compute the strain
+fields using finite element methods.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">L</span> <span class="o">=</span> <span class="mi">9</span>
+<span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">L</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+<span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_microstructures</span>
+<span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_delta_microstructures</span>
+
+<span class="n">X_delta</span> <span class="o">=</span> <span class="n">make_delta_microstructures</span><span class="p">(</span><span class="n">Nphases</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">))</span>
+<span class="n">draw_microstructures</span><span class="p">(</span><span class="n">X_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">X_delta</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:])</span>
+</pre></div>
+</div>
+<img alt="../_images/elasticity_3D_4_0.png" src="../_images/elasticity_3D_4_0.png" />
+<p>Using delta microstructures for the calibration of the first order
+influence coefficients is essentially the same as using a unit <a class="reference external" href="http://en.wikipedia.org/wiki/Impulse_response">impulse
+response</a> to find the
+kernel of a system in signal processing. Delta microstructures are
+composed of only two phases. One phase is located only at the center
+cell of the microstructure, and the rest made up of the other phase.</p>
+</div>
+<div class="section" id="generating-calibration-data">
+<h3>Generating Calibration Data<a class="headerlink" href="#generating-calibration-data" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">make_elasticFEstrain_delta</span></tt> function from <tt class="docutils literal"><span class="pre">pymks.datasets</span></tt>
+provides an easy interface to generate delta microstructures and their
+strain fields, which can then be used for calibration of the influence
+coefficients. The function calls the <tt class="docutils literal"><span class="pre">ElasticFESimulation</span></tt> class to
+compute the strain fields with the boundary conditions given above.</p>
+<p>In this example, lets look at a two phase microstructure with elastic
+moduli values of 80 and 120 and Poisson&#8217;s ratio values of 0.3 and 0.3
+respectively. Let&#8217;s also set the macroscopic imposed strain equal to
+0.02. All of these parameters used in the simulation must be passed into
+the <tt class="docutils literal"><span class="pre">make_elasticFEstrain_delta</span></tt> function.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_elasticFEstrain_delta</span>
+<span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_microstructure_strain</span>
+
+<span class="n">elastic_modulus</span> <span class="o">=</span> <span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
+<span class="n">poissons_ratio</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
+<span class="n">macro_strain</span> <span class="o">=</span> <span class="mf">0.02</span>
+<span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="n">tm</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">X_delta</span><span class="p">,</span> <span class="n">strains_delta</span> <span class="o">=</span> <span class="n">make_elasticFEstrain_delta</span><span class="p">(</span><span class="n">elastic_modulus</span><span class="o">=</span><span class="n">elastic_modulus</span><span class="p">,</span>
+                                                    <span class="n">poissons_ratio</span><span class="o">=</span><span class="n">poissons_ratio</span><span class="p">,</span>
+                                                    <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">macro_strain</span><span class="o">=</span><span class="n">macro_strain</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Elapsed Time&#39;</span><span class="p">,</span><span class="n">tm</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t</span><span class="p">,</span> <span class="s">&#39;Seconds&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>Elapsed Time 61.0055241585 Seconds</pre>
+</div>
+<p>Let&#8217;s take a look at one of the delta microstructures and the
+<span class="math">\(\varepsilon_{xx}\)</span> strain field.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">draw_microstructure_strain</span><span class="p">(</span><span class="n">X_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">strains_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:])</span>
+</pre></div>
+</div>
+<img alt="../_images/elasticity_3D_9_0.png" src="../_images/elasticity_3D_9_0.png" />
+</div>
+<div class="section" id="calibrating-first-order-influence-coefficients">
+<h3>Calibrating First Order Influence Coefficients<a class="headerlink" href="#calibrating-first-order-influence-coefficients" title="Permalink to this headline">¶</a></h3>
+<p>Now that we have the delta microstructures and their strain fields, we
+can calibrate the influence coefficients by creating an instance of the
+<tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> class. Because we have 2 phases we will create an
+instance of MKSRegressionModel with the number of states <tt class="docutils literal"><span class="pre">Nstate</span></tt>
+equal to 2. Then, pass the delta microstructures and their strain fields
+to the <tt class="docutils literal"><span class="pre">fit</span></tt> method.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks</span> <span class="kn">import</span> <span class="n">MKSRegressionModel</span>
+<span class="n">MKSmodel</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nstate</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now, pass the delta microstructures and their strain fields into the
+<tt class="docutils literal"><span class="pre">fit</span></tt> method to calibrate the first order influence coefficients.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">MKSmodel</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_delta</span><span class="p">,</span> <span class="n">strains_delta</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>That&#8217;s it, the influence coefficient have be calibrated. Let&#8217;s take a
+look at them.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_coeff</span>
+
+<span class="n">coeff</span> <span class="o">=</span> <span class="n">MKSmodel</span><span class="o">.</span><span class="n">coeff</span>
+<span class="n">draw_coeff</span><span class="p">(</span><span class="n">coeff</span><span class="p">[</span><span class="n">center</span><span class="p">])</span>
+</pre></div>
+</div>
+<img alt="../_images/elasticity_3D_15_0.png" src="../_images/elasticity_3D_15_0.png" />
+<p>The influence coefficients for <span class="math">\(h=0\)</span> have a Gaussian-like shape,
+while the influence coefficients for <span class="math">\(h=1\)</span> are constant-valued.
+The constant-valued influence coefficients may seem superfluous, but are
+equally as import. They are equivalent to the constant term in multiple
+linear regression with <a class="reference external" href="http://en.wikipedia.org/wiki/Dummy_variable_%28statistics%29">categorical
+variables</a>.</p>
+</div>
+<div class="section" id="predict-of-the-strain-field-for-a-random-microstructure">
+<h3>Predict of the Strain Field for a Random Microstructure<a class="headerlink" href="#predict-of-the-strain-field-for-a-random-microstructure" title="Permalink to this headline">¶</a></h3>
+<p>Let&#8217;s now use our instance of the <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> class with
+calibrated influence coefficients to compute the strain field for a
+random two phase microstructure and compare it with the results from a
+finite element simulation.</p>
+<p>The <tt class="docutils literal"><span class="pre">make_elasticFEstrain_random</span></tt> function from <tt class="docutils literal"><span class="pre">pymks.datasets</span></tt> is
+an easy way to generate a random microstructure and its strain field
+results from finite element analysis.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_elasticFEstrain_random</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">99</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">tm</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">strain</span> <span class="o">=</span> <span class="n">make_elasticFEstrain_random</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">elastic_modulus</span><span class="o">=</span><span class="n">elastic_modulus</span><span class="p">,</span>
+                                   <span class="n">poissons_ratio</span><span class="o">=</span><span class="n">poissons_ratio</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">macro_strain</span><span class="o">=</span><span class="n">macro_strain</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Elapsed Time&#39;</span><span class="p">,(</span><span class="n">tm</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t</span><span class="p">),</span> <span class="s">&#39;Seconds&#39;</span>
+<span class="n">draw_microstructure_strain</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="p">]</span> <span class="p">,</span> <span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>Elapsed Time 28.5320401192 Seconds</pre>
+</div>
+<img alt="../_images/elasticity_3D_18_1.png" src="../_images/elasticity_3D_18_1.png" />
+<p><strong>Note that the calibrated influence coefficients can only be used to
+reproduce the simulation with the same boundary conditions that they
+were calibrated with</strong></p>
+<p>Now to get the strain field from the <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> just pass
+the same microstructure to the <tt class="docutils literal"><span class="pre">predict</span></tt> method.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">t</span> <span class="o">=</span> <span class="n">tm</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">strain_pred</span> <span class="o">=</span> <span class="n">MKSmodel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Elapsed Time&#39;</span><span class="p">,</span><span class="n">tm</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t</span><span class="p">,</span><span class="s">&#39;Seconds&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>Elapsed Time 0.046315908432 Seconds</pre>
+</div>
+<p>Finally let&#8217;s compare the results from finite element simulation and the
+MKS model.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_strains_compare</span>
+
+<span class="n">draw_strains_compare</span><span class="p">(</span><span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="p">],</span> <span class="n">strain_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="p">])</span>
+</pre></div>
+</div>
+<img alt="../_images/elasticity_3D_22_0.png" src="../_images/elasticity_3D_22_0.png" />
+<p>The MKS model is able to capture the strain field for the random
+microstructure after being calibrated with delta microstructures.</p>
+</div>
+</div>
+<div class="section" id="resizing-the-coefficeints-to-use-on-larger-microstructures">
+<h2>Resizing the Coefficeints to use on Larger Microstructures<a class="headerlink" href="#resizing-the-coefficeints-to-use-on-larger-microstructures" title="Permalink to this headline">¶</a></h2>
+<p>The influence coefficients that were calibrated on a smaller
+microstructure can be used to predict the strain field on a larger
+microstructure though spectral interpolation <a class="reference external" href="#ref_3">[3]</a>, but
+accuracy of the MKS model drops slightly. To demonstrate how this is
+done, let&#8217;s generate a new larger <span class="math">\(N\)</span> by <span class="math">\(N\)</span> random
+microstructure and its strain field.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">N</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">L</span>
+<span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">tm</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The influence coefficients that have already been calibrated need to be
+resized to match the shape of the new larger microstructure that we want
+to compute the strain field for. This can be done by passing the shape
+of the new larger microstructure into the &#8216;resize_coeff&#8217; method.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">MKSmodel</span><span class="o">.</span><span class="n">resize_coeff</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Because the coefficients have been resized, they will no longer work for
+our original <span class="math">\(L\)</span> by <span class="math">\(L\)</span> sized microstructures they were
+calibrated on, but they can now be used on the <span class="math">\(N\)</span> by <span class="math">\(N\)</span>
+microstructures. Just like before, just pass the microstructure as the
+argument of the <tt class="docutils literal"><span class="pre">predict</span></tt> method to get the strain field.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_strains</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="n">tm</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">strain_pred</span> <span class="o">=</span> <span class="n">MKSmodel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Elapsed Time&#39;</span><span class="p">,(</span><span class="n">tm</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t</span><span class="p">),</span> <span class="s">&#39;Seconds&#39;</span>
+<span class="n">draw_strains</span><span class="p">(</span><span class="n">strain_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;xx&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>Elapsed Time 0.0535778999329 Seconds</pre>
+</div>
+<img alt="../_images/elasticity_3D_29_1.png" src="../_images/elasticity_3D_29_1.png" />
+<p>As you can see, the results from the strain field computed with the
+resized influence coefficients is still close to the finite element for
+the larger microstructure. There is a slight decrease in accuracy due to
+spectral interpolation <a class="reference external" href="#ref_4">[4]</a>, but the trade off in accuracy
+is well worth the time savings compared to finite element analysis.
+Therefore a calibrated MKS model can be used to rapidly explore the
+space of potential microstructures to optimize material performance.</p>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>[1] Binci M., Fullwood D., Kalidindi S.R., <a href="#id1"><span class="problematic" id="id2">*</span></a>A new spectral framework</div></blockquote>
+<p>for establishing localization relationships for elastic behav ior of
+composites and their calibration to finite-element models*. Acta
+Materialia, 2008. 56 (10): p. 2272-2282
+<a class="reference external" href="http://dx.doi.org/10.1016/j.actamat.2008.01.017">doi:10.1016/j.actamat.2008.01.017</a>.</p>
+<blockquote>
+<div>[2] Landi, G., S.R. Niezgoda, S.R. Kalidindi, <a href="#id3"><span class="problematic" id="id4">*</span></a>Multi-scale modeling of</div></blockquote>
+<p>elastic response of three-dimensional voxel-based microstructure
+datasets using novel DFT-based knowledge systems*. Acta Materialia,
+2009. 58 (7): p. 2716-2725
+<a class="reference external" href="http://dx.doi.org/10.1016/j.actamat.2010.01.007">doi:10.1016/j.actamat.2010.01.007</a>.</p>
+<blockquote>
+<div>[3] Marko, K., Kalidindi S.R., Fullwood D., <a href="#id5"><span class="problematic" id="id6">*</span></a>Computationally efficient</div></blockquote>
+<p>database and spectral interpolation for fully plastic Taylor-type
+crystal plasticity calculations of face-centered cubic polycrystals*.
+International Journal of Plasticity 24 (2008) 1264–1276
+<a class="reference external" href="http://dx.doi.org/10.1016/j.ijplas.2007.12.002">doi;10.1016/j.ijplas.2007.12.002</a>.</p>
+<blockquote>
+<div>[4] Marko, K. Al-Harbi H. F. , Kalidindi S.R., <a href="#id7"><span class="problematic" id="id8">*</span></a>Crystal plasticity</div></blockquote>
+<p>simulations using discrete Fourier transforms*. Acta Materialia 57
+(2009) 1777–1784
+<a class="reference external" href="http://dx.doi.org/10.1016/j.actamat.2008.12.017">doi:10.1016/j.actamat.2008.12.017</a>.</p>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
