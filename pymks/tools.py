@@ -165,14 +165,12 @@ def draw_microstructures(*microstructures):
             ax.set_xticks(())
             ax.set_yticks(())
     else:
-        micro = np.array(microstructures)[0]
-        im = axs.imshow(micro.swapaxes(0, 1), cmap=plt.cm.gray,
+        im = axs.imshow(microstructures.swapaxes(0, 1), cmap=plt.cm.gray,
                         interpolation='none', vmin=vmin, vmax=vmax)
         axs.set_xticks(())
         axs.set_yticks(())
     fig.subplots_adjust(right=0.8)
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
-    #cbar_ax, kw = mpl.colorbar.make_axes([ax for ax in axs.flat])
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
 
@@ -216,6 +214,29 @@ def draw_strains_compare(strain1, strain2):
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
     fig.colorbar(im, cax=cbar_ax)
 
+    plt.tight_layout()
+
+def draw_concentrations(*concentrations):
+    Nconcens = len(concentrations)
+    vmin = np.min(concentrations)
+    vmax = np.max(concentrations)
+    cmap = _get_response_cmap()
+    plt.close('all')
+    fig, axs = plt.subplots(1, Nconcens, figsize=(Nconcens * 4, 4))
+    if Nconcens > 1:
+        for concen, ax in zip(concentrations, axs.flat):
+            im = ax.imshow(concen.swapaxes(0, 1), cmap=cmap,
+                           interpolation='none', vmin=vmin, vmax=vmax)
+            ax.set_xticks(())
+            ax.set_yticks(())
+    else:
+        im = axs.imshow(concentrations.swapaxes(0, 1), cmap=cmap,
+                        interpolation='none', vmin=vmin, vmax=vmax)
+        axs.set_xticks(())
+        axs.set_yticks(())
+    fig.subplots_adjust(right=0.8)
+    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
+    fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
 
 def bin(arr, Nbin):
