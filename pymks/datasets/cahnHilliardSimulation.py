@@ -11,7 +11,7 @@ class CahnHilliardSimulation(object):
        \dot{\phi} = \nabla^2 \left( \phi^3 - \phi \right) - \nabla^4 \phi
        
     In 1D.
-    
+    >>> np.random.seed(99)
     >>> N = 100
     >>> phi = 0.01 * (2 * np.random.random((2, N)) - 1)
     >>> ch = CahnHilliardSimulation(width=2.)
@@ -33,6 +33,8 @@ class CahnHilliardSimulation(object):
     >>> ch = CahnHilliardSimulation(width=2.)
     >>> for i in range(10):
     ...     phi[:] = ch.get_response(phi)
+    >>> #print max(phi.flat)
+    >>> #print min(phi.flat)
     >>> assert (max(phi.flat) > 0.0005) and (min(phi.flat) < -0.0005)    
 
     _`Cahn-Hilliard equation`: https://en.wikipedia.org/wiki/Cahn-Hilliard_equation
