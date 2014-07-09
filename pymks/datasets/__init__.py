@@ -131,7 +131,7 @@ def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
     X = np.random.randint(len(elastic_modulus), size=((n_samples,)+size))
     return X, FEsim.get_response(X, strain_index=strain_index)
 
-def make_cahnHilliard(n_samples, size, dx=1.0, width=1., dt=1.):
+def make_cahnHilliard(n_samples, size, dx=0.5, width=1., dt=1.):
     """Generate delta microstructures and responses
 
     Simple interface to generate random concentration fields and their
