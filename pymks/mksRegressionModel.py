@@ -305,9 +305,6 @@ class MKSRegressionModel(LinearRegression):
         pads = tuple([tuple(p) for p in padarray])
         coeff_pad = np.pad(coeff, pads, 'constant', constant_values=0)
         Fcoeff_pad = self.coeffToFcoeff(coeff_pad)
-        Fcoeff_pad[...,-1] = 0
-        k0 = np.nonzero(self.Fcoeff[...,-1])
-        Fcoeff_pad[...,-1][k0] = self.Fcoeff[...,-1][k0]
         
         self.Fcoeff = Fcoeff_pad
 
