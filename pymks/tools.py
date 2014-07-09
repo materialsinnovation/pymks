@@ -1,7 +1,6 @@
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 import numpy as np
 
 
@@ -209,6 +208,26 @@ def draw_strains_compare(strain1, strain2):
         ax.set_xticks(())
         ax.set_yticks(())
         ax.set_title(r'$\mathbf{\varepsilon_{xx}}$ (%s)' % title, fontsize=20)
+
+    fig.subplots_adjust(right=0.8)
+    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
+    fig.colorbar(im, cax=cbar_ax)
+
+    plt.tight_layout()
+
+def draw_concentrations_compare(con1, con2):
+    plt.close('all')
+    cmap = _get_response_cmap()
+    vmin = min((con1.flatten().min(), con2.flatten().min()))
+    vmax = min((con1.flatten().max(), con2.flatten().max()))
+    fig, axs = plt.subplots(1, 2, figsize=(8, 4))
+    titles = ['Simulation', 'MKS']
+    cons = (con1, con2)
+    for con, ax, title in zip(cons, axs, titles):
+        im = ax.imshow(con.swapaxes(0, 1), cmap=cmap, interpolation='none', vmin=vmin, vmax=vmax)
+        ax.set_xticks(())
+        ax.set_yticks(())
+        ax.set_title('Concentration (%s)' % title, fontsize=15)
 
     fig.subplots_adjust(right=0.8)
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
