@@ -17,7 +17,7 @@ class CahnHilliardSimulation(object):
     >>> ch = CahnHilliardSimulation(width=2.)
     >>> for i in range(10000):
     ...     phi[:] = ch.get_response(phi)
-    >>> assert (max(phi.flat) > 0.95) and (min(phi.flat) < -0.95)
+    >>> assert (max(phi.flat) > 2e-3) and (min(phi.flat) < -2e-3)
 
     In 2D.
 
@@ -33,15 +33,14 @@ class CahnHilliardSimulation(object):
     >>> ch = CahnHilliardSimulation(width=2.)
     >>> for i in range(10):
     ...     phi[:] = ch.get_response(phi)
-    >>> #print max(phi.flat)
-    >>> #print min(phi.flat)
+
     >>> assert (max(phi.flat) > 0.0005) and (min(phi.flat) < -0.0005)    
 
     _`Cahn-Hilliard equation`: https://en.wikipedia.org/wiki/Cahn-Hilliard_equation
     
     """
 
-    def __init__(self, dx=0.5, width=1., dt=1.):
+    def __init__(self, dx=0.25, width=1., dt=0.001):
         r"""
         Args:
           dx: grid spacing
@@ -59,7 +58,7 @@ class CahnHilliardSimulation(object):
 
         Args:
           X: Array representing the concentration field between -1 and
-             1 with shape (Nsample, N, N)
+             1 with shape (n_samples, N, N)
 
         Returns:
           Array representing the microstructure at one time step ahead

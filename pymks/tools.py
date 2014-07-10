@@ -152,12 +152,12 @@ def draw_microstructure_strain(microstructure, strain):
     plt.tight_layout()
 
 def draw_microstructures(*microstructures):
-    Nmicros = len(microstructures)
+    n_micros = len(microstructures)
     vmin = np.min(microstructures)
     vmax = np.max(microstructures)
     plt.close('all')
-    fig, axs = plt.subplots(1, Nmicros, figsize=(Nmicros * 4, 4))
-    if Nmicros > 1:
+    fig, axs = plt.subplots(1, n_micros, figsize=(n_micros * 4, 4))
+    if n_micros > 1:
         for micro, ax in zip(microstructures, axs.flat):
             im = ax.imshow(micro.swapaxes(0, 1), cmap=plt.cm.gray,
                            interpolation='none', vmin=vmin, vmax=vmax)
@@ -174,11 +174,11 @@ def draw_microstructures(*microstructures):
     plt.tight_layout()
 
 def draw_strains(*strains, **titles):
-    Nstrains = len(strains)
+    n_strains = len(strains)
     plt.close('all')
     cmap = _get_response_cmap()
-    fig, axs = plt.subplots(1, Nstrains, figsize=(Nstrains * 4, 4))
-    if Nstrains > 1:
+    fig, axs = plt.subplots(1, n_strains, figsize=(n_strains * 4, 4))
+    if n_strains > 1:
         for micro, ax, title in zip(strains, axs, titles):
             im = ax.imshow(micro.swapaxes(0, 1), cmap=cmap, interpolation='none')
             ax.set_xticks(())
@@ -236,20 +236,20 @@ def draw_concentrations_compare(con1, con2):
     plt.tight_layout()
 
 def draw_concentrations(*concentrations):
-    Nconcens = len(concentrations)
+    n_concens = len(concentrations)
     vmin = np.min(concentrations)
     vmax = np.max(concentrations)
     cmap = _get_response_cmap()
     plt.close('all')
-    fig, axs = plt.subplots(1, Nconcens, figsize=(Nconcens * 4, 4))
-    if Nconcens > 1:
+    fig, axs = plt.subplots(1, n_concens, figsize=(n_concens * 4, 4))
+    if n_concens > 1:
         for concen, ax in zip(concentrations, axs.flat):
             im = ax.imshow(concen.swapaxes(0, 1), cmap=cmap,
                            interpolation='none', vmin=vmin, vmax=vmax)
             ax.set_xticks(())
             ax.set_yticks(())
     else:
-        im = axs.imshow(concentrations.swapaxes(0, 1), cmap=cmap,
+        im = axs.imshow(concentrations[0].swapaxes(0, 1), cmap=cmap,
                         interpolation='none', vmin=vmin, vmax=vmax)
         axs.set_xticks(())
         axs.set_yticks(())
@@ -258,7 +258,7 @@ def draw_concentrations(*concentrations):
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
 
-def bin(arr, Nbin):
+def bin(arr, n_bins):
     r"""
     Discretize the array `arr`, which must be between 0 and 1.
 
@@ -271,12 +271,12 @@ def bin(arr, Nbin):
 
     Args:
         arr: Array that must be between 0 and 1.
-        Nbin: Integer value representing the number of local states
+        n_bins: Integer value representing the number of local states
              in the local state space of the microstructure function.
     Returns:
         Microstructure function for array `arr`.
     """
-    X = np.linspace(0, 1, Nbin)
+    X = np.linspace(0, 1, n_bins)
     dX = X[1] - X[0]
 
     return np.maximum(1 - abs(arr[:, None] - X) / dX, 0)

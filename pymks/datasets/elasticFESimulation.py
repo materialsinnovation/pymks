@@ -127,10 +127,10 @@ class ElasticFESimulation(object):
 
         """
         dim = len(X.shape) - 1
-        Nphase = len(self.elastic_modulus)
+        n_phases = len(self.elastic_modulus)
         if not issubclass(X.dtype.type, np.integer):
             raise TypeError, "X must be an integer array"
-        if Nphase != np.max(X) + 1:
+        if n_phases != np.max(X) + 1:
             raise RuntimeError, "X has the wrong number of phases."
         if np.min(X) != 0:
             raise RuntimeError, "Phases must be zero indexed."
@@ -144,8 +144,8 @@ class ElasticFESimulation(object):
         with a macroscopic strain applied in the x direction.
 
         Args:
-          X: microstructure with shape (Nsample, Nx, Ny) or
-             (Nsample, Nx, Ny, Nz) 
+          X: microstructure with shape (n_samples, Nx, Ny) or
+             (n_samples, Nx, Ny, Nz) 
           strain_index: interger value to return
              a particular strain field.  0 returns exx, 1 returns eyy,
              etc. To return all strain fields set `strain_index` equal to

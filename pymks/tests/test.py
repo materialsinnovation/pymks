@@ -49,7 +49,7 @@ def test_MKSelastic_delta():
     X, y_prop = get_delta_data(nx, ny)
     
     for y_test in np.rollaxis(y_prop, -1):
-        model = MKSRegressionModel(Nstate=2)
+        model = MKSRegressionModel(n_states=2)
         model.fit(X, y_test)
         y_pred = model.predict(X)
         assert np.allclose(y_pred, y_test, rtol=1e-3, atol=1e-3)
@@ -61,7 +61,7 @@ def test_MKSelastic_random():
     X_test, strains_test = get_random_data(nx, ny)
 
     for y_delta, y_test in rollzip(strains_delta, strains_test):
-        model = MKSRegressionModel(Nstate=2)
+        model = MKSRegressionModel(n_states=2)
         model.fit(X_delta, y_delta)
         y_pred = model.predict(X_test)
         assert np.allclose(y_pred[0, i:-i], y_test[0, i:-i], rtol=1e-2, atol=6.1e-3)
@@ -75,7 +75,7 @@ def test_resize_pred():
     X_big_test, strains_big_test = get_random_data(resize * nx, resize * ny)
 
     for y_delta, y_test, y_big_test in rollzip(strains_delta, strains_test, strains_big_test):
-        model = MKSRegressionModel(Nstate=2)
+        model = MKSRegressionModel(n_states=2)
         model.fit(X_delta, y_delta)
         y_pred = model.predict(X_test)
         assert np.allclose(y_pred[0, i:-i], y_test[0, i:-i], rtol=1e-2, atol=6.1e-3)
@@ -91,8 +91,8 @@ def test_resize_coeff():
    
     
     for y_delta, y_big_delta in rollzip(strains_delta, strains_big_delta):
-         model = MKSRegressionModel(Nstate=2)
-         big_model = MKSRegressionModel(Nstate=2)
+         model = MKSRegressionModel(n_states=2)
+         big_model = MKSRegressionModel(n_states=2)
          model.fit(X_delta, y_delta)
          big_model.fit(X_big_delta, y_big_delta)
          model.resize_coeff((resize * nx, resize * ny))
@@ -121,14 +121,14 @@ def test_multiphase():
     assert np.allclose(strain_pred[0, i:-i], strain[0, i:-i], rtol=1e-2, atol=6.1e-3)
 
     def test_cahnHilliard():
-        Nsample = 100
-        Nspace = 20
+        n_samples = 100
+        n_spaces = 20
         dt = 1e-3
         np.random.seed(0 )
-        X, y = make_cahnHilliard(n_samples=Nsample, size=(Nspace, Nspace), dt=dt)
-        model = MKSRegressionModel(Nstate=10)
+        X, y = make_cahnHilliard(n_samples=n_samples, size=(n_spaces, n_spaces), dt=dt)
+        model = MKSRegressionModel(n_states=10)
         model.fit(X, y)
-        X_test = np.array([np.random.random((Nspace, Nspace)) for i in range(1)])
+        X_test = np.array([np.random.random((n_spaces, n_spaces)) for i in range(1)])
         CHSim = CahnHilliardSimulation(dt=dt)
         y_test = CHSim.get_response(X_test)
         y_pred = model.predict(X_test)

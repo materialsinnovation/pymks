@@ -46,7 +46,7 @@ def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio,
     X = make_delta_microstructures(len(elastic_modulus), size=size)
     return X, FEsim.get_response(X, strain_index=strain_index)
 
-def make_delta_microstructures(Nphases, size):
+def make_delta_microstructures(n_phases, size):
     """Constructs delta microstructures
 
     Constructs delta microstructures for an arbitrary number of phases
@@ -74,7 +74,7 @@ def make_delta_microstructures(Nphases, size):
     >>> assert(np.allclose(X, make_delta_microstructures(2, size=(3, 3, 3))))
 
     Args:
-        Nphases: number of phases
+        n_phases: number of phases
         size: dimension of microstructure
 
     Returns:
@@ -82,12 +82,12 @@ def make_delta_microstructures(Nphases, size):
         (Nsamples, Nx, Ny, ...)
 
     """
-    shape = (Nphases, Nphases) + size
+    shape = (n_phases, n_phases) + size
     center = tuple((np.array(size) - 1) / 2)
     X = np.zeros(shape=shape, dtype=int)
-    X[:] = np.arange(Nphases)[(slice(None), None) + (None,) * len(size)]
-    X[(slice(None), slice(None)) + center] = np.arange(Nphases)
-    mask = ~np.identity(Nphases, dtype=bool)
+    X[:] = np.arange(n_phases)[(slice(None), None) + (None,) * len(size)]
+    X[(slice(None), slice(None)) + center] = np.arange(n_phases)
+    mask = ~np.identity(n_phases, dtype=bool)
     return X[mask]
 
 def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
@@ -131,7 +131,7 @@ def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
     X = np.random.randint(len(elastic_modulus), size=((n_samples,)+size))
     return X, FEsim.get_response(X, strain_index=strain_index)
 
-def make_cahnHilliard(n_samples, size, dx=0.5, width=1., dt=1.):
+def make_cahnHilliard(n_samples, size, dx=0.25, width=1., dt=0.001):
     """Generate delta microstructures and responses
 
     Simple interface to generate random concentration fields and their

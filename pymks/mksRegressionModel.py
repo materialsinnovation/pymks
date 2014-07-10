@@ -14,9 +14,9 @@ class MKSRegressionModel(LinearRegression):
     The following demonstrates the viability of the
     `MKSRegressionModel` with a simple 1D filter.
 
-    >>> Nstate = 2
-    >>> Nspace = 81
-    >>> Nsample = 400
+    >>> n_states = 2
+    >>> n_spaces = 81
+    >>> n_samples = 400
 
     Define a filter function.
 
@@ -27,17 +27,17 @@ class MKSRegressionModel(LinearRegression):
 
     Use the filter function to construct some coefficients.
 
-    >>> coeff = np.linspace(1, 0, Nstate)[None,:] * filter(np.linspace(0, 20, Nspace))[:,None]
+    >>> coeff = np.linspace(1, 0, n_states)[None,:] * filter(np.linspace(0, 20, n_spaces))[:,None]
     >>> Fcoeff = np.fft.fft(coeff, axis=0)
 
     Make some test samples.
 
     >>> np.random.seed(2)
-    >>> X = np.random.random((Nsample, Nspace))
+    >>> X = np.random.random((n_samples, n_spaces))
 
     Construct a response with the `Fcoeff`.
 
-    >>> H = np.linspace(0, 1, Nstate)
+    >>> H = np.linspace(0, 1, n_states)
     >>> X_ = np.maximum(1 - abs(X[:,:,None] - H) / (H[1] - H[0]), 0)
     >>> FX = np.fft.fft(X_, axis=1)
     >>> Fy = np.sum(Fcoeff[None] * FX, axis=-1)
@@ -45,7 +45,7 @@ class MKSRegressionModel(LinearRegression):
 
     Use the `MKSRegressionModel` to reconstruct the coefficients
 
-    >>> model = MKSRegressionModel(Nstate=Nstate)
+    >>> model = MKSRegressionModel(n_states=n_states)
     >>> model.fit(X, y)
 
     Check the result
@@ -53,20 +53,20 @@ class MKSRegressionModel(LinearRegression):
     >>> assert np.allclose(np.fft.fftshift(coeff, axes=(0,)), model.coeff)
 
     Attributes:
-        Nstate: Interger value for number of local states
+        n_states: Interger value for number of local states
         coef: Array of values that are the influence coefficients
         Fcoef: Frequency space representation of coef
     """
 
-    def __init__(self, Nstate=None):
+    def __init__(self, n_states=None):
         r"""
         Inits an `MKSRegressionModel`.
 
         Args:
-            Nstate: is the number of discretization states in the local
+            n_states: is the number of discretization states in the local
             state space.
         """
-        self.Nstate = Nstate
+        self.n_states = n_states
 
     def _axes(self, X):
         r"""
@@ -105,22 +105,22 @@ class MKSRegressionModel(LinearRegression):
 
     def _bin_float(self, X):
         '''
-        >>> Nstate = 10
+        >>> n_states = 10
         >>> np.random.seed(4)
         >>> X = np.random.random((2, 5, 3, 2))
-        >>> #X = np.random.randint(Nstate, size=(2, 5, 3, 2))
-        >>> X_ = MKSRegressionModel(Nstate)._bin(X)
-        >>> H = np.linspace(0, 1, Nstate)
+        >>> #X = np.random.randint(n_states, size=(2, 5, 3, 2))
+        >>> X_ = MKSRegressionModel(n_states)._bin(X)
+        >>> H = np.linspace(0, 1, n_states)
         >>> Xtest = np.sum(X_ * H[None,None,None,:], axis=-1)
         >>> assert np.allclose(X, Xtest)
         
         '''
-        H = np.linspace(0, 1, self.Nstate)
+        H = np.linspace(0, 1, self.n_states)
         return np.maximum(1 - (abs(X[..., None] - H)) / (H[1] - H[0]), 0)
 
     def _bin_int(self, X):
         '''
-        >>> MKSmodel = MKSRegressionModel(Nstate=3)
+        >>> MKSmodel = MKSRegressionModel(n_states=3)
         >>> X = np.array([[1, 1, 0],
         ...               [1, 0 ,2],
         ...               [0, 1, 0]])
@@ -140,12 +140,12 @@ class MKSRegressionModel(LinearRegression):
         '''
         if np.min(X) != 0:
             raise RuntimeError, "Phases must be zero indexed."
-        Nstate = np.max(X) + 1
-        if self.Nstate is None:
-            self.Nstate = Nstate
-        if Nstate != self.Nstate:
+        n_states = np.max(X) + 1
+        if self.n_states is None:
+            self.n_states = n_states
+        if n_states != self.n_states:
             raise RuntimeError, "Nphase does not correspond with phases in X."
-        Xbin = np.zeros(X.shape + (Nstate,), dtype=float)
+        Xbin = np.zeros(X.shape + (n_states,), dtype=float)
         mask = tuple(np.indices(X.shape)) + (X,)
         Xbin[mask] = 1.
         return Xbin
@@ -155,12 +155,12 @@ class MKSRegressionModel(LinearRegression):
         r"""
         Bin the microstructure and take the Fourier transform.
 
-        >>> Nstate = 10
+        >>> n_states = 10
         >>> np.random.seed(3)
         >>> X = np.random.random((2, 5, 3))
-        >>> FX_ = MKSRegressionModel(Nstate)._binfft(X)
+        >>> FX_ = MKSRegressionModel(n_states)._binfft(X)
         >>> X_ = np.fft.ifftn(FX_, axes=(1, 2))
-        >>> H = np.linspace(0, 1, Nstate)
+        >>> H = np.linspace(0, 1, n_states)
         >>> Xtest = np.sum(X_ * H[None,None,None,:], axis=-1)
         >>> assert np.allclose(X, Xtest)
 
@@ -180,7 +180,7 @@ class MKSRegressionModel(LinearRegression):
 
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
         >>> y = X.swapaxes(1, 2)
-        >>> model = MKSRegressionModel(Nstate=2)
+        >>> model = MKSRegressionModel(n_states=2)
         >>> model.fit(X, y)
         >>> assert np.allclose(model.Fcoeff, [[[ 0.5,  0.5], [-2, 0]],
         ...                                   [[-0.5,  0  ], [-1, 0]]])
@@ -200,7 +200,7 @@ class MKSRegressionModel(LinearRegression):
         FX = self._binfft(X)
         Fy = np.fft.fftn(y, axes=self._axes(X))
         shape = X.shape[1:]
-        self.Fcoeff = np.zeros(shape + (self.Nstate,), dtype=np.complex)
+        self.Fcoeff = np.zeros(shape + (self.n_states,), dtype=np.complex)
         s0 = (slice(None),)
         for ijk in np.ndindex(shape):
             if np.all(np.array(ijk) == 0):
@@ -226,7 +226,7 @@ class MKSRegressionModel(LinearRegression):
 
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
         >>> y = X.swapaxes(1, 2)
-        >>> model = MKSRegressionModel(Nstate=2)
+        >>> model = MKSRegressionModel(n_states=2)
         >>> model.fit(X, y)
         >>> assert np.allclose(y, model.predict(X))
 
