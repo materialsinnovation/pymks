@@ -2,7 +2,10 @@ import matplotlib.colors as colors
 import matplotlib.cm as cmx
 import matplotlib.pyplot as plt
 import numpy as np
-
+from sklearn.cross_validation import train_test_split
+from sklearn import metrics
+mse = metrics.mean_squared_error
+from pymks import MKSRegressionModel
 
 def _set_colors():
     HighRGB = np.array([26,152,80])/255.
@@ -257,6 +260,27 @@ def draw_concentrations(*concentrations):
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
+
+def optimize_n_states(n_states_values, X, y, test_size=0.2, random_state=3, plot=False):
+    if n_states_values[0] <= 1:
+        raise RuntimeError, "Minimum number of local states is 2."
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=3)
+    errors = []
+    n_states = n_states_values
+    for n_state in n_states:
+        MKSmodel = MKSRegressionModel(n_states=n_state)
+        MKSmodel.fit(X_train, y_train)
+        errors.append(mse(MKSmodel.predict(X_test), y_test))
+    argmin = np.argmin(errors)
+    if plot == True:
+        print "Optimal n_states: {0}, mse: {1:1.3e}".format(n_states[argmin], errors[argmin])
+        _optimize_n_states_plot(errors, n_states)
+    return n_states[argmin]
+
+def _optimize_n_states_plot(errors, n_states):
+    plt.plot(n_states, errors, color='#1a9850', linewidth=5)
+    plt.ylabel('MSE', fontsize=20)
+    plt.xlabel('Number of Local States', fontsize=15)
 
 def bin(arr, n_bins):
     r"""
