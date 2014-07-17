@@ -207,7 +207,8 @@ def draw_strains_compare(strain1, strain2):
     titles = ['Finite Element', 'MKS']
     strains = (strain1, strain2)
     for strain, ax, title in zip(strains, axs, titles):
-        im = ax.imshow(strain.swapaxes(0, 1), cmap=cmap, interpolation='none', vmin=vmin, vmax=vmax)
+        im = ax.imshow(strain.swapaxes(0, 1), cmap=cmap,
+                       interpolation='none', vmin=vmin, vmax=vmax)
         ax.set_xticks(())
         ax.set_yticks(())
         ax.set_title(r'$\mathbf{\varepsilon_{xx}}$ (%s)' % title, fontsize=20)
@@ -227,7 +228,8 @@ def draw_concentrations_compare(con1, con2):
     titles = ['Simulation', 'MKS']
     cons = (con1, con2)
     for con, ax, title in zip(cons, axs, titles):
-        im = ax.imshow(con.swapaxes(0, 1), cmap=cmap, interpolation='none', vmin=vmin, vmax=vmax)
+        im = ax.imshow(con.swapaxes(0, 1), cmap=cmap, interpolation='none',
+                       vmin=vmin, vmax=vmax)
         ax.set_xticks(())
         ax.set_yticks(())
         ax.set_title('Concentration (%s)' % title, fontsize=15)
@@ -261,19 +263,41 @@ def draw_concentrations(*concentrations):
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
 
-def optimize_n_states(n_states_values, X, y, test_size=0.2, random_state=3, plot=False):
+def draw_diff(Simulation, MKS):
+    diff = Simulation - MKS
+    vmin = np.min(diff)
+    vmax = np.max(diff)
+    cmap = _get_response_cmap()
+    fig, axs = plt.subplots(1, 1, figsize=(4, 4))
+    im = axs.imshow(diff.swapaxes(0, 1), cmap=cmap,
+                        interpolation='none', vmin=vmin, vmax=vmax)
+    axs.set_xticks(())
+    axs.set_yticks(())
+    fig.subplots_adjust(right=0.8)
+    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
+    fig.colorbar(im, cax=cbar_ax)
+    plt.title('Simulation - MKS',fontsize=15)
+    plt.tight_layout()
+
+
+def optimize_n_states(n_states_values, X, y, test_size=0.2, random_state=3,
+                      plot=False, basis=None, domain=None):
     if n_states_values[0] <= 1:
         raise RuntimeError, "Minimum number of local states is 2."
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=3)
+    X_train, X_test, y_train, y_test = train_test_split(X, y,
+                                                        test_size=test_size,
+                                                        random_state=random_state)
     errors = []
     n_states = n_states_values
     for n_state in n_states:
         MKSmodel = MKSRegressionModel(n_states=n_state)
-        MKSmodel.fit(X_train, y_train)
-        errors.append(mse(MKSmodel.predict(X_test), y_test))
+        MKSmodel.fit(X_train, y_train, basis=basis, deg=n_state, domain=domain)
+        errors.append(mse(MKSmodel.predict(X_test, basis=basis, deg=n_state,
+                                           domain=domain), y_test))
     argmin = np.argmin(errors)
     if plot == True:
-        print "Optimal n_states: {0}, mse: {1:1.3e}".format(n_states[argmin], errors[argmin])
+        print "Optimal n_states: {0}, mse: {1:1.3e}".format(n_states[argmin],
+                                                            errors[argmin])
         _optimize_n_states_plot(errors, n_states)
     return n_states[argmin]
 

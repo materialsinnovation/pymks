@@ -173,7 +173,7 @@ class MKSRegressionModel(LinearRegression):
         Xbin = self._bin(X)
         return np.fft.fftn(Xbin, axes=self._axes(X))
 
-    def fit(self, X, y):
+    def fit(self, X, y, basis=None, deg=None, domain=None):
         r"""
         Fits the data by calculating a set of influence coefficients,
         `Fcoeff`.
@@ -197,7 +197,13 @@ class MKSRegressionModel(LinearRegression):
             raise RuntimeError, "The shape of y is incorrect."
         if y.shape != X.shape:
             raise RuntimeError, "X and y must be the same shape."
-        FX = self._binfft(X)
+        if basis == None:
+            FX = self._binfft(X)
+        elif basis == 'Legendre':
+            from pymks.basis import Legendre_fft
+            FX = Legendre_fft(X, deg, domain)
+        else:
+            raise RuntimeError, "basis is not defined."
         Fy = np.fft.fftn(y, axes=self._axes(X))
         shape = X.shape[1:]
         self.Fcoeff = np.zeros(shape + (self.n_states,), dtype=np.complex)
@@ -219,7 +225,7 @@ class MKSRegressionModel(LinearRegression):
         axes = np.arange(len(self._axes(self.Fcoeff) - 1))
         return np.fft.fftn(np.fft.ifftshift(coeff, axes=axes), axes=axes)
 
-    def predict(self, X):
+    def predict(self, X, basis=None, deg=None, domain=None):
         r"""
         Calculate a new response from the microstructure function `X` with calibrated
         influence coefficients.
@@ -252,7 +258,13 @@ class MKSRegressionModel(LinearRegression):
             raise AttributeError, "fit() method must be run before predict()."
         if X.shape[1:] != self.Fcoeff.shape[:-1]:
             raise RuntimeError, "Dimension of X are incorrect."
-        FX = self._binfft(X)
+        if basis == None:
+            FX = self._binfft(X)
+        elif basis == 'Legendre':
+            from pymks.basis import Legendre_fft
+            FX = Legendre_fft(X, deg, domain)
+        else:
+            raise RuntimeError, "basis is not defined."
         Fy = np.sum(FX * self.Fcoeff[None, ...], axis=-1)
         return np.fft.ifftn(Fy, axes=self._axes(X)).real
 
