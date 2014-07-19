@@ -2,6 +2,8 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn import metrics
 mse = metrics.mean_squared_error
+from pymks.basis import Legendre_fft
+from pymks.basis import Hermite_fft
 
 
 class MKSRegressionModel(LinearRegression):
@@ -210,8 +212,11 @@ class MKSRegressionModel(LinearRegression):
                 raise RuntimeError("Must specify domain.")
             if deg is None:
                 deg = self.n_states
-            from pymks.basis import Legendre_fft
             FX = Legendre_fft(X, deg, domain)
+        elif basis == 'Hermite':
+            if deg is None:
+                deg = self.n_states
+            FX = Hermite_fft(X, deg)
         else:
             raise RuntimeError("basis is not defined.")
         Fy = np.fft.fftn(y, axes=self._axes(X))
@@ -281,8 +286,11 @@ class MKSRegressionModel(LinearRegression):
                 raise RuntimeError("Must specify domain.")
             if deg is None:
                 deg = self.n_states
-            from pymks.basis import Legendre_fft
             FX = Legendre_fft(X, self.n_states, domain)
+        elif basis == 'Hermite':
+            if deg is None:
+                deg = self.n_states
+            FX = Hermite_fft(X, deg)
         else:
             raise RuntimeError("basis is not defined.")
         Fy = np.sum(FX * self.Fcoeff[None, ...], axis=-1)

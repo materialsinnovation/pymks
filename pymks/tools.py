@@ -276,7 +276,6 @@ def draw_diff(Simulation, MKS):
     fig.subplots_adjust(right=0.8)
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
     fig.colorbar(im, cax=cbar_ax)
-    plt.title('Simulation - MKS',fontsize=15)
     plt.tight_layout()
 
 
