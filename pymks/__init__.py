@@ -4,9 +4,9 @@ import os
 import nose
 from nose.tools import nottest
 from .mksRegressionModel import MKSRegressionModel
-from .fastmksRegressionModel import FastMKSRegressionModel
 from .tools import draw_microstructure_discretization
 from .tools import bin
+
 
 @nottest
 def test():
@@ -15,6 +15,7 @@ def test():
     """
     path = os.path.split(__file__)[0]
     nose.main(argv=['-w', path, '--with-doctest'])
+
 
 def _getVersion():
     from pkg_resources import get_distribution, DistributionNotFound
@@ -31,7 +32,5 @@ __version__ = _getVersion()
 __all__ = ['__version__',
            'test',
            'MKSRegressionModel',
-           'FastMKSRegressionModel',
-           'FiPyCHModel',
            'draw_microstructure_discretization',
            'bin']
