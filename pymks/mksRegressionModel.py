@@ -1,10 +1,12 @@
 import numpy as np
 from sklearn import metrics
-from pymks.microstructureFunction import MicrostructureFunction
 mse = metrics.mean_squared_error
+from sklearn.linear_model import LinearRegression
+
+from .bases.discrete import DiscreteIndicatorBasis
 
 
-class MKSRegressionModel(MicrostructureFunction):
+class MKSRegressionModel(LinearRegression):
     '''
     The `MKSRegressionModel` fits data using the Materials Knowledge
     System in Fourier Space. Currently, the model assumes that the
@@ -45,7 +47,9 @@ class MKSRegressionModel(MicrostructureFunction):
 
     Use the `MKSRegressionModel` to reconstruct the coefficients
 
-    >>> model = MKSRegressionModel(n_states=n_states)
+    >>> from .bases.continuous import ContinuousIndicatorBasis
+    >>> basis = ContinuousIndicatorBasis(n_states=n_states)
+    >>> model = MKSRegressionModel(basis=basis)
     >>> model.fit(X, y)
 
     Check the result
@@ -59,14 +63,19 @@ class MKSRegressionModel(MicrostructureFunction):
         Fcoef: Frequency space representation of coef
     '''
 
-    def fit(self, X, y, basis=None, deg=None, domain=None):
+    def __init__(self, basis=DiscreteIndicatorBasis()):
+        self.basis = basis
+    
+    def fit(self, X, y):
         '''
         Fits the data by calculating a set of influence coefficients,
         `Fcoeff`.
 
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
         >>> y = X.swapaxes(1, 2)
-        >>> model = MKSRegressionModel(n_states=2)
+        >>> from .bases.continuous import ContinuousIndicatorBasis
+        >>> basis = ContinuousIndicatorBasis(n_states=2)
+        >>> model = MKSRegressionModel(basis=basis)
         >>> model.fit(X, y)
         >>> assert np.allclose(model.Fcoeff, [[[ 0.5,  0.5], [-2, 0]],
         ...                                   [[-0.5,  0  ], [-1, 0]]])
@@ -77,32 +86,17 @@ class MKSRegressionModel(MicrostructureFunction):
                 `S` is the number of samples and `N` is the spatial
                discretization.
             y: The response field, same shape as `X`.
-            basis: sets basis for the microstructure function. Then a
-               basis is not specified the primitive basis is used.
-            deg: Degree of the polynomial basis.
-            domain: If a basis is specified, the domain must be used
-               indicate the range of expected values for the microstructure.
         '''
 
         if not len(y.shape) > 1:
             raise RuntimeError("The shape of y is incorrect.")
         if y.shape != X.shape:
             raise RuntimeError("X and y must be the same shape.")
-        if basis is None:
-            FX = self._binfft(X)
-        elif basis == 'Legendre':
-            if domain is None:
-                raise RuntimeError("Must specify domain.")
-            if deg is None:
-                deg = self.n_states
-            FX = self._Legendre_fft(X, deg, domain)
-        else:
-            raise RuntimeError("basis is not defined.")
+        FX = self._discrtizefft(X)
         Fy = np.fft.fftn(y, axes=self._axes(X))
-        shape = X.shape[1:]
-        self.Fcoeff = np.zeros(shape + (self.n_states,), dtype=np.complex)
+        self.Fcoeff = np.zeros(FX.shape[1:], dtype=np.complex)
         s0 = (slice(None),)
-        for ijk in np.ndindex(shape):
+        for ijk in np.ndindex(X.shape[1:]):
             if np.all(np.array(ijk) == 0):
                 s1 = s0
             else:
@@ -128,13 +122,15 @@ class MKSRegressionModel(MicrostructureFunction):
         axes = np.arange(len(self._axes(self.Fcoeff) - 1))
         return np.fft.fftn(np.fft.ifftshift(coeff, axes=axes), axes=axes)
 
-    def predict(self, X, basis=None, deg=None, domain=None):
+    def predict(self, X):
         '''Calculate a new response from the microstructure function `X` with
         calibrated influence coefficients.
 
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
         >>> y = X.swapaxes(1, 2)
-        >>> model = MKSRegressionModel(n_states=2)
+        >>> from .bases.continuous import ContinuousIndicatorBasis
+        >>> basis = ContinuousIndicatorBasis(n_states=2)
+        >>> model = MKSRegressionModel(basis=basis)
         >>> model.fit(X, y)
         >>> assert np.allclose(y, model.predict(X))
 
@@ -151,12 +147,6 @@ class MKSRegressionModel(MicrostructureFunction):
             X: The microstructre function, an `(S, N, ...)` shaped
                 array where `S` is the number of samples and `N`
                 is the spatial discretization.
-            basis: sets basis for the microstructure function. Then a
-               basis is not specified the primitive basis is used.
-            deg: Degree of the polynomial basis.
-            domain: If a basis is specified, the domain must be used to
-               indicate the range of expected values for the microstructure
-
         Returns:
             The predicted response field the same shape as `X`.
         '''
@@ -165,16 +155,7 @@ class MKSRegressionModel(MicrostructureFunction):
             raise AttributeError("fit() method must be run before predict().")
         if X.shape[1:] != self.Fcoeff.shape[:-1]:
             raise RuntimeError("Dimension of X are incorrect.")
-        if basis is None:
-            FX = self._binfft(X)
-        elif basis == 'Legendre':
-            if domain is None:
-                raise RuntimeError("Must specify domain.")
-            if deg is None:
-                deg = self.n_states
-            FX = self._Legendre_fft(X, self.n_states, domain)
-        else:
-            raise RuntimeError("basis is not defined.")
+        FX = self._discrtizefft(X)
         Fy = np.sum(FX * self.Fcoeff[None, ...], axis=-1)
         return np.fft.ifftn(Fy, axes=self._axes(X)).real
 
@@ -229,3 +210,59 @@ class MKSRegressionModel(MicrostructureFunction):
         Fcoeff_pad = self.coeffToFcoeff(coeff_pad)
 
         self.Fcoeff = Fcoeff_pad
+
+    def _discrtizefft(self, X):
+        X_ = self.basis.discretize(X)
+        return np.fft.fftn(X_, axes=self._axes(X))
+
+    def _axes(self, X):
+        '''Generate argument for fftn.
+
+        >>> X = np.zeros((5, 2, 2, 2))
+        >>> print MKSRegressionModel()._axes(X)
+        [1 2 3]
+
+        Args:
+            X: Array representing the microstructure.
+        Returns:
+            Array uses for axis argument in fftn.
+        '''
+        return np.arange(len(X.shape) - 1) + 1
+
+    def _test(self):
+        '''Tests
+
+        >>> n_states = 10
+        >>> np.random.seed(3)
+        >>> X = np.random.random((2, 5, 3))
+        >>> from .bases.continuous import ContinuousIndicatorBasis
+        >>> basis = ContinuousIndicatorBasis(n_states=n_states)
+        >>> FX_ = MKSRegressionModel(basis=basis)._discrtizefft(X)
+        >>> X_ = np.fft.ifftn(FX_, axes=(1, 2))
+        >>> H = np.linspace(0, 1, n_states)
+        >>> Xtest = np.sum(X_ * H[None,None,None,:], axis=-1)
+        >>> assert np.allclose(X, Xtest)
+
+        Use Legendre polynomials basis for the microstructure function
+        and take the Fourier transform.
+
+        >>> from .bases.legendre import LegendreBasis
+        >>> np.random.seed(3)
+        >>> X = np.random.random((1, 3, 3))
+        >>> basis = LegendreBasis(2, [0, 1])
+        >>> model = MKSRegressionModel(basis=basis)
+        >>> FXtest = model._discrtizefft(X)
+        >>> FX = np.array([[[[-0.79735949+0. ,  4.50000000+0.j],
+        ...          [-1.00887157-1.48005289j,  0.00000000+0.j],
+        ...          [-1.00887157+1.48005289j,  0.00000000+0.j]],
+        ...         [[ 0.62300683-4.97732233j,  0.00000000+0.j],
+        ...          [ 1.09318216+0.10131035j,  0.00000000+0.j],
+        ...          [ 0.37713401+1.87334545j,  0.00000000+0.j]],
+        ...         [[ 0.62300683+4.97732233j,  0.00000000+0.j],
+        ...          [ 0.37713401-1.87334545j,  0.00000000+0.j],
+        ...          [ 1.09318216-0.10131035j,  0.00000000+0.j]]]])
+        >>> assert np.allclose(FX, FXtest)
+        '''
+        pass
+
+
