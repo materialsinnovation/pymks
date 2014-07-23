@@ -1,14 +1,11 @@
 import numpy as np
-from sklearn.linear_model import LinearRegression
 from sklearn import metrics
+from pymks.microstructureFunction import MicrostructureFunction
 mse = metrics.mean_squared_error
-from pymks.basis import Legendre_fft
-from pymks.basis import Hermite_fft
 
 
-class MKSRegressionModel(LinearRegression):
-
-    r"""
+class MKSRegressionModel(MicrostructureFunction):
+    '''
     The `MKSRegressionModel` fits data using the Materials Knowledge
     System in Fourier Space. Currently, the model assumes that the
     microstructure (`X`) varies only between 0 and 1.
@@ -60,123 +57,10 @@ class MKSRegressionModel(LinearRegression):
           specified, n_states indicates the order of the polynomial.
         coef: Array of values that are the influence coefficients
         Fcoef: Frequency space representation of coef
-    """
-
-    def __init__(self, n_states=None):
-        r"""
-        Inits an `MKSRegressionModel`.
-
-        Args:
-            n_states: is the number of discretization states in the local
-            state space.
-        """
-        self.n_states = n_states
-
-    def _axes(self, X):
-        r"""
-
-        Generate argument for fftn.
-
-        >>> X = np.zeros((5, 2, 2, 2))
-        >>> print MKSRegressionModel()._axes(X)
-        [1 2 3]
-
-        Args:
-            X: Array representing the microstructure.
-        Returns:
-            Array uses for axis argument in fftn.
-
-        """
-        return np.arange(len(X.shape) - 1) + 1
-
-    def _bin(self, X):
-        """
-        Generate the microstructure function.
-
-        Args:
-            X: Array representing the Microstructure
-        Returns:
-            Microstructure function
-        """
-        dim = len(X.shape) - 1
-        if dim == 0:
-            raise RuntimeError("the shape of X is incorrect")
-        if issubclass(X.dtype.type, np.integer):
-            Xbin = self._bin_int(X)
-        else:
-            Xbin = self._bin_float(X)
-        return Xbin
-
-    def _bin_float(self, X):
-        '''
-        >>> n_states = 10
-        >>> np.random.seed(4)
-        >>> X = np.random.random((2, 5, 3, 2))
-        >>> #X = np.random.randint(n_states, size=(2, 5, 3, 2))
-        >>> X_ = MKSRegressionModel(n_states)._bin(X)
-        >>> H = np.linspace(0, 1, n_states)
-        >>> Xtest = np.sum(X_ * H[None,None,None,:], axis=-1)
-        >>> assert np.allclose(X, Xtest)
-        '''
-
-        H = np.linspace(0, 1, self.n_states)
-        return np.maximum(1 - (abs(X[..., None] - H)) / (H[1] - H[0]), 0)
-
-    def _bin_int(self, X):
-        '''
-        >>> MKSmodel = MKSRegressionModel(n_states=3)
-        >>> X = np.array([[1, 1, 0],
-        ...               [1, 0 ,2],
-        ...               [0, 1, 0]])
-
-        >>> X_bin = np.array([[[0, 1, 0],
-        ...                    [0, 1, 0],
-        ...                    [1, 0, 0]],
-        ...                   [[0, 1, 0],
-        ...                    [1, 0, 0],
-        ...                    [0, 0, 1]],
-        ...                   [[1, 0, 0],
-        ...                    [0, 1, 0],
-        ...                    [1, 0, 0]]])
-        >>> assert(np.allclose(X_bin, MKSmodel._bin_int(X)))
-        '''
-
-        if np.min(X) != 0:
-            raise RuntimeError("Phases must be zero indexed.")
-        n_states = np.max(X) + 1
-        if self.n_states is None:
-            self.n_states = n_states
-        if n_states != self.n_states:
-            raise RuntimeError("Nphase does not correspond with phases in X.")
-        Xbin = np.zeros(X.shape + (n_states,), dtype=float)
-        mask = tuple(np.indices(X.shape)) + (X,)
-        Xbin[mask] = 1.
-        return Xbin
-
-    def _binfft(self, X):
-        r"""
-        Bin the microstructure and take the Fourier transform.
-
-        >>> n_states = 10
-        >>> np.random.seed(3)
-        >>> X = np.random.random((2, 5, 3))
-        >>> FX_ = MKSRegressionModel(n_states)._binfft(X)
-        >>> X_ = np.fft.ifftn(FX_, axes=(1, 2))
-        >>> H = np.linspace(0, 1, n_states)
-        >>> Xtest = np.sum(X_ * H[None,None,None,:], axis=-1)
-        >>> assert np.allclose(X, Xtest)
-
-        Args:
-            X: Array representing the microstructure
-        Returns:
-            Microstructure function in frequency space
-
-        """
-        Xbin = self._bin(X)
-        return np.fft.fftn(Xbin, axes=self._axes(X))
+    '''
 
     def fit(self, X, y, basis=None, deg=None, domain=None):
-        r"""
+        '''
         Fits the data by calculating a set of influence coefficients,
         `Fcoeff`.
 
@@ -198,8 +82,7 @@ class MKSRegressionModel(LinearRegression):
             deg: Degree of the polynomial basis.
             domain: If a basis is specified, the domain must be used
                indicate the range of expected values for the microstructure.
-
-        """
+        '''
 
         if not len(y.shape) > 1:
             raise RuntimeError("The shape of y is incorrect.")
@@ -212,11 +95,7 @@ class MKSRegressionModel(LinearRegression):
                 raise RuntimeError("Must specify domain.")
             if deg is None:
                 deg = self.n_states
-            FX = Legendre_fft(X, deg, domain)
-        elif basis == 'Hermite':
-            if deg is None:
-                deg = self.n_states
-            FX = Hermite_fft(X, deg)
+            FX = self._Legendre_fft(X, deg, domain)
         else:
             raise RuntimeError("basis is not defined.")
         Fy = np.fft.fftn(y, axes=self._axes(X))
@@ -233,17 +112,24 @@ class MKSRegressionModel(LinearRegression):
 
     @property
     def coeff(self):
+        '''Returns the coefficients in real space with origin shifted to the
+        center.
+        '''
+
         axes = np.arange(len(self._axes(self.Fcoeff) - 1))
         return np.real_if_close(np.fft.fftshift(np.fft.ifftn(self.Fcoeff,
                                 axes=axes), axes=axes))
 
     def coeffToFcoeff(self, coeff):
+        '''Converts real space coefficients into coefficients in frequency
+        space.
+        '''
+
         axes = np.arange(len(self._axes(self.Fcoeff) - 1))
         return np.fft.fftn(np.fft.ifftshift(coeff, axes=axes), axes=axes)
 
     def predict(self, X, basis=None, deg=None, domain=None):
-        r"""
-        Calculate a new response from the microstructure function `X` with
+        '''Calculate a new response from the microstructure function `X` with
         calibrated influence coefficients.
 
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
@@ -273,8 +159,8 @@ class MKSRegressionModel(LinearRegression):
 
         Returns:
             The predicted response field the same shape as `X`.
+        '''
 
-        """
         if not hasattr(self, 'Fcoeff'):
             raise AttributeError("fit() method must be run before predict().")
         if X.shape[1:] != self.Fcoeff.shape[:-1]:
@@ -286,19 +172,14 @@ class MKSRegressionModel(LinearRegression):
                 raise RuntimeError("Must specify domain.")
             if deg is None:
                 deg = self.n_states
-            FX = Legendre_fft(X, self.n_states, domain)
-        elif basis == 'Hermite':
-            if deg is None:
-                deg = self.n_states
-            FX = Hermite_fft(X, deg)
+            FX = self._Legendre_fft(X, self.n_states, domain)
         else:
             raise RuntimeError("basis is not defined.")
         Fy = np.sum(FX * self.Fcoeff[None, ...], axis=-1)
         return np.fft.ifftn(Fy, axes=self._axes(X)).real
 
     def resize_coeff(self, shape):
-        r"""
-        Scale the size of the coefficients and pad with zeros.
+        '''Scale the size of the coefficients and pad with zeros.
 
         Let's first instantitate a model and fabricate some
         coefficients.
@@ -329,8 +210,8 @@ class MKSRegressionModel(LinearRegression):
             shape: The new shape of the influence coefficients.
         Returns:
             The resized influence coefficients to size 'shape'.
+        '''
 
-        """
         if len(shape) != (len(self.Fcoeff.shape) - 1):
             raise RuntimeError("length of resize shape is incorrect.")
         if not np.all(shape >= self.Fcoeff.shape[:-1]):
