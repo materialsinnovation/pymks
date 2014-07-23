@@ -1,6 +1,6 @@
 import numpy as np
-from pymks.datasets.elasticFESimulation import ElasticFESimulation
-from pymks.datasets.cahnHilliardSimulation import CahnHilliardSimulation
+from .elasticFESimulation import ElasticFESimulation
+from .cahnHilliardSimulation import CahnHilliardSimulation
 
 __all__ = ['make_delta_microstructures', 'make_elasticFEstrain_delta',
            'make_elasticFEstrain_random', 'make_cahnHilliard']
@@ -21,8 +21,7 @@ def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio,
     >>> poissons_ratio = (0.3, 0.3)
     >>> X, y = make_elasticFEstrain_delta(elastic_modulus=elastic_modulus,
     ...                                   poissons_ratio=poissons_ratio,
-    ...                                   size=(5, 5)) #doctest: +ELLIPSIS
-    sfepy: ...
+    ...                                   size=(5, 5))
 
     `X` is the delta microstructures, and `y` is the
     strain response fields.
@@ -107,8 +106,7 @@ def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
     >>> X, y = make_elasticFEstrain_random(n_samples=1,
     ...                                    elastic_modulus=elastic_modulus,
     ...                                    poissons_ratio=poissons_ratio,
-    ...                                    size=(5, 5)) #doctest: +ELLIPSIS
-    sfepy: ...
+    ...                                    size=(5, 5))
 
     `X` is the delta microstructures, and `y` is the
     strain response fields.
