@@ -3,17 +3,14 @@ from sklearn import metrics
 mse = metrics.mean_squared_error
 from sklearn.linear_model import LinearRegression
 
-from .bases.discrete import DiscreteIndicatorBasis
+from .bases import DiscreteIndicatorBasis
 
 
 class MKSRegressionModel(LinearRegression):
     '''
     The `MKSRegressionModel` fits data using the Materials Knowledge
-    System in Fourier Space. Currently, the model assumes that the
-    microstructure (`X`) varies only between 0 and 1.
-
-    The following demonstrates the viability of the
-    `MKSRegressionModel` with a simple 1D filter.
+    System in Fourier Space. The following demonstrates the viability
+    of the `MKSRegressionModel` with a simple 1D filter.
 
     >>> n_states = 2
     >>> n_spaces = 81
@@ -47,7 +44,7 @@ class MKSRegressionModel(LinearRegression):
 
     Use the `MKSRegressionModel` to reconstruct the coefficients
 
-    >>> from .bases.continuous import ContinuousIndicatorBasis
+    >>> from .bases import ContinuousIndicatorBasis
     >>> basis = ContinuousIndicatorBasis(n_states=n_states)
     >>> model = MKSRegressionModel(basis=basis)
     >>> model.fit(X, y)
@@ -63,7 +60,16 @@ class MKSRegressionModel(LinearRegression):
         Fcoef: Frequency space representation of coef
     '''
 
-    def __init__(self, basis=DiscreteIndicatorBasis()):
+    def __init__(self, basis=None):
+        """
+        Instantiate an MKSRegressionModel.
+
+        Args:
+          basis: an instance of a bases class.
+
+        """
+        if basis is None:
+            basis = DiscreteIndicatorBasis()
         self.basis = basis
     
     def fit(self, X, y):
@@ -73,7 +79,7 @@ class MKSRegressionModel(LinearRegression):
 
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
         >>> y = X.swapaxes(1, 2)
-        >>> from .bases.continuous import ContinuousIndicatorBasis
+        >>> from .bases import ContinuousIndicatorBasis
         >>> basis = ContinuousIndicatorBasis(n_states=2)
         >>> model = MKSRegressionModel(basis=basis)
         >>> model.fit(X, y)
@@ -82,10 +88,10 @@ class MKSRegressionModel(LinearRegression):
 
 
         Args:
-            X: the microstructure function, an `(S, N, ...)` shaped array where
-                `S` is the number of samples and `N` is the spatial
-               discretization.
-            y: The response field, same shape as `X`.
+          X: the microstructure function, an `(S, N, ...)` shaped
+             array where `S` is the number of samples and `N` is the
+             spatial discretization.
+          y: The response field, same shape as `X`.
         '''
 
         if not len(y.shape) > 1:
@@ -123,12 +129,12 @@ class MKSRegressionModel(LinearRegression):
         return np.fft.fftn(np.fft.ifftshift(coeff, axes=axes), axes=axes)
 
     def predict(self, X):
-        '''Calculate a new response from the microstructure function `X` with
+        r'''Calculate a new response from the microstructure function `X` with
         calibrated influence coefficients.
 
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
         >>> y = X.swapaxes(1, 2)
-        >>> from .bases.continuous import ContinuousIndicatorBasis
+        >>> from .bases import ContinuousIndicatorBasis
         >>> basis = ContinuousIndicatorBasis(n_states=2)
         >>> model = MKSRegressionModel(basis=basis)
         >>> model.fit(X, y)
@@ -235,7 +241,7 @@ class MKSRegressionModel(LinearRegression):
         >>> n_states = 10
         >>> np.random.seed(3)
         >>> X = np.random.random((2, 5, 3))
-        >>> from .bases.continuous import ContinuousIndicatorBasis
+        >>> from .bases import ContinuousIndicatorBasis
         >>> basis = ContinuousIndicatorBasis(n_states=n_states)
         >>> FX_ = MKSRegressionModel(basis=basis)._discrtizefft(X)
         >>> X_ = np.fft.ifftn(FX_, axes=(1, 2))
@@ -246,7 +252,7 @@ class MKSRegressionModel(LinearRegression):
         Use Legendre polynomials basis for the microstructure function
         and take the Fourier transform.
 
-        >>> from .bases.legendre import LegendreBasis
+        >>> from .bases import LegendreBasis
         >>> np.random.seed(3)
         >>> X = np.random.random((1, 3, 3))
         >>> basis = LegendreBasis(2, [0, 1])
