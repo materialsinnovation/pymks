@@ -320,8 +320,8 @@ def draw_diff(*responses, **titles):
     plt.tight_layout()
 
 
-def optimize_n_states(n_states_values, X, y, test_size=0.2, random_state=3,
-                      plot=False, basis=None, domain=None):
+def optimize_n_states(n_states_values, X, y, basis, test_size=0.2,
+                      random_state=3, plot=False):
     if n_states_values[0] <= 1:
         raise RuntimeError("Minimum number of local states is 2.")
     X_train, X_test, y_train, y_test = train_test_split(X,
@@ -332,10 +332,11 @@ def optimize_n_states(n_states_values, X, y, test_size=0.2, random_state=3,
     errors = []
     n_states = n_states_values
     for n_state in n_states:
-        MKSmodel = MKSRegressionModel(n_states=n_state)
-        MKSmodel.fit(X_train, y_train, basis=basis, deg=n_state, domain=domain)
-        errors.append(mse(MKSmodel.predict(X_test, basis=basis, deg=n_state,
-                                           domain=domain), y_test))
+        #basis.set_n_states(n_state)
+        basis.n_states = n_state
+        MKSmodel = MKSRegressionModel(basis=basis)
+        MKSmodel.fit(X_train, y_train)
+        errors.append(mse(MKSmodel.predict(X_test), y_test))
     argmin = np.argmin(errors)
     if plot is True:
         print "Optimal n_states: {0}, mse: {1:1.3e}".format(n_states[argmin],

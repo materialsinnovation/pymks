@@ -71,7 +71,7 @@ class MKSRegressionModel(LinearRegression):
         if basis is None:
             basis = DiscreteIndicatorBasis()
         self.basis = basis
-    
+
     def fit(self, X, y):
         '''
         Fits the data by calculating a set of influence coefficients,
@@ -270,5 +270,3 @@ class MKSRegressionModel(LinearRegression):
         >>> assert np.allclose(FX, FXtest)
         '''
         pass
-
-

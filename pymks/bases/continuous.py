@@ -1,7 +1,7 @@
 import numpy as np
 from .abstract import _AbstractMicrostructureBasis
 
-    
+
 class ContinuousIndicatorBasis(_AbstractMicrostructureBasis):
     """
     Discretize a continuous field into `n_states` local states. The
@@ -22,7 +22,7 @@ class ContinuousIndicatorBasis(_AbstractMicrostructureBasis):
     def __init__(self, n_states=10):
         """
         Instantiate a `ContinuousIndicatorBasis`
-        
+
         Args:
           n_states: The number of local states
 
@@ -32,7 +32,7 @@ class ContinuousIndicatorBasis(_AbstractMicrostructureBasis):
     def discretize(self, X):
         """
         Discretize `X`.
-        
+
         Args:
           X: continuous field between 0 and 1
         Returns:
@@ -41,4 +41,3 @@ class ContinuousIndicatorBasis(_AbstractMicrostructureBasis):
         self.check(X, [0, 1])
         H = np.linspace(0, 1, self.n_states)
         return np.maximum(1 - (abs(X[..., None] - H)) / (H[1] - H[0]), 0)
-        
