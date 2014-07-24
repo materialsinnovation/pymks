@@ -1,9 +1,5 @@
 import numpy as np
-from sklearn import metrics
-mse = metrics.mean_squared_error
 from sklearn.linear_model import LinearRegression
-
-from .bases import DiscreteIndicatorBasis
 
 
 class MKSRegressionModel(LinearRegression):
@@ -45,7 +41,7 @@ class MKSRegressionModel(LinearRegression):
     Use the `MKSRegressionModel` to reconstruct the coefficients
 
     >>> from .bases import ContinuousIndicatorBasis
-    >>> basis = ContinuousIndicatorBasis(n_states=n_states)
+    >>> basis = ContinuousIndicatorBasis(n_states, [0, 1])
     >>> model = MKSRegressionModel(basis=basis)
     >>> model.fit(X, y)
 
@@ -60,7 +56,7 @@ class MKSRegressionModel(LinearRegression):
         Fcoef: Frequency space representation of coef
     '''
 
-    def __init__(self, basis=None):
+    def __init__(self, basis):
         """
         Instantiate an MKSRegressionModel.
 
@@ -68,8 +64,6 @@ class MKSRegressionModel(LinearRegression):
           basis: an instance of a bases class.
 
         """
-        if basis is None:
-            basis = DiscreteIndicatorBasis()
         self.basis = basis
 
     def fit(self, X, y):
@@ -80,7 +74,7 @@ class MKSRegressionModel(LinearRegression):
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
         >>> y = X.swapaxes(1, 2)
         >>> from .bases import ContinuousIndicatorBasis
-        >>> basis = ContinuousIndicatorBasis(n_states=2)
+        >>> basis = ContinuousIndicatorBasis(2, [0, 1])
         >>> model = MKSRegressionModel(basis=basis)
         >>> model.fit(X, y)
         >>> assert np.allclose(model.Fcoeff, [[[ 0.5,  0.5], [-2, 0]],
@@ -135,7 +129,7 @@ class MKSRegressionModel(LinearRegression):
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
         >>> y = X.swapaxes(1, 2)
         >>> from .bases import ContinuousIndicatorBasis
-        >>> basis = ContinuousIndicatorBasis(n_states=2)
+        >>> basis = ContinuousIndicatorBasis(2, [0, 1])
         >>> model = MKSRegressionModel(basis=basis)
         >>> model.fit(X, y)
         >>> assert np.allclose(y, model.predict(X))
@@ -143,7 +137,7 @@ class MKSRegressionModel(LinearRegression):
         The fit method must be called to calibrate the coefficients before
         the predict method can be used.
 
-        >>> MKSmodel = MKSRegressionModel()
+        >>> MKSmodel = MKSRegressionModel(basis)
         >>> MKSmodel.predict(X)
         Traceback (most recent call last):
         ...
@@ -171,7 +165,7 @@ class MKSRegressionModel(LinearRegression):
         Let's first instantitate a model and fabricate some
         coefficients.
 
-        >>> model = MKSRegressionModel()
+        >>> model = MKSRegressionModel(None)
         >>> coeff = np.arange(20).reshape((5, 4, 1))
         >>> coeff = np.concatenate((coeff , np.ones_like(coeff)), axis=2)
         >>> coeff = np.fft.ifftshift(coeff, axes=(0, 1))
@@ -225,7 +219,7 @@ class MKSRegressionModel(LinearRegression):
         '''Generate argument for fftn.
 
         >>> X = np.zeros((5, 2, 2, 2))
-        >>> print MKSRegressionModel()._axes(X)
+        >>> print MKSRegressionModel(None)._axes(X)
         [1 2 3]
 
         Args:
@@ -242,7 +236,7 @@ class MKSRegressionModel(LinearRegression):
         >>> np.random.seed(3)
         >>> X = np.random.random((2, 5, 3))
         >>> from .bases import ContinuousIndicatorBasis
-        >>> basis = ContinuousIndicatorBasis(n_states=n_states)
+        >>> basis = ContinuousIndicatorBasis(n_states, [0, 1])
         >>> FX_ = MKSRegressionModel(basis=basis)._discrtizefft(X)
         >>> X_ = np.fft.ifftn(FX_, axes=(1, 2))
         >>> H = np.linspace(0, 1, n_states)

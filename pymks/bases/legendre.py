@@ -19,18 +19,6 @@ class LegendreBasis(_AbstractMicrostructureBasis):
 
     """
 
-    def __init__(self, deg, domain):
-        """
-        Instantiate a Legendre polynomial basis.
-
-        Args:
-            deg: Degree of the polynomial basis.
-            domain: If a basis is specified, the domain must be used
-               indicate the range of expected values for the microstructure.
-        """
-        self.n_states = deg
-        self.domain = domain
-
     def discretize(self, X):
         """
         Discretize `X`.
@@ -40,7 +28,7 @@ class LegendreBasis(_AbstractMicrostructureBasis):
         Returns:
           field of local states
         """
-        self.check(X, self.domain)
+        self.check(X)
         leg = np.polynomial.legendre
         X_scaled = 2. * X - self.domain[0] - self.domain[1] / (self.domain[1] -
                                                                self.domain[0])

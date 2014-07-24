@@ -11,7 +11,7 @@ class DiscreteIndicatorBasis(_AbstractMicrostructureBasis):
     `(n_samples, Nx, Ny)` where n_samples is 1 in this case (`Nx=3`
     and `Ny=3`).
     
-    >>> basis = DiscreteIndicatorBasis()
+    >>> basis = DiscreteIndicatorBasis(n_states=3)
     >>> X = np.array([[[1, 1, 0],
     ...                [1, 0 ,2],
     ...                [0, 1, 0]]])
@@ -35,8 +35,22 @@ class DiscreteIndicatorBasis(_AbstractMicrostructureBasis):
     ...                     [1, 0, 0]]]])
     >>> assert(np.allclose(X_bin, basis.discretize(X)))
 
+    Check that the basis works when all the states are not specified
+    in X.
+    
+    >>> basis = DiscreteIndicatorBasis(n_states=3)
+    >>> X = np.array([1, 1, 0])
+    >>> X_bin = np.array([[0, 1, 0],
+    ...                   [0, 1, 0],
+    ...                   [1, 0, 0]])
+    >>> assert(np.allclose(X_bin, basis.discretize(X)))
+
+
     
     """
+    def __init__(self, n_states):
+        super(DiscreteIndicatorBasis, self).__init__(n_states, [0, n_states - 1])
+    
     def discretize(self, X):
         '''
         Discretize `X`.
@@ -48,10 +62,9 @@ class DiscreteIndicatorBasis(_AbstractMicrostructureBasis):
         '''
         if not issubclass(X.dtype.type, np.integer):
             raise RuntimeError("X must be an integer array")
-        self.check(X, [0, np.max(X)])
+        self.check(X)
 
-        n_states = np.max(X) + 1
-        Xbin = np.zeros(X.shape + (n_states,), dtype=float)
+        Xbin = np.zeros(X.shape + (self.n_states,), dtype=float)
         mask = tuple(np.indices(X.shape)) + (X,)
         Xbin[mask] = 1.
         return Xbin
