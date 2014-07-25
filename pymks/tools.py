@@ -2,10 +2,6 @@ import matplotlib.colors as colors
 import matplotlib.cm as cmx
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.cross_validation import train_test_split
-from sklearn import metrics
-mse = metrics.mean_squared_error
-from pymks import MKSRegressionModel
 
 
 def _set_colors():
@@ -254,7 +250,7 @@ def draw_strains_compare(strain1, strain2):
     plt.close('all')
     cmap = _get_response_cmap()
     vmin = min((strain1.flatten().min(), strain2.flatten().min()))
-    vmax = min((strain1.flatten().max(), strain2.flatten().max()))
+    vmax = max((strain1.flatten().max(), strain2.flatten().max()))
     fig, axs = plt.subplots(1, 2, figsize=(8, 4))
     titles = ['Finite Element', 'MKS']
     strains = (strain1, strain2)
@@ -276,7 +272,7 @@ def draw_concentrations_compare(con1, con2):
     plt.close('all')
     cmap = _get_response_cmap()
     vmin = min((con1.flatten().min(), con2.flatten().min()))
-    vmax = min((con1.flatten().max(), con2.flatten().max()))
+    vmax = max((con1.flatten().max(), con2.flatten().max()))
     fig, axs = plt.subplots(1, 2, figsize=(8, 4))
     titles = ['Simulation', 'MKS']
     cons = (con1, con2)
@@ -319,37 +315,16 @@ def draw_diff(*responses, **titles):
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
 
+def draw_gridscores(grid_scores, label=None, color='#f46d43'):
+    tmp = [[params['n_states'], -mean_score, scores.std()] \
+            for params, mean_score, scores in grid_scores]
+    
+    n_states, errors, stddev = zip(*tmp)
+    plt.errorbar(n_states, errors, yerr=stddev, linewidth=2, color=color, label=label)
 
-def optimize_n_states(n_states_values, X, y, basis, test_size=0.2,
-                      random_state=3, plot=False):
-    if n_states_values[0] <= 1:
-        raise RuntimeError("Minimum number of local states is 2.")
-    X_train, X_test, y_train, y_test = train_test_split(X,
-                                                        y,
-                                                        test_size=test_size,
-                                                        random_state=
-                                                        random_state)
-    errors = []
-    n_states = n_states_values
-    for n_state in n_states:
-        #basis.set_n_states(n_state)
-        basis.n_states = n_state
-        MKSmodel = MKSRegressionModel(basis=basis)
-        MKSmodel.fit(X_train, y_train)
-        errors.append(mse(MKSmodel.predict(X_test), y_test))
-    argmin = np.argmin(errors)
-    if plot is True:
-        print "Optimal n_states: {0}, mse: {1:1.3e}".format(n_states[argmin],
-                                                            errors[argmin])
-        _optimize_n_states_plot(errors, n_states)
-    return n_states[argmin]
-
-
-def _optimize_n_states_plot(errors, n_states):
-    plt.plot(n_states, errors, color='#1a9850', linewidth=5)
+    plt.legend()
     plt.ylabel('MSE', fontsize=20)
     plt.xlabel('Number of Local States', fontsize=15)
-
 
 def bin(arr, n_bins):
     r"""
