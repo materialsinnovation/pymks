@@ -72,7 +72,7 @@ class CahnHilliardSimulation(object):
 
         L = self.dx * N
         k = np.arange(N)
-        k[N / 2:] = (k - N / 2)[:(N + 1) / 2]
+        k[N / 2:] = (k - N / 2)[:N / 2]
         k = k * 2 * np.pi / L
 
         i_ = np.indices(X.shape[1:])

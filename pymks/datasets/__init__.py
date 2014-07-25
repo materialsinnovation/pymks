@@ -141,7 +141,7 @@ def make_cahnHilliard(n_samples, size, dx=0.25, width=1., dt=0.001):
     `MKSRegressionModel`.  The following example is or a two phase
     microstructure with dimensions of `(5, 5)`.
 
-    >>> X, y = make_cahnHilliard(n_samples=1, size=(5, 5))
+    >>> X, y = make_cahnHilliard(n_samples=1, size=(6, 6))
 
     `X` is the initial concentration fields, and `y` is the
     strain response fields (the concentration after one time step).
