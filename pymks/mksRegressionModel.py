@@ -56,7 +56,7 @@ class MKSRegressionModel(LinearRegression):
         Fcoef: Frequency space representation of coef
     '''
 
-    def __init__(self, basis):
+    def __init__(self, basis, n_states=None):
         """
         Instantiate an MKSRegressionModel.
 
@@ -65,7 +65,12 @@ class MKSRegressionModel(LinearRegression):
 
         """
         self.basis = basis
-
+        if n_states is None:
+            self.n_states = basis.n_states
+        else:
+            self.n_states = n_states
+        self.domain = basis.domain
+                
     def fit(self, X, y):
         '''
         Fits the data by calculating a set of influence coefficients,
@@ -87,7 +92,8 @@ class MKSRegressionModel(LinearRegression):
              spatial discretization.
           y: The response field, same shape as `X`.
         '''
-
+        self.basis = self.basis.__class__(self.n_states, self.domain)
+        
         if not len(y.shape) > 1:
             raise RuntimeError("The shape of y is incorrect.")
         if y.shape != X.shape:
@@ -165,7 +171,9 @@ class MKSRegressionModel(LinearRegression):
         Let's first instantitate a model and fabricate some
         coefficients.
 
-        >>> model = MKSRegressionModel(None)
+        >>> from pymks.bases import DiscreteIndicatorBasis
+        >>> basis = DiscreteIndicatorBasis(n_states=2)
+        >>> model = MKSRegressionModel(basis)
         >>> coeff = np.arange(20).reshape((5, 4, 1))
         >>> coeff = np.concatenate((coeff , np.ones_like(coeff)), axis=2)
         >>> coeff = np.fft.ifftshift(coeff, axes=(0, 1))
@@ -219,7 +227,9 @@ class MKSRegressionModel(LinearRegression):
         '''Generate argument for fftn.
 
         >>> X = np.zeros((5, 2, 2, 2))
-        >>> print MKSRegressionModel(None)._axes(X)
+        >>> from pymks.bases import DiscreteIndicatorBasis
+        >>> basis = DiscreteIndicatorBasis(n_states=2)
+        >>> print MKSRegressionModel(basis)._axes(X)
         [1 2 3]
 
         Args:
@@ -264,3 +274,4 @@ class MKSRegressionModel(LinearRegression):
         >>> assert np.allclose(FX, FXtest)
         '''
         pass
+
