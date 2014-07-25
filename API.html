@@ -111,15 +111,13 @@
 <h2>MKS Models<a class="headerlink" href="#mks-models" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="pymks.mksRegressionModel.MKSRegressionModel">
-<em class="property">class </em><tt class="descclassname">pymks.mksRegressionModel.</tt><tt class="descname">MKSRegressionModel</tt><big>(</big><em>Nstate=None</em><big>)</big><a class="headerlink" href="#pymks.mksRegressionModel.MKSRegressionModel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">pymks.mksRegressionModel.</tt><tt class="descname">MKSRegressionModel</tt><big>(</big><em>basis</em>, <em>n_states=None</em><big>)</big><a class="headerlink" href="#pymks.mksRegressionModel.MKSRegressionModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>The <cite>MKSRegressionModel</cite> fits data using the Materials Knowledge
-System in Fourier Space. Currently, the model assumes that the
-microstructure (<cite>X</cite>) varies only between 0 and 1.</p>
-<p>The following demonstrates the viability of the
-<cite>MKSRegressionModel</cite> with a simple 1D filter.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Nstate</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Nspace</span> <span class="o">=</span> <span class="mi">81</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Nsample</span> <span class="o">=</span> <span class="mi">400</span>
+System in Fourier Space. The following demonstrates the viability
+of the <cite>MKSRegressionModel</cite> with a simple 1D filter.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n_states</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n_spaces</span> <span class="o">=</span> <span class="mi">81</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n_samples</span> <span class="o">=</span> <span class="mi">400</span>
 </pre></div>
 </div>
 <p>Define a filter function.</p>
@@ -130,17 +128,18 @@ microstructure (<cite>X</cite>) varies only between 0 and 1.</p>
 </pre></div>
 </div>
 <p>Use the filter function to construct some coefficients.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Nstate</span><span class="p">)[</span><span class="bp">None</span><span class="p">,:]</span> <span class="o">*</span> <span class="nb">filter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">Nspace</span><span class="p">))[:,</span><span class="bp">None</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n_states</span><span class="p">)[</span><span class="bp">None</span><span class="p">,:]</span> <span class="o">*</span> <span class="nb">filter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span>
+<span class="gp">... </span>                                                     <span class="n">n_spaces</span><span class="p">))[:,</span><span class="bp">None</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Fcoeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">coeff</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Make some test samples.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">Nsample</span><span class="p">,</span> <span class="n">Nspace</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_spaces</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Construct a response with the <cite>Fcoeff</cite>.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Nstate</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_states</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">X_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">X</span><span class="p">[:,:,</span><span class="bp">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">H</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">H</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">H</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">FX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">X_</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Fy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Fcoeff</span><span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">FX</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
@@ -148,7 +147,9 @@ microstructure (<cite>X</cite>) varies only between 0 and 1.</p>
 </pre></div>
 </div>
 <p>Use the <cite>MKSRegressionModel</cite> to reconstruct the coefficients</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nstate</span><span class="o">=</span><span class="n">Nstate</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">.bases</span> <span class="kn">import</span> <span class="n">ContinuousIndicatorBasis</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">basis</span> <span class="o">=</span> <span class="n">ContinuousIndicatorBasis</span><span class="p">(</span><span class="n">n_states</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">basis</span><span class="o">=</span><span class="n">basis</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -157,9 +158,10 @@ microstructure (<cite>X</cite>) varies only between 0 and 1.</p>
 </pre></div>
 </div>
 <dl class="attribute">
-<dt id="MKSRegressionModel.Nstate">
-<tt class="descname">Nstate</tt><a class="headerlink" href="#MKSRegressionModel.Nstate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Interger value for number of local states</p>
+<dt id="MKSRegressionModel.n_states">
+<tt class="descname">n_states</tt><a class="headerlink" href="#MKSRegressionModel.n_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interger value for number of local states, if a basis is
+specified, n_states indicates the order of the polynomial.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -174,6 +176,29 @@ microstructure (<cite>X</cite>) varies only between 0 and 1.</p>
 <dd><p>Frequency space representation of coef</p>
 </dd></dl>
 
+<p>Instantiate an MKSRegressionModel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>basis</strong> &#8211; an instance of a bases class.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pymks.mksRegressionModel.MKSRegressionModel.coeff">
+<tt class="descname">coeff</tt><a class="headerlink" href="#pymks.mksRegressionModel.MKSRegressionModel.coeff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the coefficients in real space with origin shifted to the
+center.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pymks.mksRegressionModel.MKSRegressionModel.coeffToFcoeff">
+<tt class="descname">coeffToFcoeff</tt><big>(</big><em>coeff</em><big>)</big><a class="headerlink" href="#pymks.mksRegressionModel.MKSRegressionModel.coeffToFcoeff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts real space coefficients into coefficients in frequency
+space.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="pymks.mksRegressionModel.MKSRegressionModel.fit">
 <tt class="descname">fit</tt><big>(</big><em>X</em>, <em>y</em><big>)</big><a class="headerlink" href="#pymks.mksRegressionModel.MKSRegressionModel.fit" title="Permalink to this definition">¶</a></dt>
@@ -181,7 +206,9 @@ microstructure (<cite>X</cite>) varies only between 0 and 1.</p>
 <cite>Fcoeff</cite>.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nstate</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">.bases</span> <span class="kn">import</span> <span class="n">ContinuousIndicatorBasis</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">basis</span> <span class="o">=</span> <span class="n">ContinuousIndicatorBasis</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">basis</span><span class="o">=</span><span class="n">basis</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Fcoeff</span><span class="p">,</span> <span class="p">[[[</span> <span class="mf">0.5</span><span class="p">,</span>  <span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span>
 <span class="gp">... </span>                                  <span class="p">[[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span>  <span class="mi">0</span>  <span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]])</span>
@@ -192,12 +219,9 @@ microstructure (<cite>X</cite>) varies only between 0 and 1.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>X</strong> &#8211; <dl class="docutils">
-<dt>the microstructre function, an <cite>(S, N, ...)</cite> shaped array where</dt>
-<dd><cite>S</cite> is the number of samples and <cite>N</cite> is the spatial</dd>
-</dl>
-<p>discretization.</p>
-</li>
+<li><strong>X</strong> &#8211; the microstructure function, an <cite>(S, N, ...)</cite> shaped
+array where <cite>S</cite> is the number of samples and <cite>N</cite> is the
+spatial discretization.</li>
 <li><strong>y</strong> &#8211; The response field, same shape as <cite>X</cite>.</li>
 </ul>
 </td>
@@ -209,20 +233,24 @@ microstructure (<cite>X</cite>) varies only between 0 and 1.</p>
 <dl class="method">
 <dt id="pymks.mksRegressionModel.MKSRegressionModel.predict">
 <tt class="descname">predict</tt><big>(</big><em>X</em><big>)</big><a class="headerlink" href="#pymks.mksRegressionModel.MKSRegressionModel.predict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate a new response from the microstructure function <cite>X</cite> with calibrated
-influence coefficients.</p>
+<dd><p>Calculate a new response from the microstructure function <cite>X</cite> with
+calibrated influence coefficients.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nstate</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">.bases</span> <span class="kn">import</span> <span class="n">ContinuousIndicatorBasis</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">basis</span> <span class="o">=</span> <span class="n">ContinuousIndicatorBasis</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">basis</span><span class="o">=</span><span class="n">basis</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>The fit method must be called to calibrate the coefficients before
 the predict method can be used.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">MKSmodel</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">MKSmodel</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">basis</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">MKSmodel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<span class="go">AttributeError, &quot;fit() method must be run before predict().&quot;</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">AttributeError</span>: <span class="n">fit() method must be run before predict().</span>
 </pre></div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
@@ -245,7 +273,9 @@ is the spatial discretization.</td>
 <dd><p>Scale the size of the coefficients and pad with zeros.</p>
 <p>Let&#8217;s first instantitate a model and fabricate some
 coefficients.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pymks.bases</span> <span class="kn">import</span> <span class="n">DiscreteIndicatorBasis</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">basis</span> <span class="o">=</span> <span class="n">DiscreteIndicatorBasis</span><span class="p">(</span><span class="n">n_states</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">basis</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">coeff</span> <span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">coeff</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftshift</span><span class="p">(</span><span class="n">coeff</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
@@ -287,7 +317,7 @@ coefficients should have.</p>
 <span id="data-generation"></span><h2>Data Generation<a class="headerlink" href="#module-pymks.datasets" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="pymks.datasets.make_delta_microstructures">
-<tt class="descclassname">pymks.datasets.</tt><tt class="descname">make_delta_microstructures</tt><big>(</big><em>Nphases</em>, <em>size</em><big>)</big><a class="headerlink" href="#pymks.datasets.make_delta_microstructures" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">pymks.datasets.</tt><tt class="descname">make_delta_microstructures</tt><big>(</big><em>n_phases</em>, <em>size</em><big>)</big><a class="headerlink" href="#pymks.datasets.make_delta_microstructures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructs delta microstructures</p>
 <p>Constructs delta microstructures for an arbitrary number of phases
 given the size of the domain.</p>
@@ -319,7 +349,7 @@ given the size of the domain.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>Nphases</strong> &#8211; number of phases</li>
+<li><strong>n_phases</strong> &#8211; number of phases</li>
 <li><strong>size</strong> &#8211; dimension of microstructure</li>
 </ul>
 </td>
@@ -346,8 +376,7 @@ microstructure with dimensions of <cite>(5, 5)</cite>.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">poissons_ratio</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_elasticFEstrain_delta</span><span class="p">(</span><span class="n">elastic_modulus</span><span class="o">=</span><span class="n">elastic_modulus</span><span class="p">,</span>
 <span class="gp">... </span>                                  <span class="n">poissons_ratio</span><span class="o">=</span><span class="n">poissons_ratio</span><span class="p">,</span>
-<span class="gp">... </span>                                  <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span> 
-<span class="go">sfepy: ...</span>
+<span class="gp">... </span>                                  <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 </pre></div>
 </div>
 <p><cite>X</cite> is the delta microstructures, and <cite>y</cite> is the
@@ -377,20 +406,17 @@ strain fields set strain_index equal to slice(None).</li>
 <dl class="function">
 <dt id="pymks.datasets.make_elasticFEstrain_random">
 <tt class="descclassname">pymks.datasets.</tt><tt class="descname">make_elasticFEstrain_random</tt><big>(</big><em>n_samples</em>, <em>elastic_modulus</em>, <em>poissons_ratio</em>, <em>size</em>, <em>macro_strain=1.0</em>, <em>strain_index=0</em><big>)</big><a class="headerlink" href="#pymks.datasets.make_elasticFEstrain_random" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate delta microstructures and responses</p>
-<p>Simple interface to generate delta microstructures and their
+<dd><p>Generate random microstructures and responses</p>
+<p>Simple interface to generate random microstructures and their
 strain response fields that can be used for the fit method in the
-<cite>MKSRegressionModel</cite>. The length of <cite>elastic_modulus</cite> and
-<cite>poissons_ratio</cite> indicates the number of phases in the
-microstructure. The following example is or a two phase
+<cite>MKSRegressionModel</cite>. The following example is or a two phase
 microstructure with dimensions of <cite>(5, 5)</cite>.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">elastic_modulus</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">poissons_ratio</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_elasticFEstrain_random</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="gp">... </span>                                   <span class="n">elastic_modulus</span><span class="o">=</span><span class="n">elastic_modulus</span><span class="p">,</span>
 <span class="gp">... </span>                                   <span class="n">poissons_ratio</span><span class="o">=</span><span class="n">poissons_ratio</span><span class="p">,</span>
-<span class="gp">... </span>                                   <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span> 
-<span class="go">sfepy: ...</span>
+<span class="gp">... </span>                                   <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 </pre></div>
 </div>
 <p><cite>X</cite> is the delta microstructures, and <cite>y</cite> is the
@@ -418,59 +444,199 @@ strain fields set strain_index equal to slice(None).</li>
 </table>
 </dd></dl>
 
-<dl class="class">
-<dt id="pymks.datasets.ElasticFESimulation">
-<em class="property">class </em><tt class="descclassname">pymks.datasets.</tt><tt class="descname">ElasticFESimulation</tt><big>(</big><em>elastic_modulus</em>, <em>poissons_ratio</em>, <em>macro_strain=1.0</em><big>)</big><a class="headerlink" href="#pymks.datasets.ElasticFESimulation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Use SfePy to solve a linear strain problem in 2D with a varying
-microstructure on a rectangular grid. The rectangle (cube) is held
-at the negative edge (plane) and displaced by 1 on the positive x
-edge (plane). Periodic boundary conditions are applied to the
-other boundaries.</p>
-<p>The microstructure is of shape (Nsample, Nx, Ny) or (Nsample, Nx, Ny, Nz).</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<dl class="function">
+<dt id="pymks.datasets.make_cahnHilliard">
+<tt class="descclassname">pymks.datasets.</tt><tt class="descname">make_cahnHilliard</tt><big>(</big><em>n_samples</em>, <em>size</em>, <em>dx=0.25</em>, <em>width=1.0</em>, <em>dt=0.001</em><big>)</big><a class="headerlink" href="#pymks.datasets.make_cahnHilliard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate delta microstructures and responses</p>
+<p>Simple interface to generate random concentration fields and their
+evolution after one time step that can be used for the fit method in the
+<cite>MKSRegressionModel</cite>.  The following example is or a two phase
+microstructure with dimensions of <cite>(5, 5)</cite>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_cahnHilliard</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">ElasticFESimulation</span><span class="p">(</span><span class="n">elastic_modulus</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">),</span> <span class="n">poissons_ratio</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="bp">None</span><span class="p">))</span> 
-<span class="go">sfepy: ...</span>
-</pre></div>
-</div>
-<p>y is the strain with components as follows</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">exx</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">eyy</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">exy</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
-</pre></div>
-</div>
-<p>Since there is no contrast in the microstructure the strain is only
-in the x-direction and has a uniform value of 1 since the
-displacement is always 1 and the size of the domain is 1.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">exx</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">eyy</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">exy</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-</pre></div>
-</div>
-<dl class="method">
-<dt id="pymks.datasets.ElasticFESimulation.get_response">
-<tt class="descname">get_response</tt><big>(</big><em>X</em>, <em>strain_index=0</em><big>)</big><a class="headerlink" href="#pymks.datasets.ElasticFESimulation.get_response" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the strain fields given an initial microstructure
-with a macroscopic strain applied in the x direction.</p>
+<p><cite>X</cite> is the initial concentration fields, and <cite>y</cite> is the
+strain response fields (the concentration after one time step).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>X</strong> &#8211; microstructure with shape (Nsample, Nx, Ny) or
-(Nsample, Nx, Ny, Nz)</li>
-<li><strong>strain_index</strong> &#8211; interger value to return
-a particular strain field.  0 returns exx, 1 returns eyy,
-etc. To return all strain fields set <cite>strain_index</cite> equal to
-<cite>slice(None)</cite>.</li>
+<li><strong>n_samples</strong> &#8211; number of microstructure samples</li>
+<li><strong>size</strong> &#8211; size of the microstructure</li>
+<li><strong>dx</strong> &#8211; grid spacing</li>
+<li><strong>dt</strong> &#8211; time step size</li>
+<li><strong>width</strong> &#8211; interface width between phases.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the strain fields over each cell</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Array representing the microstructures at one time step ahead
+of &#8216;X&#8217;</p>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pymks.bases">
+<span id="microstructure-bases"></span><h2>Microstructure Bases<a class="headerlink" href="#module-pymks.bases" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pymks.bases.DiscreteIndicatorBasis">
+<em class="property">class </em><tt class="descclassname">pymks.bases.</tt><tt class="descname">DiscreteIndicatorBasis</tt><big>(</big><em>n_states</em>, <em>domain=None</em><big>)</big><a class="headerlink" href="#pymks.bases.DiscreteIndicatorBasis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Digitize a discretly labeled microstructre.</p>
+<p>The following test is for a 2D (3x3) microstructre with three
+different phases labeled 0, 1 and 2. The shape of <cite>X</cite> is
+<cite>(n_samples, Nx, Ny)</cite> where n_samples is 1 in this case (<cite>Nx=3</cite>
+and <cite>Ny=3</cite>).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">basis</span> <span class="o">=</span> <span class="n">DiscreteIndicatorBasis</span><span class="p">(</span><span class="n">n_states</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>               <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span> <span class="p">,</span><span class="mi">2</span><span class="p">],</span>
+<span class="gp">... </span>               <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(1, 3, 3)</span>
+</pre></div>
+</div>
+<p>The <cite>discretize</cite> method discretizes the labeled phases into three
+different local states. This results in an array of shape
+<cite>(n_samples, Nx, Ny, n_states)</cite>, where <cite>n_states=3</cite> in this case.
+For example, if a cell has a label of 2, its local state will be
+<cite>[0, 0, 1]</cite>. The local state can only have values of 0 or 1.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">X_bin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span>
+<span class="gp">... </span>                   <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span>
+<span class="gp">... </span>                   <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">X_bin</span><span class="p">,</span> <span class="n">basis</span><span class="o">.</span><span class="n">discretize</span><span class="p">(</span><span class="n">X</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>Check that the basis works when all the states are not specified
+in X.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">basis</span> <span class="o">=</span> <span class="n">DiscreteIndicatorBasis</span><span class="p">(</span><span class="n">n_states</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_bin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                  <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">X_bin</span><span class="p">,</span> <span class="n">basis</span><span class="o">.</span><span class="n">discretize</span><span class="p">(</span><span class="n">X</span><span class="p">)))</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="pymks.bases.DiscreteIndicatorBasis.discretize">
+<tt class="descname">discretize</tt><big>(</big><em>X</em><big>)</big><a class="headerlink" href="#pymks.bases.DiscreteIndicatorBasis.discretize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Discretize <cite>X</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>X</strong> &#8211; Integer valued field</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Integer valued field, either 0 or 1</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pymks.bases.ContinuousIndicatorBasis">
+<em class="property">class </em><tt class="descclassname">pymks.bases.</tt><tt class="descname">ContinuousIndicatorBasis</tt><big>(</big><em>n_states</em>, <em>domain</em><big>)</big><a class="headerlink" href="#pymks.bases.ContinuousIndicatorBasis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Discretize a continuous field into <cite>n_states</cite> local states. The
+field must be between the specified domain values. For example, if
+a cell has a value of 0.4, n_states=2 and the domain=[0, 1] then
+the local state is (0.6, 0.4) (the local state must sum to 1).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n_states</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_</span> <span class="o">=</span> <span class="n">ContinuousIndicatorBasis</span><span class="p">(</span><span class="n">n_states</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">discretize</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_states</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Xtest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">X_</span> <span class="o">*</span> <span class="n">H</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span><span class="bp">None</span><span class="p">,</span><span class="bp">None</span><span class="p">,:],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Xtest</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Check that the basis works for values outside of 0 and 1.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n_states</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_test</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_</span> <span class="o">=</span> <span class="n">ContinuousIndicatorBasis</span><span class="p">(</span><span class="n">n_states</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">discretize</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">X_</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Instantiate a <cite>Basis</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>n_states</strong> &#8211; The number of local states</li>
+<li><strong>domain</strong> &#8211; indicate the range of expected values for the microstructure.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pymks.bases.ContinuousIndicatorBasis.discretize">
+<tt class="descname">discretize</tt><big>(</big><em>X</em><big>)</big><a class="headerlink" href="#pymks.bases.ContinuousIndicatorBasis.discretize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Discretize <cite>X</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>X</strong> &#8211; continuous field between the domain bounds</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">field of local states between 0 and 1</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pymks.bases.LegendreBasis">
+<em class="property">class </em><tt class="descclassname">pymks.bases.</tt><tt class="descname">LegendreBasis</tt><big>(</big><em>n_states</em>, <em>domain</em><big>)</big><a class="headerlink" href="#pymks.bases.LegendreBasis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Discretize a continuous field into <cite>deg</cite> local states using a
+Legendre polynomial basis.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">deg</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_Legendre</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span><span class="o">-</span><span class="mf">0.3125</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+<span class="gp">... </span>                        <span class="p">[</span> <span class="mf">1.15</span><span class="p">,</span>   <span class="o">-</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]],</span>
+<span class="gp">... </span>                       <span class="p">[[</span><span class="o">-</span><span class="mf">1.25</span><span class="p">,</span>      <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+<span class="gp">... </span>                        <span class="p">[</span><span class="o">-</span><span class="mf">0.3125</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">basis</span> <span class="o">=</span> <span class="n">LegendreBasis</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">basis</span><span class="o">.</span><span class="n">discretize</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">X_Legendre</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Instantiate a <cite>Basis</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>n_states</strong> &#8211; The number of local states</li>
+<li><strong>domain</strong> &#8211; indicate the range of expected values for the microstructure.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pymks.bases.LegendreBasis.discretize">
+<tt class="descname">discretize</tt><big>(</big><em>X</em><big>)</big><a class="headerlink" href="#pymks.bases.LegendreBasis.discretize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Discretize <cite>X</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>X</strong> &#8211; field representing the microstructure</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">field of local states</td>
 </tr>
 </tbody>
 </table>

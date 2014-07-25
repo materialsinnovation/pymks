@@ -63,7 +63,7 @@ and can be cast in terms of displacement.
 
 .. math::  \mu u_{i,jj}+(\mu + \lambda)u_{j,ij}=0 
 
- In this example, a displacement controlled simulation is used to
+In this example, a displacement controlled simulation is used to
 calculated the strain and the following boundary conditions for square
 box of length :math:`L` and macroscopic strain
 :math:`\bar{\varepsilon}_{xx}` are imposed.
@@ -108,12 +108,12 @@ compute a strain field of a random microstructure as long as the ratio
 between the elastic moduli (also known as the contrast) is less than
 1.5. If this condition is met we can expect a mean absolute error of 2%
 or less when comparing the MKS results with those computed using finite
-element methods `[1] <#ref_1>`__.
+element methods [1].
 
 Because we are using distinct phases and the contrast is low enough to
 only need the first order coefficients, delta microstructures and their
 strain fields are all that we need to calibrate the first order
-influence coefficients\ `[2] <#ref_2>`__.
+influence coefficients [2].
 
 Here we use the ``make_delta_microstructure`` function from
 ``pymks.datasets`` to create the two delta microstructures needed to
@@ -136,7 +136,7 @@ generate the data
     from pymks.tools import draw_microstructures
     from pymks.datasets import make_delta_microstructures
     
-    X_delta = make_delta_microstructures(Nphases=2, size=(L, L))
+    X_delta = make_delta_microstructures(n_phases=2, size=(L, L))
     draw_microstructures(X_delta[0], X_delta[1])
 
 
@@ -157,8 +157,7 @@ The ``make_elasticFEstrain_delta`` function from ``pymks.datasets``
 provides an easy interface to generate delta microstructures and their
 strain fields, which can then be used for calibration of the influence
 coefficients. The function calls the ``ElasticFESimulation`` class to
-compute the strain fields with the boundary conditions given
-`above <#BC>`__.
+compute the strain fields with the boundary conditions given above.
 
 In this example, lets look at a two phase microstructure with elastic
 moduli values of 100 and 120 and Poisson's ratio values of 0.3 and 0.3
@@ -226,14 +225,17 @@ Calibrating First Order Influence Coefficients
 Now that we have the delta microstructures and their strain fields, we
 can calibrate the influence coefficients by creating an instance of the
 ``MKSRegressionModel`` class. Because we have 2 phases we will create an
-instance of MKSRegressionModel with the number of states ``Nstate``
+instance of MKSRegressionModel with the number of states ``n_states``
 equal to 2. Then, pass the delta microstructures and their strain fields
 to the ``fit`` method.
 
 .. code:: python
 
     from pymks import MKSRegressionModel
-    MKSmodel = MKSRegressionModel(Nstate=2)
+    from pymks import DiscreteIndicatorBasis
+    
+    basis = DiscreteIndicatorBasis(n_states=2, domain=[0, 1])
+    MKSmodel = MKSRegressionModel(basis=basis)
 Now, pass the delta microstructures and their strain fields into the
 ``fit`` method to calibrate the first order influence coefficients.
 
@@ -312,15 +314,14 @@ MKS model.
 The MKS model is able to capture the strain field for the random
 microstructure after being calibrated with delta microstructures.
 
-Resizing the Coefficeints to use on Larger Microstructures
+Resizing the Coefficients to use on Larger Microstructures
 ----------------------------------------------------------
 
 The influence coefficients that were calibrated on a smaller
 microstructure can be used to predict the strain field on a larger
-microstructure though spectral interpolation `[3] <#ref_3>`__, but
-accuracy of the MKS model drops slightly. To demonstrate how this is
-done, let's generate a new larger random microstructure and its strain
-field.
+microstructure though spectral interpolation [3], but accuracy of the
+MKS model drops slightly. To demonstrate how this is done, let's
+generate a new larger random microstructure and its strain field.
 
 .. code:: python
 
@@ -380,30 +381,30 @@ argument of the ``predict`` method to get the strain field.
 As you can see, the results from the strain field computed with the
 resized influence coefficients is not as close to the finite element
 results as they were before they were resized. This decrease in accuracy
-is expected when using spectral interpolation `[4] <#ref_4>`__.
+is expected when using spectral interpolation [4].
 
 References
 ----------
 
- [1] Binci M., Fullwood D., Kalidindi S.R., A new spectral framework for
+[1] Binci M., Fullwood D., Kalidindi S.R., A new spectral framework for
 establishing localization relationships for elastic behavior of
 composites and their calibration to finite-element models. Acta
 Materialia, 2008. 56 (10) p. 2272-2282
 `doi:10.1016/j.actamat.2008.01.017 <http://dx.doi.org/10.1016/j.actamat.2008.01.017>`__.
 
- [2] Landi, G., S.R. Niezgoda, S.R. Kalidindi, Multi-scale modeling of
+[2] Landi, G., S.R. Niezgoda, S.R. Kalidindi, Multi-scale modeling of
 elastic response of three-dimensional voxel-based microstructure
 datasets using novel DFT-based knowledge systems. Acta Materialia, 2009.
 58 (7): p. 2716-2725
 `doi:10.1016/j.actamat.2010.01.007 <http://dx.doi.org/10.1016/j.actamat.2010.01.007>`__.
 
- [3] Marko, K., Kalidindi S.R., Fullwood D., Computationally efficient
+[3] Marko, K., Kalidindi S.R., Fullwood D., Computationally efficient
 database and spectral interpolation for fully plastic Taylor-type
 crystal plasticity calculations of face-centered cubic polycrystals.
 International Journal of Plasticity 24 (2008) 1264–1276
 `doi;10.1016/j.ijplas.2007.12.002 <http://dx.doi.org/10.1016/j.ijplas.2007.12.002>`__.
 
- [4] Marko, K. Al-Harbi H. F. , Kalidindi S.R., Crystal plasticity
+[4] Marko, K. Al-Harbi H. F. , Kalidindi S.R., Crystal plasticity
 simulations using discrete Fourier transforms. Acta Materialia 57 (2009)
 1777–1784
 `doi:10.1016/j.actamat.2008.12.017 <http://dx.doi.org/10.1016/j.actamat.2008.12.017>`__.

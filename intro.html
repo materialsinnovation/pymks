@@ -213,9 +213,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable</pre>
 <span class="n">draw_microstructure_strain</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">strains</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>&lt;matplotlib.figure.Figure at 0x5252990&gt;</pre>
-</div>
-<img alt="_images/intro_6_1.png" src="_images/intro_6_1.png" />
+<img alt="_images/intro_6_0.png" src="_images/intro_6_0.png" />
 <div class="section" id="create-the-delta-microstructures">
 <h2>Create the Delta Microstructures<a class="headerlink" href="#create-the-delta-microstructures" title="Permalink to this headline">¶</a></h2>
 <p>The goal of the MKS it to quickly reproduce the finite element
@@ -228,7 +226,7 @@ calibration the influence coefficients.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_microstructures</span>
 <span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_delta_microstructures</span>
 
-<span class="n">X_delta</span> <span class="o">=</span> <span class="n">make_delta_microstructures</span><span class="p">(</span><span class="n">Nphases</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="n">X_delta</span> <span class="o">=</span> <span class="n">make_delta_microstructures</span><span class="p">(</span><span class="n">n_phases</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
 <span class="n">draw_microstructures</span><span class="p">(</span><span class="n">X_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">X_delta</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -249,20 +247,21 @@ inputs to calibrate the influence coefficients.</p>
 <span class="n">draw_microstructure_strain</span><span class="p">(</span><span class="n">X_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">strains_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>&lt;matplotlib.figure.Figure at 0x3faaa10&gt;</pre>
-</div>
-<img alt="_images/intro_10_1.png" src="_images/intro_10_1.png" />
+<img alt="_images/intro_10_0.png" src="_images/intro_10_0.png" />
 </div>
 <div class="section" id="calibrate-the-mks-model">
 <h2>Calibrate the MKS Model<a class="headerlink" href="#calibrate-the-mks-model" title="Permalink to this headline">¶</a></h2>
-<p>Now lets instantiate a <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> and use the
-microstructures and strain fields created by
-<tt class="docutils literal"><span class="pre">make_elasticFEstrain_delta</span></tt> to calibrate the influence coefficients
-using the <tt class="docutils literal"><span class="pre">fit</span></tt> method.</p>
+<p>Now lets instantiate a<tt class="docutils literal"><span class="pre">DiscreteIndicatorBasis</span></tt> and a
+<tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> and use the microstructures and strain fields
+created by <tt class="docutils literal"><span class="pre">make_elasticFEstrain_delta</span></tt> to calibrate the influence
+coefficients using the <tt class="docutils literal"><span class="pre">fit</span></tt> method.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks</span> <span class="kn">import</span> <span class="n">MKSRegressionModel</span>
+<span class="kn">from</span> <span class="nn">pymks.bases</span> <span class="kn">import</span> <span class="n">DiscreteIndicatorBasis</span>
+
+<span class="n">basis</span> <span class="o">=</span> <span class="n">DiscreteIndicatorBasis</span><span class="p">(</span><span class="n">n_states</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="n">X_delta</span><span class="p">,</span> <span class="n">y_delta</span> <span class="o">=</span> <span class="n">X_delta</span><span class="p">,</span> <span class="n">strains_delta</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nbin</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">basis</span><span class="o">=</span><span class="n">basis</span><span class="p">)</span>
 <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_delta</span><span class="p">,</span> <span class="n">y_delta</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -280,9 +279,7 @@ into the <tt class="docutils literal"><span class="pre">predict</span></tt> meth
 <span class="n">draw_strains_compare</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>&lt;matplotlib.figure.Figure at 0x20bc890&gt;</pre>
-</div>
-<img alt="_images/intro_14_1.png" src="_images/intro_14_1.png" />
+<img alt="_images/intro_14_0.png" src="_images/intro_14_0.png" />
 <p>The <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> has done quite a good job of predicting the
 results from the original FE simulation after calibrating the influence
 coefficients using delta microstructures.</p>

@@ -176,11 +176,11 @@ compute a strain field of a random microstructure as long as the ratio
 between the elastic moduli (also known as the contrast) is less than
 1.5. If this condition is met we can expect a mean absolute error of 2%
 or less when comparing the MKS results with those computed using finite
-element methods <a class="reference external" href="#ref_1">[1]</a>.</p>
+element methods [1].</p>
 <p>Because we are using distinct phases and the contrast is low enough to
 only need the first order coefficients, delta microstructures and their
 strain fields are all that we need to calibrate the first order
-influence coefficients<a class="reference external" href="#ref_2">[2]</a>.</p>
+influence coefficients [2].</p>
 <p>The <tt class="docutils literal"><span class="pre">make_delta_microstructure</span></tt> function from <tt class="docutils literal"><span class="pre">pymks.datasets</span></tt> can
 be used to create the two delta microstructures needed to calibrate the
 first order influence coefficients for a two phase microstructure. This
@@ -193,7 +193,7 @@ fields using finite element methods.</p>
 <span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_microstructures</span>
 <span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_delta_microstructures</span>
 
-<span class="n">X_delta</span> <span class="o">=</span> <span class="n">make_delta_microstructures</span><span class="p">(</span><span class="n">Nphases</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">))</span>
+<span class="n">X_delta</span> <span class="o">=</span> <span class="n">make_delta_microstructures</span><span class="p">(</span><span class="n">n_phases</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">))</span>
 <span class="n">draw_microstructures</span><span class="p">(</span><span class="n">X_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">X_delta</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:])</span>
 </pre></div>
 </div>
@@ -232,7 +232,7 @@ the <tt class="docutils literal"><span class="pre">make_elasticFEstrain_delta</s
 <span class="k">print</span> <span class="s">&#39;Elapsed Time&#39;</span><span class="p">,</span><span class="n">tm</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t</span><span class="p">,</span> <span class="s">&#39;Seconds&#39;</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>Elapsed Time 61.0055241585 Seconds</pre>
+<div class="highlight-python"><pre>Elapsed Time 51.7413358688 Seconds</pre>
 </div>
 <p>Let&#8217;s take a look at one of the delta microstructures and the
 <span class="math">\(\varepsilon_{xx}\)</span> strain field.</p>
@@ -244,13 +244,17 @@ the <tt class="docutils literal"><span class="pre">make_elasticFEstrain_delta</s
 <div class="section" id="calibrating-first-order-influence-coefficients">
 <h3>Calibrating First Order Influence Coefficients<a class="headerlink" href="#calibrating-first-order-influence-coefficients" title="Permalink to this headline">¶</a></h3>
 <p>Now that we have the delta microstructures and their strain fields, we
-can calibrate the influence coefficients by creating an instance of the
-<tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> class. Because we have 2 phases we will create an
-instance of MKSRegressionModel with the number of states <tt class="docutils literal"><span class="pre">Nstate</span></tt>
-equal to 2. Then, pass the delta microstructures and their strain fields
-to the <tt class="docutils literal"><span class="pre">fit</span></tt> method.</p>
+can calibrate the influence coefficients by creating an instance of a
+bases and the <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> class. Because we have 2 discrete
+phases we will create an instance of the <tt class="docutils literal"><span class="pre">DiscreteIndicatorBasis</span></tt> with
+<tt class="docutils literal"><span class="pre">n_states</span></tt> equal to 2, and then pass the basis in to create an
+instance of the <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt>. The delta microstructures and
+their strain fields are then passed to the <tt class="docutils literal"><span class="pre">fit</span></tt> method.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks</span> <span class="kn">import</span> <span class="n">MKSRegressionModel</span>
-<span class="n">MKSmodel</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nstate</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pymks.bases</span> <span class="kn">import</span> <span class="n">DiscreteIndicatorBasis</span>
+
+<span class="n">basis</span> <span class="o">=</span> <span class="n">DiscreteIndicatorBasis</span><span class="p">(</span><span class="n">n_states</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">MKSmodel</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">basis</span><span class="o">=</span><span class="n">basis</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now, pass the delta microstructures and their strain fields into the
@@ -293,7 +297,7 @@ results from finite element analysis.</p>
 <span class="n">draw_microstructure_strain</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="p">]</span> <span class="p">,</span> <span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>Elapsed Time 28.5320401192 Seconds</pre>
+<div class="highlight-python"><pre>Elapsed Time 26.5504748821 Seconds</pre>
 </div>
 <img alt="../_images/elasticity_3D_18_1.png" src="../_images/elasticity_3D_18_1.png" />
 <p><strong>Note that the calibrated influence coefficients can only be used to
@@ -306,7 +310,7 @@ the same microstructure to the <tt class="docutils literal"><span class="pre">pr
 <span class="k">print</span> <span class="s">&#39;Elapsed Time&#39;</span><span class="p">,</span><span class="n">tm</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t</span><span class="p">,</span><span class="s">&#39;Seconds&#39;</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>Elapsed Time 0.046315908432 Seconds</pre>
+<div class="highlight-python"><pre>Elapsed Time 0.000949144363403 Seconds</pre>
 </div>
 <p>Finally let&#8217;s compare the results from finite element simulation and the
 MKS model.</p>
@@ -324,10 +328,10 @@ microstructure after being calibrated with delta microstructures.</p>
 <h2>Resizing the Coefficeints to use on Larger Microstructures<a class="headerlink" href="#resizing-the-coefficeints-to-use-on-larger-microstructures" title="Permalink to this headline">¶</a></h2>
 <p>The influence coefficients that were calibrated on a smaller
 microstructure can be used to predict the strain field on a larger
-microstructure though spectral interpolation <a class="reference external" href="#ref_3">[3]</a>, but
-accuracy of the MKS model drops slightly. To demonstrate how this is
-done, let&#8217;s generate a new larger <span class="math">\(N\)</span> by <span class="math">\(N\)</span> random
-microstructure and its strain field.</p>
+microstructure though spectral interpolation [3], but accuracy of the
+MKS model drops slightly. To demonstrate how this is done, let&#8217;s
+generate a new larger <span class="math">\(N\)</span> by <span class="math">\(N\)</span> random microstructure and
+its strain field.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="n">N</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">L</span>
 <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
 <span class="n">t</span> <span class="o">=</span> <span class="n">tm</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -354,40 +358,36 @@ argument of the <tt class="docutils literal"><span class="pre">predict</span></t
 <span class="n">draw_strains</span><span class="p">(</span><span class="n">strain_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;xx&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>Elapsed Time 0.0535778999329 Seconds</pre>
+<div class="highlight-python"><pre>Elapsed Time 0.0109941959381 Seconds</pre>
 </div>
 <img alt="../_images/elasticity_3D_29_1.png" src="../_images/elasticity_3D_29_1.png" />
 <p>As you can see, the results from the strain field computed with the
 resized influence coefficients is still close to the finite element for
 the larger microstructure. There is a slight decrease in accuracy due to
-spectral interpolation <a class="reference external" href="#ref_4">[4]</a>, but the trade off in accuracy
-is well worth the time savings compared to finite element analysis.
-Therefore a calibrated MKS model can be used to rapidly explore the
-space of potential microstructures to optimize material performance.</p>
+spectral interpolation [4], but the trade off in accuracy is well worth
+the time savings compared to finite element analysis. Therefore a
+calibrated MKS model can be used to rapidly explore the space of
+potential microstructures to optimize material performance.</p>
 </div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div>[1] Binci M., Fullwood D., Kalidindi S.R., <a href="#id1"><span class="problematic" id="id2">*</span></a>A new spectral framework</div></blockquote>
-<p>for establishing localization relationships for elastic behav ior of
-composites and their calibration to finite-element models*. Acta
+<p>[1] Binci M., Fullwood D., Kalidindi S.R., <em>A new spectral framework for
+establishing localization relationships for elastic behav ior of
+composites and their calibration to finite-element models</em>. Acta
 Materialia, 2008. 56 (10): p. 2272-2282
 <a class="reference external" href="http://dx.doi.org/10.1016/j.actamat.2008.01.017">doi:10.1016/j.actamat.2008.01.017</a>.</p>
-<blockquote>
-<div>[2] Landi, G., S.R. Niezgoda, S.R. Kalidindi, <a href="#id3"><span class="problematic" id="id4">*</span></a>Multi-scale modeling of</div></blockquote>
-<p>elastic response of three-dimensional voxel-based microstructure
-datasets using novel DFT-based knowledge systems*. Acta Materialia,
+<p>[2] Landi, G., S.R. Niezgoda, S.R. Kalidindi, <em>Multi-scale modeling of
+elastic response of three-dimensional voxel-based microstructure
+datasets using novel DFT-based knowledge systems</em>. Acta Materialia,
 2009. 58 (7): p. 2716-2725
 <a class="reference external" href="http://dx.doi.org/10.1016/j.actamat.2010.01.007">doi:10.1016/j.actamat.2010.01.007</a>.</p>
-<blockquote>
-<div>[3] Marko, K., Kalidindi S.R., Fullwood D., <a href="#id5"><span class="problematic" id="id6">*</span></a>Computationally efficient</div></blockquote>
-<p>database and spectral interpolation for fully plastic Taylor-type
-crystal plasticity calculations of face-centered cubic polycrystals*.
+<p>[3] Marko, K., Kalidindi S.R., Fullwood D., <em>Computationally efficient
+database and spectral interpolation for fully plastic Taylor-type
+crystal plasticity calculations of face-centered cubic polycrystals</em>.
 International Journal of Plasticity 24 (2008) 1264–1276
 <a class="reference external" href="http://dx.doi.org/10.1016/j.ijplas.2007.12.002">doi;10.1016/j.ijplas.2007.12.002</a>.</p>
-<blockquote>
-<div>[4] Marko, K. Al-Harbi H. F. , Kalidindi S.R., <a href="#id7"><span class="problematic" id="id8">*</span></a>Crystal plasticity</div></blockquote>
-<p>simulations using discrete Fourier transforms*. Acta Materialia 57
+<p>[4] Marko, K. Al-Harbi H. F. , Kalidindi S.R., <em>Crystal plasticity
+simulations using discrete Fourier transforms</em>. Acta Materialia 57
 (2009) 1777–1784
 <a class="reference external" href="http://dx.doi.org/10.1016/j.actamat.2008.12.017">doi:10.1016/j.actamat.2008.12.017</a>.</p>
 </div>

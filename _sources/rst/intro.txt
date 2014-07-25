@@ -131,13 +131,7 @@ Both phases will have a Poisson's ratio of 0.3.
     draw_microstructure_strain(X[0], strains[0])
 
 
-.. parsed-literal::
-
-    <matplotlib.figure.Figure at 0x5252990>
-
-
-
-.. image:: intro_files/intro_6_1.png
+.. image:: intro_files/intro_6_0.png
 
 
 Create the Delta Microstructures
@@ -156,7 +150,7 @@ calibration the influence coefficients.
     from pymks.tools import draw_microstructures
     from pymks.datasets import make_delta_microstructures
     
-    X_delta = make_delta_microstructures(Nphases=2, size=(15, 15))
+    X_delta = make_delta_microstructures(n_phases=2, size=(15, 15))
     draw_microstructures(X_delta[0], X_delta[1])
 
 
@@ -182,29 +176,26 @@ inputs to calibrate the influence coefficients.
     draw_microstructure_strain(X_delta[0], strains_delta[0])
 
 
-.. parsed-literal::
-
-    <matplotlib.figure.Figure at 0x3faaa10>
-
-
-
-.. image:: intro_files/intro_10_1.png
+.. image:: intro_files/intro_10_0.png
 
 
 Calibrate the MKS Model
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Now lets instantiate a ``MKSRegressionModel`` and use the
-microstructures and strain fields created by
-``make_elasticFEstrain_delta`` to calibrate the influence coefficients
-using the ``fit`` method.
+Now lets instantiate a\ ``DiscreteIndicatorBasis`` and a
+``MKSRegressionModel`` and use the microstructures and strain fields
+created by ``make_elasticFEstrain_delta`` to calibrate the influence
+coefficients using the ``fit`` method.
 
 .. code:: python
 
     from pymks import MKSRegressionModel
+    from pymks.bases import DiscreteIndicatorBasis
+    
+    basis = DiscreteIndicatorBasis(n_states=2)
     
     X_delta, y_delta = X_delta, strains_delta
-    model = MKSRegressionModel(Nbin=2)
+    model = MKSRegressionModel(basis=basis)
     model.fit(X_delta, y_delta)
 Reproduce the Finite Element Simulation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -223,13 +214,7 @@ into the ``predict`` method.
     draw_strains_compare(y[0], y_pred[0]);
 
 
-.. parsed-literal::
-
-    <matplotlib.figure.Figure at 0x20bc890>
-
-
-
-.. image:: intro_files/intro_14_1.png
+.. image:: intro_files/intro_14_0.png
 
 
 The ``MKSRegressionModel`` has done quite a good job of predicting the
