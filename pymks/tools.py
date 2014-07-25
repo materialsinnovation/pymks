@@ -2,48 +2,56 @@ import matplotlib.colors as colors
 import matplotlib.cm as cmx
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.cross_validation import train_test_split
-from sklearn import metrics
-mse = metrics.mean_squared_error
-from pymks import MKSRegressionModel
+
 
 def _set_colors():
-    HighRGB = np.array([26,152,80])/255.
-    MediumRGB = np.array([255,255,191])/255.
-    LowRGB = np.array([0,0,0])/255.
+    HighRGB = np.array([26, 152, 80]) / 255.
+    MediumRGB = np.array([255, 255, 191]) / 255.
+    LowRGB = np.array([0, 0, 0]) / 255.
     cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
     plt.register_cmap(name='PyMKS', data=cdict)
     plt.set_cmap('PyMKS')
 
+
 def _get_response_cmap():
-    HighRGB = np.array([26,152,80])/255.
-    MediumRGB = np.array([255,255,191])/255.
-    LowRGB = np.array([0,0,0])/255.
+    HighRGB = np.array([26, 152, 80]) / 255.
+    MediumRGB = np.array([255, 255, 191]) / 255.
+    LowRGB = np.array([0, 0, 0]) / 255.
+    cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
+    return colors.LinearSegmentedColormap('coeff_cmap', cdict, 256)
+
+
+def _get_diff_cmap():
+    HighRGB = np.array([118, 42, 131]) / 255.
+    MediumRGB = np.array([255, 255, 191]) / 255.
+    LowRGB = np.array([0, 0, 0]) / 255.
     cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
     return colors.LinearSegmentedColormap('coeff_cmap', cdict, 256)
 
 
 def _set_cdict(HighRGB, MediumRGB, LowRGB):
-    cdict = {'red':   ((0.0,    LowRGB[0],    LowRGB[0]),
-                       (0.5, MediumRGB[0], MediumRGB[0]),
-                       (1.0,   HighRGB[0],   HighRGB[0])),
+    cdict = {'red': ((0.0, LowRGB[0], LowRGB[0]),
+                    (0.5, MediumRGB[0], MediumRGB[0]),
+                    (1.0, HighRGB[0], HighRGB[0])),
 
-             'green': ((0.0,    LowRGB[1],    LowRGB[1]),
+             'green': ((0.0, LowRGB[1], LowRGB[1]),
                        (0.5, MediumRGB[1], MediumRGB[1]),
-                       (1.0,   HighRGB[1],   HighRGB[1])),
+                       (1.0, HighRGB[1], HighRGB[1])),
 
-             'blue':  ((0.0,    LowRGB[2],    LowRGB[2]),
-                       (0.5, MediumRGB[2], MediumRGB[2]),
-                       (1.0,   HighRGB[2],   HighRGB[2]))}
+             'blue': ((0.0, LowRGB[2], LowRGB[2]),
+                      (0.5, MediumRGB[2], MediumRGB[2]),
+                      (1.0, HighRGB[2], HighRGB[2]))}
 
     return cdict
 
+
 def _get_coeff_cmap():
-    HighRGB = np.array([244,109,67])/255.
-    MediumRGB = np.array([255,255,191])/255.
-    LowRGB = np.array([0,0,0])/255.
+    HighRGB = np.array([244, 109, 67]) / 255.
+    MediumRGB = np.array([255, 255, 191]) / 255.
+    LowRGB = np.array([0, 0, 0]) / 255.
     cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
     return colors.LinearSegmentedColormap('coeff_cmap', cdict, 256)
+
 
 def draw_microstructure_discretization(M, a=0, s=0, Nbin=6,
                                        bound=0.016, height=1.7, ax=None):
@@ -109,7 +117,11 @@ def draw_microstructure_discretization(M, a=0, s=0, Nbin=6,
              fontsize=16,
              color='r')
 
+
 def draw_coeff(coeff):
+    if coeff.dtype == 'complex':
+        print DeprecationWarning("Coefficients are complex.")
+        coeff = coeff.real
     coeff_cmap = _get_coeff_cmap()
     plt.close('all')
     vmin = np.min(coeff)
@@ -133,16 +145,18 @@ def draw_coeff(coeff):
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
 
+
 def draw_microstructure_strain(microstructure, strain):
     plt.close('all')
     cmap = _get_response_cmap()
     fig = plt.figure(figsize=(8, 4))
-    ax0 = plt.subplot(1,2,1)
-    ax0.imshow(microstructure.swapaxes(0, 1), cmap=plt.cm.gray, interpolation='none')
+    ax0 = plt.subplot(1, 2, 1)
+    ax0.imshow(microstructure.swapaxes(0, 1), cmap=plt.cm.gray,
+               interpolation='none')
     ax0.set_xticks(())
     ax0.set_yticks(())
-    ax1 = plt.subplot(1,2,2)
-    im1 = ax1.imshow(strain.swapaxes(0, 1), cmap=cmap,  interpolation='none');
+    ax1 = plt.subplot(1, 2, 2)
+    im1 = ax1.imshow(strain.swapaxes(0, 1), cmap=cmap, interpolation='none')
     ax1.set_xticks(())
     ax1.set_yticks(())
     ax1.set_title(r'$\mathbf{\varepsilon_{xx}}$', fontsize=25)
@@ -153,6 +167,7 @@ def draw_microstructure_strain(microstructure, strain):
     fig.colorbar(im1, cax=cbar_ax)
 
     plt.tight_layout()
+
 
 def draw_microstructures(*microstructures):
     n_micros = len(microstructures)
@@ -176,6 +191,7 @@ def draw_microstructures(*microstructures):
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
 
+
 def draw_strains(*strains, **titles):
     n_strains = len(strains)
     plt.close('all')
@@ -183,31 +199,64 @@ def draw_strains(*strains, **titles):
     fig, axs = plt.subplots(1, n_strains, figsize=(n_strains * 4, 4))
     if n_strains > 1:
         for micro, ax, title in zip(strains, axs, titles):
-            im = ax.imshow(micro.swapaxes(0, 1), cmap=cmap, interpolation='none')
+            im = ax.imshow(micro.swapaxes(0, 1), cmap=cmap,
+                           interpolation='none')
             ax.set_xticks(())
             ax.set_yticks(())
-            ax.set_title(r'$\mathbf{\varepsilon_{%s}}$' % titles[title], fontsize=25)
+            ax.set_title(r'$\mathbf{\varepsilon_{%s}}$' % titles[title],
+                         fontsize=25)
     else:
         micro = np.array(strains)[0]
         im = axs.imshow(micro.swapaxes(0, 1), cmap=cmap, interpolation='none')
         axs.set_xticks(())
         axs.set_yticks(())
-        axs.set_title(r'$\mathbf{\varepsilon_{%s}}$' % titles.itervalues().next(), fontsize=25)
+        axs.set_title(r'$\mathbf{\varepsilon_{%s}}$'
+                      % titles.itervalues().next(), fontsize=25)
     fig.subplots_adjust(right=0.8)
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
 
+
+def draw_concentrations(*concentrations, **titles):
+    n_concens = len(concentrations)
+    vmin = np.min(concentrations)
+    vmax = np.max(concentrations)
+    cmap = _get_response_cmap()
+    plt.close('all')
+    fig, axs = plt.subplots(1, n_concens, figsize=(n_concens * 4, 4))
+    if n_concens > 1:
+        for concen, ax, title in zip(concentrations, axs, titles):
+            im = ax.imshow(concen.swapaxes(0, 1), cmap=cmap,
+                           interpolation='none', vmin=vmin, vmax=vmax)
+            ax.set_xticks(())
+            ax.set_yticks(())
+            ax.set_title('Concentration (%s)' % titles[title],
+                         fontsize=15)
+    else:
+        im = axs.imshow(concentrations[0].swapaxes(0, 1), cmap=cmap,
+                        interpolation='none', vmin=vmin, vmax=vmax)
+        axs.set_xticks(())
+        axs.set_yticks(())
+        axs.set_title('Concentration (%s)' % titles.itervalues().next(),
+                      fontsize=15)
+    fig.subplots_adjust(right=0.8)
+    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
+    fig.colorbar(im, cax=cbar_ax)
+    plt.tight_layout()
+
+
 def draw_strains_compare(strain1, strain2):
     plt.close('all')
     cmap = _get_response_cmap()
     vmin = min((strain1.flatten().min(), strain2.flatten().min()))
-    vmax = min((strain1.flatten().max(), strain2.flatten().max()))
+    vmax = max((strain1.flatten().max(), strain2.flatten().max()))
     fig, axs = plt.subplots(1, 2, figsize=(8, 4))
     titles = ['Finite Element', 'MKS']
     strains = (strain1, strain2)
     for strain, ax, title in zip(strains, axs, titles):
-        im = ax.imshow(strain.swapaxes(0, 1), cmap=cmap, interpolation='none', vmin=vmin, vmax=vmax)
+        im = ax.imshow(strain.swapaxes(0, 1), cmap=cmap,
+                       interpolation='none', vmin=vmin, vmax=vmax)
         ax.set_xticks(())
         ax.set_yticks(())
         ax.set_title(r'$\mathbf{\varepsilon_{xx}}$ (%s)' % title, fontsize=20)
@@ -218,16 +267,18 @@ def draw_strains_compare(strain1, strain2):
 
     plt.tight_layout()
 
+
 def draw_concentrations_compare(con1, con2):
     plt.close('all')
     cmap = _get_response_cmap()
     vmin = min((con1.flatten().min(), con2.flatten().min()))
-    vmax = min((con1.flatten().max(), con2.flatten().max()))
+    vmax = max((con1.flatten().max(), con2.flatten().max()))
     fig, axs = plt.subplots(1, 2, figsize=(8, 4))
     titles = ['Simulation', 'MKS']
     cons = (con1, con2)
     for con, ax, title in zip(cons, axs, titles):
-        im = ax.imshow(con.swapaxes(0, 1), cmap=cmap, interpolation='none', vmin=vmin, vmax=vmax)
+        im = ax.imshow(con.swapaxes(0, 1), cmap=cmap, interpolation='none',
+                       vmin=vmin, vmax=vmax)
         ax.set_xticks(())
         ax.set_yticks(())
         ax.set_title('Concentration (%s)' % title, fontsize=15)
@@ -238,47 +289,40 @@ def draw_concentrations_compare(con1, con2):
 
     plt.tight_layout()
 
-def draw_concentrations(*concentrations):
-    n_concens = len(concentrations)
-    vmin = np.min(concentrations)
-    vmax = np.max(concentrations)
-    cmap = _get_response_cmap()
+
+def draw_diff(*responses, **titles):
+    n_responses = len(responses)
+    vmin = np.min(responses)
+    vmax = np.max(responses)
+    cmap = _get_diff_cmap()
     plt.close('all')
-    fig, axs = plt.subplots(1, n_concens, figsize=(n_concens * 4, 4))
-    if n_concens > 1:
-        for concen, ax in zip(concentrations, axs.flat):
-            im = ax.imshow(concen.swapaxes(0, 1), cmap=cmap,
+    fig, axs = plt.subplots(1, n_responses, figsize=(n_responses * 4, 4))
+    if n_responses > 1:
+        for response, ax, title in zip(responses, axs, titles):
+            im = ax.imshow(response.swapaxes(0, 1), cmap=cmap,
                            interpolation='none', vmin=vmin, vmax=vmax)
             ax.set_xticks(())
             ax.set_yticks(())
+            ax.set_title('%s' % titles[title], fontsize=15)
     else:
-        im = axs.imshow(concentrations[0].swapaxes(0, 1), cmap=cmap,
+        im = axs.imshow(responses[0].swapaxes(0, 1), cmap=cmap,
                         interpolation='none', vmin=vmin, vmax=vmax)
         axs.set_xticks(())
         axs.set_yticks(())
+        axs.set_title('%s' % titles.itervalues().next(), fontsize=15)
     fig.subplots_adjust(right=0.8)
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
 
-def optimize_n_states(n_states_values, X, y, test_size=0.2, random_state=3, plot=False):
-    if n_states_values[0] <= 1:
-        raise RuntimeError, "Minimum number of local states is 2."
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=3)
-    errors = []
-    n_states = n_states_values
-    for n_state in n_states:
-        MKSmodel = MKSRegressionModel(n_states=n_state)
-        MKSmodel.fit(X_train, y_train)
-        errors.append(mse(MKSmodel.predict(X_test), y_test))
-    argmin = np.argmin(errors)
-    if plot == True:
-        print "Optimal n_states: {0}, mse: {1:1.3e}".format(n_states[argmin], errors[argmin])
-        _optimize_n_states_plot(errors, n_states)
-    return n_states[argmin]
+def draw_gridscores(grid_scores, label=None, color='#f46d43'):
+    tmp = [[params['n_states'], -mean_score, scores.std()] \
+            for params, mean_score, scores in grid_scores]
+    
+    n_states, errors, stddev = zip(*tmp)
+    plt.errorbar(n_states, errors, yerr=stddev, linewidth=2, color=color, label=label)
 
-def _optimize_n_states_plot(errors, n_states):
-    plt.plot(n_states, errors, color='#1a9850', linewidth=5)
+    plt.legend()
     plt.ylabel('MSE', fontsize=20)
     plt.xlabel('Number of Local States', fontsize=15)
 
@@ -305,17 +349,17 @@ def bin(arr, n_bins):
 
     return np.maximum(1 - abs(arr[:, None] - X) / dX, 0)
 
+
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
                         n_jobs=1, train_sizes=np.linspace(.1, 1.0, 5)):
-    r"""
-    Code taken from scikit-learn examples for version 0.15.
-    
+    """Code taken from scikit-learn examples for version 0.15.
+
     Generate a simple plot of the test and traning learning curve.
 
     Args:
         estimator : object type that implements the "fit" and "predict" methods
             An object of that type which is cloned for each validation.
-        title: string 
+        title: string
             Used for the title for the chart.
         X: array-like, shape (n_samples, n_features)
             Training vector, where n_samples is the number of samples and
@@ -332,21 +376,21 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
         n_jobs : integer, optional
             Number of jobs to run in parallel (default 1).
         train_sizes : array-like, shape (n_ticks,), dtype float or int
-            Relative or absolute numbers of training examples that will be used to
-            generate the learning curve. If the dtype is float, it is regarded as a
-            fraction of the maximum size of the training set (that is determined
-            by the selected validation method), i.e. it has to be within (0, 1].
-            Otherwise it is interpreted as absolute sizes of the training sets.
-            Note that for classification the number of samples usually have to
-            be big enough to contain at least one sample from each class.
-            (default: np.linspace(0.1, 1.0, 5))
-        
+            Relative or absolute numbers of training examples that will be used
+            to generate the learning curve. If the dtype is float, it is
+            regarded as a fraction of the maximum size of the training set
+            (that is determined by the selected validation method), i.e. it has
+            to be within (0, 1]. Otherwise it is interpreted as absolute sizes
+            of the training sets. Note that for classification the number of
+            samples usually have to be big enough to contain at least one
+            sample from each class. (default: np.linspace(0.1, 1.0, 5))
+
         Returns:
             A plot of the learning curves for both the training curve and the
             cross-validation curve.
     """
     from sklearn.learning_curve import learning_curve
-    
+
     plt.figure()
     plt.title(title)
     if ylim is not None:
@@ -373,5 +417,3 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
 
     plt.legend(loc="best")
     return plt
-
-

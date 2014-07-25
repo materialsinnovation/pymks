@@ -35,8 +35,7 @@ class ElasticFESimulation(object):
     >>> X[0, :, 1] = 1
 
     >>> model = ElasticFESimulation(elastic_modulus=(1.0, 10.0), poissons_ratio=(0., 0.))
-    >>> y = model.get_response(X, slice(None)) # doctest: +ELLIPSIS
-    sfepy: ...
+    >>> y = model.get_response(X, slice(None))
 
     y is the strain with components as follows
 

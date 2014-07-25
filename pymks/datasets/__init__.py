@@ -1,11 +1,12 @@
 import numpy as np
-from pymks.datasets.elasticFESimulation import ElasticFESimulation
-from pymks.datasets.cahnHilliardSimulation import CahnHilliardSimulation
+from .elasticFESimulation import ElasticFESimulation
+from .cahnHilliardSimulation import CahnHilliardSimulation
 
 __all__ = ['make_delta_microstructures', 'make_elasticFEstrain_delta',
            'make_elasticFEstrain_random', 'make_cahnHilliard']
 
-def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio, 
+
+def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio,
                                size, macro_strain=1.0, strain_index=0):
     """Generate delta microstructures and responses
 
@@ -20,8 +21,7 @@ def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio,
     >>> poissons_ratio = (0.3, 0.3)
     >>> X, y = make_elasticFEstrain_delta(elastic_modulus=elastic_modulus,
     ...                                   poissons_ratio=poissons_ratio,
-    ...                                   size=(5, 5)) #doctest: +ELLIPSIS
-    sfepy: ...
+    ...                                   size=(5, 5))
 
     `X` is the delta microstructures, and `y` is the
     strain response fields.
@@ -30,7 +30,7 @@ def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio,
       elastic_modulus: list of elastic moduli for the phases
       poissons_ratio: list of Poisson's ratios for the phases
       size: size of the microstructure
-      macro_strain: Scalar for macroscopic strain applied 
+      macro_strain: Scalar for macroscopic strain applied
       strain_index: interger value to return a particular strain
         field.  0 returns exx, 1 returns eyy, etc. To return all
         strain fields set strain_index equal to slice(None).
@@ -45,6 +45,7 @@ def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio,
 
     X = make_delta_microstructures(len(elastic_modulus), size=size)
     return X, FEsim.get_response(X, strain_index=strain_index)
+
 
 def make_delta_microstructures(n_phases, size):
     """Constructs delta microstructures
@@ -90,6 +91,7 @@ def make_delta_microstructures(n_phases, size):
     mask = ~np.identity(n_phases, dtype=bool)
     return X[mask]
 
+
 def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
                                 size, macro_strain=1.0, strain_index=0):
     """Generate random microstructures and responses
@@ -104,8 +106,7 @@ def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
     >>> X, y = make_elasticFEstrain_random(n_samples=1,
     ...                                    elastic_modulus=elastic_modulus,
     ...                                    poissons_ratio=poissons_ratio,
-    ...                                    size=(5, 5)) #doctest: +ELLIPSIS
-    sfepy: ...
+    ...                                    size=(5, 5))
 
     `X` is the delta microstructures, and `y` is the
     strain response fields.
@@ -128,8 +129,9 @@ def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
                                 poissons_ratio=poissons_ratio,
                                 macro_strain=macro_strain)
 
-    X = np.random.randint(len(elastic_modulus), size=((n_samples,)+size))
+    X = np.random.randint(len(elastic_modulus), size=((n_samples, ) + size))
     return X, FEsim.get_response(X, strain_index=strain_index)
+
 
 def make_cahnHilliard(n_samples, size, dx=0.25, width=1., dt=0.001):
     """Generate delta microstructures and responses
@@ -139,7 +141,7 @@ def make_cahnHilliard(n_samples, size, dx=0.25, width=1., dt=0.001):
     `MKSRegressionModel`.  The following example is or a two phase
     microstructure with dimensions of `(5, 5)`.
 
-    >>> X, y = make_cahnHilliard(n_samples=1, size=(5, 5))
+    >>> X, y = make_cahnHilliard(n_samples=1, size=(6, 6))
 
     `X` is the initial concentration fields, and `y` is the
     strain response fields (the concentration after one time step).
@@ -158,5 +160,5 @@ def make_cahnHilliard(n_samples, size, dx=0.25, width=1., dt=0.001):
     """
     CHsim = CahnHilliardSimulation(dx=dx, dt=dt, width=width)
 
-    X = np.random.random((n_samples,) + size)
+    X = 2 * np.random.random((n_samples,) + size) - 1
     return X, CHsim.get_response(X)
