@@ -2,15 +2,36 @@ import numpy as np
 import scipy as sp
 
 
-def microstructure_generator(X):
-    _make_filter(X)
+def microstructure_generator(n_samples, size, n_phases):
+    X = np.random.random((n_samples,) + size)
+    filt = _make_filter(size)
+    filt = np.tile(filt, (n_samples,) + tuple(np.ones(len(filt.shape))))
+    print filt.shape
+    print X.shape
+    return _fft_convolve(X, filt)
 
 
-def _make_filter(X):
-    shape = np.array(X[0].shape) / 4.
-    filt = np.zeros_like(X[0].shape)
-    filt[:np.split(shape, len(shape))] = np.ones(shape)
-    print filt
+def _make_filter(size):
+    '''
+    Create filter for convolution.
+    '''
+    filter_size = np.array(size) / 2
+    filt = np.ones(filter_size, dtype=int)
+    pads = tuple([(0, ((p + 1) / 2)) for p in size])
+    return np.pad(filt, pads, 'constant', constant_values=0)
+
+
+def _fft_convolve(X, filt):
+    '''
+    Convolve X and the filter using FFT method.
+    '''
+    axes = np.arange(len(X[0].shape)) + 1
+    FX = np.fft.fftn(X, axes=axes)
+    Ffilt = np.fft.fftn(filt, axes=axes)
+    return np.fft.ifftn(FX * np.conj(Ffilt), axes=axes).real
+
+
+#def _assign_phases(X):
 
 
 """
