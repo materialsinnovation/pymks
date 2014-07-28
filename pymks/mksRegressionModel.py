@@ -58,7 +58,7 @@ class MKSRegressionModel(LinearRegression):
 
     def __init__(self, basis, n_states=None):
         """
-        Instantiate an MKSRegressionModel.
+        Instantiate a MKSRegressionModel.
 
         Args:
           basis: an instance of a bases class.
@@ -70,7 +70,7 @@ class MKSRegressionModel(LinearRegression):
         else:
             self.n_states = n_states
         self.domain = basis.domain
-                
+
     def fit(self, X, y):
         '''
         Fits the data by calculating a set of influence coefficients,
@@ -93,7 +93,7 @@ class MKSRegressionModel(LinearRegression):
           y: The response field, same shape as `X`.
         '''
         self.basis = self.basis.__class__(self.n_states, self.domain)
-        
+
         if not len(y.shape) > 1:
             raise RuntimeError("The shape of y is incorrect.")
         if y.shape != X.shape:
@@ -274,4 +274,3 @@ class MKSRegressionModel(LinearRegression):
         >>> assert np.allclose(FX, FXtest)
         '''
         pass
-

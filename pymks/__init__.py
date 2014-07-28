@@ -9,6 +9,7 @@ from .tools import bin
 from .bases.discrete import DiscreteIndicatorBasis
 from .bases.legendre import LegendreBasis
 from .bases.continuous import ContinuousIndicatorBasis
+from .spatialStatistics import SpatialStatistics
 
 
 @nottest
@@ -35,6 +36,7 @@ __version__ = _getVersion()
 __all__ = ['__version__',
            'test',
            'MKSRegressionModel',
+           'SpatialStatistics'
            'draw_microstructure_discretization',
            'bin',
            'DiscreteIndicatorBasis',
