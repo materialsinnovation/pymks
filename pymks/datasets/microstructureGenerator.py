@@ -30,7 +30,9 @@ def get_microstructure(n_samples, size, n_phases):
     gaussian_filter = np.tile(gaussian_filter, (n_samples,) +
                               tuple(np.ones(len(gaussian_filter.shape),
                                             dtype=int)))
-    return _assign_phases(_convolve_fft(X, gaussian_filter), n_phases)
+    X_blur = _convolve_fft(X, gaussian_filter,
+                           axes=np.arange(len(X[0].shape)) + 1)
+    return _assign_phases(X_blur, n_phases)
 
 
 def _make_filter(size):
@@ -50,11 +52,10 @@ def _make_filter(size):
     return np.pad(gaussian_filter, pads, 'constant', constant_values=0)
 
 
-def _convolve_fft(X, filt):
+def _convolve_fft(X, filt, axes):
     '''
     Convolve X and the filter using FFT method.
     '''
-    axes = np.arange(len(X[0].shape)) + 1
     FX = np.fft.fftn(X, axes=axes)
     Ffilt = np.fft.fftn(filt, axes=axes)
     return np.fft.ifftn(FX * np.conj(Ffilt), axes=axes).real
@@ -66,5 +67,5 @@ def _assign_phases(X, n_phases):
     '''
     x = np.linspace(np.min(X), np.max(X), n_phases + 1)[:-1][::-1]
     for ii in range(len(x)):
-        X = np.where(X >= x[ii], int(ii), X)
-    return np.intc(X)
+        X = np.where(X >= x[ii], -int(ii), X)
+    return np.intc(-X)
