@@ -67,4 +67,4 @@ def _assign_phases(X, n_phases):
     x = np.linspace(np.min(X), np.max(X), n_phases + 1)[:-1][::-1]
     for ii in range(len(x)):
         X = np.where(X >= x[ii], int(ii), X)
-    return np.round(X)
+    return np.intc(X)
