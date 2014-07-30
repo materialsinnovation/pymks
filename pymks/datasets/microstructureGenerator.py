@@ -23,7 +23,6 @@ class MicrostructureGenerator(object):
         Create filter for convolution.
         '''
         M = np.max(size) / 2
-        guassian = scipy.
         gaussian = np.exp(-((np.arange(M) - (M / 2)) / (M / 8.)) ** 2)
         dim = len(size)
         gaussian = np.ones((np.array(size)) / 2) * gaussian
@@ -95,7 +94,6 @@ def _make_filter(size):
     Create filter for convolution.
     '''
     M = np.max(size) / 2
-    guassian = scipy.
     gaussian = np.exp(-((np.arange(M) - (M / 2)) / (M / 8.)) ** 2)
     dim = len(size)
     gaussian = np.ones((np.array(size)) / 2) * gaussian

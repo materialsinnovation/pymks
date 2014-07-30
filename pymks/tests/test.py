@@ -140,4 +140,4 @@ def test_multiphase():
         assert mse(y_test, y_pred) < 0.03
 
 if __name__ == '__main__':
-    test_MKSelastic_random()
+    test_MKSelastic_delta()
