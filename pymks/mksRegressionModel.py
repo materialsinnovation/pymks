@@ -161,7 +161,7 @@ class MKSRegressionModel(LinearRegression):
             raise AttributeError("fit() method must be run before predict().")
         if X.shape[1:] != self.Fcoeff.shape[:-1]:
             raise RuntimeError("Dimension of X are incorrect.")
-        FX = self._discrtizefft(X)
+        FX = self._discretizefft(X)
         Fy = np.sum(FX * self.Fcoeff[None, ...], axis=-1)
         return np.fft.ifftn(Fy, axes=self._axes(X)).real
 
@@ -219,7 +219,7 @@ class MKSRegressionModel(LinearRegression):
 
         self.Fcoeff = Fcoeff_pad
 
-    def _discrtizefft(self, X):
+    def _discretizefft(self, X):
         X_ = self.basis.discretize(X)
         return np.fft.fftn(X_, axes=self._axes(X))
 
