@@ -5,19 +5,15 @@ class Filter(object):
     """
     Wrapper class for convolution with a kernel and resizing of a kernel
     """
-    def __init__(self, Fkernel, axes=None):
+    def __init__(self, Fkernel):
         """
         Instantiate a Filter.
 
         Args:
           Fkernel: an array representing a convolution kernel
-          axes: the convolution axes
         """
-        
+        self.axes = np.arange(len(Fkernel.shape) - 2) + 1
         self.Fkernel = Fkernel
-        self.axes = axes
-        if self.axes is None:
-            self.axes = np.arange(len(self.Fkernel.shape))
 
     def frequency2real(self):
         """
@@ -52,13 +48,12 @@ class Filter(object):
         Returns:
           convolution of X with the kernel
         """
-        if X.shape[1:] != self.Fkernel.shape:
+        if X.shape[1:] != self.Fkernel.shape[1:]:
             raise RuntimeError("Dimensions of X are incorrect.")
-        FX = np.fft.fftn(X, axes=self.axes + 1)
-        Fy = FX * self.Fkernel[None, ...]
-        if len(self.axes) + 1 == len(self.Fkernel.shape):
-            Fy = np.sum(Fy, axis=-1)
-        return np.fft.ifftn(Fy, axes=self.axes + 1).real
+        FX = np.fft.fftn(X, axes=self.axes)
+        Fy = FX * self.Fkernel
+        Fy = np.sum(Fy, axis=-1)
+        return np.fft.ifftn(Fy, axes=self.axes).real
 
     def resize(self, size):
         """
@@ -67,12 +62,13 @@ class Filter(object):
         Args:
           size: tuple with the shape of the new kernel
         """
-        if len(size) != len(self.Fkernel.shape):
+        if len(size) != len(self.Fkernel.shape[1:-1]):
             raise RuntimeError("length of resize shape is incorrect.")
-        if not np.all(size >= self.Fkernel.shape[:-1]):
+        if not np.all(size >= self.Fkernel.shape[1:-1]):
             raise RuntimeError("resize shape is too small.")
 
         kernel = self.frequency2real()
+        size = kernel.shape[:1] + size + kernel.shape[-1:]
         padsize = np.array(size) - np.array(kernel.shape)
         paddown = padsize / 2
         padup = padsize - paddown
@@ -83,3 +79,12 @@ class Filter(object):
         Fkernel_pad = self.real2frequency(kernel_pad)
 
         self.Fkernel = Fkernel_pad
+
+
+    
+
+        
+
+        
+        
+        

@@ -112,7 +112,7 @@ class MKSRegressionModel(LinearRegression):
             Fkernel[ijk + s1] = np.linalg.lstsq(FX[s0 + ijk + s1],
                                                 Fy[s0 + ijk])[0]
         
-        self._filter = Filter(Fkernel, axes=axes - 1)
+        self._filter = Filter(Fkernel[None])
         
 
     @property
@@ -120,7 +120,7 @@ class MKSRegressionModel(LinearRegression):
         '''Returns the coefficients in real space with origin shifted to the
         center.
         '''
-        return self._filter.frequency2real()
+        return self._filter.frequency2real()[0]
 
     def predict(self, X):
         r'''Calculate a new response from the microstructure function `X` with
@@ -168,7 +168,7 @@ class MKSRegressionModel(LinearRegression):
         >>> coeff = np.arange(20).reshape((5, 4, 1))
         >>> coeff = np.concatenate((coeff , np.ones_like(coeff)), axis=2)
         >>> coeff = np.fft.ifftshift(coeff, axes=(0, 1))
-        >>> model._filter = Filter(np.fft.fftn(coeff, axes=(0, 1)), axes=(0, 1))
+        >>> model._filter = Filter(np.fft.fftn(coeff, axes=(0, 1))[None])
 
         The coefficients can be reshaped by passing the new shape that
         coefficients should have.
@@ -191,7 +191,6 @@ class MKSRegressionModel(LinearRegression):
         Returns:
             The resized influence coefficients to size.
         '''
-        size += (self.n_states,)
         self._filter.resize(size)
 
     def _test(self):

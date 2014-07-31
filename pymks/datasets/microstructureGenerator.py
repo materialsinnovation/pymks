@@ -1,5 +1,5 @@
 import numpy as np
-from pymks import Filter
+from pymks.filter import Filter
 from scipy.ndimage.fourier import fourier_gaussian
 
 class MicrostructureGenerator(object):
@@ -55,9 +55,9 @@ class MicrostructureGenerator(object):
             raise RuntimeError("Dimensions of size and grain_size are not equal.")
         X = np.random.random((self.n_samples,) + self.size)
         gaussian = fourier_gaussian(np.ones(self.grain_size), np.ones(len(self.size)))
-        filter_ = Filter(np.fft.fftn(gaussian))
+        filter_ = Filter(np.fft.fftn(gaussian)[None,...,None])
         filter_.resize(self.size)
-        X_blur = filter_.convolve(X)
+        X_blur = filter_.convolve(X[...,None])
         return self._assign_phases(X_blur)
 
     def _assign_phases(self, X_blur):
