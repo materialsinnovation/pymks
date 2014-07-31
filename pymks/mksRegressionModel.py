@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression
-from .filters import Filter
+from .filter import Filter
+
 
 class MKSRegressionModel(LinearRegression):
     '''
@@ -190,7 +191,7 @@ class MKSRegressionModel(LinearRegression):
         Returns:
             The resized influence coefficients to size.
         '''
-
+        size += (self.n_states,)
         self._filter.resize(size)
 
     def _test(self):
