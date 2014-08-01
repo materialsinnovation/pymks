@@ -123,11 +123,7 @@ class Correlation(Filter):
         
     def sum(self, Fy):
         return Fy
-        
-def crosscorrelate(X_):
-    n_states = X_.shape[-1]
-    Niter = n_states / 2 + 1
-    Nslice = n_states * (n_states - 1) / 2 + n_states
-    tmp = [Correlation(X_).convolve(np.roll(X_, i, axis=-1)) for i in range(Niter)]
-    return np.concatenate(tmp, axis=-1)[...,:Nslice]
+
+
+
     
