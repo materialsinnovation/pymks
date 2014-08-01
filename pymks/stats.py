@@ -7,11 +7,11 @@ point statistics. Current the funciton only work for interger valued
 microstructures and the DiscreteIndicatorBasis.
 """
 
-def autocorrelate(self, X_):
+def autocorrelate(X_):
     """
     Computes the autocorrelation for a microstructure
     """
-    Correlation(X_).convolve(X_)
+    return Correlation(X_).convolve(X_)
 
 def crosscorrelate(X_):
     '''
@@ -56,7 +56,6 @@ def crosscorrelate(X_):
     >>> print crosscorrelate(X_).shape
     (1, 3, 3, 10)
 
-    
     Args:
       X: microstructure
     Returns:
