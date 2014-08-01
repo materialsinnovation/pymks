@@ -58,7 +58,7 @@ class MicrostructureGenerator(object):
         filter_ = Filter(np.fft.fftn(gaussian)[None,...,None])
         filter_.resize(self.size)
         X_blur = filter_.convolve(X[...,None])
-        return self._assign_phases(X_blur)
+        return self._assign_phases(X_blur).astype(int)
 
     def _assign_phases(self, X_blur):
         '''
