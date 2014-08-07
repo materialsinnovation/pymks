@@ -134,12 +134,12 @@ def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
 
 
 def make_cahnHilliard(n_samples, size, dx=0.25, width=1., dt=0.001):
-    """Generate delta microstructures and responses
+    """Generate microstructures and responses for Cahn-Hilliard.
 
     Simple interface to generate random concentration fields and their
     evolution after one time step that can be used for the fit method in the
     `MKSRegressionModel`.  The following example is or a two phase
-    microstructure with dimensions of `(5, 5)`.
+    microstructure with dimensions of `(6, 6)`.
 
     >>> X, y = make_cahnHilliard(n_samples=1, size=(6, 6))
 

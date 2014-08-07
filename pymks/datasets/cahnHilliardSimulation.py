@@ -12,6 +12,7 @@ class CahnHilliardSimulation(object):
        \dot{\phi} = \nabla^2 \left( \phi^3 - \phi \right) - \nabla^4 \phi
 
     In 1D.
+    
     >>> np.random.seed(99)
     >>> N = 100
     >>> phi = 0.01 * (2 * np.random.random((2, N)) - 1)
