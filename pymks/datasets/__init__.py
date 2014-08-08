@@ -158,7 +158,7 @@ def make_cahnHilliard(n_samples, size, dx=0.25, width=1., dt=0.001):
       of 'X'
 
     """
-    CHsim = CahnHilliardSimulation(dx=dx, dt=dt, width=width)
+    CHsim = CahnHilliardSimulation(dx=dx, dt=dt, gamma=width**2)
 
     X = 2 * np.random.random((n_samples,) + size) - 1
     return X, CHsim.get_response(X)
