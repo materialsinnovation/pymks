@@ -1,5 +1,4 @@
 import numpy as np
-from .elasticFESimulation import ElasticFESimulation
 from .cahnHilliardSimulation import CahnHilliardSimulation
 
 __all__ = ['make_delta_microstructures', 'make_elasticFEstrain_delta',
@@ -39,6 +38,8 @@ def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio,
       tuple containing delta microstructures and their strain fields
 
     """
+    from .elasticFESimulation import ElasticFESimulation
+    
     FEsim = ElasticFESimulation(elastic_modulus=elastic_modulus,
                                 poissons_ratio=poissons_ratio,
                                 macro_strain=macro_strain)
@@ -125,6 +126,8 @@ def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
       tuple containing delta microstructures and their strain fields
 
     """
+    from .elasticFESimulation import ElasticFESimulation
+    
     FEsim = ElasticFESimulation(elastic_modulus=elastic_modulus,
                                 poissons_ratio=poissons_ratio,
                                 macro_strain=macro_strain)

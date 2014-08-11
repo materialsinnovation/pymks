@@ -37,7 +37,7 @@ def crosscorrelate(X_):
     >>> n_states = 3
     >>> basis = DiscreteIndicatorBasis(n_states=n_states)
     >>> X_ = basis.discretize(X)
-    >>> print crosscorrelate(X_).shape
+    >>> print(crosscorrelate(X_).shape)
     (1, 3, 3, 3)
 
     Test for 4 states
@@ -45,7 +45,7 @@ def crosscorrelate(X_):
     >>> n_states = 4
     >>> basis = DiscreteIndicatorBasis(n_states=n_states)
     >>> X_ = basis.discretize(X)
-    >>> print crosscorrelate(X_).shape
+    >>> print(crosscorrelate(X_).shape)
     (1, 3, 3, 6)
 
     Test for 5 states
@@ -53,7 +53,7 @@ def crosscorrelate(X_):
     >>> n_states = 5
     >>> basis = DiscreteIndicatorBasis(n_states=n_states)
     >>> X_ = basis.discretize(X)
-    >>> print crosscorrelate(X_).shape
+    >>> print(crosscorrelate(X_).shape)
     (1, 3, 3, 10)
 
     Args:
@@ -63,7 +63,7 @@ def crosscorrelate(X_):
     '''
     
     n_states = X_.shape[-1]
-    Niter = n_states / 2
+    Niter = n_states // 2
     Nslice = n_states * (n_states - 1) / 2
     tmp = [Correlation(X_).convolve(np.roll(X_, i, axis=-1)) for i in range(1, Niter + 1)]
     return np.concatenate(tmp, axis=-1)[...,:Nslice]

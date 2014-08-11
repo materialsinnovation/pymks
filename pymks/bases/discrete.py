@@ -15,7 +15,7 @@ class DiscreteIndicatorBasis(_AbstractMicrostructureBasis):
     >>> X = np.array([[[1, 1, 0],
     ...                [1, 0 ,2],
     ...                [0, 1, 0]]])
-    >>> print X.shape
+    >>> print(X.shape)
     (1, 3, 3)
 
     The `discretize` method discretizes the labeled phases into three

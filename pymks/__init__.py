@@ -9,7 +9,7 @@ from .tools import bin
 from .bases.discrete import DiscreteIndicatorBasis
 from .bases.legendre import LegendreBasis
 from .bases.continuous import ContinuousIndicatorBasis
-from .spatialStatisticsModel import SpatialStatisticsModel
+
 
 @nottest
 def test():

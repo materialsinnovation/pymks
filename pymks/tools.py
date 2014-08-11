@@ -120,7 +120,7 @@ def draw_microstructure_discretization(M, a=0, s=0, Nbin=6,
 
 def draw_coeff(coeff):
     if coeff.dtype == 'complex':
-        print DeprecationWarning("Coefficients are complex.")
+        print(DeprecationWarning("Coefficients are complex."))
         coeff = coeff.real
     coeff_cmap = _get_coeff_cmap()
     plt.close('all')
@@ -211,7 +211,7 @@ def draw_strains(*strains, **titles):
         axs.set_xticks(())
         axs.set_yticks(())
         axs.set_title(r'$\mathbf{\varepsilon_{%s}}$'
-                      % titles.itervalues().next(), fontsize=25)
+                      % next(iter(titles.values())), fontsize=25)
     fig.subplots_adjust(right=0.8)
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
     fig.colorbar(im, cax=cbar_ax)
@@ -238,7 +238,7 @@ def draw_concentrations(*concentrations, **titles):
                         interpolation='none', vmin=vmin, vmax=vmax)
         axs.set_xticks(())
         axs.set_yticks(())
-        axs.set_title('Concentration (%s)' % titles.itervalues().next(),
+        axs.set_title('Concentration (%s)' % next(iter(titles.values())),
                       fontsize=15)
     fig.subplots_adjust(right=0.8)
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
@@ -309,7 +309,7 @@ def draw_diff(*responses, **titles):
                         interpolation='none', vmin=vmin, vmax=vmax)
         axs.set_xticks(())
         axs.set_yticks(())
-        axs.set_title('%s' % titles.itervalues().next(), fontsize=15)
+        axs.set_title('%s' % next(iter(titles.values())), fontsize=15)
     fig.subplots_adjust(right=0.8)
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
     fig.colorbar(im, cax=cbar_ax)
@@ -319,7 +319,7 @@ def draw_gridscores(grid_scores, label=None, color='#f46d43'):
     tmp = [[params['n_states'], -mean_score, scores.std()] \
             for params, mean_score, scores in grid_scores]
     
-    n_states, errors, stddev = zip(*tmp)
+    n_states, errors, stddev = list(zip(*tmp))
     plt.errorbar(n_states, errors, yerr=stddev, linewidth=2, color=color, label=label)
 
     plt.legend()

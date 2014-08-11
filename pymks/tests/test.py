@@ -1,15 +1,9 @@
-from pymks import MKSRegressionModel
-from pymks.datasets.elasticFESimulation import ElasticFESimulation
 import numpy as np
-from sklearn import metrics
-mse = metrics.mean_squared_error
-from pymks.datasets import make_elasticFEstrain_delta
-from pymks.datasets import make_elasticFEstrain_random
-from pymks.datasets.cahnHilliardSimulation import CahnHilliardSimulation
-from pymks.datasets import make_cahnHilliard
-from pymks.bases import DiscreteIndicatorBasis
+
 
 def test_ElasticFESimulation_2D():
+    from pymks.datasets.elasticFESimulation import ElasticFESimulation
+
     nx = 5
     ii = (nx - 1) / 2
     X = np.zeros((1, nx, nx), dtype=int)
@@ -20,6 +14,8 @@ def test_ElasticFESimulation_2D():
     assert np.allclose(strains[0, ii, ii], solution, rtol=1e-3)
 
 def test_ElasticFESimulation_3D():
+    from pymks.datasets.elasticFESimulation import ElasticFESimulation
+
     nx = 4
     ii = (nx - 1) / 2
     X = np.zeros((1, nx, nx, nx), dtype=int)
@@ -30,22 +26,26 @@ def test_ElasticFESimulation_3D():
     assert np.allclose([np.mean(strains[0,...,i]) for i in range(6)], solution)
 
 def get_delta_data(nx, ny):
-
+    from pymks.datasets import make_elasticFEstrain_delta
     return make_elasticFEstrain_delta(elastic_modulus=(1, 1.1), 
                                       poissons_ratio=(0.3, 0.3), 
                                       size=(nx, ny),
                                       strain_index=slice(None))
 
 def get_random_data(nx, ny):
+    from pymks.datasets import make_elasticFEstrain_random
     np.random.seed(8)
     return make_elasticFEstrain_random(elastic_modulus=(1., 1.1),
                                 poissons_ratio=(0.3, 0.3), n_samples=1,
                                 size=(nx, ny), strain_index=slice(None))
 
 def rollzip(*args):
-    return zip(*tuple(np.rollaxis(x, -1) for x in args))
+    return list(zip(*tuple(np.rollaxis(x, -1) for x in args)))
 
 def test_MKSelastic_delta():
+    from pymks import MKSRegressionModel
+    from pymks.bases import DiscreteIndicatorBasis
+    
     nx, ny = 21, 21
     X, y_prop = get_delta_data(nx, ny)
     basis = DiscreteIndicatorBasis(n_states=2)
@@ -57,6 +57,9 @@ def test_MKSelastic_delta():
         assert np.allclose(y_pred, y_test, rtol=1e-3, atol=1e-3)
 
 def test_MKSelastic_random():
+    from pymks import MKSRegressionModel
+    from pymks.bases import DiscreteIndicatorBasis
+    
     nx, ny = 21, 21
     i = 3
     X_delta, strains_delta = get_delta_data(nx, ny)
@@ -70,6 +73,9 @@ def test_MKSelastic_random():
         assert np.allclose(y_pred[0, i:-i], y_test[0, i:-i], rtol=1e-2, atol=6.1e-3)
 
 def test_resize_pred():
+    from pymks import MKSRegressionModel
+    from pymks.bases import DiscreteIndicatorBasis
+    
     nx, ny = 21, 21
     i = 3
     resize = 3
@@ -88,6 +94,9 @@ def test_resize_pred():
         assert np.allclose(y_big_pred[0, resize * i:-i * resize], y_big_test[0, resize * i:-i * resize],  rtol=1e-2, atol=6.1e-2)
         
 def test_resize_coeff():
+    from pymks import MKSRegressionModel
+    from pymks.bases import DiscreteIndicatorBasis
+    
     nx, ny = 21, 21
     resize = 3
     X_delta, strains_delta = get_delta_data(nx, ny)
@@ -99,10 +108,20 @@ def test_resize_coeff():
         big_model = MKSRegressionModel(basis)
         model.fit(X_delta, y_delta)
         big_model.fit(X_big_delta, y_big_delta)
-        model.resize_coeff((resize * nx, resize * ny))
+        model.resize_coeff((resize * 
+                            nx, resize * ny))
         assert np.allclose(model.coeff, big_model.coeff, rtol=1e-2, atol=2.1e-3)
     
 def test_multiphase():
+    from pymks import MKSRegressionModel
+    from pymks.datasets import make_elasticFEstrain_delta
+    from sklearn import metrics
+    mse = metrics.mean_squared_error
+    from pymks.datasets import make_elasticFEstrain_random
+    from pymks.datasets.cahnHilliardSimulation import CahnHilliardSimulation
+    from pymks.datasets import make_cahnHilliard
+    from pymks.bases import DiscreteIndicatorBasis
+    
     L = 21
     i = 3
     elastic_modulus = (80, 100, 120)
@@ -121,8 +140,8 @@ def test_multiphase():
                                    poissons_ratio=poissons_ratio, size=size, 
                                    macro_strain=macro_strain)
     strain_pred = MKSmodel.predict(X)
-    print strain[0]
-    print strain_pred[0]
+    print(strain[0])
+    print(strain_pred[0])
     assert np.allclose(strain_pred[0, i:-i], strain[0, i:-i], rtol=1e-2, atol=6.1e-3)
 
     def test_cahnHilliard():

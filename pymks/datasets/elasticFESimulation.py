@@ -65,7 +65,7 @@ class ElasticFESimulation(object):
         self.elastic_modulus = elastic_modulus
         self.poissons_ratio = poissons_ratio
         if len(elastic_modulus) != len(poissons_ratio):
-            raise RuntimeError, 'elastic_modulus and poissons_ratio must be the same length'
+            raise RuntimeError('elastic_modulus and poissons_ratio must be the same length')
 
     def _convert_properties(self, dim):
         """
@@ -128,13 +128,13 @@ class ElasticFESimulation(object):
         dim = len(X.shape) - 1
         n_phases = len(self.elastic_modulus)
         if not issubclass(X.dtype.type, np.integer):
-            raise TypeError, "X must be an integer array"
+            raise TypeError("X must be an integer array")
         if n_phases != np.max(X) + 1:
-            raise RuntimeError, "X has the wrong number of phases."
+            raise RuntimeError("X has the wrong number of phases.")
         if np.min(X) != 0:
-            raise RuntimeError, "Phases must be zero indexed."
+            raise RuntimeError("Phases must be zero indexed.")
         if not (2 <= dim <= 3):
-            raise RuntimeError, "the shape of X is incorrect"
+            raise RuntimeError("the shape of X is incorrect")
         return self._convert_properties(dim)[X]
 
     def get_response(self, X, strain_index=0):
@@ -250,7 +250,7 @@ class ElasticFESimulation(object):
     def _get_periodicBCs(self, domain):
         dims = domain.get_mesh_bounding_box().shape[1]
 
-        bc_list, func_list = zip(*[self._get_periodicBC(domain, i) for i in range(1, dims)])
+        bc_list, func_list = list(zip(*[self._get_periodicBC(domain, i) for i in range(1, dims)]))
         return Conditions(bc_list), Functions(func_list)
 
     def _get_displacementBCs(self, domain):

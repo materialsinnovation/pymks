@@ -72,7 +72,7 @@ class Filter(object):
         kernel = self.frequency2real()
         size = kernel.shape[:1] + size + kernel.shape[-1:]
         padsize = np.array(size) - np.array(kernel.shape)
-        paddown = padsize / 2
+        paddown = padsize // 2
         padup = padsize - paddown
         padarray = np.concatenate((padup[..., None],
                                    paddown[..., None]), axis=1)
