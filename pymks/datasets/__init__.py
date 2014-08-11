@@ -1,9 +1,11 @@
 import numpy as np
 from .elasticFESimulation import ElasticFESimulation
 from .cahnHilliardSimulation import CahnHilliardSimulation
+from .microstructureGenerator import MicrostructureGenerator
 
 __all__ = ['make_delta_microstructures', 'make_elasticFEstrain_delta',
-           'make_elasticFEstrain_random', 'make_cahnHilliard']
+           'make_elasticFEstrain_random',
+           'make_cahnHilliard', 'make_microstructure']
 
 
 def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio,
@@ -133,7 +135,7 @@ def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
     return X, FEsim.get_response(X, strain_index=strain_index)
 
 
-def make_cahnHilliard(n_samples, size, dx=0.25, width=1., dt=0.001):
+def make_cahnHilliard(n_samples, size, dx=0.25, width=1., dt=0.001, n_steps=1):
     """Generate delta microstructures and responses
 
     Simple interface to generate random concentration fields and their
@@ -152,13 +154,50 @@ def make_cahnHilliard(n_samples, size, dx=0.25, width=1., dt=0.001):
       dx: grid spacing
       dt: time step size
       width: interface width between phases.
+      n_steps: number of time steps used
 
     Returns:
-      Array representing the microstructures at one time step ahead
-      of 'X'
+      Array representing the microstructures at n_steps ahead of 'X'
 
     """
     CHsim = CahnHilliardSimulation(dx=dx, dt=dt, width=width)
 
-    X = 2 * np.random.random((n_samples,) + size) - 1
-    return X, CHsim.get_response(X)
+    X0 = 2 * np.random.random((n_samples,) + size) - 1
+    X = X0.copy()
+    for ii in range(n_steps):
+        X = CHsim.get_response(X)
+    return X0, X
+
+
+def make_microstructure(n_samples=10, size=(101, 101), n_phases=2,
+                        grain_size=(33, 14), seed=10):
+    """
+    Constructs microstructures for an arbitrary number of phases
+    given the size of the domain, and relative grain size.
+
+    >>> n_samples, n_phases = 1, 2
+    >>> size, grain_size = (3, 3), (1, 1)
+    >>> Xtest = np.array([[[0, 1, 0],
+    ...                [0, 0, 0],
+    ...                [0, 1, 1]]])
+    >>> X = make_microstructure(n_samples=n_samples, size=size,
+    ...                         n_phases=n_phases, grain_size=grain_size,
+    ...                         seed=0)
+
+    >>> assert(np.allclose(X, Xtest))
+
+    Args:
+        n_samples: number of samples
+        size: dimension of microstructure
+        n_phases: number of phases
+        grain_size: effective dimensions of grains
+        seed: seed for random number microstructureGenerator
+
+    Returns:
+        microstructures for the system of shape (Nsamples, Nx, Ny, ...)
+
+    """
+    MS = MicrostructureGenerator(n_samples=n_samples, size=size,
+                                 n_phases=n_phases, grain_size=grain_size,
+                                 seed=seed)
+    return MS.generate()

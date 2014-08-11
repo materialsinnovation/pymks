@@ -18,7 +18,7 @@ def crosscorrelate(X_):
     Computes the crosscorrelations for a microstructure.
 
     Test for 2 states.
-    
+
     >>> n_states = 2
     >>> X = np.array([[[0, 1, 0],
     ...                [0, 1, 0],
@@ -33,7 +33,7 @@ def crosscorrelate(X_):
     >>> assert(np.allclose(X_cross, X_test))
 
     Test for 3 states
-    
+
     >>> n_states = 3
     >>> basis = DiscreteIndicatorBasis(n_states=n_states)
     >>> X_ = basis.discretize(X)
@@ -41,7 +41,7 @@ def crosscorrelate(X_):
     (1, 3, 3, 3)
 
     Test for 4 states
-    
+
     >>> n_states = 4
     >>> basis = DiscreteIndicatorBasis(n_states=n_states)
     >>> X_ = basis.discretize(X)
@@ -49,7 +49,7 @@ def crosscorrelate(X_):
     (1, 3, 3, 6)
 
     Test for 5 states
-    
+
     >>> n_states = 5
     >>> basis = DiscreteIndicatorBasis(n_states=n_states)
     >>> X_ = basis.discretize(X)
@@ -61,7 +61,7 @@ def crosscorrelate(X_):
     Returns:
       Crosscorelations for microstructure X.
     '''
-    
+
     n_states = X_.shape[-1]
     Niter = n_states / 2
     Nslice = n_states * (n_states - 1) / 2
