@@ -1,12 +1,45 @@
 #!/usr/bin/env python
 
+import subprocess
 from setuptools import setup, find_packages
+import os
+
+
+def git_version():
+    def _minimal_ext_cmd(cmd):
+        # construct minimal environment
+        env = {}
+        for k in ['SYSTEMROOT', 'PATH']:
+            v = os.environ.get(k)
+            if v is not None:
+                env[k] = v
+        # LANGUAGE is used on win32
+        env['LANGUAGE'] = 'C'
+        env['LANG'] = 'C'
+        env['LC_ALL'] = 'C'
+        out = subprocess.Popen(cmd, stdout = subprocess.PIPE, env=env).communicate()[0]
+        return out
+    
+    try:
+        out = _minimal_ext_cmd(['git', 'rev-parse', 'HEAD'])
+        GIT_REVISION = out.strip().decode('ascii')
+    except OSError:
+        GIT_REVISION = ""
+
+    return GIT_REVISION
+
+def getVersion(version, release=False):
+    if release:
+        return version
+    else:
+        return version + '-dev' + git_version()[:7]
+
 setup(name='pymks',
-      version='0.1-dev',
-      description='Package for Materials Knowledge System (MKS) regression tutorial',
+      version=getVersion('0.1'),
+      description='Package for the Materials Knowledge System (MKS)',
       author='Daniel Wheeler',
       author_email='daniel.wheeler2@gmail.com',
-      url='http://wd15.github.com/pymks',
+      url='http://pymks.org',
       packages=find_packages(),
       package_data = {'' : ['tests/*.py']}
       )
