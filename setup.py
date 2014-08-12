@@ -29,10 +29,14 @@ def git_version():
     return GIT_REVISION
 
 def getVersion(version, release=False):
+    if os.path.exists('.git'):
+        _git_version = git_version()[:7]
+    else:
+        _git_version = ''
     if release:
         return version
     else:
-        return version + '-dev' + git_version()[:7]
+        return version + '-dev.' + _git_version
 
 setup(name='pymks',
       version=getVersion('0.1'),
