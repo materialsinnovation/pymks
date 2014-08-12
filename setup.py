@@ -45,5 +45,6 @@ setup(name='pymks',
       author_email='daniel.wheeler2@gmail.com',
       url='http://pymks.org',
       packages=find_packages(),
-      package_data = {'' : ['tests/*.py']}
+      package_data={'' : ['tests/*.py']},
+      install_requires=['nose', 'numpy', 'scikit-learn', 'scipy']
       )

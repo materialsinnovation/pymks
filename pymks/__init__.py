@@ -4,8 +4,6 @@ import os
 import nose
 from nose.tools import nottest
 from .mksRegressionModel import MKSRegressionModel
-from .tools import draw_microstructure_discretization
-from .tools import bin
 from .bases.discrete import DiscreteIndicatorBasis
 from .bases.legendre import LegendreBasis
 from .bases.continuous import ContinuousIndicatorBasis
