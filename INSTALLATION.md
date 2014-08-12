@@ -4,25 +4,26 @@ Use pip,
 
     $ pip install pymks
 
-Check that you can import it and run the tests.
+and then run the tests.
 
     $ python -c "import pymks; pymks.test()"
 
 ## Scipy Stack
 
-The packages Nosetests, Scipy, Numpy, Scikit-learn and [Sfepy](sfepy)
-are all required to run the tests.
+The packages [Nosetests](https://nose.readthedocs.org/en/latest/),
+[Scipy](http://www.scipy.org/), [Numpy](http://www.scipy.org/),
+[Scikit-learn](http://scikit-learn.org) are all required.
 
 ## Examples
 
 To use the interactive examples from the `notebooks/` directory,
-IPython and Matplotlib are required.
+IPython and Matplotlib are both required.
 
 ## [SfePy][sfepy]
 
-PyMKS can be used without [SfePy][sfepy]. However, a number of the
-tests depend on [SfePy][sfepy] to run and it is also required to run
-the elasticity examples.
+PyMKS can be used without [SfePy][sfepy], but many of the tests and
+examples require [SfePy][sfepy] to generate the sample data so it is a
+good idea to install it.
 
 To install [SfePy][sfepy], first clone with
 
