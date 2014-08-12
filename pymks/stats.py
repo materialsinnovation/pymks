@@ -1,5 +1,5 @@
 import numpy as np
-from .filter import Correlation
+from ._filter import _Correlation
 
 """
 The SpatialStatisticsModel takes in a microstructure and returns its two
@@ -7,11 +7,13 @@ point statistics. Current the funciton only work for interger valued
 microstructures and the DiscreteIndicatorBasis.
 """
 
+
 def autocorrelate(X_):
     """
     Computes the autocorrelation for a microstructure
     """
-    return Correlation(X_).convolve(X_)
+    return _Correlation(X_).convolve(X_)
+
 
 def crosscorrelate(X_):
     '''
@@ -65,5 +67,7 @@ def crosscorrelate(X_):
     n_states = X_.shape[-1]
     Niter = n_states / 2
     Nslice = n_states * (n_states - 1) / 2
-    tmp = [Correlation(X_).convolve(np.roll(X_, i, axis=-1)) for i in range(1, Niter + 1)]
-    return np.concatenate(tmp, axis=-1)[...,:Nslice]
+    tmp = [_Correlation(X_).convolve(np.roll(X_, i,
+                                             axis=-1)) for i in range(1,
+                                                                      Niter + 1)]
+    return np.concatenate(tmp, axis=-1)[..., :Nslice]

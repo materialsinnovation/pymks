@@ -3,13 +3,13 @@ import os
 
 import nose
 from nose.tools import nottest
-from .mksRegressionModel import MKSRegressionModel
+from .mks_regression_model import MKSRegressionModel
 from .tools import draw_microstructure_discretization
 from .tools import bin
 from .bases.discrete import DiscreteIndicatorBasis
 from .bases.legendre import LegendreBasis
 from .bases.continuous import ContinuousIndicatorBasis
-from .mksKernelPCAModel import MKSKernelPCAModel
+from .mks_kernel_pca_model import MKSKernelPCAModel
 
 
 @nottest

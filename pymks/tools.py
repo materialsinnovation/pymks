@@ -4,32 +4,32 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def _set_colors():
+def _setColors():
     HighRGB = np.array([26, 152, 80]) / 255.
     MediumRGB = np.array([255, 255, 191]) / 255.
     LowRGB = np.array([0, 0, 0]) / 255.
-    cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
+    cdict = _setCdict(HighRGB, MediumRGB, LowRGB)
     plt.register_cmap(name='PyMKS', data=cdict)
     plt.set_cmap('PyMKS')
 
 
-def _get_response_cmap():
+def _getResponseCmap():
     HighRGB = np.array([26, 152, 80]) / 255.
     MediumRGB = np.array([255, 255, 191]) / 255.
     LowRGB = np.array([0, 0, 0]) / 255.
-    cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
+    cdict = _setCdict(HighRGB, MediumRGB, LowRGB)
     return colors.LinearSegmentedColormap('coeff_cmap', cdict, 256)
 
 
-def _get_diff_cmap():
+def _getDiffCmap():
     HighRGB = np.array([118, 42, 131]) / 255.
     MediumRGB = np.array([255, 255, 191]) / 255.
     LowRGB = np.array([0, 0, 0]) / 255.
-    cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
+    cdict = _setCdict(HighRGB, MediumRGB, LowRGB)
     return colors.LinearSegmentedColormap('coeff_cmap', cdict, 256)
 
 
-def _set_cdict(HighRGB, MediumRGB, LowRGB):
+def _setCdict(HighRGB, MediumRGB, LowRGB):
     cdict = {'red': ((0.0, LowRGB[0], LowRGB[0]),
                     (0.5, MediumRGB[0], MediumRGB[0]),
                     (1.0, HighRGB[0], HighRGB[0])),
@@ -45,11 +45,11 @@ def _set_cdict(HighRGB, MediumRGB, LowRGB):
     return cdict
 
 
-def _get_coeff_cmap():
+def _getCoeffCmap():
     HighRGB = np.array([244, 109, 67]) / 255.
     MediumRGB = np.array([255, 255, 191]) / 255.
     LowRGB = np.array([0, 0, 0]) / 255.
-    cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
+    cdict = _setCdict(HighRGB, MediumRGB, LowRGB)
     return colors.LinearSegmentedColormap('coeff_cmap', cdict, 256)
 
 
@@ -122,7 +122,7 @@ def draw_coeff(coeff):
     if coeff.dtype == 'complex':
         print DeprecationWarning("Coefficients are complex.")
         coeff = coeff.real
-    coeff_cmap = _get_coeff_cmap()
+    coeff_cmap = _getCoeffCmap()
     plt.close('all')
     vmin = np.min(coeff)
     vmax = np.max(coeff)
@@ -148,7 +148,7 @@ def draw_coeff(coeff):
 
 def draw_microstructure_strain(microstructure, strain):
     plt.close('all')
-    cmap = _get_response_cmap()
+    cmap = _getResponseCmap()
     fig = plt.figure(figsize=(8, 4))
     ax0 = plt.subplot(1, 2, 1)
     ax0.imshow(microstructure.swapaxes(0, 1), cmap=plt.cm.gray,
@@ -195,7 +195,7 @@ def draw_microstructures(*microstructures):
 def draw_strains(*strains, **titles):
     n_strains = len(strains)
     plt.close('all')
-    cmap = _get_response_cmap()
+    cmap = _getResponseCmap()
     fig, axs = plt.subplots(1, n_strains, figsize=(n_strains * 4, 4))
     if n_strains > 1:
         for micro, ax, title in zip(strains, axs, titles):
@@ -222,7 +222,7 @@ def draw_concentrations(*concentrations, **titles):
     n_concens = len(concentrations)
     vmin = np.min(concentrations)
     vmax = np.max(concentrations)
-    cmap = _get_response_cmap()
+    cmap = _getResponseCmap()
     plt.close('all')
     fig, axs = plt.subplots(1, n_concens, figsize=(n_concens * 4, 4))
     if n_concens > 1:
@@ -248,7 +248,7 @@ def draw_concentrations(*concentrations, **titles):
 
 def draw_strains_compare(strain1, strain2):
     plt.close('all')
-    cmap = _get_response_cmap()
+    cmap = _getResponseCmap()
     vmin = min((strain1.flatten().min(), strain2.flatten().min()))
     vmax = max((strain1.flatten().max(), strain2.flatten().max()))
     fig, axs = plt.subplots(1, 2, figsize=(8, 4))
@@ -270,7 +270,7 @@ def draw_strains_compare(strain1, strain2):
 
 def draw_concentrations_compare(con1, con2):
     plt.close('all')
-    cmap = _get_response_cmap()
+    cmap = _getResponseCmap()
     vmin = min((con1.flatten().min(), con2.flatten().min()))
     vmax = max((con1.flatten().max(), con2.flatten().max()))
     fig, axs = plt.subplots(1, 2, figsize=(8, 4))
@@ -294,7 +294,7 @@ def draw_diff(*responses, **titles):
     n_responses = len(responses)
     vmin = np.min(responses)
     vmax = np.max(responses)
-    cmap = _get_diff_cmap()
+    cmap = _getDiffCmap()
     plt.close('all')
     fig, axs = plt.subplots(1, n_responses, figsize=(n_responses * 4, 4))
     if n_responses > 1:
@@ -315,16 +315,19 @@ def draw_diff(*responses, **titles):
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
 
+
 def draw_gridscores(grid_scores, label=None, color='#f46d43'):
-    tmp = [[params['n_states'], -mean_score, scores.std()] \
-            for params, mean_score, scores in grid_scores]
-    
+    tmp = [[params['n_states'], -mean_score, scores.std()]
+           for params, mean_score, scores in grid_scores]
+
     n_states, errors, stddev = zip(*tmp)
-    plt.errorbar(n_states, errors, yerr=stddev, linewidth=2, color=color, label=label)
+    plt.errorbar(n_states, errors, yerr=stddev, linewidth=2, color=color,
+                 label=label)
 
     plt.legend()
     plt.ylabel('MSE', fontsize=20)
     plt.xlabel('Number of Local States', fontsize=15)
+
 
 def bin(arr, n_bins):
     r"""

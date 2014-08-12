@@ -45,7 +45,7 @@ class MKSKernelPCAModel(KernelPCA):
         self.basis = basis
         super(MKSKernelPCAModel, self).__init__(**kwargs)
 
-    def _spatial_correlate(self, X):
+    def _getSpatialCorrelations(self, X):
         """
         Generates spatial correlations for a microstructure X.
 
@@ -71,8 +71,8 @@ class MKSKernelPCAModel(KernelPCA):
             array where `n_samples` is the number of samples and `N`
             is the spatial discretization.
         """
-        X_corr = self._spatial_correlate(X)
-        super(MKSKernelPCAModel, self).fit(self._set_shape(X_corr))
+        X_corr = self._getSpatialCorrelations(X)
+        super(MKSKernelPCAModel, self).fit(self._setShape(X_corr))
 
     def transform(self, X):
         """
@@ -85,9 +85,9 @@ class MKSKernelPCAModel(KernelPCA):
           Data points for in principle components shaped (n_samples,
           n_components)
         """
-        X_corr = self._spatial_correlate(X)
+        X_corr = self._getSpatialCorrelations(X)
         return super(MKSKernelPCAModel,
-                     self).transform(self._set_shape(X_corr))
+                     self).transform(self._setShape(X_corr))
 
     def fit_transform(self, X):
         """
@@ -110,10 +110,10 @@ class MKSKernelPCAModel(KernelPCA):
           Data points for in principle components shaped (n_samples,
           n_components)
         """
-        X_shaped = self._set_shape(X)
+        X_shaped = self._setShape(X)
         return super(MKSKernelPCAModel, self).fit_transform(X_shaped)
 
-    def _set_shape(self, X_):
+    def _setShape(self, X_):
         """
         Reshapes data X to (n_samples, n_features).
 
@@ -124,7 +124,7 @@ class MKSKernelPCAModel(KernelPCA):
         >>> X_test = np.array([[0, 0, 1, 1], [2, 2, 3, 3]])
         >>> basis = DiscreteIndicatorBasis(n_states=4)
         >>> model = MKSKernelPCAModel(basis=basis)
-        >>> X_shaped = model._set_shape(X)
+        >>> X_shaped = model._setShape(X)
         >>> assert(np.allclose(X_shaped, X_test))
 
         Args:

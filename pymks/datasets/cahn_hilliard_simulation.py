@@ -2,7 +2,7 @@ import numpy as np
 
 
 class CahnHilliardSimulation(object):
-    r"""
+    """
     Solve the `Cahn-Hilliard equation`_ for multiple samples in
     arbitrary dimensions. The concentration varies from -1 to 1. The
     equation is given by
@@ -17,7 +17,7 @@ class CahnHilliardSimulation(object):
     >>> phi = 0.01 * (2 * np.random.random((2, N)) - 1)
     >>> ch = CahnHilliardSimulation(width=2.)
     >>> for i in range(10000):
-    ...     phi[:] = ch.get_response(phi)
+    ...     phi[:] = ch.getResponse(phi)
     >>> assert (max(phi.flat) > 2e-3) and (min(phi.flat) < -2e-3)
 
     In 2D.
@@ -25,7 +25,7 @@ class CahnHilliardSimulation(object):
     >>> phi = 0.01 * (2 * np.random.random((2, N, N)) - 1)
     >>> ch = CahnHilliardSimulation(width=2.)
     >>> for i in range(100):
-    ...     phi[:] = ch.get_response(phi)
+    ...     phi[:] = ch.getResponse(phi)
     >>> assert (max(phi.flat) > 0.001) and (min(phi.flat) < -0.001)
 
     In 3D.
@@ -33,7 +33,7 @@ class CahnHilliardSimulation(object):
     >>> phi = 0.01 * (2 * np.random.random((2, N, N, N)) - 1)
     >>> ch = CahnHilliardSimulation(width=2.)
     >>> for i in range(10):
-    ...     phi[:] = ch.get_response(phi)
+    ...     phi[:] = ch.getResponse(phi)
 
     >>> assert (max(phi.flat) > 0.0005) and (min(phi.flat) < -0.0005)
 
@@ -53,7 +53,7 @@ class CahnHilliardSimulation(object):
         self.dt = dt
         self.width = width
 
-    def get_response(self, X):
+    def getResponse(self, X):
         r"""
         Return the response field
 
