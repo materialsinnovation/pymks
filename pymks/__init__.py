@@ -33,9 +33,6 @@ __version__ = _getVersion()
 __all__ = ['__version__',
            'test',
            'MKSRegressionModel',
-           'SpatialStatisticsModel',
-           'draw_microstructure_discretization',
-           'bin',
            'DiscreteIndicatorBasis',
            'ContinuousIndicatorBasis',
            'LegendreBasis']
