@@ -3,12 +3,13 @@ import os
 
 import nose
 from nose.tools import nottest
-from .mksRegressionModel import MKSRegressionModel
+from .mks_regression_model import MKSRegressionModel
 from .tools import draw_microstructure_discretization
 from .tools import bin
 from .bases.discrete import DiscreteIndicatorBasis
 from .bases.legendre import LegendreBasis
 from .bases.continuous import ContinuousIndicatorBasis
+from .mks_kernel_pca_model import MKSKernelPCAModel
 
 
 @nottest
@@ -20,7 +21,7 @@ def test():
     nose.main(argv=['-w', path, '--with-doctest'])
 
 
-def _getVersion():
+def _get_version():
     from pkg_resources import get_distribution, DistributionNotFound
 
     try:
@@ -30,11 +31,12 @@ def _getVersion():
 
     return version
 
-__version__ = _getVersion()
+__version__ = _get_version()
 
 __all__ = ['__version__',
            'test',
            'MKSRegressionModel',
+           'MKSKernelPCAModel',
            'draw_microstructure_discretization',
            'bin',
            'DiscreteIndicatorBasis',

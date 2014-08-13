@@ -20,9 +20,9 @@ from sfepy.mechanics.matcoefs import ElasticConstants
 from sfepy.base.base import output
 output.set_output(quiet=True)
 
+
 class ElasticFESimulation(object):
     """
-
     Use SfePy to solve a linear strain problem in 2D with a varying
     microstructure on a rectangular grid. The rectangle (cube) is held
     at the negative edge (plane) and displaced by 1 on the positive x
@@ -34,7 +34,8 @@ class ElasticFESimulation(object):
     >>> X = np.zeros((1, 3, 3), dtype=int)
     >>> X[0, :, 1] = 1
 
-    >>> model = ElasticFESimulation(elastic_modulus=(1.0, 10.0), poissons_ratio=(0., 0.))
+    >>> model = ElasticFESimulation(elastic_modulus=(1.0, 10.0),
+    ...                             poissons_ratio=(0., 0.))
     >>> y = model.get_response(X, slice(None))
 
     y is the strain with components as follows
@@ -65,14 +66,16 @@ class ElasticFESimulation(object):
         self.elastic_modulus = elastic_modulus
         self.poissons_ratio = poissons_ratio
         if len(elastic_modulus) != len(poissons_ratio):
-            raise RuntimeError, 'elastic_modulus and poissons_ratio must be the same length'
+            raise RuntimeError("elastic_modulus and poissons_ratio must be the"
+                               " same length.")
 
     def _convert_properties(self, dim):
         """
         Convert from elastic modulus and Poisson's ratio to the Lame
         parameter and shear modulus
 
-        >>> model = ElasticFESimulation(elastic_modulus=(1., 2.), poissons_ratio=(1., 1.))
+        >>> model = ElasticFESimulation(elastic_modulus=(1., 2.),
+        ...                             poissons_ratio=(1., 1.))
         >>> result = model._convert_properties(2)
         >>> answer = np.array([[-0.5, 1. / 6.], [-1., 1. / 3.]])
         >>> assert(np.allclose(result, answer))
@@ -90,18 +93,21 @@ class ElasticFESimulation(object):
             lame = ec.lam
             return lame, mu
 
-        return np.array([_convert(E, nu) for E, nu in zip(self.elastic_modulus, self.poissons_ratio)])
+        return np.array([_convert(E, nu) for E, nu in zip(self.elastic_modulus,
+                                                          self.poissons_ratio)])
 
     def _get_property_array(self, X):
         """
-        Generate property array with elastic_modulus and poissons_ratio for each phase.
+        Generate property array with elastic_modulus and poissons_ratio for
+        each phase.
 
         Test case for 2D with 3 phases.
 
         >>> X2D = np.array([[[0, 1, 2, 1],
         ...                  [2, 1, 0, 0],
         ...                  [1, 0, 2, 2]]])
-        >>> model2D = ElasticFESimulation(elastic_modulus=(1., 2., 3.), poissons_ratio=(1., 1., 1.))
+        >>> model2D = ElasticFESimulation(elastic_modulus=(1., 2., 3.),
+        ...                               poissons_ratio=(1., 1., 1.))
         >>> lame = lame0, lame1, lame2 = -0.5, -1., -1.5
         >>> mu = mu0, mu1, mu2 = 1. / 6, 1. / 3, 1. / 2
         >>> lm = zip(lame, mu)
@@ -113,7 +119,8 @@ class ElasticFESimulation(object):
 
         Test case for 3D with 2 phases.
 
-        >>> model3D = ElasticFESimulation(elastic_modulus=(1., 2.), poissons_ratio=(1., 1.))
+        >>> model3D = ElasticFESimulation(elastic_modulus=(1., 2.),
+        ...                               poissons_ratio=(1., 1.))
         >>> X3D = np.array([[[0, 1],
         ...                  [0, 0]],
         ...                 [[1, 1],
@@ -128,13 +135,13 @@ class ElasticFESimulation(object):
         dim = len(X.shape) - 1
         n_phases = len(self.elastic_modulus)
         if not issubclass(X.dtype.type, np.integer):
-            raise TypeError, "X must be an integer array"
+            raise TypeError("X must be an integer array")
         if n_phases != np.max(X) + 1:
-            raise RuntimeError, "X has the wrong number of phases."
+            raise RuntimeError("X has the wrong number of phases.")
         if np.min(X) != 0:
-            raise RuntimeError, "Phases must be zero indexed."
+            raise RuntimeError("Phases must be zero indexed.")
         if not (2 <= dim <= 3):
-            raise RuntimeError, "the shape of X is incorrect"
+            raise RuntimeError("the shape of X is incorrect")
         return self._convert_properties(dim)[X]
 
     def get_response(self, X, strain_index=0):
@@ -144,7 +151,7 @@ class ElasticFESimulation(object):
 
         Args:
           X: microstructure with shape (n_samples, Nx, Ny) or
-             (n_samples, Nx, Ny, Nz) 
+             (n_samples, Nx, Ny, Nz)
           strain_index: interger value to return
              a particular strain field.  0 returns exx, 1 returns eyy,
              etc. To return all strain fields set `strain_index` equal to
@@ -160,7 +167,8 @@ class ElasticFESimulation(object):
 
     def _get_material(self, property_array, domain):
         """
-        Creates an SfePy material from the material property fields for the quadrature points.
+        Creates an SfePy material from the material property fields for the
+        quadrature points.
 
         Args:
           property_array: array of the properties with shape (Nx, Ny, Nz, 2)
@@ -174,14 +182,15 @@ class ElasticFESimulation(object):
         def _material_func_(ts, coors, mode=None, **kwargs):
             if mode == 'qp':
                 ijk_out = np.empty_like(coors, dtype=int)
-                ijk = np.floor((coors - min_xyz[None]) / self.dx, ijk_out, casting="unsafe")
+                ijk = np.floor((coors - min_xyz[None]) / self.dx,
+                               ijk_out, casting="unsafe")
                 ijk_tuple = tuple(ijk.swapaxes(0, 1))
                 property_array_qp = property_array[ijk_tuple]
                 lam = property_array_qp[..., 0]
                 mu = property_array_qp[..., 1]
                 lam = np.ascontiguousarray(lam.reshape((lam.shape[0], 1, 1)))
                 mu = np.ascontiguousarray(mu.reshape((mu.shape[0], 1, 1)))
-                return {'lam' : lam, 'mu' : mu}
+                return {'lam': lam, 'mu': mu}
             else:
                 return
 
@@ -221,12 +230,12 @@ class ElasticFESimulation(object):
         return _func
 
     def _get_periodicBC(self, domain, dim):
-        dim_dict = {1 : ('y', per.match_y_plane),
-                       2 : ('z', per.match_z_plane)}
+        dim_dict = {1: ('y', per.match_y_plane),
+                    2: ('z', per.match_z_plane)}
         dim_string = dim_dict[dim][0]
         match_plane = dim_dict[dim][1]
         min_, max_ = domain.get_mesh_bounding_box()[:, dim]
-        plus_ = self._subdomain_func(**{dim_string : (max_,)})
+        plus_ = self._subdomain_func(**{dim_string: (max_,)})
         minus_ = self._subdomain_func(**{dim_string: (min_,)})
         plus_string = dim_string + 'plus'
         minus_string = dim_string + 'minus'
@@ -243,7 +252,7 @@ class ElasticFESimulation(object):
         match_plane = Function('match_{0}_plane'.format(dim_string), match_plane)
         bc = PeriodicBC('periodic_{0}'.format(dim_string),
                         [region_plus, region_minus],
-                        {'u.all' : 'u.all'},
+                        {'u.all': 'u.all'},
                         match='match_{0}_plane'.format(dim_string))
         return bc, match_plane
 
@@ -273,7 +282,7 @@ class ElasticFESimulation(object):
 
         kwargs = {}
         if len(min_xyz) == 3:
-            kwargs = {'z' : (max_xyz[2], min_xyz[2])}
+            kwargs = {'z': (max_xyz[2], min_xyz[2])}
         fix_x_points_ = self._subdomain_func(x=(min_xyz[0],),
                                              y=(max_xyz[1], min_xyz[1]),
                                              **kwargs)
@@ -282,21 +291,22 @@ class ElasticFESimulation(object):
         xminus = Function('xminus', xminus_)
         fix_x_points = Function('fix_x_points', fix_x_points_)
         region_x_plus = domain.create_region('region_x_plus',
-                                            'vertices by xplus',
-                                            'facet',
+                                             'vertices by xplus',
+                                             'facet',
                                              functions=Functions([xplus]))
         region_left = domain.create_region('region_x_minus',
                                            'vertices by xminus',
                                            'facet',
-                                            functions=Functions([xminus]))
+                                           functions=Functions([xminus]))
         region_fix_points = domain.create_region('region_fix_points',
-                                          'vertices by fix_x_points',
-                                          'vertex',
-                                           functions=Functions([fix_x_points]))
-        fixed_BC = EssentialBC('fixed_BC', region_left, {'u.0' : 0.0})
+                                                 'vertices by fix_x_points',
+                                                 'vertex',
+                                                 functions=Functions([fix_x_points]))
+        fixed_BC = EssentialBC('fixed_BC', region_left, {'u.0': 0.0})
         displaced_BC = EssentialBC('displaced_BC', region_x_plus,
-                                   {'u.0' : self.macro_strain * (max_xyz[0] - min_xyz[0])})
-        fix_points_BC = EssentialBC('fix_points_BC', region_fix_points, {'u.1' : 0.0})
+                                   {'u.0': self.macro_strain * (max_xyz[0] - min_xyz[0])})
+        fix_points_BC = EssentialBC('fix_points_BC', region_fix_points,
+                                    {'u.1': 0.0})
         return Conditions([fixed_BC, displaced_BC, fix_points_BC])
 
     def _get_mesh(self, shape):
@@ -311,7 +321,8 @@ class ElasticFESimulation(object):
 
         """
         center = np.zeros_like(shape)
-        return gen_block_mesh(shape, np.array(shape) + 1, center, verbose=False)
+        return gen_block_mesh(shape, np.array(shape) + 1, center,
+                              verbose=False)
 
     def _solve(self, property_array):
         """
@@ -333,7 +344,8 @@ class ElasticFESimulation(object):
 
         region_all = domain.create_region('region_all', 'all')
 
-        field = Field.from_args('fu', np.float64, 'vector', region_all, approx_order=2)
+        field = Field.from_args('fu', np.float64, 'vector', region_all,
+                                approx_order=2)
 
         u = FieldVariable('u', 'unknown', field)
         v = FieldVariable('v', 'test', field, primary_var_name='u')
@@ -360,5 +372,6 @@ class ElasticFESimulation(object):
         pb.time_update(ebcs=ebcs, epbcs=epbcs, functions=functions)
         pb.solve()
 
-        strain = np.squeeze(pb.evaluate('ev_cauchy_strain.3.region_all(u)', mode='el_avg'))
+        strain = np.squeeze(pb.evaluate('ev_cauchy_strain.3.region_all(u)',
+                                        mode='el_avg'))
         return np.reshape(strain, (shape + strain.shape[-1:]))

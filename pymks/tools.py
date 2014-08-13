@@ -45,7 +45,7 @@ def _set_cdict(HighRGB, MediumRGB, LowRGB):
     return cdict
 
 
-def _get_coeff_cmap():
+def _getCoeffCmap():
     HighRGB = np.array([244, 109, 67]) / 255.
     MediumRGB = np.array([255, 255, 191]) / 255.
     LowRGB = np.array([0, 0, 0]) / 255.
@@ -122,7 +122,7 @@ def draw_coeff(coeff):
     if coeff.dtype == 'complex':
         print DeprecationWarning("Coefficients are complex.")
         coeff = coeff.real
-    coeff_cmap = _get_coeff_cmap()
+    coeff_cmap = _getCoeffCmap()
     plt.close('all')
     vmin = np.min(coeff)
     vmax = np.max(coeff)
@@ -315,16 +315,19 @@ def draw_diff(*responses, **titles):
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
 
+
 def draw_gridscores(grid_scores, label=None, color='#f46d43'):
-    tmp = [[params['n_states'], -mean_score, scores.std()] \
-            for params, mean_score, scores in grid_scores]
-    
+    tmp = [[params['n_states'], -mean_score, scores.std()]
+           for params, mean_score, scores in grid_scores]
+
     n_states, errors, stddev = zip(*tmp)
-    plt.errorbar(n_states, errors, yerr=stddev, linewidth=2, color=color, label=label)
+    plt.errorbar(n_states, errors, yerr=stddev, linewidth=2, color=color,
+                 label=label)
 
     plt.legend()
     plt.ylabel('MSE', fontsize=20)
     plt.xlabel('Number of Local States', fontsize=15)
+
 
 def bin(arr, n_bins):
     r"""

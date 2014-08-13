@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression
+from ._filter import _Filter
 
 
 class MKSRegressionModel(LinearRegression):
@@ -58,7 +59,7 @@ class MKSRegressionModel(LinearRegression):
 
     def __init__(self, basis, n_states=None):
         """
-        Instantiate an MKSRegressionModel.
+        Instantiate a MKSRegressionModel.
 
         Args:
           basis: an instance of a bases class.
@@ -70,11 +71,10 @@ class MKSRegressionModel(LinearRegression):
         else:
             self.n_states = n_states
         self.domain = basis.domain
-                
+
     def fit(self, X, y):
         '''
-        Fits the data by calculating a set of influence coefficients,
-        `Fcoeff`.
+        Fits the data by calculating a set of influence coefficients.
 
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
         >>> y = X.swapaxes(1, 2)
@@ -82,8 +82,10 @@ class MKSRegressionModel(LinearRegression):
         >>> basis = ContinuousIndicatorBasis(2, [0, 1])
         >>> model = MKSRegressionModel(basis=basis)
         >>> model.fit(X, y)
-        >>> assert np.allclose(model.Fcoeff, [[[ 0.5,  0.5], [-2, 0]],
-        ...                                   [[-0.5,  0  ], [-1, 0]]])
+        >>> assert np.allclose(model._filter.Fkernel, [[[ 0.5,  0.5],
+        ...                                             [  -2,    0]],
+        ...                                            [[-0.5,  0  ],
+        ...                                             [  -1,  0  ]]])
 
 
         Args:
@@ -93,40 +95,33 @@ class MKSRegressionModel(LinearRegression):
           y: The response field, same shape as `X`.
         '''
         self.basis = self.basis.__class__(self.n_states, self.domain)
-        
+
         if not len(y.shape) > 1:
             raise RuntimeError("The shape of y is incorrect.")
         if y.shape != X.shape:
             raise RuntimeError("X and y must be the same shape.")
-        FX = self._discrtizefft(X)
-        Fy = np.fft.fftn(y, axes=self._axes(X))
-        self.Fcoeff = np.zeros(FX.shape[1:], dtype=np.complex)
+        X_ = self.basis.discretize(X)
+        axes = np.arange(len(X.shape) - 1) + 1
+        FX = np.fft.fftn(X_, axes=axes)
+        Fy = np.fft.fftn(y, axes=axes)
+        Fkernel = np.zeros(FX.shape[1:], dtype=np.complex)
         s0 = (slice(None),)
         for ijk in np.ndindex(X.shape[1:]):
             if np.all(np.array(ijk) == 0):
                 s1 = s0
             else:
                 s1 = (slice(-1),)
-            self.Fcoeff[ijk + s1] = np.linalg.lstsq(FX[s0 + ijk + s1],
-                                                    Fy[s0 + ijk])[0]
+            Fkernel[ijk + s1] = np.linalg.lstsq(FX[s0 + ijk + s1],
+                                                Fy[s0 + ijk])[0]
+
+        self._filter = _Filter(Fkernel[None])
 
     @property
     def coeff(self):
         '''Returns the coefficients in real space with origin shifted to the
         center.
         '''
-
-        axes = np.arange(len(self._axes(self.Fcoeff) - 1))
-        return np.real_if_close(np.fft.fftshift(np.fft.ifftn(self.Fcoeff,
-                                axes=axes), axes=axes))
-
-    def coeffToFcoeff(self, coeff):
-        '''Converts real space coefficients into coefficients in frequency
-        space.
-        '''
-
-        axes = np.arange(len(self._axes(self.Fcoeff) - 1))
-        return np.fft.fftn(np.fft.ifftshift(coeff, axes=axes), axes=axes)
+        return self._filter._frequency_2_real()[0]
 
     def predict(self, X):
         r'''Calculate a new response from the microstructure function `X` with
@@ -157,15 +152,12 @@ class MKSRegressionModel(LinearRegression):
             The predicted response field the same shape as `X`.
         '''
 
-        if not hasattr(self, 'Fcoeff'):
+        if not hasattr(self, '_filter'):
             raise AttributeError("fit() method must be run before predict().")
-        if X.shape[1:] != self.Fcoeff.shape[:-1]:
-            raise RuntimeError("Dimension of X are incorrect.")
-        FX = self._discrtizefft(X)
-        Fy = np.sum(FX * self.Fcoeff[None, ...], axis=-1)
-        return np.fft.ifftn(Fy, axes=self._axes(X)).real
+        X_ = self.basis.discretize(X)
+        return self._filter.convolve(X_)
 
-    def resize_coeff(self, shape):
+    def resize_coeff(self, size):
         '''Scale the size of the coefficients and pad with zeros.
 
         Let's first instantitate a model and fabricate some
@@ -177,7 +169,7 @@ class MKSRegressionModel(LinearRegression):
         >>> coeff = np.arange(20).reshape((5, 4, 1))
         >>> coeff = np.concatenate((coeff , np.ones_like(coeff)), axis=2)
         >>> coeff = np.fft.ifftshift(coeff, axes=(0, 1))
-        >>> model.Fcoeff = np.fft.fftn(coeff, axes=(0, 1))
+        >>> model._filter = _Filter(np.fft.fftn(coeff, axes=(0, 1))[None])
 
         The coefficients can be reshaped by passing the new shape that
         coefficients should have.
@@ -196,48 +188,11 @@ class MKSRegressionModel(LinearRegression):
         ...                     [0, 0, 0, 0, 0, 0, 0]])
 
         Args:
-            shape: The new shape of the influence coefficients.
+            size: The new size of the influence coefficients.
         Returns:
-            The resized influence coefficients to size 'shape'.
+            The resized influence coefficients to size.
         '''
-
-        if len(shape) != (len(self.Fcoeff.shape) - 1):
-            raise RuntimeError("length of resize shape is incorrect.")
-        if not np.all(shape >= self.Fcoeff.shape[:-1]):
-            raise RuntimeError("resize shape is too small.")
-
-        coeff = self.coeff
-        shape += coeff.shape[-1:]
-        padsize = np.array(shape) - np.array(coeff.shape)
-        paddown = padsize / 2
-        padup = padsize - paddown
-        padarray = np.concatenate((padup[..., None],
-                                   paddown[..., None]), axis=1)
-        pads = tuple([tuple(p) for p in padarray])
-        coeff_pad = np.pad(coeff, pads, 'constant', constant_values=0)
-        Fcoeff_pad = self.coeffToFcoeff(coeff_pad)
-
-        self.Fcoeff = Fcoeff_pad
-
-    def _discrtizefft(self, X):
-        X_ = self.basis.discretize(X)
-        return np.fft.fftn(X_, axes=self._axes(X))
-
-    def _axes(self, X):
-        '''Generate argument for fftn.
-
-        >>> X = np.zeros((5, 2, 2, 2))
-        >>> from pymks.bases import DiscreteIndicatorBasis
-        >>> basis = DiscreteIndicatorBasis(n_states=2)
-        >>> print MKSRegressionModel(basis)._axes(X)
-        [1 2 3]
-
-        Args:
-            X: Array representing the microstructure.
-        Returns:
-            Array uses for axis argument in fftn.
-        '''
-        return np.arange(len(X.shape) - 1) + 1
+        self._filter.resize(size)
 
     def _test(self):
         '''Tests
@@ -247,8 +202,7 @@ class MKSRegressionModel(LinearRegression):
         >>> X = np.random.random((2, 5, 3))
         >>> from .bases import ContinuousIndicatorBasis
         >>> basis = ContinuousIndicatorBasis(n_states, [0, 1])
-        >>> FX_ = MKSRegressionModel(basis=basis)._discrtizefft(X)
-        >>> X_ = np.fft.ifftn(FX_, axes=(1, 2))
+        >>> X_ = basis.discretize(X)
         >>> H = np.linspace(0, 1, n_states)
         >>> Xtest = np.sum(X_ * H[None,None,None,:], axis=-1)
         >>> assert np.allclose(X, Xtest)
@@ -261,17 +215,18 @@ class MKSRegressionModel(LinearRegression):
         >>> X = np.random.random((1, 3, 3))
         >>> basis = LegendreBasis(2, [0, 1])
         >>> model = MKSRegressionModel(basis=basis)
-        >>> FXtest = model._discrtizefft(X)
-        >>> FX = np.array([[[[-0.79735949+0. ,  4.50000000+0.j],
-        ...          [-1.00887157-1.48005289j,  0.00000000+0.j],
-        ...          [-1.00887157+1.48005289j,  0.00000000+0.j]],
-        ...         [[ 0.62300683-4.97732233j,  0.00000000+0.j],
-        ...          [ 1.09318216+0.10131035j,  0.00000000+0.j],
-        ...          [ 0.37713401+1.87334545j,  0.00000000+0.j]],
-        ...         [[ 0.62300683+4.97732233j,  0.00000000+0.j],
-        ...          [ 0.37713401-1.87334545j,  0.00000000+0.j],
-        ...          [ 1.09318216-0.10131035j,  0.00000000+0.j]]]])
+        >>> #FX = model._discrtizefft(X)
+        >>> X_ = basis.discretize(X)
+        >>> FX = np.fft.fftn(X_, axes=(1, 2))
+        >>> FXtest = np.array([[[[-0.79735949+0. ,  4.50000000+0.j],
+        ...                      [-1.00887157-1.48005289j,  0.00000000+0.j],
+        ...                      [-1.00887157+1.48005289j,  0.00000000+0.j]],
+        ...                     [[ 0.62300683-4.97732233j,  0.00000000+0.j],
+        ...                      [ 1.09318216+0.10131035j,  0.00000000+0.j],
+        ...                      [ 0.37713401+1.87334545j,  0.00000000+0.j]],
+        ...                     [[ 0.62300683+4.97732233j,  0.00000000+0.j],
+        ...                      [ 0.37713401-1.87334545j,  0.00000000+0.j],
+        ...                      [ 1.09318216-0.10131035j,  0.00000000+0.j]]]])
         >>> assert np.allclose(FX, FXtest)
         '''
         pass
-

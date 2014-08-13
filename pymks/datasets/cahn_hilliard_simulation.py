@@ -2,7 +2,7 @@ import numpy as np
 
 
 class CahnHilliardSimulation(object):
-    r"""
+    """
     Solve the `Cahn-Hilliard equation`_ for multiple samples in
     arbitrary dimensions. The concentration varies from -1 to 1. The
     equation is given by
