@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class _Filter(object):
+class Filter(object):
     """
     Wrapper class for convolution with a kernel and resizing of a kernel
     """
@@ -84,7 +84,7 @@ class _Filter(object):
         self.Fkernel = Fkernel_pad
 
 
-class _Correlation(_Filter):
+class Correlation(Filter):
     '''
     Computes the autocorrelation for a microstructure
 
@@ -95,7 +95,7 @@ class _Correlation(_Filter):
     >>> from pymks.bases import DiscreteIndicatorBasis
     >>> basis = DiscreteIndicatorBasis(n_states=n_states)
     >>> X_ = basis.discretize(X)
-    >>> filter_ = _Correlation(X_)
+    >>> filter_ = Correlation(X_)
     >>> X_auto = filter_.convolve(X_)
     >>> X_test = np.array([[[[1/3., 0.  ],
     ...                      [2/3., 1/3.],
@@ -116,10 +116,10 @@ class _Correlation(_Filter):
     def __init__(self, kernel):
         axes = np.arange(len(kernel.shape) - 2) + 1
         Fkernel = np.conjugate(np.fft.fftn(kernel, axes=axes))
-        super(_Correlation, self).__init__(Fkernel)
+        super(Correlation, self).__init__(Fkernel)
 
     def convolve(self, X):
-        X_auto = super(_Correlation, self).convolve(X)
+        X_auto = super(Correlation, self).convolve(X)
         return np.fft.fftshift(X_auto, axes=self.axes) / np.prod(X.shape[1:-1])
 
     def _sum(self, Fy):

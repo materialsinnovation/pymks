@@ -1,7 +1,7 @@
 import numpy as np
 
 from .cahn_hilliard_simulation import CahnHilliardSimulation
-from ._microstructure_generator import _MicrostructureGenerator
+from .microstructure_generator import MicrostructureGenerator
 
 __all__ = ['make_delta_microstructures', 'make_elastic_FE_strain_delta',
            'make_elastic_FE_strain_random',
@@ -41,7 +41,7 @@ def make_elastic_FE_strain_delta(elastic_modulus, poissons_ratio,
       tuple containing delta microstructures and their strain fields
 
     """
-    from .elastic_FE_Simulation import ElasticFESimulation
+    from .elastic_FE_simulation import ElasticFESimulation
     
     FEsim = ElasticFESimulation(elastic_modulus=elastic_modulus,
                                 poissons_ratio=poissons_ratio,
@@ -129,7 +129,7 @@ def make_elastic_FE_strain_random(n_samples, elastic_modulus, poissons_ratio,
       tuple containing delta microstructures and their strain fields
 
     """
-    from .elastic_FE_Simulation import ElasticFESimulation
+    from .elastic_FE_simulation import ElasticFESimulation
     
     FEsim = ElasticFESimulation(elastic_modulus=elastic_modulus,
                                 poissons_ratio=poissons_ratio,
@@ -201,7 +201,7 @@ def make_microstructure(n_samples=10, size=(101, 101), n_phases=2,
         microstructures for the system of shape (Nsamples, Nx, Ny, ...)
 
     """
-    MS = _MicrostructureGenerator(n_samples=n_samples, size=size,
+    MS = MicrostructureGenerator(n_samples=n_samples, size=size,
                                   n_phases=n_phases, grain_size=grain_size,
                                   seed=seed)
     return MS.generate()
