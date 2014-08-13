@@ -17,7 +17,7 @@ class CahnHilliardSimulation(object):
     >>> phi = 0.01 * (2 * np.random.random((2, N)) - 1)
     >>> ch = CahnHilliardSimulation(width=2.)
     >>> for i in range(10000):
-    ...     phi[:] = ch.getResponse(phi)
+    ...     phi[:] = ch.get_response(phi)
     >>> assert (max(phi.flat) > 2e-3) and (min(phi.flat) < -2e-3)
 
     In 2D.
@@ -25,7 +25,7 @@ class CahnHilliardSimulation(object):
     >>> phi = 0.01 * (2 * np.random.random((2, N, N)) - 1)
     >>> ch = CahnHilliardSimulation(width=2.)
     >>> for i in range(100):
-    ...     phi[:] = ch.getResponse(phi)
+    ...     phi[:] = ch.get_response(phi)
     >>> assert (max(phi.flat) > 0.001) and (min(phi.flat) < -0.001)
 
     In 3D.
@@ -33,7 +33,7 @@ class CahnHilliardSimulation(object):
     >>> phi = 0.01 * (2 * np.random.random((2, N, N, N)) - 1)
     >>> ch = CahnHilliardSimulation(width=2.)
     >>> for i in range(10):
-    ...     phi[:] = ch.getResponse(phi)
+    ...     phi[:] = ch.get_response(phi)
 
     >>> assert (max(phi.flat) > 0.0005) and (min(phi.flat) < -0.0005)
 
@@ -53,7 +53,7 @@ class CahnHilliardSimulation(object):
         self.dt = dt
         self.width = width
 
-    def getResponse(self, X):
+    def get_response(self, X):
         r"""
         Return the response field
 

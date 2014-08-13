@@ -36,7 +36,7 @@ class ElasticFESimulation(object):
 
     >>> model = ElasticFESimulation(elastic_modulus=(1.0, 10.0),
     ...                             poissons_ratio=(0., 0.))
-    >>> y = model.getResponse(X, slice(None))
+    >>> y = model.get_response(X, slice(None))
 
     y is the strain with components as follows
 
@@ -69,14 +69,14 @@ class ElasticFESimulation(object):
             raise RuntimeError("elastic_modulus and poissons_ratio must be the"
                                " same length.")
 
-    def _convertProperties(self, dim):
+    def _convert_properties(self, dim):
         """
         Convert from elastic modulus and Poisson's ratio to the Lame
         parameter and shear modulus
 
         >>> model = ElasticFESimulation(elastic_modulus=(1., 2.),
         ...                             poissons_ratio=(1., 1.))
-        >>> result = model._convertProperties(2)
+        >>> result = model._convert_properties(2)
         >>> answer = np.array([[-0.5, 1. / 6.], [-1., 1. / 3.]])
         >>> assert(np.allclose(result, answer))
 
@@ -96,7 +96,7 @@ class ElasticFESimulation(object):
         return np.array([_convert(E, nu) for E, nu in zip(self.elastic_modulus,
                                                           self.poissons_ratio)])
 
-    def _getPropertyArray(self, X):
+    def _get_property_array(self, X):
         """
         Generate property array with elastic_modulus and poissons_ratio for
         each phase.
@@ -115,7 +115,7 @@ class ElasticFESimulation(object):
         ...                          [lm[2], lm[1], lm[0], lm[0]],
         ...                          [lm[1], lm[0], lm[2], lm[2]]])
 
-        >>> assert(np.allclose(model2D._getPropertyArray(X2D), X2D_property))
+        >>> assert(np.allclose(model2D._get_property_array(X2D), X2D_property))
 
         Test case for 3D with 2 phases.
 
@@ -129,7 +129,7 @@ class ElasticFESimulation(object):
         ...                           [lm[0], lm[0]]],
         ...                          [[lm[1], lm[1]],
         ...                           [lm[0], lm[1]]]])
-        >>> assert(np.allclose(model3D._getPropertyArray(X3D), X3D_property))
+        >>> assert(np.allclose(model3D._get_property_array(X3D), X3D_property))
 
         """
         dim = len(X.shape) - 1
@@ -142,9 +142,9 @@ class ElasticFESimulation(object):
             raise RuntimeError("Phases must be zero indexed.")
         if not (2 <= dim <= 3):
             raise RuntimeError("the shape of X is incorrect")
-        return self._convertProperties(dim)[X]
+        return self._convert_properties(dim)[X]
 
-    def getResponse(self, X, strain_index=0):
+    def get_response(self, X, strain_index=0):
         """
         Get the strain fields given an initial microstructure
         with a macroscopic strain applied in the x direction.
@@ -161,11 +161,11 @@ class ElasticFESimulation(object):
           the strain fields over each cell
 
         """
-        X_property = self._getPropertyArray(X)
+        X_property = self._get_property_array(X)
         y_strain = np.array([self._solve(x) for x in X_property])
         return y_strain[..., strain_index]
 
-    def _getMaterial(self, property_array, domain):
+    def _get_material(self, property_array, domain):
         """
         Creates an SfePy material from the material property fields for the
         quadrature points.
@@ -229,7 +229,7 @@ class ElasticFESimulation(object):
 
         return _func
 
-    def _getPeriodicBC(self, domain, dim):
+    def _get_periodicBC(self, domain, dim):
         dim_dict = {1: ('y', per.match_y_plane),
                     2: ('z', per.match_z_plane)}
         dim_string = dim_dict[dim][0]
@@ -256,13 +256,13 @@ class ElasticFESimulation(object):
                         match='match_{0}_plane'.format(dim_string))
         return bc, match_plane
 
-    def _getPeriodicBCs(self, domain):
+    def _get_periodicBCs(self, domain):
         dims = domain.get_mesh_bounding_box().shape[1]
 
-        bc_list, func_list = zip(*[self._getPeriodicBC(domain, i) for i in range(1, dims)])
+        bc_list, func_list = zip(*[self._get_periodicBC(domain, i) for i in range(1, dims)])
         return Conditions(bc_list), Functions(func_list)
 
-    def _getDisplacementBCs(self, domain):
+    def _get_displacementBCs(self, domain):
         """
         Fix the left plane in x, displace the right plane by 1 and fix
         the y-direction with the top and bottom points on the left x
@@ -309,7 +309,7 @@ class ElasticFESimulation(object):
                                     {'u.1': 0.0})
         return Conditions([fixed_BC, displaced_BC, fix_points_BC])
 
-    def _getMesh(self, shape):
+    def _get_mesh(self, shape):
         """
         Generate an Sfepy rectangular mesh
 
@@ -339,7 +339,7 @@ class ElasticFESimulation(object):
 
         """
         shape = property_array.shape[:-1]
-        mesh = self._getMesh(shape)
+        mesh = self._get_mesh(shape)
         domain = Domain('domain', mesh)
 
         region_all = domain.create_region('region_all', 'all')
@@ -350,7 +350,7 @@ class ElasticFESimulation(object):
         u = FieldVariable('u', 'unknown', field)
         v = FieldVariable('v', 'test', field, primary_var_name='u')
 
-        m = self._getMaterial(property_array, domain)
+        m = self._get_material(property_array, domain)
 
         integral = Integral('i', order=3)
 
@@ -366,8 +366,8 @@ class ElasticFESimulation(object):
         pb = Problem('elasticity', equations=eqs, nls=nls, ls=ls)
         pb.save_regions_as_groups('regions')
 
-        epbcs, functions = self._getPeriodicBCs(domain)
-        ebcs = self._getDisplacementBCs(domain)
+        epbcs, functions = self._get_periodicBCs(domain)
+        ebcs = self._get_displacementBCs(domain)
 
         pb.time_update(ebcs=ebcs, epbcs=epbcs, functions=functions)
         pb.solve()

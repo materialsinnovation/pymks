@@ -10,32 +10,32 @@ from pymks.datasets import make_cahn_hilliard
 from pymks.bases import DiscreteIndicatorBasis
 
 
-def testElasticFESimulation_2D():
+def test_elastic_FE_simulation_2D():
     nx = 5
     ii = (nx - 1) / 2
     X = np.zeros((1, nx, nx), dtype=int)
     X[0, ii, ii] = 1
     model = ElasticFESimulation(elastic_modulus=(1., 10.),
                                 poissons_ratio=(0.3, 0.3))
-    strains = model.getResponse(X, slice(None))
+    strains = model.get_response(X, slice(None))
     solution = (1.518e-1, -1.672e-2, 0.)
     assert np.allclose(strains[0, ii, ii], solution, rtol=1e-3)
 
 
-def testElasticFESimulation_3D():
+def test_elastic_FE_simulation_3D():
     nx = 4
     ii = (nx - 1) / 2
     X = np.zeros((1, nx, nx, nx), dtype=int)
     X[0, :, ii] = 1
     model = ElasticFESimulation(elastic_modulus=(1., 10.),
                                 poissons_ratio=(0., 0.))
-    strains = model.getResponse(X, slice(None))
+    strains = model.get_response(X, slice(None))
     solution = [1., 0., 0., 0., 0., 0.]
     assert np.allclose([np.mean(strains[0, ..., i]) for i in range(6)],
                        solution)
 
 
-def getDeltaData(nx, ny):
+def get_delta_data(nx, ny):
 
     return make_elastic_FE_strain_delta(elastic_modulus=(1, 1.1),
                                         poissons_ratio=(0.3, 0.3),
@@ -43,7 +43,7 @@ def getDeltaData(nx, ny):
                                         strain_index=slice(None))
 
 
-def getRandomData(nx, ny):
+def get_random_data(nx, ny):
     np.random.seed(8)
     return make_elastic_FE_strain_random(elastic_modulus=(1., 1.1),
                                          poissons_ratio=(0.3, 0.3),
@@ -51,13 +51,13 @@ def getRandomData(nx, ny):
                                          size=(nx, ny), strain_index=slice(None))
 
 
-def rollzip(*args):
+def roll_zip(*args):
     return zip(*tuple(np.rollaxis(x, -1) for x in args))
 
 
-def testMKSelasticDelta():
+def test_MKS_elastic_delta():
     nx, ny = 21, 21
-    X, y_prop = getDeltaData(nx, ny)
+    X, y_prop = get_delta_data(nx, ny)
     basis = DiscreteIndicatorBasis(n_states=2)
     for y_test in np.rollaxis(y_prop, -1):
         model = MKSRegressionModel(basis)
@@ -66,14 +66,14 @@ def testMKSelasticDelta():
         assert np.allclose(y_pred, y_test, rtol=1e-3, atol=1e-3)
 
 
-def testMKSelasticRandom():
+def test_MKS_elastic_random():
     nx, ny = 21, 21
     i = 3
-    X_delta, strains_delta = getDeltaData(nx, ny)
-    X_test, strains_test = getRandomData(nx, ny)
+    X_delta, strains_delta = get_delta_data(nx, ny)
+    X_test, strains_test = get_random_data(nx, ny)
     basis = DiscreteIndicatorBasis(n_states=2)
 
-    for y_delta, y_test in rollzip(strains_delta, strains_test):
+    for y_delta, y_test in roll_zip(strains_delta, strains_test):
         model = MKSRegressionModel(basis)
         model.fit(X_delta, y_delta)
         y_pred = model.predict(X_test)
@@ -81,47 +81,47 @@ def testMKSelasticRandom():
                            y_test[0, i:-i], rtol=1e-2, atol=6.1e-3)
 
 
-def testResizePred():
+def test_resize_pred():
     nx, ny = 21, 21
     i = 3
     resize = 3
-    X_delta, strains_delta = getDeltaData(nx, ny)
-    X_test, strains_test = getRandomData(nx, ny)
-    X_big_test, strains_big_test = getRandomData(resize * nx, resize * ny)
+    X_delta, strains_delta = get_delta_data(nx, ny)
+    X_test, strains_test = get_random_data(nx, ny)
+    X_big_test, strains_big_test = get_random_data(resize * nx, resize * ny)
     basis = DiscreteIndicatorBasis(n_states=2)
 
-    for y_delta, y_test, y_big_test in rollzip(strains_delta, strains_test,
+    for y_delta, y_test, y_big_test in roll_zip(strains_delta, strains_test,
                                                strains_big_test):
         model = MKSRegressionModel(basis)
         model.fit(X_delta, y_delta)
         y_pred = model.predict(X_test)
         assert np.allclose(y_pred[0, i:-i], y_test[0, i:-i],
                            rtol=1e-2, atol=6.1e-3)
-        model.resizeCoeff((resize * nx, resize * ny))
+        model.resize_coeff((resize * nx, resize * ny))
         y_big_pred = model.predict(X_big_test)
         assert np.allclose(y_big_pred[0, resize * i:-i * resize],
                            y_big_test[0, resize * i:-i * resize],
                            rtol=1e-2, atol=6.1e-2)
 
 
-def testResizeCoeff():
+def test_resize_coeff():
     nx, ny = 21, 21
     resize = 3
-    X_delta, strains_delta = getDeltaData(nx, ny)
-    X_big_delta, strains_big_delta = getDeltaData(resize * nx, resize * ny)
+    X_delta, strains_delta = get_delta_data(nx, ny)
+    X_big_delta, strains_big_delta = get_delta_data(resize * nx, resize * ny)
     basis = DiscreteIndicatorBasis(n_states=2)
 
-    for y_delta, y_big_delta in rollzip(strains_delta, strains_big_delta):
+    for y_delta, y_big_delta in roll_zip(strains_delta, strains_big_delta):
         model = MKSRegressionModel(basis)
         big_model = MKSRegressionModel(basis)
         model.fit(X_delta, y_delta)
         big_model.fit(X_big_delta, y_big_delta)
-        model.resizeCoeff((resize * nx, resize * ny))
+        model.resize_coeff((resize * nx, resize * ny))
         assert np.allclose(model.coeff, big_model.coeff,
                            rtol=1e-2, atol=2.1e-3)
 
 
-def testMultiphaseFEstrain():
+def test_multiphase_FE_strain():
     L = 21
     i = 3
     elastic_modulus = (80, 100, 120)
@@ -147,7 +147,7 @@ def testMultiphaseFEstrain():
     assert np.allclose(strain_pred[0, i:-i], strain[0, i:-i],
                        rtol=1e-2, atol=6.1e-3)
 
-    def testCahnHilliard():
+    def test_cahn_hilliard():
         n_samples = 100
         n_spaces = 20
         dt = 1e-3
@@ -158,9 +158,9 @@ def testMultiphaseFEstrain():
         model.fit(X, y)
         X_test = np.array([np.random.random((n_spaces, n_spaces)) for i in range(1)])
         CHSim = CahnHilliardSimulation(dt=dt)
-        y_test = CHSim.getResponse(X_test)
+        y_test = CHSim.get_response(X_test)
         y_pred = model.predict(X_test)
         assert mse(y_test, y_pred) < 0.03
 
 if __name__ == '__main__':
-    testMKSelasticDelta()
+    test_MKS_elastic_delta()

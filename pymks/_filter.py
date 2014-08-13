@@ -15,7 +15,7 @@ class _Filter(object):
         self.axes = np.arange(len(Fkernel.shape) - 2) + 1
         self.Fkernel = Fkernel
 
-    def _frequency2Real(self):
+    def _frequency_2_real(self):
         """
         Converts the kernel from frequency space to real space with
         the origin shifted to the center.
@@ -26,7 +26,7 @@ class _Filter(object):
         return np.real_if_close(np.fft.fftshift(np.fft.ifftn(self.Fkernel,
                                 axes=self.axes), axes=self.axes))
 
-    def _real2Frequency(self, kernel):
+    def _real_2_frequency(self, kernel):
         """
         Converts a kernel from real space to frequency space.
 
@@ -70,7 +70,7 @@ class _Filter(object):
         if not np.all(size >= self.Fkernel.shape[1:-1]):
             raise RuntimeError("resize shape is too small.")
 
-        kernel = self._frequency2Real()
+        kernel = self._frequency_2_real()
         size = kernel.shape[:1] + size + kernel.shape[-1:]
         padsize = np.array(size) - np.array(kernel.shape)
         paddown = padsize / 2
@@ -79,7 +79,7 @@ class _Filter(object):
                                    paddown[..., None]), axis=1)
         pads = tuple([tuple(p) for p in padarray])
         kernel_pad = np.pad(kernel, pads, 'constant', constant_values=0)
-        Fkernel_pad = self._real2Frequency(kernel_pad)
+        Fkernel_pad = self._real_2_frequency(kernel_pad)
 
         self.Fkernel = Fkernel_pad
 

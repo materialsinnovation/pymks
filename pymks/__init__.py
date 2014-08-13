@@ -21,7 +21,7 @@ def test():
     nose.main(argv=['-w', path, '--with-doctest'])
 
 
-def _getVersion():
+def _get_version():
     from pkg_resources import get_distribution, DistributionNotFound
 
     try:
@@ -31,7 +31,7 @@ def _getVersion():
 
     return version
 
-__version__ = _getVersion()
+__version__ = _get_version()
 
 __all__ = ['__version__',
            'test',

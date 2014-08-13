@@ -121,7 +121,7 @@ class MKSRegressionModel(LinearRegression):
         '''Returns the coefficients in real space with origin shifted to the
         center.
         '''
-        return self._filter._frequency2Real()[0]
+        return self._filter._frequency_2_real()[0]
 
     def predict(self, X):
         r'''Calculate a new response from the microstructure function `X` with
@@ -157,7 +157,7 @@ class MKSRegressionModel(LinearRegression):
         X_ = self.basis.discretize(X)
         return self._filter.convolve(X_)
 
-    def resizeCoeff(self, size):
+    def resize_coeff(self, size):
         '''Scale the size of the coefficients and pad with zeros.
 
         Let's first instantitate a model and fabricate some
@@ -174,7 +174,7 @@ class MKSRegressionModel(LinearRegression):
         The coefficients can be reshaped by passing the new shape that
         coefficients should have.
 
-        >>> model.resizeCoeff((10, 7))
+        >>> model.resize_coeff((10, 7))
         >>> assert np.allclose(model.coeff[:,:,0],
         ...                    [[0, 0, 0, 0, 0, 0, 0],
         ...                     [0, 0, 0, 0, 0, 0, 0],

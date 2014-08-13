@@ -46,7 +46,7 @@ def make_elastic_FE_strain_delta(elastic_modulus, poissons_ratio,
                                 macro_strain=macro_strain)
 
     X = make_delta_microstructures(len(elastic_modulus), size=size)
-    return X, FEsim.getResponse(X, strain_index=strain_index)
+    return X, FEsim.get_response(X, strain_index=strain_index)
 
 
 def make_delta_microstructures(n_phases, size):
@@ -132,7 +132,7 @@ def make_elastic_FE_strain_random(n_samples, elastic_modulus, poissons_ratio,
                                 macro_strain=macro_strain)
 
     X = np.random.randint(len(elastic_modulus), size=((n_samples, ) + size))
-    return X, FEsim.getResponse(X, strain_index=strain_index)
+    return X, FEsim.get_response(X, strain_index=strain_index)
 
 
 def make_cahn_hilliard(n_samples, size, dx=0.25, width=1.,
@@ -166,7 +166,7 @@ def make_cahn_hilliard(n_samples, size, dx=0.25, width=1.,
     X0 = 2 * np.random.random((n_samples,) + size) - 1
     X = X0.copy()
     for ii in range(n_steps):
-        X = CHsim.getResponse(X)
+        X = CHsim.get_response(X)
     return X0, X
 
 
