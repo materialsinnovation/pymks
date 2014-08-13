@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression
-from .filter import Filter
+from ._filter import _Filter
 
 
 class MKSRegressionModel(LinearRegression):
@@ -82,8 +82,10 @@ class MKSRegressionModel(LinearRegression):
         >>> basis = ContinuousIndicatorBasis(2, [0, 1])
         >>> model = MKSRegressionModel(basis=basis)
         >>> model.fit(X, y)
-        >>> assert np.allclose(model._filter.Fkernel, [[[ 0.5,  0.5], [-2, 0]],
-        ...                                            [[-0.5,  0  ], [-1, 0]]])
+        >>> assert np.allclose(model._filter.Fkernel, [[[ 0.5,  0.5],
+        ...                                             [  -2,    0]],
+        ...                                            [[-0.5,  0  ],
+        ...                                             [  -1,  0  ]]])
 
 
         Args:
@@ -111,16 +113,15 @@ class MKSRegressionModel(LinearRegression):
                 s1 = (slice(-1),)
             Fkernel[ijk + s1] = np.linalg.lstsq(FX[s0 + ijk + s1],
                                                 Fy[s0 + ijk])[0]
-        
-        self._filter = Filter(Fkernel[None])
-        
+
+        self._filter = _Filter(Fkernel[None])
 
     @property
     def coeff(self):
         '''Returns the coefficients in real space with origin shifted to the
         center.
         '''
-        return self._filter.frequency2real()[0]
+        return self._filter._frequency_2_real()[0]
 
     def predict(self, X):
         r'''Calculate a new response from the microstructure function `X` with
@@ -155,7 +156,7 @@ class MKSRegressionModel(LinearRegression):
             raise AttributeError("fit() method must be run before predict().")
         X_ = self.basis.discretize(X)
         return self._filter.convolve(X_)
-        
+
     def resize_coeff(self, size):
         '''Scale the size of the coefficients and pad with zeros.
 
@@ -168,7 +169,7 @@ class MKSRegressionModel(LinearRegression):
         >>> coeff = np.arange(20).reshape((5, 4, 1))
         >>> coeff = np.concatenate((coeff , np.ones_like(coeff)), axis=2)
         >>> coeff = np.fft.ifftshift(coeff, axes=(0, 1))
-        >>> model._filter = Filter(np.fft.fftn(coeff, axes=(0, 1))[None])
+        >>> model._filter = _Filter(np.fft.fftn(coeff, axes=(0, 1))[None])
 
         The coefficients can be reshaped by passing the new shape that
         coefficients should have.
@@ -200,7 +201,7 @@ class MKSRegressionModel(LinearRegression):
         >>> np.random.seed(3)
         >>> X = np.random.random((2, 5, 3))
         >>> from .bases import ContinuousIndicatorBasis
-        >>> basis = ContinuousIndicatorBasis(n_states, [0, 1])        
+        >>> basis = ContinuousIndicatorBasis(n_states, [0, 1])
         >>> X_ = basis.discretize(X)
         >>> H = np.linspace(0, 1, n_states)
         >>> Xtest = np.sum(X_ * H[None,None,None,:], axis=-1)

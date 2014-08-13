@@ -1,12 +1,15 @@
 import numpy as np
-from .cahnHilliardSimulation import CahnHilliardSimulation
 
-__all__ = ['make_delta_microstructures', 'make_elasticFEstrain_delta',
-           'make_elasticFEstrain_random', 'make_cahnHilliard']
+from .cahn_hilliard_simulation import CahnHilliardSimulation
+from ._microstructure_generator import _MicrostructureGenerator
+
+__all__ = ['make_delta_microstructures', 'make_elastic_FE_strain_delta',
+           'make_elastic_FE_strain_random',
+           'make_cahn_hilliard', 'make_microstructure']
 
 
-def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio,
-                               size, macro_strain=1.0, strain_index=0):
+def make_elastic_FE_strain_delta(elastic_modulus, poissons_ratio,
+                                 size, macro_strain=1.0, strain_index=0):
     """Generate delta microstructures and responses
 
     Simple interface to generate delta microstructures and their
@@ -18,9 +21,9 @@ def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio,
 
     >>> elastic_modulus = (1., 2.)
     >>> poissons_ratio = (0.3, 0.3)
-    >>> X, y = make_elasticFEstrain_delta(elastic_modulus=elastic_modulus,
-    ...                                   poissons_ratio=poissons_ratio,
-    ...                                   size=(5, 5))
+    >>> X, y = make_elastic_FE_strain_delta(elastic_modulus=elastic_modulus,
+    ...                                     poissons_ratio=poissons_ratio,
+    ...                                     size=(5, 5))
 
     `X` is the delta microstructures, and `y` is the
     strain response fields.
@@ -38,7 +41,7 @@ def make_elasticFEstrain_delta(elastic_modulus, poissons_ratio,
       tuple containing delta microstructures and their strain fields
 
     """
-    from .elasticFESimulation import ElasticFESimulation
+    from .elastic_FE_Simulation import ElasticFESimulation
     
     FEsim = ElasticFESimulation(elastic_modulus=elastic_modulus,
                                 poissons_ratio=poissons_ratio,
@@ -93,8 +96,8 @@ def make_delta_microstructures(n_phases, size):
     return X[mask]
 
 
-def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
-                                size, macro_strain=1.0, strain_index=0):
+def make_elastic_FE_strain_random(n_samples, elastic_modulus, poissons_ratio,
+                                  size, macro_strain=1.0, strain_index=0):
     """Generate random microstructures and responses
 
     Simple interface to generate random microstructures and their
@@ -104,10 +107,10 @@ def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
 
     >>> elastic_modulus = (1., 2.)
     >>> poissons_ratio = (0.3, 0.3)
-    >>> X, y = make_elasticFEstrain_random(n_samples=1,
-    ...                                    elastic_modulus=elastic_modulus,
-    ...                                    poissons_ratio=poissons_ratio,
-    ...                                    size=(5, 5))
+    >>> X, y = make_elastic_FE_strain_random(n_samples=1,
+    ...                                      elastic_modulus=elastic_modulus,
+    ...                                      poissons_ratio=poissons_ratio,
+    ...                                      size=(5, 5))
 
     `X` is the delta microstructures, and `y` is the
     strain response fields.
@@ -126,7 +129,7 @@ def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
       tuple containing delta microstructures and their strain fields
 
     """
-    from .elasticFESimulation import ElasticFESimulation
+    from .elastic_FE_Simulation import ElasticFESimulation
     
     FEsim = ElasticFESimulation(elastic_modulus=elastic_modulus,
                                 poissons_ratio=poissons_ratio,
@@ -136,15 +139,15 @@ def make_elasticFEstrain_random(n_samples, elastic_modulus, poissons_ratio,
     return X, FEsim.get_response(X, strain_index=strain_index)
 
 
-def make_cahnHilliard(n_samples, size, dx=0.25, width=1., dt=0.001):
+def make_cahn_hilliard(n_samples, size, dx=0.25, width=1.,
+                       dt=0.001, n_steps=1):
     """Generate microstructures and responses for Cahn-Hilliard.
-
     Simple interface to generate random concentration fields and their
     evolution after one time step that can be used for the fit method in the
     `MKSRegressionModel`.  The following example is or a two phase
     microstructure with dimensions of `(6, 6)`.
 
-    >>> X, y = make_cahnHilliard(n_samples=1, size=(6, 6))
+    >>> X, y = make_cahn_hilliard(n_samples=1, size=(6, 6))
 
     `X` is the initial concentration fields, and `y` is the
     strain response fields (the concentration after one time step).
@@ -155,13 +158,50 @@ def make_cahnHilliard(n_samples, size, dx=0.25, width=1., dt=0.001):
       dx: grid spacing
       dt: time step size
       width: interface width between phases.
+      n_steps: number of time steps used
 
     Returns:
-      Array representing the microstructures at one time step ahead
-      of 'X'
+      Array representing the microstructures at n_steps ahead of 'X'
 
     """
     CHsim = CahnHilliardSimulation(dx=dx, dt=dt, gamma=width**2)
 
-    X = 2 * np.random.random((n_samples,) + size) - 1
-    return X, CHsim.get_response(X)
+    X0 = 2 * np.random.random((n_samples,) + size) - 1
+    X = X0.copy()
+    for ii in range(n_steps):
+        X = CHsim.get_response(X)
+    return X0, X
+
+
+def make_microstructure(n_samples=10, size=(101, 101), n_phases=2,
+                        grain_size=(33, 14), seed=10):
+    """
+    Constructs microstructures for an arbitrary number of phases
+    given the size of the domain, and relative grain size.
+
+    >>> n_samples, n_phases = 1, 2
+    >>> size, grain_size = (3, 3), (1, 1)
+    >>> Xtest = np.array([[[0, 1, 0],
+    ...                [0, 0, 0],
+    ...                [0, 1, 1]]])
+    >>> X = make_microstructure(n_samples=n_samples, size=size,
+    ...                         n_phases=n_phases, grain_size=grain_size,
+    ...                         seed=0)
+
+    >>> assert(np.allclose(X, Xtest))
+
+    Args:
+        n_samples: number of samples
+        size: dimension of microstructure
+        n_phases: number of phases
+        grain_size: effective dimensions of grains
+        seed: seed for random number microstructureGenerator
+
+    Returns:
+        microstructures for the system of shape (Nsamples, Nx, Ny, ...)
+
+    """
+    MS = _MicrostructureGenerator(n_samples=n_samples, size=size,
+                                  n_phases=n_phases, grain_size=grain_size,
+                                  seed=seed)
+    return MS.generate()
