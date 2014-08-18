@@ -1,7 +1,7 @@
 MKS Models
 ==========
 
-.. autoclass:: pymks.mksRegressionModel.MKSRegressionModel
+.. autoclass:: pymks.mks_regression_model.MKSRegressionModel
    :members:
 
 
