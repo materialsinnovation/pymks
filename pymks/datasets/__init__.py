@@ -8,8 +8,8 @@ __all__ = ['make_delta_microstructures', 'make_elastic_FE_strain_delta',
            'make_cahn_hilliard', 'make_microstructure']
 
 
-def make_elastic_FE_strain_delta(elastic_modulus, poissons_ratio,
-                                 size, macro_strain=1.0, strain_index=0):
+def make_elastic_FE_strain_delta(elastic_modulus=(1, 1), poissons_ratio=(1, 1),
+                                 size=(21, 21), macro_strain=1.0, strain_index=0):
     """Generate delta microstructures and responses
 
     Simple interface to generate delta microstructures and their
@@ -51,7 +51,7 @@ def make_elastic_FE_strain_delta(elastic_modulus, poissons_ratio,
     return X, FEsim.get_response(X, strain_index=strain_index)
 
 
-def make_delta_microstructures(n_phases, size):
+def make_delta_microstructures(n_phases=2, size=(21, 21)):
     """Constructs delta microstructures
 
     Constructs delta microstructures for an arbitrary number of phases
@@ -96,8 +96,8 @@ def make_delta_microstructures(n_phases, size):
     return X[mask]
 
 
-def make_elastic_FE_strain_random(n_samples, elastic_modulus, poissons_ratio,
-                                  size, macro_strain=1.0, strain_index=0):
+def make_elastic_FE_strain_random(n_samples=1, elastic_modulus=(1, 1), poissons_ratio=(1, 1),
+                                  size=(21, 21), macro_strain=1.0, strain_index=0):
     """Generate random microstructures and responses
 
     Simple interface to generate random microstructures and their
@@ -139,7 +139,7 @@ def make_elastic_FE_strain_random(n_samples, elastic_modulus, poissons_ratio,
     return X, FEsim.get_response(X, strain_index=strain_index)
 
 
-def make_cahn_hilliard(n_samples, size, dx=0.25, width=1.,
+def make_cahn_hilliard(n_samples=1, size=(21, 21), dx=0.25, width=1.,
                        dt=0.001, n_steps=1):
     """Generate microstructures and responses for Cahn-Hilliard.
     Simple interface to generate random concentration fields and their

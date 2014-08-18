@@ -48,7 +48,7 @@ class DiscreteIndicatorBasis(_AbstractMicrostructureBasis):
 
     
     """
-    def __init__(self, n_states, domain=None):
+    def __init__(self, n_states=2, domain=None):
         super(DiscreteIndicatorBasis, self).__init__(n_states, [0, n_states - 1])
     
     def discretize(self, X):
