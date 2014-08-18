@@ -3,13 +3,18 @@ from .abstract import _AbstractMicrostructureBasis
 
 
 class DiscreteIndicatorBasis(_AbstractMicrostructureBasis):
-    """
-    Digitize a discretly labeled microstructre.
+    r"""
+    Digitize a discretly labeled microstructure such that,
 
-    The following test is for a 2D (3x3) microstructre with three
-    different phases labeled 0, 1 and 2. The shape of `X` is
-    `(n_samples, Nx, Ny)` where n_samples is 1 in this case (`Nx=3`
-    and `Ny=3`).
+    .. math::
+
+       m_h \left[i\right] = \delta_{hm\left[i\right] }
+
+    where :math:`0 \le h \le n-1` and :math:`0 \le m \le n-1` where
+    :math:`n` is the number of states.  The following test is for a 2D
+    (3x3) microstructre with three different phases labeled 0, 1 and
+    2. The shape of `X` is `(n_samples, Nx, Ny)` where n_samples is 1
+    in this case (`Nx=3` and `Ny=3`).
     
     >>> basis = DiscreteIndicatorBasis(n_states=3)
     >>> X = np.array([[[1, 1, 0],

@@ -3,11 +3,39 @@ from .abstract import _AbstractMicrostructureBasis
 
 
 class ContinuousIndicatorBasis(_AbstractMicrostructureBasis):
-    """
-    Discretize a continuous field into `n_states` local states. The
-    field must be between the specified domain values. For example, if
-    a cell has a value of 0.4, n_states=2 and the domain=[0, 1] then
-    the local state is (0.6, 0.4) (the local state must sum to 1).
+    r"""
+    Discretize a continuous field into `n_states` local states such
+    that:
+
+    .. math::
+
+       m_h \left[i\right] = R\left(1 - \frac{\left| \phi\left[i\right] -
+       \chi_h \right|}{\Delta h}\right)
+
+    where :math:`R` is the ramp function and
+
+    .. math::
+
+       \chi_h = \chi_0 + h \Delta h
+
+    and
+
+    .. math::
+
+       \Delta h = \left( \chi_{n-1} - \chi_0 \right) / \left(n-1\right)
+
+    with the continuous variable, :math:`\phi`, bounded such that
+
+    .. math::
+
+       \chi_0 \le \phi \le \chi_{n-1}
+
+    and :math:`0 \le h \le n-1`.
+
+    The field must be between the specified domain values. For
+    example, if a cell has a value of 0.4, n_states=2 and the
+    domain=[0, 1] then the local state is (0.6, 0.4) (the local state
+    must sum to 1).
 
     >>> n_states = 10
     >>> np.random.seed(4)
