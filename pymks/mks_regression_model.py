@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression
-from ._filter import _Filter
+from .filter import Filter
 
 
 class MKSRegressionModel(LinearRegression):
@@ -114,7 +114,7 @@ class MKSRegressionModel(LinearRegression):
             Fkernel[ijk + s1] = np.linalg.lstsq(FX[s0 + ijk + s1],
                                                 Fy[s0 + ijk])[0]
 
-        self._filter = _Filter(Fkernel[None])
+        self._filter = Filter(Fkernel[None])
 
     @property
     def coeff(self):
@@ -169,7 +169,7 @@ class MKSRegressionModel(LinearRegression):
         >>> coeff = np.arange(20).reshape((5, 4, 1))
         >>> coeff = np.concatenate((coeff , np.ones_like(coeff)), axis=2)
         >>> coeff = np.fft.ifftshift(coeff, axes=(0, 1))
-        >>> model._filter = _Filter(np.fft.fftn(coeff, axes=(0, 1))[None])
+        >>> model._filter = Filter(np.fft.fftn(coeff, axes=(0, 1))[None])
 
         The coefficients can be reshaped by passing the new shape that
         coefficients should have.

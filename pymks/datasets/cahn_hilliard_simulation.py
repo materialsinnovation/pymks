@@ -2,20 +2,36 @@ import numpy as np
 
 
 class CahnHilliardSimulation(object):
-    """
-    Solve the `Cahn-Hilliard equation`_ for multiple samples in
-    arbitrary dimensions. The concentration varies from -1 to 1. The
-    equation is given by
+    r"""
+    Solve the `Cahn-Hilliard equation
+    <https://en.wikipedia.org/wiki/Cahn-Hilliard_equation>`__ for
+    multiple samples in arbitrary dimensions. The concentration varies
+    from -1 to 1. The equation is given by
 
     .. math::
 
-       \dot{\phi} = \nabla^2 \left( \phi^3 - \phi \right) - \nabla^4 \phi
+       \dot{\phi} = \nabla^2 \left( \phi^3 - \phi \right) - \gamma \nabla^4 \phi
 
-    In 1D.
+    The discretiztion scheme used here is from `Chang and Rutenberg
+    <http://dx.doi.org/10.1103/PhysRevE.72.055701>`__. The scheme is a
+    semi-implicit discretization in time and is given by
+
+    .. math::
+
+       \phi_{t+\Delta t}
+       + \left(1 - a_1\right) \Delta t \nabla^2 \phi_{t+\Delta t}
+       + \left(1 - a_2\right) \Delta t \gamma \nabla^4 \phi_{t+\Delta t}
+       = \phi_t
+       - \Delta t \nabla^2 \left(a_1 \phi_t + a_2 \gamma \nabla^2 \phi_t - \phi_t^3 \right)
+
+    where :math:`a_1=3` and :math:`a_2=0`.
+    
+    In 1D. 
+    
     >>> np.random.seed(99)
     >>> N = 100
     >>> phi = 0.01 * (2 * np.random.random((2, N)) - 1)
-    >>> ch = CahnHilliardSimulation(width=2.)
+    >>> ch = CahnHilliardSimulation(gamma=4)
     >>> for i in range(10000):
     ...     phi[:] = ch.get_response(phi)
     >>> assert (max(phi.flat) > 2e-3) and (min(phi.flat) < -2e-3)
@@ -23,7 +39,7 @@ class CahnHilliardSimulation(object):
     In 2D.
 
     >>> phi = 0.01 * (2 * np.random.random((2, N, N)) - 1)
-    >>> ch = CahnHilliardSimulation(width=2.)
+    >>> ch = CahnHilliardSimulation(gamma=4.)
     >>> for i in range(100):
     ...     phi[:] = ch.get_response(phi)
     >>> assert (max(phi.flat) > 0.001) and (min(phi.flat) < -0.001)
@@ -31,27 +47,25 @@ class CahnHilliardSimulation(object):
     In 3D.
 
     >>> phi = 0.01 * (2 * np.random.random((2, N, N, N)) - 1)
-    >>> ch = CahnHilliardSimulation(width=2.)
+    >>> ch = CahnHilliardSimulation(gamma=4.)
     >>> for i in range(10):
     ...     phi[:] = ch.get_response(phi)
 
     >>> assert (max(phi.flat) > 0.0005) and (min(phi.flat) < -0.0005)
 
-    _`Cahn-Hilliard equation`: https://en.wikipedia.org/wiki/Cahn-Hilliard_equation
-
     """
 
-    def __init__(self, dx=0.25, width=1., dt=0.001):
+    def __init__(self, dx=0.25, gamma=1., dt=0.001):
         r"""
         Args:
           dx: grid spacing
           dt: time step size
-          width: interface width between phases.
+          gamma: paramater in CH equation
 
         """
         self.dx = dx
         self.dt = dt
-        self.width = width
+        self.gamma = gamma
 
     def get_response(self, X):
         r"""
@@ -84,9 +98,8 @@ class CahnHilliardSimulation(object):
 
         a1 = 3.
         a2 = 0.
-        gamma = self.width ** 2
-        explicit = ksq * (a1 - gamma * a2 * ksq)
-        implicit = ksq * ((1 - a1) - gamma * (1 - a2) * ksq)
+        explicit = ksq * (a1 - self.gamma * a2 * ksq)
+        implicit = ksq * ((1 - a1) - self.gamma * (1 - a2) * ksq)
         dt = self.dt
 
         Fy = (FX * (1 + dt * explicit) - ksq * dt * FX3) / (1 - dt * implicit)

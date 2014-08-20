@@ -3,10 +3,24 @@ from .abstract import _AbstractMicrostructureBasis
 
 
 class LegendreBasis(_AbstractMicrostructureBasis):
-    """
+    r"""
     Discretize a continuous field into `deg` local states using a
-    Legendre polynomial basis.
+    Legendre polynomial basis such that,
 
+    .. math::
+
+       m_h \left[i\right] = \frac{2h +1}{2} P_h \left(
+       2 \left( \frac{\phi\left[i\right] - \chi_{\text{min}}}{\chi_{\text{max}} - \chi_{\text{min}}} \right) - 1
+       \right)
+
+    where the :math:`P_h` are Legendre polynomials and
+
+    .. math::
+
+       \chi_{\text{min}} \le \phi \le \chi_{\text{max}}
+
+    and :math:`0 \le h \le n-1`.
+      
     >>> deg = 3
     >>> X = np.array([[0.25, 0.1],
     ...               [0.5, 0.25]])

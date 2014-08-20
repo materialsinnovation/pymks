@@ -66,8 +66,7 @@ class ElasticFESimulation(object):
         self.elastic_modulus = elastic_modulus
         self.poissons_ratio = poissons_ratio
         if len(elastic_modulus) != len(poissons_ratio):
-            raise RuntimeError("elastic_modulus and poissons_ratio must be the"
-                               " same length.")
+            raise RuntimeError('elastic_modulus and poissons_ratio must be the same length')
 
     def _convert_properties(self, dim):
         """
@@ -259,7 +258,7 @@ class ElasticFESimulation(object):
     def _get_periodicBCs(self, domain):
         dims = domain.get_mesh_bounding_box().shape[1]
 
-        bc_list, func_list = zip(*[self._get_periodicBC(domain, i) for i in range(1, dims)])
+        bc_list, func_list = list(zip(*[self._get_periodicBC(domain, i) for i in range(1, dims)]))
         return Conditions(bc_list), Functions(func_list)
 
     def _get_displacementBCs(self, domain):

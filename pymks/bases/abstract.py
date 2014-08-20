@@ -2,7 +2,7 @@ import numpy as np
 
 
 class _AbstractMicrostructureBasis(object):
-    def __init__(self, n_states, domain):
+    def __init__(self, n_states=1, domain=[0, 1]):
         """
         Instantiate a `Basis`
 

@@ -1,5 +1,5 @@
 import numpy as np
-from ._filter import _Correlation
+from .filter import Correlation
 
 """
 The SpatialStatisticsModel takes in a microstructure and returns its two
@@ -12,7 +12,7 @@ def autocorrelate(X_):
     """
     Computes the autocorrelation for a microstructure
     """
-    return _Correlation(X_).convolve(X_)
+    return Correlation(X_).convolve(X_)
 
 
 def crosscorrelate(X_):
@@ -39,7 +39,7 @@ def crosscorrelate(X_):
     >>> n_states = 3
     >>> basis = DiscreteIndicatorBasis(n_states=n_states)
     >>> X_ = basis.discretize(X)
-    >>> print crosscorrelate(X_).shape
+    >>> print(crosscorrelate(X_).shape)
     (1, 3, 3, 3)
 
     Test for 4 states
@@ -47,7 +47,7 @@ def crosscorrelate(X_):
     >>> n_states = 4
     >>> basis = DiscreteIndicatorBasis(n_states=n_states)
     >>> X_ = basis.discretize(X)
-    >>> print crosscorrelate(X_).shape
+    >>> print(crosscorrelate(X_).shape)
     (1, 3, 3, 6)
 
     Test for 5 states
@@ -55,7 +55,7 @@ def crosscorrelate(X_):
     >>> n_states = 5
     >>> basis = DiscreteIndicatorBasis(n_states=n_states)
     >>> X_ = basis.discretize(X)
-    >>> print crosscorrelate(X_).shape
+    >>> print(crosscorrelate(X_).shape)
     (1, 3, 3, 10)
 
     Args:
@@ -65,9 +65,9 @@ def crosscorrelate(X_):
     '''
 
     n_states = X_.shape[-1]
-    Niter = n_states / 2
+    Niter = n_states // 2
     Nslice = n_states * (n_states - 1) / 2
-    tmp = [_Correlation(X_).convolve(np.roll(X_, i,
+    tmp = [Correlation(X_).convolve(np.roll(X_, i,
                                              axis=-1)) for i in range(1,
                                                                       Niter + 1)]
     return np.concatenate(tmp, axis=-1)[..., :Nslice]

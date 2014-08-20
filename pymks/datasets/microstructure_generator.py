@@ -1,9 +1,9 @@
 import numpy as np
-from pymks._filter import _Filter
+from pymks.filter import Filter
 from scipy.ndimage.fourier import fourier_gaussian
 
 
-class _MicrostructureGenerator(object):
+class MicrostructureGenerator(object):
     """
     Generates n_samples number of a periodic random microstructures
     with domain size equal to size and with n_phases number of
@@ -12,7 +12,7 @@ class _MicrostructureGenerator(object):
 
     >>> n_samples, n_phases = 1, 2
     >>> size = (3, 3)
-    >>> generator = _MicrostructureGenerator(n_samples, size,
+    >>> generator = MicrostructureGenerator(n_samples, size,
     ...                                      n_phases, seed=10)
     >>> X = generator.generate()
     >>> X_test = np.array([[[1, 0, 1],
@@ -22,9 +22,9 @@ class _MicrostructureGenerator(object):
 
     """
 
-    def __init__(self, n_samples, size, n_phases, grain_size=None, seed=3):
+    def __init__(self, n_samples=1, size=(21,21), n_phases=2, grain_size=None, seed=3):
         """
-        Instantiate a _MicrostructureGenerator.
+        Instantiate a MicrostructureGenerator.
 
         Args:
           n_samples: number of samples to be generated
@@ -59,7 +59,7 @@ class _MicrostructureGenerator(object):
         X = np.random.random((self.n_samples,) + self.size)
         gaussian = fourier_gaussian(np.ones(self.grain_size),
                                     np.ones(len(self.size)))
-        filter_ = _Filter(np.fft.fftn(gaussian)[None, ..., None])
+        filter_ = Filter(np.fft.fftn(gaussian)[None, ..., None])
         filter_.resize(self.size)
         X_blur = filter_.convolve(X[..., None])
         return self._assign_phases(X_blur).astype(int)
