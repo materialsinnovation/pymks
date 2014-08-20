@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1-dev',
+        VERSION:     '0.1-dev.eecb0e2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1-dev.eecb0e2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -107,31 +107,28 @@
       
   <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>To get up and running with PyMKS, clone the repository</p>
-<div class="highlight-python"><pre>$ git clone https://github.com/wd15/pymks.git</pre>
+<p>Use pip,</p>
+<div class="highlight-python"><pre>$ pip install pymks</pre>
 </div>
-<p>and install with</p>
-<div class="highlight-python"><pre>$ cd pymks
-$ python setup.py install</pre>
-</div>
-<p>Check that you can import it and run the tests.</p>
+<p>and then run the tests.</p>
 <div class="highlight-python"><pre>$ python -c "import pymks; pymks.test()"</pre>
 </div>
-<p>In all likelihood there will be some errors unless the packages below
-are installed.</p>
-<div class="section" id="additional-requirements">
-<h2>Additional Requirements<a class="headerlink" href="#additional-requirements" title="Permalink to this headline">¶</a></h2>
-<p>PyMKS will not work without the following packages.</p>
-<div class="highlight-python"><pre>$ pip install numpy
-$ pip install scipy
-$ pip install scikit-learn</pre>
+<div class="section" id="scipy-stack">
+<h2>Scipy Stack<a class="headerlink" href="#scipy-stack" title="Permalink to this headline">¶</a></h2>
+<p>The packages <a class="reference external" href="https://nose.readthedocs.org/en/latest/">Nosetests</a>,
+<a class="reference external" href="http://www.scipy.org/">Scipy</a>, <a class="reference external" href="http://www.scipy.org/">Numpy</a>,
+<a class="reference external" href="http://scikit-learn.org">Scikit-learn</a> are all required.</p>
 </div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>To use the interactive examples from the <tt class="docutils literal"><span class="pre">notebooks/</span></tt> directory,
+IPython and Matplotlib are both required.</p>
 </div>
 <div class="section" id="sfepy">
 <h2><a class="reference external" href="http://sfepy.org">SfePy</a><a class="headerlink" href="#sfepy" title="Permalink to this headline">¶</a></h2>
-<p>PyMKS can be used without <a class="reference external" href="http://sfepy.org">SfePy</a>. However, a
-number of the tests depend on <a class="reference external" href="http://sfepy.org">SfePy</a> to run and it
-is also required to run the elasticity examples.</p>
+<p>PyMKS can be used without <a class="reference external" href="http://sfepy.org">SfePy</a>, but many of the
+tests and examples require <a class="reference external" href="http://sfepy.org">SfePy</a> to generate the
+sample data so it is a good idea to install it.</p>
 <p>To install <a class="reference external" href="http://sfepy.org">SfePy</a>, first clone with</p>
 <div class="highlight-python"><pre>$ git clone git://github.com/sfepy/sfepy.git</pre>
 </div>
@@ -142,19 +139,6 @@ $ python setup.py install</pre>
 <p>See the <a class="reference external" href="http://sfepy.org/doc-devel/installation.html">SfePy installation
 instructions</a> for more
 details.</p>
-</div>
-<div class="section" id="fftw">
-<h2><a class="reference external" href="http://www.fftw.org/">FFTW</a><a class="headerlink" href="#fftw" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="http://www.fftw.org/">FFTW</a> is not necessary to use PyMKS, but it
-does give improved performance. The main requirement for <tt class="docutils literal"><span class="pre">pyfftw</span></tt> is
-FFTW3, which can be installed via,</p>
-<div class="highlight-python"><pre>$ sudo apt-get install libfftw3-dev</pre>
-</div>
-<p>on Debian/Ubuntu. Windows and Mac users should consult</p>
-<p><a class="reference external" href="https://github.com/hgomersall/pyFFTW#platform-specific-build-info">https://github.com/hgomersall/pyFFTW#platform-specific-build-info</a></p>
-<p>Once this is installed, do</p>
-<div class="highlight-python"><pre>$ pip install pyfftw</pre>
-</div>
 </div>
 <div class="section" id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>

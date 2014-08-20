@@ -3,55 +3,50 @@ Technical Overview
 ------------------
 
 An important component of the MKS is the regression technique for rapid
-calculation of a response field :math:`p_i` based on a microstructure
-:math:`m_i`, where the index :math:`i` refers to a spatial location
-often in 2D or 3D. For example, the microstructure might represent
-values of material properties that vary based on phase such as elastic
-modulus or Poisson's ratio while the response might be the stress or
-strain field.
+calculation of a response field :math:`p\left[i\right]` based on a
+microstructure :math:`m\left[i\right]`, where :math:`i` refers to a
+discretized spatial location often in 2D or 3D and
+:math:`\left[\cdot\right]` indicates a discrete argument over the
+spatial domain. For example, the microstructure might represent values
+of material properties that vary based on phase such as elastic modulus
+or Poisson's ratio while the response might be the stress or strain
+field.
 
 Discretize in State Space
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The first step in the MKS is to bin (or discretize) the state space. To
-so this, the microstructure :math:`m_i` and is discretized and then
-represented by :math:`m^h_i` such that
+do this, the microstructure :math:`m` is discretized and then
+represented by :math:`m_h` such that
 
-.. math::  m_i = \sum_h m_{i,h} \chi_h 
+.. math::  m\left[i\right] = \sum_{h=0}^{n-1} m_h\left[i\right] \chi_h 
 
-where :math:`\chi_h` is the basis representation for the microstructure.
+where :math:`\chi_h` is the basis representation for the microstructure
+and :math:`n` is the number of states. For example if
+:math:`m \left[i\right] = (0, 2, 1)`, and :math:`n=3`, then
+:math:`\chi_h = (0, 1, 2)` and
+:math:`m_h[i] = ((1, 0, 0), (0, 0, 1), (0, 1, 0))`. Thus,
 
-The following image represents one form of discretization. State space
-discrtization is analogous to splitting the data into channels in signal
-processing. For example, a value of 0.049 is represented by (0.76, 0.24,
-0, 0, 0, 0) when discretized into 6 bins sampled over an interval of 0
-to 1.
+.. math::  m_h = \delta_{hm} 
 
-.. code:: python
+.. math:: m_h \left[i\right] = \delta_{hm\left[i\right]}
 
-    from IPython.display import Image
-    Image(filename='microstructure.png')
-
-
-
-.. image:: intro_files/intro_1_0.png
-
-
+since the :math:`m`'s are just indices representing the state (the
+:math:`\left[i\right]` has been dropped).
 
 The Influence Coefficients
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once the state space is discretized, the relationship between the
-response :math:`p_i` and microstructure :math:`m_{i,h}` can be written
-as,
+response :math:`p` and microstructure :math:`m_h` can be written as,
 
-.. math::  p_i = \sum_h \sum_j \alpha_{j,h} m_{i + j,h} 
+.. math::  p\left[i\right] = \sum_{h=0}^{n-1} \alpha_h\left[j\right] m_h\left[i + j\right] 
 
-where the :math:`\alpha_{j,h}` are known as the influence coefficients
-and describe the relationship between :math:`p_i` and :math:`m_j`. The
-:math:`p_i` are a spatial convolution of :math:`\alpha_{j,h}` and
-:math:`m_j`. In general, it is assumed that both :math:`m_j` and
-:math:`p_i` are periodic.
+where the :math:`\alpha_h` are known as the influence coefficients and
+describe the relationship between :math:`p` and :math:`m_h`. The
+:math:`p` are a spatial convolution of :math:`\alpha_h` and :math:`m_h`.
+In general, it is assumed that both :math:`m_h` and :math:`p` are
+periodic.
 
 \*\*\* Note that the formulation above has dropped an index representing
 the samples for simplicity. Generally the MKS is calibrated using many
@@ -66,20 +61,21 @@ regression is reduced from $ (N^2 N\_{} N^2 H )$ to
 :math:`\left(N_{\text{sample}} \times H \right)` for each point in the
 Fourier space of size :math:`N^2`. The convolution,
 
-.. math::  \sum_h \sum_j \alpha_{j,h} m_{i + j,h} 
+.. math::  \sum_{h=0}^{n-1} \alpha_h\left[j\right] m_h \left[i + j\right] 
 
-can be deconvolved in Fourier space using `circular convolution
-theorem <http://en.wikipedia.org/wiki/Discrete_Fourier_transform#Circular_convolution_theorem_and_cross-correlation_theorem>`__
+can be deconvolved in Fourier space using the `circular convolution
+theorem <http://en.wikipedia.org/wiki/Discrete_Fourier_transform#Circular_convolution_theorem_and_cross-correlation_theorem>`__.
 
-If we write :math:`P_{k} =  \mathcal{F}_k \left( p_{i} \right)`,
-:math:`M_{k,h} = \mathcal{F}_k  \left( m_{i,h} \right)` and
-:math:`\beta_{k,h} = \mathcal{F}_k \left(  \alpha_{i,h} \right)`, then
-we just need to solve
+If we write
+:math:`P \left[k \right] =  \mathcal{F}_k \{ p\left[i\right] \}`,
+:math:`M_h \left[k\right]= \mathcal{F}_k  \{ m_h\left[i\right] \}` and
+:math:`\beta\left[k\right] = \mathcal{F}_k \{  \alpha_h \left[i\right] \}`,
+then we just need to solve
 
-.. math::  P_{k} = \sum_h \beta_{k,h} M_{k,h} 
+.. math::  P\left[k\right] = \sum_{h=0}^{n-1} \beta_h \left[k\right] M_h \left[k\right] 
 
 with a linear regression at each discretization location in :math:`k` to
-calculate the :math:`\beta_{k,h}`.
+calculate the :math:`\beta_h`.
 
 A PyMKS Example
 ---------------
@@ -91,7 +87,7 @@ influence coefficients using the ``fit`` method. Once the influence
 coefficients have been calibrated, the ``predict`` method can be used to
 quickly reproduce the same simulation for any microstructure. The rest
 of the page will demonstrate how to do this for a finite element
-simulation of the linear elastic strain.
+simulation for linear elastic strain.
 
 Linear Elasticity
 -----------------
@@ -106,9 +102,10 @@ represented by ``X``.
 
 The ``make_elasticFEstrain_random`` function from ``pymks.datasets``
 provides a convenient interface to get random microstructures and their
-strain fields from ``ElasticFESimulation``. In this case we are going to
-look at a 15 by 15 two phase microstructure with values of 80 and 120.
-Both phases will have a Poisson's ratio of 0.3.
+strain fields using the ``ElasticFESimulation`` class. In this case we
+are going to look at a 15 by 15 two phase microstructure with values of
+elasic modulus values of 80 and 120. Both phases will have a Poisson's
+ratio of 0.3.
 
 .. code:: python
 
@@ -131,19 +128,18 @@ Both phases will have a Poisson's ratio of 0.3.
     draw_microstructure_strain(X[0], strains[0])
 
 
-.. image:: intro_files/intro_6_0.png
+.. image:: intro_files/intro_5_0.png
 
 
 Create the Delta Microstructures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The goal of the MKS it to quickly reproduce the finite element
-simulation shown above. In the case of linear elasticity where we are
-looking at distinct phases, the MKS model can be calibrated with a delta
-microstructures and the ``fit`` method. The
+The goal of the MKS it to quickly reproduce finite element simulations
+like the one shown above. In the case of linear elasticity, which has
+distinct phases, the MKS model can be calibrated with two delta
+microstructures rather than hundreds of random microstructures. The
 ``make_delta_microstructures`` function from ``pymks.datasets`` provides
-an interface to produce the delta microstructures that can be used to
-calibration the influence coefficients.
+a convenient interface to produce the delta microstructures.
 
 .. code:: python
 
@@ -154,16 +150,16 @@ calibration the influence coefficients.
     draw_microstructures(X_delta[0], X_delta[1])
 
 
-.. image:: intro_files/intro_8_0.png
+.. image:: intro_files/intro_7_0.png
 
 
 Create the Responses
 ~~~~~~~~~~~~~~~~~~~~
 
-The ``make_elasticFEstrain_delta`` function from ``pymks.datasets``
-creates not only the delta microstructures but also their strain fields.
-These strain fields and microstructures can then be used as in the
-inputs to calibrate the influence coefficients.
+The ``make_elasticFEstrain_delta`` function from the ``datasets``
+submodule of ``pymks`` returns both the delta microstructure and the
+strain field. The strain fields and microstructures are used as inputs
+to calibrate the influence coefficients.
 
 .. code:: python
 
@@ -176,16 +172,18 @@ inputs to calibrate the influence coefficients.
     draw_microstructure_strain(X_delta[0], strains_delta[0])
 
 
-.. image:: intro_files/intro_10_0.png
+.. image:: intro_files/intro_9_0.png
 
 
 Calibrate the MKS Model
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Now lets instantiate a\ ``DiscreteIndicatorBasis`` and a
-``MKSRegressionModel`` and use the microstructures and strain fields
-created by ``make_elasticFEstrain_delta`` to calibrate the influence
-coefficients using the ``fit`` method.
+The first step is to calibrate the influence coefficients using the
+microstructures and strain fields returned by
+``make_elasticFEstrain_delta``. The ``MKSRegressionModel`` calibrates
+the model in the ``fit`` method. A ``DiscreteIndicatorBasis`` is needed
+to discretize the microstructure before passing it to the ``fit``
+method.
 
 .. code:: python
 
@@ -214,7 +212,7 @@ into the ``predict`` method.
     draw_strains_compare(y[0], y_pred[0]);
 
 
-.. image:: intro_files/intro_14_0.png
+.. image:: intro_files/intro_13_0.png
 
 
 The ``MKSRegressionModel`` has done quite a good job of predicting the
@@ -229,4 +227,6 @@ simulations using only the small FE simulation to seed the MKS model.
 
 \*\* Note that the cells close to the left and right side of the domain
 are not well predicted. This is due to issues with the SfePy FE solver
-and periodic boundary conditions. This should be ironed out soon. \*\*
+and periodic boundary conditions. This should be ironed out soon. This
+is not an issue with the ``MKSRegressionModel``, but only the FE tool
+used to produce the calibration data.\*\*

@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Cahn-Hilliard &mdash; PyMKS</title>
+    <title>Cahn-Hilliard Example &mdash; PyMKS</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1-dev',
+        VERSION:     '0.1-dev.eecb0e2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1-dev.eecb0e2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -105,46 +105,28 @@
   <div class="row">
     <div class="col-md-12">
       
-  <div class="section" id="cahn-hilliard">
-<h1>Cahn-Hilliard<a class="headerlink" href="#cahn-hilliard" title="Permalink to this headline">¶</a></h1>
-<p>This example demonstrates how to use PyMKS to quickly produce phase
-field results from a Cahn-Hilliard simulation. The first section
-provides some background information about the Cahn-Hilliard equation as
-well as details behind the Cahn-Hilliard simulation used to calibration
-and validate the MKS model. The example then goes on to demonstrate how
-to generate calibration data to calibrate the influence coefficients
-using linear regression. As part of the calibration process, the example
-explains how to pick an appropriate number of local states for the MKS
-model when state space is continuous. The Cahn-Hilliard simulation and
-the MKS model with calibrated influence coefficients are then used to
-predict the microstructure evolution from a given initial concentration
-and the results are compared. Finally, the influence coefficients are
-scaled up and used to predict the evolution for a much larger system.</p>
+  <div class="section" id="cahn-hilliard-example">
+<h1>Cahn-Hilliard Example<a class="headerlink" href="#cahn-hilliard-example" title="Permalink to this headline">¶</a></h1>
+<p>This example demonstrates how to use PyMKS to solve the Cahn-Hilliard
+equation. The first section provides some background information about
+the Cahn-Hilliard equation as well as details about calibrating and
+validating the MKS model. The example demonstrates how to generate
+sample data, calibrate the influence coefficients and then pick an
+appropriate number of local states when state space is continuous. The
+MKS model and a spectral solution of the Cahn-Hilliard equation are
+compared on a larger test microstructure over multiple time steps.</p>
 <div class="section" id="cahn-hilliard-equation">
 <h2>Cahn-Hilliard Equation<a class="headerlink" href="#cahn-hilliard-equation" title="Permalink to this headline">¶</a></h2>
-<p>The Cahn-Hilliard equation is used to simulation microstructure
-evolution during spinodial decompation. The equation take the following
-form.</p>
+<p>The Cahn-Hilliard equation is used to simulate microstructure evolution
+during spinodial decomposition and has the following form,</p>
 <div class="math">
-\[\frac{\partial \phi}{\partial t} = \nabla \cdot D \nabla \Bigg ( \frac{\partial f}{\partial \phi} + \epsilon^2 \nabla^2 \phi \Bigg )\]</div>
-<p><span class="math">\(\phi\)</span> is an conserved ordered parameter which can represent alloy
-composition, <span class="math">\(D\)</span> is the diffusion coefficient,
-<span class="math">\(f(\phi(x,t))\)</span> is the free energy function, and <span class="math">\(\epsilon\)</span>
-is the length of interface region. <span class="math">\(f(ϕ(x,t))\)</span> is a double well
-potential and can be represented as a fourth-order polynomial.</p>
-<div class="math">
-\[f = \frac{a^2}{2}\phi^2 (1 - \phi)^2\]</div>
-<p>The free paramter <span class="math">\(a\)</span> can be used to control the height of the
-free energy function while the free parameter $ $ can be used to control
-to interface width. The double well provides the thermodynamic driving
-force for phase seperation. While the gradient energy term
-<span class="math">\(\epsilon^2 \nabla^2 \phi\)</span> provides the driving force to keep the
-interface between the phases continous.</p>
-<p>In this example, a 2D concentration fields <span class="math">\(\phi\)</span> are simulated by
-solving the Cahn-Hilliard equation using the spectral method with
-periodic boundary conditions [1]. The simulated concentration fields are
-used to both calibrate the influence coefficients and validate the
-accuracy of the MKS model.</p>
+\[\dot{\phi} = \nabla^2 \left( \phi^3 - \phi \right) - \gamma \nabla^4 \phi\]</div>
+<p>where <span class="math">\(\phi\)</span> is a conserved ordered parameter and
+<span class="math">\(\sqrt{\gamma}\)</span> represents the width of the interface. In this
+example, the Cahn-Hilliard equation is solved using a semi-implicit
+spectral scheme with periodic boundary conditions, see <a class="reference external" href="http://dx.doi.org/10.1103/PhysRevE.72.055701">Chang and
+Rutenberg</a> for more
+details.</p>
 <div class="code python highlight-python"><pre>%matplotlib inline
 %load_ext autoreload
 %autoreload 2
@@ -165,34 +147,33 @@ which can change over time, therefore the first order influence
 coefficients cannot be calibrated with delta microstructures. Instead a
 large number of simulations with random initial conditions are used to
 calibrate the first order influence coefficients using linear
-regression. Let&#8217;s show how this is done.</p>
-<p>The function <tt class="docutils literal"><span class="pre">make_cahnHilliard</span></tt> from <tt class="docutils literal"><span class="pre">pymks.datasets</span></tt> provides a
-nice interface to generate calibration datasets for the influence
-coefficients. To use <tt class="docutils literal"><span class="pre">make_cahnHilliard</span></tt>, we need to set the number of
-samples we want to use to calibrate the influence coefficients using
-<tt class="docutils literal"><span class="pre">n_samples</span></tt> as well as the size of the simulation using <tt class="docutils literal"><span class="pre">size</span></tt>.</p>
+regression.</p>
+<p>The function <tt class="docutils literal"><span class="pre">make_cahn_hilliard</span></tt> from <tt class="docutils literal"><span class="pre">pymks.datasets</span></tt> provides an
+interface to generate calibration datasets for the influence
+coefficients. To use <tt class="docutils literal"><span class="pre">make_cahn_hilliard</span></tt>, we need to set the number
+of samples we want to use to calibrate the influence coefficients using
+<tt class="docutils literal"><span class="pre">n_samples</span></tt>, the size of the simulation domain using <tt class="docutils literal"><span class="pre">size</span></tt> and the
+time step using <tt class="docutils literal"><span class="pre">dt</span></tt>.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pymks</span>
-<span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_cahnHilliard</span>
+<span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_cahn_hilliard</span>
 
 <span class="n">L</span> <span class="o">=</span> <span class="mi">40</span>
 <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">400</span>
-<span class="n">dt</span><span class="o">=</span><span class="mf">1e-2</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">1e-2</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">99</span><span class="p">)</span>
-<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_cahnHilliard</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">),</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_cahn_hilliard</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">),</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The function <tt class="docutils literal"><span class="pre">make_cahnHilliard</span></tt> has generated <tt class="docutils literal"><span class="pre">n_samples</span></tt> number of
-random microstructures <tt class="docutils literal"><span class="pre">X</span></tt> and returned the same microstructures after
-they have evolved one time step <tt class="docutils literal"><span class="pre">y</span></tt>. Let&#8217;s take a look at one of them.</p>
+<p>The function <tt class="docutils literal"><span class="pre">make_cahnHilliard</span></tt> generates <tt class="docutils literal"><span class="pre">n_samples</span></tt> number of
+random microstructures, <tt class="docutils literal"><span class="pre">X</span></tt>, and the associated updated
+microstructures, <tt class="docutils literal"><span class="pre">y</span></tt>, after one time step <tt class="docutils literal"><span class="pre">y</span></tt>. The following cell
+plots one of these microstructures along with its update.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_concentrations</span>
 
 <span class="n">draw_concentrations</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title0</span><span class="o">=</span><span class="s">&#39;time=0&#39;</span><span class="p">,</span> <span class="n">title1</span><span class="o">=</span><span class="s">&#39;time = 1&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>/home/wd15/anaconda/lib/python2.7/site-packages/matplotlib/figure.py:1595: UserWarning: This figure includes Axes that are not compatible with tight_layout, so its results might be incorrect.
-  warnings.warn("This figure includes Axes that are not "</pre>
-</div>
-<img alt="../_images/cahn_hilliard_6_1.png" src="../_images/cahn_hilliard_6_1.png" />
+<img alt="../_images/cahn_hilliard_6_0.png" src="../_images/cahn_hilliard_6_0.png" />
 </div>
 <div class="section" id="calibrate-influence-coefficients">
 <h2>Calibrate Influence Coefficients<a class="headerlink" href="#calibrate-influence-coefficients" title="Permalink to this headline">¶</a></h2>
@@ -200,9 +181,11 @@ they have evolved one time step <tt class="docutils literal"><span class="pre">y
 have discrete phases. This leaves the number of local states in local
 state space as a free hyper parameter. In previous work it has been
 shown that as you increase the number of local states, the accuracy of
-MKS model increases [2], but as the number of local states increases,
-the difference in accuracy decreases. Some work needs to be done in
-order to find the practical number of local states that we will use.</p>
+MKS model increases (see <a class="reference external" href="http://dx.doi.org/10.1016/j.actamat.2010.10.008">Fast et
+al.</a>), but as the
+number of local states increases, the difference in accuracy decreases.
+Some work needs to be done in order to find the practical number of
+local states that we will use.</p>
 <p>Let&#8217;s split the calibrate dataset into testing and training datasets.
 The function <tt class="docutils literal"><span class="pre">train_test_split</span></tt> for the machine learning python module
 <tt class="docutils literal"><span class="pre">`sklearn</span></tt> &lt;<a class="reference external" href="http://scikit-learn.org/stable/">http://scikit-learn.org/stable/</a>&gt;`__ provides a convenient
@@ -253,7 +236,7 @@ overfit the data.</p>
 </pre></div>
 </div>
 <div class="highlight-python"><pre>GridSearchCV(cv=5,
-       estimator=MKSRegressionModel(basis=&lt;pymks.bases.continuous.ContinuousIndicatorBasis object at 0x7fa61aabfd10&gt;,
+       estimator=MKSRegressionModel(basis=&lt;pymks.bases.continuous.ContinuousIndicatorBasis object at 0xabfdc4ec&gt;,
           n_states=2),
        fit_params={}, iid=True, loss_func=None, n_jobs=1,
        param_grid={'n_states': array([ 2,  3,  4,  5,  6,  7,  8,  9, 10])},
@@ -264,7 +247,7 @@ overfit the data.</p>
 <span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>MKSRegressionModel(basis=&lt;pymks.bases.continuous.ContinuousIndicatorBasis object at 0x7fa61a8b2fd0&gt;,
+<div class="highlight-python"><pre>MKSRegressionModel(basis=&lt;pymks.bases.continuous.ContinuousIndicatorBasis object at 0xabfdc0ac&gt;,
           n_states=10)
 0.999999081316</pre>
 </div>
@@ -273,7 +256,10 @@ overfit the data.</p>
 <span class="n">draw_gridscores</span><span class="p">(</span><span class="n">gs</span><span class="o">.</span><span class="n">grid_scores_</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/cahn_hilliard_14_0.png" src="../_images/cahn_hilliard_14_0.png" />
+<div class="highlight-python"><pre>/home/david/anaconda/lib/python2.7/site-packages/matplotlib/axes.py:4747: UserWarning: No labeled objects found. Use label='...' kwarg on individual plots.
+  warnings.warn("No labeled objects found. "</pre>
+</div>
+<img alt="../_images/cahn_hilliard_14_1.png" src="../_images/cahn_hilliard_14_1.png" />
 <p>As expected the accuracy of the MKS model monotonically increases as we
 increase n_states, but accuracy doesn&#8217;t improve significantly as
 n_states gets larger than signal digits.</p>
@@ -300,7 +286,7 @@ the Cahn-Hilliard simulation and the MKS model start with the same
 initial concentration <tt class="docutils literal"><span class="pre">phi0</span></tt> and evolve in time. In order to do the
 Cahn-Hilliard simulation we need an instance of the class
 <tt class="docutils literal"><span class="pre">CahnHilliardSimulation</span></tt>.</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.datasets.cahnHilliardSimulation</span> <span class="kn">import</span> <span class="n">CahnHilliardSimulation</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.datasets.cahn_hilliard_simulation</span> <span class="kn">import</span> <span class="n">CahnHilliardSimulation</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">191</span><span class="p">)</span>
 
 <span class="n">phi0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
@@ -356,17 +342,6 @@ model.</p>
 <img alt="../_images/cahn_hilliard_30_0.png" src="../_images/cahn_hilliard_30_0.png" />
 <p>The MKS model with resized influence coefficients was able to reasonably
 predict the structure evolution for a larger concentration field.</p>
-</div>
-<div class="section" id="references">
-<h3>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h3>
-<p>[1] Ye X., Cheng X., The Fourier spectral method for the Cahn-Hilliard
-equation. Applied Mathematics and Computation, 171, 1, 345-357, 2005.
-<a class="reference external" href="http://dx.doi.org/10.1016/j.amc.2005.01.050">doi:10.1016/j.amc.2005.01.050</a></p>
-<p>[2] Fast T., Niezgoda S., Kalidindi S.R., A new framework for
-computationally efficient structure–structure evolution linkages to
-facilitate high-fidelity scale bridging in multi-scale materials models
-59, 2, 699-707, 2011.
-<a class="reference external" href="http://dx.doi.org/10.1016/j.actamat.2010.10.008">doi:10.1016/j.actamat.2010.10.008</a></p>
 </div>
 </div>
 </div>

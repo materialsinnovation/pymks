@@ -36,11 +36,11 @@ fields. For an isotropic material the stiffness tensor can be
 represented by lower dimension terms which can relate the stress and the
 strain as follows.
 
-.. math::  \sigma_{ij} = \lambda \delta_{ij} \varepsilon{kk} + 2\mu \varepsilon_{ij}  
+.. math::  \sigma_{ij} = \lambda \delta_{ij} \varepsilon_{kk} + 2\mu \varepsilon_{ij}  
 
-$ $ and :math:`\mu` are the first and second Lame parameters and can be
-defined in terms of the Young's modulus :math:`E` and Poisson's ratio
-:math:`\nu` in 2D.
+:math:`\lambda` and :math:`\mu` are the first and second Lame parameters
+and can be defined in terms of the Young's modulus :math:`E` and
+Poisson's ratio :math:`\nu` in 2D.
 
 .. math::  \lambda = \frac{E\nu}{(1-\nu)(1-2\nu)} 
 
@@ -64,9 +64,8 @@ and can be cast in terms of displacement.
 .. math::  \mu u_{i,jj}+(\mu + \lambda)u_{j,ij}=0 
 
 In this example, a displacement controlled simulation is used to
-calculated the strain and the following boundary conditions for square
-box of length :math:`L` and macroscopic strain
-:math:`\bar{\varepsilon}_{xx}` are imposed.
+calculate the strain. The domain is a square box of side :math:`L` which
+has an macroscopic strain :math:`\bar{\varepsilon}_{xx}` imposed.
 
 In general, generateing the calibration data for the MKS requires
 boundary conditions that are both periodic and displaced, which are
@@ -170,7 +169,7 @@ number of phases.
 
 .. code:: python
 
-    from pymks.datasets import make_elasticFEstrain_delta
+    from pymks.datasets import make_elastic_FE_strain_delta
     from pymks.tools import draw_microstructure_strain
     
     elastic_modulus = (100, 120)
@@ -178,7 +177,7 @@ number of phases.
     macro_strain = 0.02
     size = (L, L)
     
-    X_delta, strains_delta = make_elasticFEstrain_delta(elastic_modulus=elastic_modulus,
+    X_delta, strains_delta = make_elastic_FE_strain_delta(elastic_modulus=elastic_modulus,
                                                         poissons_ratio=poissons_ratio,
                                                         size=size, macro_strain=macro_strain,
                                                         strain_index=slice(None))
@@ -262,8 +261,8 @@ equally as import. They are equivalent to the constant term in multiple
 linear regression with `categorical
 variables <http://en.wikipedia.org/wiki/Dummy_variable_%28statistics%29>`__.
 
-Predict of the Strain Field for a Random Microstructure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Predict the Strain Field for a Random Microstructure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Let's now use our instance of the ``MKSRegressionModel`` class with
 calibrated influence coefficients to compute the strain field for a
@@ -276,12 +275,12 @@ results from finite element analysis.
 
 .. code:: python
 
-    from pymks.datasets import make_elasticFEstrain_random
+    from pymks.datasets import make_elastic_FE_strain_random
     
     np.random.seed(99)
-    X, strain = make_elasticFEstrain_random(n_samples=1, elastic_modulus=elastic_modulus,
-                                       poissons_ratio=poissons_ratio, size=size, 
-                                       macro_strain=macro_strain)
+    X, strain = make_elastic_FE_strain_random(n_samples=1, elastic_modulus=elastic_modulus,
+                                              poissons_ratio=poissons_ratio, size=size, 
+                                              macro_strain=macro_strain)
     a = draw_microstructure_strain(X[0] , strain[0])
 
 
@@ -329,9 +328,9 @@ generate a new larger random microstructure and its strain field.
     size = (N, N)
     print size
     
-    X, strain = make_elasticFEstrain_random(n_samples=1, elastic_modulus=elastic_modulus,
-                                       poissons_ratio=poissons_ratio, size=size, 
-                                       macro_strain=macro_strain)
+    X, strain = make_elastic_FE_strain_random(n_samples=1, elastic_modulus=elastic_modulus,
+                                              poissons_ratio=poissons_ratio, size=size, 
+                                              macro_strain=macro_strain)
     
     draw_microstructure_strain(X[0] , strain[0])
 

@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>A Simple Filter &mdash; PyMKS</title>
+    <title>Filter Example &mdash; PyMKS</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1-dev',
+        VERSION:     '0.1-dev.eecb0e2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1-dev.eecb0e2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -105,19 +105,13 @@
   <div class="row">
     <div class="col-md-12">
       
-  <div class="section" id="a-simple-filter">
-<h1>A Simple Filter<a class="headerlink" href="#a-simple-filter" title="Permalink to this headline">¶</a></h1>
-<p>This example will demonstrate the importance of removing the
-redundancies from the regression. This notebook will</p>
-<ul class="simple">
-<li>define a simple 1D filter,</li>
-<li>generate influence coefficients using the filter,</li>
-<li>use these coefficients to calculate a response from a microstructure,</li>
-<li>back calculate the influence coefficients,</li>
-<li>compare the back calculated influence coefficients with the original,</li>
-<li>introduce the <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> class and</li>
-<li>show how the this class deals with redundancies.</li>
-</ul>
+  <div class="section" id="filter-example">
+<h1>Filter Example<a class="headerlink" href="#filter-example" title="Permalink to this headline">¶</a></h1>
+<p>This example deomonstrates the connection between MKS and signal
+processing for a 1D filter. It shows that the filter is in fact the same
+as the influence coefficients and, thus, applying the <tt class="docutils literal"><span class="pre">predict</span></tt> method
+of the <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> is the same as filtering the
+microstructure.</p>
 <div class="code python highlight-python"><pre>%matplotlib inline
 %load_ext autoreload
 %autoreload 2
@@ -130,111 +124,67 @@ import matplotlib.pyplot as plt</pre>
 </div>
 <div class="section" id="the-filter">
 <h2>The filter<a class="headerlink" href="#the-filter" title="Permalink to this headline">¶</a></h2>
-<p>Create a filter.</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">,</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">20</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="mi">20</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
-
-<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-<span class="n">a</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">filter</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-</pre></div>
-</div>
-<img alt="../_images/filter_4_0.png" src="../_images/filter_4_0.png" />
-<div class="code python highlight-python"><pre>?np.linspace</pre>
-</div>
-<p>Construct the coefficients, <tt class="docutils literal"><span class="pre">coeff</span></tt></p>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">Nbin</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="n">Nspace</span> <span class="o">=</span> <span class="mi">81</span>
-
-<span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Nbin</span><span class="p">)[</span><span class="bp">None</span><span class="p">,:]</span> <span class="o">*</span> <span class="nb">filter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">Nspace</span><span class="p">))[:,</span><span class="bp">None</span><span class="p">]</span>
-<span class="k">print</span> <span class="n">coeff</span><span class="o">.</span><span class="n">shape</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">81</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Take the Fourier transform.</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">Fcoeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">coeff</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Make some sample microstructures, <tt class="docutils literal"><span class="pre">X</span></tt></p>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">Nsample</span> <span class="o">=</span> <span class="mi">400</span>
-
-<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">Nsample</span><span class="p">,</span> <span class="n">Nspace</span><span class="p">))</span>
-<span class="k">print</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="mi">81</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Discretize the microstructure</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Nbin</span><span class="p">)</span>
-<span class="n">X_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">X</span><span class="p">[:,:,</span><span class="bp">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">H</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">H</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">H</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">X_</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-<span class="k">print</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-</pre></div>
-</div>
-<div class="highlight-python"><pre>[ 0.5640051  0.4359949]
-0.435994902142</pre>
-</div>
-<p>Calculate the responses</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">FX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">X_</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">Fy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Fcoeff</span><span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">FX</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">Fy</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="what-is-a-filter">
-<h2>What is a Filter?<a class="headerlink" href="#what-is-a-filter" title="Permalink to this headline">¶</a></h2>
-<p>A convolution</p>
+<p>Here we construct a filter, <span class="math">\(F\)</span>, such that</p>
 <div class="math">
-\[y_k = \sum_{i=0}^{N - 1} x_{k-i} h_i\]</div>
-<p>where <span class="math">\(h\)</span> is filter and <span class="math">\(x\)</span> is periodic in this case.</p>
-</div>
-<div class="section" id="exercise-03-0">
-<h2>Exercise 03-0<a class="headerlink" href="#exercise-03-0" title="Permalink to this headline">¶</a></h2>
-<p>Use the <tt class="docutils literal"><span class="pre">scipy.ndimage.convolve</span></tt> function to construct the <tt class="docutils literal"><span class="pre">y</span></tt>.</p>
-<ul class="simple">
-<li>look at <tt class="docutils literal"><span class="pre">scipy.ndimage.convove</span></tt> documentation</li>
-<li>just do the first sample</li>
-<li>the <tt class="docutils literal"><span class="pre">convolve</span></tt> function must be in <tt class="docutils literal"><span class="pre">wrap</span></tt> mode to be periodic</li>
-<li>use a small <tt class="docutils literal"><span class="pre">Nspace</span></tt> to test</li>
-<li>use <tt class="docutils literal"><span class="pre">np.roll</span></tt> to align the results</li>
-<li>check the answer with <tt class="docutils literal"><span class="pre">np.allclose</span></tt></li>
-</ul>
-<div class="code python highlight-python"><pre>import scipy.signal
-import scipy.ndimage
-?scipy.signal.fftconvolve
-
-y_alt = scipy.ndimage.convolve(X[0], filter(np.linspace(0, 20, Nspace)), mode='wrap')
-print np.allclose(np.roll(y_alt, 40), y[0])</pre>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="bp">True</span>
+\[F\left(x\right) = e^{|x|} \cos{\left(2\pi x\right)}\]</div>
+<p>We want to show that if <span class="math">\(F\)</span> is used to generate sample calibration
+data for the MKS, then the calculated influence coefficents are in fact
+just <span class="math">\(F\)</span>.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">F</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">F</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="calculate-the-influence-coefficients-using-the-regression">
-<h2>Calculate the influence coefficients using the regression<a class="headerlink" href="#calculate-the-influence-coefficients-using-the-regression" title="Permalink to this headline">¶</a></h2>
-<p>Use the binned microstructure, <tt class="docutils literal"><span class="pre">X_</span></tt>, and the repsonses, <tt class="docutils literal"><span class="pre">y</span></tt> to
-recalculate the coefficients.</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">model_Fcoeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nspace</span><span class="p">,</span> <span class="n">Nbin</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nspace</span><span class="p">):</span>
-    <span class="n">model_Fcoeff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">X_</span><span class="p">[:,</span><span class="n">i</span><span class="p">],</span> <span class="n">y</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span> <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<img alt="../_images/filter_3_0.png" src="../_images/filter_3_0.png" />
+<p>Next we generate the sample data <tt class="docutils literal"><span class="pre">(X,</span> <span class="pre">y)</span></tt> using
+<tt class="docutils literal"><span class="pre">scipy.ndimage.convolve</span></tt>.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">scipy.ndimage</span>
 
-<span class="n">model_coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">model_Fcoeff</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nbin</span><span class="p">):</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">coeff</span><span class="p">[:,</span><span class="n">b</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;orignal&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_coeff</span><span class="p">[:,</span><span class="n">b</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;MKS&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">Nspace</span> <span class="o">=</span> <span class="mi">101</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">201</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">Nspace</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">50</span><span class="p">,</span> <span class="n">Nspace</span><span class="p">))</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">scipy</span><span class="o">.</span><span class="n">ndimage</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">F</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;wrap&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">xx</span> <span class="ow">in</span> <span class="n">X</span><span class="p">])</span>
 </pre></div>
 </div>
-<img alt="../_images/filter_20_0.png" src="../_images/filter_20_0.png" />
-<img alt="../_images/filter_20_1.png" src="../_images/filter_20_1.png" />
+<p>For this problem, a basis is unnessary as no discretaztion is required
+to accuraletly reproduce the convolution with the MKS. Using the
+<tt class="docutils literal"><span class="pre">ContinuousIndicatorBasis</span></tt> with <tt class="docutils literal"><span class="pre">n_states=2</span></tt> is the equivalent of
+non-discretized convolution in space.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks</span> <span class="kn">import</span> <span class="n">MKSRegressionModel</span>
+<span class="kn">from</span> <span class="nn">pymks</span> <span class="kn">import</span> <span class="n">ContinuousIndicatorBasis</span>
+
+<span class="n">basis</span> <span class="o">=</span> <span class="n">ContinuousIndicatorBasis</span><span class="p">(</span><span class="n">n_states</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">basis</span><span class="o">=</span><span class="n">basis</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Fit the model using the data generated by <span class="math">\(F\)</span>.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To check for internal consistency, we can compare the predicited output
+with the original for a few values</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+<span class="k">print</span> <span class="n">y_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>[-0.41059557  0.20004566  0.61200171  0.5878077 ]
+[-0.41059557  0.20004566  0.61200171  0.5878077 ]</pre>
+</div>
+<p>With a slight linear manipulation of the coefficients, they agree
+perfectly with filter <span class="math">\(F\)</span>.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">p</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">F</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="n">model</span><span class="o">.</span><span class="n">coeff</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">model</span><span class="o">.</span><span class="n">coeff</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s">&#39;k--&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/filter_13_0.png" src="../_images/filter_13_0.png" />
+<p>Some manipulation of the coefficients is required to reproduce tht
+filter</p>
+<p>The convolution is written as,</p>
+<div class="math">
+\[p \left[i\right] = \sum_h^{n-1} \alpha_h \left[j\right] m_h \left[i + j\right]\]</div>
 <p>The calculated influence coefficients are not even close to the
 originals. What&#8217;s going on? The equation,</p>
 <div class="math">
@@ -298,8 +248,8 @@ in the next tutorial.</p>
     <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/filter_26_0.png" src="../_images/filter_26_0.png" />
-<img alt="../_images/filter_26_1.png" src="../_images/filter_26_1.png" />
+<img alt="../_images/filter_20_0.png" src="../_images/filter_20_0.png" />
+<img alt="../_images/filter_20_1.png" src="../_images/filter_20_1.png" />
 <p>The <tt class="docutils literal"><span class="pre">model.coeff</span></tt> needed rearranging as the <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt>
 coefficients are using the coefficients that have the redundancies
 removed.</p>

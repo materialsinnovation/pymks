@@ -4,14 +4,597 @@
     %matplotlib inline
     %load_ext autoreload
     %autoreload 2
-    
-    import numpy as np
-    import matplotlib.pyplot as plt
-    from pymks import MKSRegressionModel
 
 .. code:: python
 
-    from pymks.microstructureFunction import MicrostructureFunction
+    from pymks.datasets.microstructureGenerator import MicrostructureGenerator
+    
+    X = MicrostructureGenerator(n_samples=100, size=(31, 31), n_phases=2, grain_size=(10, 10)).generate()
+    
+    plt.imshow(X[0])
+    
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.image.AxesImage at 0x7ffc7ce264d0>
+
+
+
+
+.. image:: sandbox_files/sandbox_1_1.png
+
+
+.. code:: python
+
+    from pymks import SpatialStatisticsModel
+    from pymks import MKSRegressionModel
+    from pymks.bases import DiscreteIndicatorBasis
+.. code:: python
+
+    basis = DiscreteIndicatorBasis(n_states=2)
+    MKSmodel = MKSRegressionModel(basis=basis)
+    SpatStats = SpatialStatisticsModel(basis=basis)
+
+.. code:: python
+
+    from pymks.datasets.microstructureGenerator import get_microstructure
+    
+    n_samples = 100
+    n = 31
+    n_phases = 2
+    size = (n, n)
+    X = get_microstructure(n_samples, size, n_phases)
+    print X.dtype
+    X_auto = SpatStats.get_autocorrelation(X)
+    print X_auto.shape
+
+.. parsed-literal::
+
+    int32
+    (100, 31, 31, 2)
+
+
+.. code:: python
+
+    plt.imshow(X[0], interpolation='none')
+
+
+
+.. parsed-literal::
+
+    <matplotlib.image.AxesImage at 0xac1b904c>
+
+
+
+
+.. image:: sandbox_files/sandbox_5_1.png
+
+
+.. code:: python
+
+    plt.imshow(X_auto[0, ..., 0], interpolation='none')
+    plt.colorbar()
+    print np.sum(X_auto[0, ..., 1])
+
+.. parsed-literal::
+
+    82.4162330905
+
+
+
+.. image:: sandbox_files/sandbox_6_1.png
+
+
+.. code:: python
+
+    plt.imshow(X_auto[0,...,1], interpolation='none')
+    plt.colorbar()
+
+
+
+.. parsed-literal::
+
+    <matplotlib.colorbar.Colorbar instance at 0xac07726c>
+
+
+
+
+.. image:: sandbox_files/sandbox_7_1.png
+
+
+.. code:: python
+
+    X = np.array([[[0, 1, 0], [0, 1, 0], [0, 1, 0]]])
+    X_auto = SpatStats.get_autocorrelation(X)
+    print X_auto
+
+.. parsed-literal::
+
+    (1, 3, 3, 2)
+    [1 2]
+    [[[[  1.66666667e-01  -3.28954970e-17]
+       [  1.66666667e-01  -3.28954970e-17]
+       [  3.33333333e-01   1.66666667e-01]]
+    
+      [[  1.66666667e-01  -3.28954970e-17]
+       [  1.66666667e-01  -3.28954970e-17]
+       [  3.33333333e-01   1.66666667e-01]]
+    
+      [[  1.66666667e-01  -3.28954970e-17]
+       [  1.66666667e-01  -3.28954970e-17]
+       [  3.33333333e-01   1.66666667e-01]]]]
+
+
+.. code:: python
+
+    plt.imshow(X_auto[0,...,1] + X_auto[0,...,0], interpolation='none')
+    plt.colorbar()
+
+.. parsed-literal::
+
+    /home/david/anaconda/lib/python2.7/site-packages/matplotlib/colorbar.py:829: RuntimeWarning: divide by zero encountered in divide
+      z = np.take(y, i0) + (xn - np.take(b, i0)) * dy / db
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.colorbar.Colorbar instance at 0xabe808cc>
+
+
+
+
+.. image:: sandbox_files/sandbox_9_2.png
+
+
+.. code:: python
+
+    from pymks.datasets.microstructureGenerator import microstructure_generator
+    
+    n_samples = 1
+    n = 50
+    n_phases = 2
+    size = (n, n)
+    plt.imshow(microstructure_generator(n_samples, size, n_phases)[0])
+
+
+
+.. parsed-literal::
+
+    <matplotlib.image.AxesImage at 0xa88894ec>
+
+
+
+
+.. image:: sandbox_files/sandbox_10_1.png
+
+
+.. code:: python
+
+    from pymks.datasets.microstructureGenerator import get_microstructure
+    
+    np.random.seed(10)
+    n_samples, n_phases = 1, 2
+    #n_samples = 1
+    #n = 3
+    #n_phases = 2
+    size = (3, 3)
+    
+    X = get_microstructure(n_samples, size, n_phases)
+    X_test = np.array([[ 0.,  1.,  0.],
+     [ 0.,  0.,  1.],
+     [ 1.,  0.,  1.]])
+    #plt.imshow(X[0], interpolation='none')
+    #print X[0]
+    assert(np.allclose(X, X_test))
+.. code:: python
+
+    X_cum = np.cumsum(np.histogram(X, bins=100)[0])
+    plt.plot(X_cum)
+
+
+
+.. parsed-literal::
+
+    [<matplotlib.lines.Line2D at 0xa1e310ec>]
+
+
+
+
+.. image:: sandbox_files/sandbox_12_1.png
+
+
+.. code:: python
+
+    m = 3
+    n = (np.arange(m+1)) * 1. / m
+    values = np.round(n * 100)
+    print values
+    print X_cum[33]
+
+.. parsed-literal::
+
+    [   0.   33.   67.  100.]
+    208233407.661
+
+
+.. code:: python
+
+    from scipy.stats import norm
+    m = 10
+    normalization =  np.sqrt(2 * np.pi)
+    x1 = np.linspace(-normalization , normalization, m)
+    x2 = np.linspace(-5, 5, m)
+    #plt.plot(norm.pdf(x1))
+    y1 = norm.pdf(x1) * normalization 
+    y2 = norm.pdf(x2) * normalization 
+    print(np.max(y1))
+    #plt.plot(y1)
+    plt.imshow(np.outer(y1, y1, y1))
+    plt.colorbar()
+
+
+::
+
+
+    ---------------------------------------------------------------------------
+    TypeError                                 Traceback (most recent call last)
+
+    <ipython-input-208-f3c2db246b68> in <module>()
+          9 print(np.max(y1))
+         10 #plt.plot(y1)
+    ---> 11 plt.imshow(np.outer(y1, y1, y1))
+         12 plt.colorbar()
+
+
+    TypeError: outer() takes exactly 2 arguments (3 given)
+
+
+.. parsed-literal::
+
+    0.961957416885
+
+
+.. code:: python
+
+    y3 = np.roll(y1, 4, axis=0)
+    plt.imshow(np.outer(y1, y3))
+    plt.colorbar()
+
+
+
+.. parsed-literal::
+
+    <matplotlib.colorbar.Colorbar instance at 0x20158950>
+
+
+
+
+.. image:: sandbox_files/sandbox_15_1.png
+
+
+.. code:: python
+
+    from scipy import signal
+    L = 121
+    x = np.arange(L)
+    xp1 = x - ((L) / 2)
+    xp2 = x - ((L) / 2)
+    print xp
+    ga1 = np.exp(-((np.arange(L) - (L / 2)) / (L / 8.)) ** 2)
+    #ga2 = np.exp(-(xp2 / ((L) / 4.2)) ** 2)
+    q = signal.gaussian(L, L / 8)
+    #ga = ga1 * ga2
+    #print q
+    #print ga
+    plt.plot(q)
+    plt.plot(ga1)
+    #plt.plot(ga1)
+    #plt.plot(ga2)
+
+.. parsed-literal::
+
+    [-5 -4 -3 -2 -1  0  1  2  3  4]
+
+
+
+
+.. parsed-literal::
+
+    [<matplotlib.lines.Line2D at 0xa2ffe3ac>]
+
+
+
+
+.. image:: sandbox_files/sandbox_16_2.png
+
+
+.. code:: python
+
+    from scipy import signal
+    L = 21
+    gaussian = signal.gaussian(L, L / 4)
+    dim = 3
+    print dim * (L,)
+    gaussian = np.ones(dim * (L,)) * gaussian
+    gaussian_tmp = np.ones((dim,) + gaussian.shape)
+    for ii in range(dim):
+        gaussian = np.rot90(gaussian.swapaxes(0, dim -1), dim)
+        gaussian_tmp[ii] = gaussian
+    gaussian_filter = np.prod(gaussian_tmp, axis=0)
+    plt.imshow(gaussian_filter[11])
+    plt.colorbar()
+
+.. parsed-literal::
+
+    (21, 21, 21)
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.colorbar.Colorbar instance at 0xab845d6c>
+
+
+
+
+.. image:: sandbox_files/sandbox_17_2.png
+
+
+.. code:: python
+
+    [1 * p + 1 for p in np.arange(len(Q.shape) - 2)]
+    
+    #print Qf.shape
+
+
+
+
+.. parsed-literal::
+
+    [1]
+
+
+
+.. code:: python
+
+    ons = np.ones((L, L, L))
+    Q = ons * q
+    plt.imshow(Q[11])
+
+
+
+.. parsed-literal::
+
+    <matplotlib.image.AxesImage at 0xad67fbcc>
+
+
+
+
+.. image:: sandbox_files/sandbox_19_1.png
+
+
+.. code:: python
+
+    #from scipy.stats import multivariate_normal
+    from scipy.stats.multivariate_normal import multivariate_normal
+    
+    x = np.linspace(0, 5, 10, endpoint=False)
+    y = mn.pdf(x, mean=2.5, cov=0.5)
+    print y
+    plt.plot(x, y)
+
+::
+
+
+    ---------------------------------------------------------------------------
+    ImportError                               Traceback (most recent call last)
+
+    <ipython-input-279-ac485fe001c8> in <module>()
+          1 #from scipy.stats import multivariate_normal
+    ----> 2 from scipy.stats.multivariate_normal import multivariate_normal
+          3 
+          4 x = np.linspace(0, 5, 10, endpoint=False)
+          5 y = mn.pdf(x, mean=2.5, cov=0.5)
+
+
+    ImportError: No module named multivariate_normal
+
+
+.. code:: python
+
+    values, base = np.histogram(X, bins=100)
+    #evaluate the cumulative
+    cumulative = np.cumsum(values)
+    # plot the cumulative function
+    plt.plot(base[:-1], cumulative, c='blue')
+    #plot the survival function 
+    plt.plot(base[:-1], len(X)-cumulative, c='green')
+
+
+
+
+.. parsed-literal::
+
+    [<matplotlib.lines.Line2D at 0xb82a290>]
+
+
+
+
+.. image:: sandbox_files/sandbox_21_1.png
+
+
+.. code:: python
+
+    L = 3
+    X = np.ones((L, L, L))
+    x = np.linspace(- (L) / 2, (L) / 2, L - 1 )
+    y = L / 2 - abs(np.arange(L) - L / 2)
+    mesh_size = [y for p in np.arange(len(X.shape))]
+    
+    print y.shape
+    Ones = np.ones((L, L, L)) * y
+    print Ones
+    
+    for ii in range(len(X.shape) - 1):
+        print ii
+        print np.transpose(Ones, axes=(ii + 1))
+        Ones = Ones * np.transpose(Ones, axes=ii + 1)
+    print Ones
+    #print mesh_size
+    #print mesh_size[0]
+    #np.meshgrid(mesh_size)
+
+.. parsed-literal::
+
+    (3,)
+    [[[ 0.  1.  0.]
+      [ 0.  1.  0.]
+      [ 0.  1.  0.]]
+    
+     [[ 0.  1.  0.]
+      [ 0.  1.  0.]
+      [ 0.  1.  0.]]
+    
+     [[ 0.  1.  0.]
+      [ 0.  1.  0.]
+      [ 0.  1.  0.]]]
+    0
+
+
+::
+
+
+    ---------------------------------------------------------------------------
+    ValueError                                Traceback (most recent call last)
+
+    <ipython-input-153-e1fadf94a7c0> in <module>()
+         11 for ii in range(len(X.shape) - 1):
+         12     print ii
+    ---> 13     print np.transpose(Ones, axes=(ii + 1))
+         14     Ones = Ones * np.transpose(Ones, axes=ii + 1)
+         15 print Ones
+
+
+    /home/david/anaconda/lib/python2.7/site-packages/numpy/core/fromnumeric.pyc in transpose(a, axes)
+        532     except AttributeError:
+        533         return _wrapit(a, 'transpose', axes)
+    --> 534     return transpose(axes)
+        535 
+        536 
+
+
+    ValueError: axes don't match array
+
+
+.. code:: python
+
+    N = 20
+    k = np.arange(N)
+    k[N / 2:] = (k - N / 2)[:N / 2]
+    print (k - N / 2)[:N / 2]
+
+.. parsed-literal::
+
+    [-10  -9  -8  -7  -6  -5  -4  -3  -2  -1]
+
+
+.. code:: python
+
+              X = np.array([[[0, 1, 0],
+                   [0, 1, 0],
+                   [0, 1, 0]]])
+    print X.shape
+    print np.array(X.shape)
+    y = np.array(X.shape)
+    print np.prod(y)
+    X_ = basis.discretize(X)
+    print SpatStats._fftconvolve(X_, X_)
+    C = SpatStats.Autocorrelation(X)
+    np.real_if_close(np.where(C < 1e-10, 0, C))
+
+.. parsed-literal::
+
+    (1, 3, 3)
+    [1 3 3]
+    9
+    [[[[  5.00000000e-01+0.j  -1.31581988e-16+0.j]
+       [  1.66666667e-01+0.j   3.33333333e-01+0.j]
+       [  1.66666667e-01+0.j   3.33333333e-01+0.j]]
+    
+      [[  5.00000000e-01+0.j  -1.31581988e-16+0.j]
+       [  1.66666667e-01+0.j   3.33333333e-01+0.j]
+       [  1.66666667e-01+0.j   3.33333333e-01+0.j]]
+    
+      [[  5.00000000e-01+0.j  -1.31581988e-16+0.j]
+       [  1.66666667e-01+0.j   3.33333333e-01+0.j]
+       [  1.66666667e-01+0.j   3.33333333e-01+0.j]]]]
+
+
+
+
+.. parsed-literal::
+
+    array([[[[ 0.5       ,  0.        ],
+             [ 0.16666667,  0.33333333],
+             [ 0.16666667,  0.33333333]],
+    
+            [[ 0.5       ,  0.        ],
+             [ 0.16666667,  0.33333333],
+             [ 0.16666667,  0.33333333]],
+    
+            [[ 0.5       ,  0.        ],
+             [ 0.16666667,  0.33333333],
+             [ 0.16666667,  0.33333333]]]])
+
+
+
+.. code:: python
+
+    from pymks.datasets.microstructureGenerator import microstructure_generator
+.. code:: python
+
+    microstructure_generator(np.zeros((5, 5)))
+
+.. parsed-literal::
+
+    /home/david/anaconda/lib/python2.7/site-packages/numpy/core/numeric.py:178: DeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+      a = empty(shape, dtype, order)
+
+
+::
+
+
+    ---------------------------------------------------------------------------
+    IndexError                                Traceback (most recent call last)
+
+    <ipython-input-19-442a14176a6a> in <module>()
+    ----> 1 microstructure_generator(np.zeros((5, 5)))
+    
+
+    /home/david/git/pymks/pymks/datasets/microstructureGenerator.py in microstructure_generator(X)
+          4 
+          5 def microstructure_generator(X):
+    ----> 6     _make_filter(X)
+          7 
+          8 
+
+
+    /home/david/git/pymks/pymks/datasets/microstructureGenerator.py in _make_filter(X)
+         10     shape = np.array(X[0].shape) / 4.
+         11     filt = np.zeros_like(X[0].shape)
+    ---> 12     filt[:np.split(shape, len(shape))] = np.ones(shape)
+         13     print filt
+         14 
+
+
+    IndexError: invalid slice
+
 
 .. code:: python
 
@@ -137,7 +720,7 @@
 
 
 
-.. image:: sandbox_files/sandbox_6_1.png
+.. image:: sandbox_files/sandbox_31_1.png
 
 
 .. code:: python
@@ -258,7 +841,7 @@
 
 
 
-.. image:: sandbox_files/sandbox_7_1.png
+.. image:: sandbox_files/sandbox_32_1.png
 
 
 .. code:: python
@@ -377,31 +960,31 @@
 
 
 
-.. image:: sandbox_files/sandbox_9_2.png
+.. image:: sandbox_files/sandbox_34_2.png
 
 
 
-.. image:: sandbox_files/sandbox_9_3.png
+.. image:: sandbox_files/sandbox_34_3.png
 
 
 
-.. image:: sandbox_files/sandbox_9_4.png
+.. image:: sandbox_files/sandbox_34_4.png
 
 
 
-.. image:: sandbox_files/sandbox_9_5.png
+.. image:: sandbox_files/sandbox_34_5.png
 
 
 
-.. image:: sandbox_files/sandbox_9_6.png
+.. image:: sandbox_files/sandbox_34_6.png
 
 
 
-.. image:: sandbox_files/sandbox_9_7.png
+.. image:: sandbox_files/sandbox_34_7.png
 
 
 
-.. image:: sandbox_files/sandbox_9_8.png
+.. image:: sandbox_files/sandbox_34_8.png
 
 
 .. code:: python
@@ -503,11 +1086,11 @@
 
 
 
-.. image:: sandbox_files/sandbox_11_1.png
+.. image:: sandbox_files/sandbox_36_1.png
 
 
 
-.. image:: sandbox_files/sandbox_11_2.png
+.. image:: sandbox_files/sandbox_36_2.png
 
 
 
@@ -516,4 +1099,45 @@
     <matplotlib.figure.Figure at 0x4f15610>
 
 
+
+.. code:: python
+
+    import numpy as np
+    from pymks.datasets.microstructureGenerator import MicrostructureGenerator
+.. code:: python
+
+    m = MicrostructureGenerator(1, (10, 10), 2)
+    X = m.generate()
+.. code:: python
+
+    plt.imshow(X[0])
+
+
+
+.. parsed-literal::
+
+    <matplotlib.image.AxesImage at 0x7f7250798110>
+
+
+
+
+.. image:: sandbox_files/sandbox_40_1.png
+
+
+.. code:: python
+
+    from pymks.filter import crosscorrelate
+.. code:: python
+
+    from pymks.bases import DiscreteIndicatorBasis
+    basis = DiscreteIndicatorBasis(n_states=2)
+    print X_.shape
+    print X_.shape[-1]
+    X_ = basis.discretize(X)
+    Y = crosscorrelate(X_)
+
+.. parsed-literal::
+
+    (1, 10, 10, 2)
+    2
 

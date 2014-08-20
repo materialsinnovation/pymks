@@ -1,0 +1,481 @@
+
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Data Generation &mdash; PyMKS</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.1.0/cosmo/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pymks.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1-dev.eecb0e2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.1.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="_static/pymks_logo.ico"/>
+    <link rel="top" title="PyMKS" href="index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><img src="_static/pymks_logo.png">
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1-dev.eecb0e2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+                <li><a href="rst/INSTALLATION.html">Installation</a></li>
+                <li><a href="EXAMPLES.html">Examples</a></li>
+                <li><a href="API.html">API</a></li>
+                <li><a href="https://github.com/wd15/pymks/">Github</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">More <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="THEORY.html">Theory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rst/derivation.html">Derivation of Materials Knowledge Systems Equation using Linear Elasticity</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rst/CREDITS.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rst/LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rst/CITATION.html">Citing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rst/REQUIREMENTS.html">Requirements</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="section" id="module-pymks.datasets">
+<span id="data-generation"></span><h1>Data Generation<a class="headerlink" href="#module-pymks.datasets" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="pymks.datasets.make_delta_microstructures">
+<tt class="descclassname">pymks.datasets.</tt><tt class="descname">make_delta_microstructures</tt><big>(</big><em>n_phases=2</em>, <em>size=(21</em>, <em>21)</em><big>)</big><a class="headerlink" href="#pymks.datasets.make_delta_microstructures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs delta microstructures</p>
+<p>Constructs delta microstructures for an arbitrary number of phases
+given the size of the domain.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span>
+<span class="gp">... </span>               <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span>
+<span class="gp">... </span>               <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]],</span>
+<span class="gp">... </span>              <span class="p">[[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="gp">... </span>                <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="gp">... </span>                <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span>
+<span class="gp">... </span>               <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="gp">... </span>                <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="gp">... </span>                <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span>
+<span class="gp">... </span>               <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="gp">... </span>                <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="gp">... </span>                <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]]])</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">make_delta_microstructures</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))))</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n_phases</strong> &#8211; number of phases</li>
+<li><strong>size</strong> &#8211; dimension of microstructure</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">delta microstructures for the system of shape
+(Nsamples, Nx, Ny, ...)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pymks.datasets.make_elastic_FE_strain_delta">
+<tt class="descclassname">pymks.datasets.</tt><tt class="descname">make_elastic_FE_strain_delta</tt><big>(</big><em>elastic_modulus=(1</em>, <em>1)</em>, <em>poissons_ratio=(1</em>, <em>1)</em>, <em>size=(21</em>, <em>21)</em>, <em>macro_strain=1.0</em>, <em>strain_index=0</em><big>)</big><a class="headerlink" href="#pymks.datasets.make_elastic_FE_strain_delta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate delta microstructures and responses</p>
+<p>Simple interface to generate delta microstructures and their
+strain response fields that can be used for the fit method in the
+<cite>MKSRegressionModel</cite>. The length of <cite>elastic_modulus</cite> and
+<cite>poissons_ratio</cite> indicates the number of phases in the
+microstructure. The following example is or a two phase
+microstructure with dimensions of <cite>(5, 5)</cite>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">elastic_modulus</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">poissons_ratio</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_elastic_FE_strain_delta</span><span class="p">(</span><span class="n">elastic_modulus</span><span class="o">=</span><span class="n">elastic_modulus</span><span class="p">,</span>
+<span class="gp">... </span>                                    <span class="n">poissons_ratio</span><span class="o">=</span><span class="n">poissons_ratio</span><span class="p">,</span>
+<span class="gp">... </span>                                    <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+<p><cite>X</cite> is the delta microstructures, and <cite>y</cite> is the
+strain response fields.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>elastic_modulus</strong> &#8211; list of elastic moduli for the phases</li>
+<li><strong>poissons_ratio</strong> &#8211; list of Poisson&#8217;s ratios for the phases</li>
+<li><strong>size</strong> &#8211; size of the microstructure</li>
+<li><strong>macro_strain</strong> &#8211; Scalar for macroscopic strain applied</li>
+<li><strong>strain_index</strong> &#8211; interger value to return a particular strain
+field.  0 returns exx, 1 returns eyy, etc. To return all
+strain fields set strain_index equal to slice(None).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">tuple containing delta microstructures and their strain fields</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pymks.datasets.make_elastic_FE_strain_random">
+<tt class="descclassname">pymks.datasets.</tt><tt class="descname">make_elastic_FE_strain_random</tt><big>(</big><em>n_samples=1</em>, <em>elastic_modulus=(1</em>, <em>1)</em>, <em>poissons_ratio=(1</em>, <em>1)</em>, <em>size=(21</em>, <em>21)</em>, <em>macro_strain=1.0</em>, <em>strain_index=0</em><big>)</big><a class="headerlink" href="#pymks.datasets.make_elastic_FE_strain_random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate random microstructures and responses</p>
+<p>Simple interface to generate random microstructures and their
+strain response fields that can be used for the fit method in the
+<cite>MKSRegressionModel</cite>. The following example is or a two phase
+microstructure with dimensions of <cite>(5, 5)</cite>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">elastic_modulus</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">poissons_ratio</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_elastic_FE_strain_random</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>                                     <span class="n">elastic_modulus</span><span class="o">=</span><span class="n">elastic_modulus</span><span class="p">,</span>
+<span class="gp">... </span>                                     <span class="n">poissons_ratio</span><span class="o">=</span><span class="n">poissons_ratio</span><span class="p">,</span>
+<span class="gp">... </span>                                     <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+<p><cite>X</cite> is the delta microstructures, and <cite>y</cite> is the
+strain response fields.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>elastic_modulus</strong> &#8211; list of elastic moduli for the phases</li>
+<li><strong>poissons_ratio</strong> &#8211; list of Poisson&#8217;s ratios for the phases</li>
+<li><strong>n_samples</strong> &#8211; number of microstructure samples</li>
+<li><strong>size</strong> &#8211; size of the microstructure</li>
+<li><strong>macro_strain</strong> &#8211; Scalar for macroscopic strain applied</li>
+<li><strong>strain_index</strong> &#8211; interger value to return a particular strain
+field.  0 returns exx, 1 returns eyy, etc. To return all
+strain fields set strain_index equal to slice(None).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">tuple containing delta microstructures and their strain fields</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pymks.datasets.make_cahn_hilliard">
+<tt class="descclassname">pymks.datasets.</tt><tt class="descname">make_cahn_hilliard</tt><big>(</big><em>n_samples=1</em>, <em>size=(21</em>, <em>21)</em>, <em>dx=0.25</em>, <em>width=1.0</em>, <em>dt=0.001</em>, <em>n_steps=1</em><big>)</big><a class="headerlink" href="#pymks.datasets.make_cahn_hilliard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate microstructures and responses for Cahn-Hilliard.
+Simple interface to generate random concentration fields and their
+evolution after one time step that can be used for the fit method in the
+<cite>MKSRegressionModel</cite>.  The following example is or a two phase
+microstructure with dimensions of <cite>(6, 6)</cite>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_cahn_hilliard</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+</pre></div>
+</div>
+<p><cite>X</cite> is the initial concentration fields, and <cite>y</cite> is the
+strain response fields (the concentration after one time step).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n_samples</strong> &#8211; number of microstructure samples</li>
+<li><strong>size</strong> &#8211; size of the microstructure</li>
+<li><strong>dx</strong> &#8211; grid spacing</li>
+<li><strong>dt</strong> &#8211; time step size</li>
+<li><strong>width</strong> &#8211; interface width between phases.</li>
+<li><strong>n_steps</strong> &#8211; number of time steps used</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Array representing the microstructures at n_steps ahead of &#8216;X&#8217;</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pymks.datasets.make_microstructure">
+<tt class="descclassname">pymks.datasets.</tt><tt class="descname">make_microstructure</tt><big>(</big><em>n_samples=10</em>, <em>size=(101</em>, <em>101)</em>, <em>n_phases=2</em>, <em>grain_size=(33</em>, <em>14)</em>, <em>seed=10</em><big>)</big><a class="headerlink" href="#pymks.datasets.make_microstructure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs microstructures for an arbitrary number of phases
+given the size of the domain, and relative grain size.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_phases</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">size</span><span class="p">,</span> <span class="n">grain_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Xtest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>               <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>               <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">make_microstructure</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
+<span class="gp">... </span>                        <span class="n">n_phases</span><span class="o">=</span><span class="n">n_phases</span><span class="p">,</span> <span class="n">grain_size</span><span class="o">=</span><span class="n">grain_size</span><span class="p">,</span>
+<span class="gp">... </span>                        <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Xtest</span><span class="p">))</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n_samples</strong> &#8211; number of samples</li>
+<li><strong>size</strong> &#8211; dimension of microstructure</li>
+<li><strong>n_phases</strong> &#8211; number of phases</li>
+<li><strong>grain_size</strong> &#8211; effective dimensions of grains</li>
+<li><strong>seed</strong> &#8211; seed for random number microstructureGenerator</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">microstructures for the system of shape (Nsamples, Nx, Ny, ...)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="pymks.datasets.cahn_hilliard_simulation.CahnHilliardSimulation">
+<em class="property">class </em><tt class="descclassname">pymks.datasets.cahn_hilliard_simulation.</tt><tt class="descname">CahnHilliardSimulation</tt><big>(</big><em>dx=0.25</em>, <em>gamma=1.0</em>, <em>dt=0.001</em><big>)</big><a class="headerlink" href="#pymks.datasets.cahn_hilliard_simulation.CahnHilliardSimulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solve the <a class="reference external" href="https://en.wikipedia.org/wiki/Cahn-Hilliard_equation">Cahn-Hilliard equation</a> for
+multiple samples in arbitrary dimensions. The concentration varies
+from -1 to 1. The equation is given by</p>
+<div class="math">
+\[\dot{\phi} = \nabla^2 \left( \phi^3 - \phi \right) - \gamma \nabla^4 \phi\]</div>
+<p>The discretiztion scheme used here is from <a class="reference external" href="http://dx.doi.org/10.1103/PhysRevE.72.055701">Chang and Rutenberg</a>. The scheme is a
+semi-implicit discretization in time and is given by</p>
+<div class="math">
+\[\phi_{t+\Delta t}
++ \left(1 - a_1\right) \Delta t \nabla^2 \phi_{t+\Delta t}
++ \left(1 - a_2\right) \Delta t \gamma \nabla^4 \phi_{t+\Delta t}
+= \phi_t
+- \Delta t \nabla^2 \left(a_1 \phi_t + a_2 \gamma \nabla^2 \phi_t - \phi_t^3 \right)\]</div>
+<p>where <span class="math">\(a_1=3\)</span> and <span class="math">\(a_2=0\)</span>.</p>
+<p>In 1D.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">99</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">N</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phi</span> <span class="o">=</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch</span> <span class="o">=</span> <span class="n">CahnHilliardSimulation</span><span class="p">(</span><span class="n">gamma</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">phi</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">phi</span><span class="o">.</span><span class="n">flat</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">2e-3</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">phi</span><span class="o">.</span><span class="n">flat</span><span class="p">)</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">2e-3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In 2D.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">phi</span> <span class="o">=</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch</span> <span class="o">=</span> <span class="n">CahnHilliardSimulation</span><span class="p">(</span><span class="n">gamma</span><span class="o">=</span><span class="mf">4.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">phi</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">phi</span><span class="o">.</span><span class="n">flat</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.001</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">phi</span><span class="o">.</span><span class="n">flat</span><span class="p">)</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.001</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In 3D.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">phi</span> <span class="o">=</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch</span> <span class="o">=</span> <span class="n">CahnHilliardSimulation</span><span class="p">(</span><span class="n">gamma</span><span class="o">=</span><span class="mf">4.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">phi</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">phi</span><span class="o">.</span><span class="n">flat</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.0005</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">phi</span><span class="o">.</span><span class="n">flat</span><span class="p">)</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.0005</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dx</strong> &#8211; grid spacing</li>
+<li><strong>dt</strong> &#8211; time step size</li>
+<li><strong>gamma</strong> &#8211; paramater in CH equation</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pymks.datasets.cahn_hilliard_simulation.CahnHilliardSimulation.get_response">
+<tt class="descname">get_response</tt><big>(</big><em>X</em><big>)</big><a class="headerlink" href="#pymks.datasets.cahn_hilliard_simulation.CahnHilliardSimulation.get_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the response field</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>X</strong> &#8211; Array representing the concentration field between -1 and
+1 with shape (n_samples, N, N)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Array representing the microstructure at one time step ahead
+of &#8216;X&#8217;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pymks.datasets.elastic_FE_simulation.ElasticFESimulation">
+<em class="property">class </em><tt class="descclassname">pymks.datasets.elastic_FE_simulation.</tt><tt class="descname">ElasticFESimulation</tt><big>(</big><em>elastic_modulus</em>, <em>poissons_ratio</em>, <em>macro_strain=1.0</em><big>)</big><a class="headerlink" href="#pymks.datasets.elastic_FE_simulation.ElasticFESimulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use SfePy to solve a linear strain problem in 2D with a varying
+microstructure on a rectangular grid. The rectangle (cube) is held
+at the negative edge (plane) and displaced by 1 on the positive x
+edge (plane). Periodic boundary conditions are applied to the
+other boundaries.</p>
+<p>The microstructure is of shape (Nsample, Nx, Ny) or (Nsample, Nx, Ny, Nz).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">ElasticFESimulation</span><span class="p">(</span><span class="n">elastic_modulus</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">),</span>
+<span class="gp">... </span>                            <span class="n">poissons_ratio</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="bp">None</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>y is the strain with components as follows</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">exx</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eyy</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exy</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Since there is no contrast in the microstructure the strain is only
+in the x-direction and has a uniform value of 1 since the
+displacement is always 1 and the size of the domain is 1.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">exx</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">eyy</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">exy</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>elastic_modulus</strong> &#8211; array of elastic moduli for phases</li>
+<li><strong>poissons_ratio</strong> &#8211; array of possion ratios for phases</li>
+<li><strong>macro_strain</strong> &#8211; Scalar for macroscopic strain</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pymks.datasets.elastic_FE_simulation.ElasticFESimulation.get_response">
+<tt class="descname">get_response</tt><big>(</big><em>X</em>, <em>strain_index=0</em><big>)</big><a class="headerlink" href="#pymks.datasets.elastic_FE_simulation.ElasticFESimulation.get_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the strain fields given an initial microstructure
+with a macroscopic strain applied in the x direction.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>X</strong> &#8211; microstructure with shape (n_samples, Nx, Ny) or
+(n_samples, Nx, Ny, Nz)</li>
+<li><strong>strain_index</strong> &#8211; interger value to return
+a particular strain field.  0 returns exx, 1 returns eyy,
+etc. To return all strain fields set <cite>strain_index</cite> equal to
+<cite>slice(None)</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the strain fields over each cell</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

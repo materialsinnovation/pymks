@@ -78,8 +78,14 @@ generate the data
     X_delta = make_delta_microstructures(n_phases=n_phases, size=(L, L))
     draw_microstructures(X_delta[0], X_delta[1], X_delta[2], X_delta[3])
 
+.. parsed-literal::
 
-.. image:: elasticity_2D_Multiphase_files/elasticity_2D_Multiphase_4_0.png
+    /home/wd15/anaconda/lib/python2.7/site-packages/matplotlib/figure.py:1595: UserWarning: This figure includes Axes that are not compatible with tight_layout, so its results might be incorrect.
+      warnings.warn("This figure includes Axes that are not "
+
+
+
+.. image:: elasticity_2D_Multiphase_files/elasticity_2D_Multiphase_4_1.png
 
 
 Using delta microstructures for the calibration of the first order
@@ -113,7 +119,7 @@ number of phases.
 
 .. code:: python
 
-    from pymks.datasets import make_elasticFEstrain_delta
+    from pymks.datasets import make_elastic_FE_strain_delta
     from pymks.tools import draw_microstructure_strain
     
     elastic_modulus = (80, 100, 120)
@@ -121,9 +127,9 @@ number of phases.
     macro_strain = 0.02
     size = (L, L)
     
-    X_delta, strains_delta = make_elasticFEstrain_delta(elastic_modulus=elastic_modulus,
-                                                        poissons_ratio=poissons_ratio,
-                                                        size=size, macro_strain=macro_strain)
+    X_delta, strains_delta = make_elastic_FE_strain_delta(elastic_modulus=elastic_modulus,
+                                                          poissons_ratio=poissons_ratio,
+                                                          size=size, macro_strain=macro_strain)
 Let's take a look at one of the delta microstructures and the
 :math:`\varepsilon_{xx}` strain field.
 
@@ -201,12 +207,12 @@ results from finite element analysis.
 
 .. code:: python
 
-    from pymks.datasets import make_elasticFEstrain_random
+    from pymks.datasets import make_elastic_FE_strain_random
     
     np.random.seed(101)
-    X, strain = make_elasticFEstrain_random(n_samples=1, elastic_modulus=elastic_modulus,
-                                       poissons_ratio=poissons_ratio, size=size, 
-                                       macro_strain=macro_strain)
+    X, strain = make_elastic_FE_strain_random(n_samples=1, elastic_modulus=elastic_modulus,
+                                              poissons_ratio=poissons_ratio, size=size, 
+                                              macro_strain=macro_strain)
     draw_microstructure_strain(X[0] , strain[0])
 
 
@@ -254,9 +260,9 @@ generate a new larger random microstructure and its strain field.
     size = (N, N)
     print size
     
-    X, strain = make_elasticFEstrain_random(n_samples=1, elastic_modulus=elastic_modulus,
-                                       poissons_ratio=poissons_ratio, size=size, 
-                                       macro_strain=macro_strain)
+    X, strain = make_elastic_FE_strain_random(n_samples=1, elastic_modulus=elastic_modulus,
+                                              poissons_ratio=poissons_ratio, size=size, 
+                                              macro_strain=macro_strain)
     
     draw_microstructure_strain(X[0] , strain[0])
 

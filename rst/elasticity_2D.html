@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1-dev',
+        VERSION:     '0.1-dev.eecb0e2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1-dev.eecb0e2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -136,10 +136,10 @@ fields. For an isotropic material the stiffness tensor can be
 represented by lower dimension terms which can relate the stress and the
 strain as follows.</p>
 <div class="math">
-\[\sigma_{ij} = \lambda \delta_{ij} \varepsilon{kk} + 2\mu \varepsilon_{ij}\]</div>
-<p>$ $ and <span class="math">\(\mu\)</span> are the first and second Lame parameters and can be
-defined in terms of the Young&#8217;s modulus <span class="math">\(E\)</span> and Poisson&#8217;s ratio
-<span class="math">\(\nu\)</span> in 2D.</p>
+\[\sigma_{ij} = \lambda \delta_{ij} \varepsilon_{kk} + 2\mu \varepsilon_{ij}\]</div>
+<p><span class="math">\(\lambda\)</span> and <span class="math">\(\mu\)</span> are the first and second Lame parameters
+and can be defined in terms of the Young&#8217;s modulus <span class="math">\(E\)</span> and
+Poisson&#8217;s ratio <span class="math">\(\nu\)</span> in 2D.</p>
 <div class="math">
 \[\lambda = \frac{E\nu}{(1-\nu)(1-2\nu)}\]</div>
 <div class="math">
@@ -158,9 +158,8 @@ the equation above back into our expression for stress.</p>
 <div class="math">
 \[\mu u_{i,jj}+(\mu + \lambda)u_{j,ij}=0\]</div>
 <p>In this example, a displacement controlled simulation is used to
-calculated the strain and the following boundary conditions for square
-box of length <span class="math">\(L\)</span> and macroscopic strain
-<span class="math">\(\bar{\varepsilon}_{xx}\)</span> are imposed.</p>
+calculate the strain. The domain is a square box of side <span class="math">\(L\)</span> which
+has an macroscopic strain <span class="math">\(\bar{\varepsilon}_{xx}\)</span> imposed.</p>
 <p>In general, generateing the calibration data for the MKS requires
 boundary conditions that are both periodic and displaced, which are
 quite unusual boundary conditions. The ideal boundary conditions are
@@ -247,7 +246,7 @@ the <tt class="docutils literal"><span class="pre">make_elasticFEstrain_delta</s
 <tt class="docutils literal"><span class="pre">make_elasticFEstrain_delta</span></tt> does not take a number of samples
 argument as the number of samples to calibrate the MKS is fixed by the
 number of phases.</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_elasticFEstrain_delta</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_elastic_FE_strain_delta</span>
 <span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_microstructure_strain</span>
 
 <span class="n">elastic_modulus</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
@@ -255,7 +254,7 @@ number of phases.</p>
 <span class="n">macro_strain</span> <span class="o">=</span> <span class="mf">0.02</span>
 <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 
-<span class="n">X_delta</span><span class="p">,</span> <span class="n">strains_delta</span> <span class="o">=</span> <span class="n">make_elasticFEstrain_delta</span><span class="p">(</span><span class="n">elastic_modulus</span><span class="o">=</span><span class="n">elastic_modulus</span><span class="p">,</span>
+<span class="n">X_delta</span><span class="p">,</span> <span class="n">strains_delta</span> <span class="o">=</span> <span class="n">make_elastic_FE_strain_delta</span><span class="p">(</span><span class="n">elastic_modulus</span><span class="o">=</span><span class="n">elastic_modulus</span><span class="p">,</span>
                                                     <span class="n">poissons_ratio</span><span class="o">=</span><span class="n">poissons_ratio</span><span class="p">,</span>
                                                     <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">macro_strain</span><span class="o">=</span><span class="n">macro_strain</span><span class="p">,</span>
                                                     <span class="n">strain_index</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="bp">None</span><span class="p">))</span>
@@ -323,8 +322,8 @@ equally as import. They are equivalent to the constant term in multiple
 linear regression with <a class="reference external" href="http://en.wikipedia.org/wiki/Dummy_variable_%28statistics%29">categorical
 variables</a>.</p>
 </div>
-<div class="section" id="predict-of-the-strain-field-for-a-random-microstructure">
-<h3>Predict of the Strain Field for a Random Microstructure<a class="headerlink" href="#predict-of-the-strain-field-for-a-random-microstructure" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="predict-the-strain-field-for-a-random-microstructure">
+<h3>Predict the Strain Field for a Random Microstructure<a class="headerlink" href="#predict-the-strain-field-for-a-random-microstructure" title="Permalink to this headline">¶</a></h3>
 <p>Let&#8217;s now use our instance of the <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> class with
 calibrated influence coefficients to compute the strain field for a
 random two phase microstructure and compare it with the results from a
@@ -332,12 +331,12 @@ finite element simulation.</p>
 <p>The <tt class="docutils literal"><span class="pre">make_elasticFEstrain_random</span></tt> function from <tt class="docutils literal"><span class="pre">pymks.datasets</span></tt> is
 an easy way to generate a random microstructure and its strain field
 results from finite element analysis.</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_elasticFEstrain_random</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_elastic_FE_strain_random</span>
 
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">99</span><span class="p">)</span>
-<span class="n">X</span><span class="p">,</span> <span class="n">strain</span> <span class="o">=</span> <span class="n">make_elasticFEstrain_random</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">elastic_modulus</span><span class="o">=</span><span class="n">elastic_modulus</span><span class="p">,</span>
-                                   <span class="n">poissons_ratio</span><span class="o">=</span><span class="n">poissons_ratio</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
-                                   <span class="n">macro_strain</span><span class="o">=</span><span class="n">macro_strain</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">strain</span> <span class="o">=</span> <span class="n">make_elastic_FE_strain_random</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">elastic_modulus</span><span class="o">=</span><span class="n">elastic_modulus</span><span class="p">,</span>
+                                          <span class="n">poissons_ratio</span><span class="o">=</span><span class="n">poissons_ratio</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
+                                          <span class="n">macro_strain</span><span class="o">=</span><span class="n">macro_strain</span><span class="p">)</span>
 <span class="n">a</span> <span class="o">=</span> <span class="n">draw_microstructure_strain</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">,</span> <span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -373,9 +372,9 @@ generate a new larger random microstructure and its strain field.</p>
 <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
 <span class="k">print</span> <span class="n">size</span>
 
-<span class="n">X</span><span class="p">,</span> <span class="n">strain</span> <span class="o">=</span> <span class="n">make_elasticFEstrain_random</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">elastic_modulus</span><span class="o">=</span><span class="n">elastic_modulus</span><span class="p">,</span>
-                                   <span class="n">poissons_ratio</span><span class="o">=</span><span class="n">poissons_ratio</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
-                                   <span class="n">macro_strain</span><span class="o">=</span><span class="n">macro_strain</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">strain</span> <span class="o">=</span> <span class="n">make_elastic_FE_strain_random</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">elastic_modulus</span><span class="o">=</span><span class="n">elastic_modulus</span><span class="p">,</span>
+                                          <span class="n">poissons_ratio</span><span class="o">=</span><span class="n">poissons_ratio</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
+                                          <span class="n">macro_strain</span><span class="o">=</span><span class="n">macro_strain</span><span class="p">)</span>
 
 <span class="n">draw_microstructure_strain</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">,</span> <span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>

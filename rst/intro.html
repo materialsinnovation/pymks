@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1-dev',
+        VERSION:     '0.1-dev.eecb0e2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1-dev.eecb0e2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -108,43 +108,44 @@
   <div class="section" id="technical-overview">
 <h1>Technical Overview<a class="headerlink" href="#technical-overview" title="Permalink to this headline">¶</a></h1>
 <p>An important component of the MKS is the regression technique for rapid
-calculation of a response field <span class="math">\(p_i\)</span> based on a microstructure
-<span class="math">\(m_i\)</span>, where the index <span class="math">\(i\)</span> refers to a spatial location
-often in 2D or 3D. For example, the microstructure might represent
-values of material properties that vary based on phase such as elastic
-modulus or Poisson&#8217;s ratio while the response might be the stress or
-strain field.</p>
+calculation of a response field <span class="math">\(p\left[i\right]\)</span> based on a
+microstructure <span class="math">\(m\left[i\right]\)</span>, where <span class="math">\(i\)</span> refers to a
+discretized spatial location often in 2D or 3D and
+<span class="math">\(\left[\cdot\right]\)</span> indicates a discrete argument over the
+spatial domain. For example, the microstructure might represent values
+of material properties that vary based on phase such as elastic modulus
+or Poisson&#8217;s ratio while the response might be the stress or strain
+field.</p>
 <div class="section" id="discretize-in-state-space">
 <h2>Discretize in State Space<a class="headerlink" href="#discretize-in-state-space" title="Permalink to this headline">¶</a></h2>
 <p>The first step in the MKS is to bin (or discretize) the state space. To
-so this, the microstructure <span class="math">\(m_i\)</span> and is discretized and then
-represented by <span class="math">\(m^h_i\)</span> such that</p>
+do this, the microstructure <span class="math">\(m\)</span> is discretized and then
+represented by <span class="math">\(m_h\)</span> such that</p>
 <div class="math">
-\[m_i = \sum_h m_{i,h} \chi_h\]</div>
-<p>where <span class="math">\(\chi_h\)</span> is the basis representation for the microstructure.</p>
-<p>The following image represents one form of discretization. State space
-discrtization is analogous to splitting the data into channels in signal
-processing. For example, a value of 0.049 is represented by (0.76, 0.24,
-0, 0, 0, 0) when discretized into 6 bins sampled over an interval of 0
-to 1.</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span>
-<span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;microstructure.png&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<img alt="../_images/intro_1_01.png" src="../_images/intro_1_01.png" />
+\[m\left[i\right] = \sum_{h=0}^{n-1} m_h\left[i\right] \chi_h\]</div>
+<p>where <span class="math">\(\chi_h\)</span> is the basis representation for the microstructure
+and <span class="math">\(n\)</span> is the number of states. For example if
+<span class="math">\(m \left[i\right] = (0, 2, 1)\)</span>, and <span class="math">\(n=3\)</span>, then
+<span class="math">\(\chi_h = (0, 1, 2)\)</span> and
+<span class="math">\(m_h[i] = ((1, 0, 0), (0, 0, 1), (0, 1, 0))\)</span>. Thus,</p>
+<div class="math">
+\[m_h = \delta_{hm}\]</div>
+<div class="math">
+\[m_h \left[i\right] = \delta_{hm\left[i\right]}\]</div>
+<p>since the <span class="math">\(m\)</span>&#8216;s are just indices representing the state (the
+<span class="math">\(\left[i\right]\)</span> has been dropped).</p>
 </div>
 <div class="section" id="the-influence-coefficients">
 <h2>The Influence Coefficients<a class="headerlink" href="#the-influence-coefficients" title="Permalink to this headline">¶</a></h2>
 <p>Once the state space is discretized, the relationship between the
-response <span class="math">\(p_i\)</span> and microstructure <span class="math">\(m_{i,h}\)</span> can be written
-as,</p>
+response <span class="math">\(p\)</span> and microstructure <span class="math">\(m_h\)</span> can be written as,</p>
 <div class="math">
-\[p_i = \sum_h \sum_j \alpha_{j,h} m_{i + j,h}\]</div>
-<p>where the <span class="math">\(\alpha_{j,h}\)</span> are known as the influence coefficients
-and describe the relationship between <span class="math">\(p_i\)</span> and <span class="math">\(m_j\)</span>. The
-<span class="math">\(p_i\)</span> are a spatial convolution of <span class="math">\(\alpha_{j,h}\)</span> and
-<span class="math">\(m_j\)</span>. In general, it is assumed that both <span class="math">\(m_j\)</span> and
-<span class="math">\(p_i\)</span> are periodic.</p>
+\[p\left[i\right] = \sum_{h=0}^{n-1} \alpha_h\left[j\right] m_h\left[i + j\right]\]</div>
+<p>where the <span class="math">\(\alpha_h\)</span> are known as the influence coefficients and
+describe the relationship between <span class="math">\(p\)</span> and <span class="math">\(m_h\)</span>. The
+<span class="math">\(p\)</span> are a spatial convolution of <span class="math">\(\alpha_h\)</span> and <span class="math">\(m_h\)</span>.
+In general, it is assumed that both <span class="math">\(m_h\)</span> and <span class="math">\(p\)</span> are
+periodic.</p>
 <p>*** Note that the formulation above has dropped an index representing
 the samples for simplicity. Generally the MKS is calibrated using many
 samples. ***</p>
@@ -157,17 +158,18 @@ regression is reduced from $ (N^2 N_{} N^2 H )$ to
 <span class="math">\(\left(N_{\text{sample}} \times H \right)\)</span> for each point in the
 Fourier space of size <span class="math">\(N^2\)</span>. The convolution,</p>
 <div class="math">
-\[\sum_h \sum_j \alpha_{j,h} m_{i + j,h}\]</div>
-<p>can be deconvolved in Fourier space using <a class="reference external" href="http://en.wikipedia.org/wiki/Discrete_Fourier_transform#Circular_convolution_theorem_and_cross-correlation_theorem">circular convolution
-theorem</a></p>
-<p>If we write <span class="math">\(P_{k} =  \mathcal{F}_k \left( p_{i} \right)\)</span>,
-<span class="math">\(M_{k,h} = \mathcal{F}_k  \left( m_{i,h} \right)\)</span> and
-<span class="math">\(\beta_{k,h} = \mathcal{F}_k \left(  \alpha_{i,h} \right)\)</span>, then
-we just need to solve</p>
+\[\sum_{h=0}^{n-1} \alpha_h\left[j\right] m_h \left[i + j\right]\]</div>
+<p>can be deconvolved in Fourier space using the <a class="reference external" href="http://en.wikipedia.org/wiki/Discrete_Fourier_transform#Circular_convolution_theorem_and_cross-correlation_theorem">circular convolution
+theorem</a>.</p>
+<p>If we write
+<span class="math">\(P \left[k \right] =  \mathcal{F}_k \{ p\left[i\right] \}\)</span>,
+<span class="math">\(M_h \left[k\right]= \mathcal{F}_k  \{ m_h\left[i\right] \}\)</span> and
+<span class="math">\(\beta\left[k\right] = \mathcal{F}_k \{  \alpha_h \left[i\right] \}\)</span>,
+then we just need to solve</p>
 <div class="math">
-\[P_{k} = \sum_h \beta_{k,h} M_{k,h}\]</div>
+\[P\left[k\right] = \sum_{h=0}^{n-1} \beta_h \left[k\right] M_h \left[k\right]\]</div>
 <p>with a linear regression at each discretization location in <span class="math">\(k\)</span> to
-calculate the <span class="math">\(\beta_{k,h}\)</span>.</p>
+calculate the <span class="math">\(\beta_h\)</span>.</p>
 </div>
 </div>
 <div class="section" id="a-pymks-example">
@@ -179,7 +181,7 @@ influence coefficients using the <tt class="docutils literal"><span class="pre">
 coefficients have been calibrated, the <tt class="docutils literal"><span class="pre">predict</span></tt> method can be used to
 quickly reproduce the same simulation for any microstructure. The rest
 of the page will demonstrate how to do this for a finite element
-simulation of the linear elastic strain.</p>
+simulation for linear elastic strain.</p>
 </div>
 <div class="section" id="linear-elasticity">
 <h1>Linear Elasticity<a class="headerlink" href="#linear-elasticity" title="Permalink to this headline">¶</a></h1>
@@ -192,9 +194,10 @@ boundary conditions in the y-direction. The two phase microstructure is
 represented by <tt class="docutils literal"><span class="pre">X</span></tt>.</p>
 <p>The <tt class="docutils literal"><span class="pre">make_elasticFEstrain_random</span></tt> function from <tt class="docutils literal"><span class="pre">pymks.datasets</span></tt>
 provides a convenient interface to get random microstructures and their
-strain fields from <tt class="docutils literal"><span class="pre">ElasticFESimulation</span></tt>. In this case we are going to
-look at a 15 by 15 two phase microstructure with values of 80 and 120.
-Both phases will have a Poisson&#8217;s ratio of 0.3.</p>
+strain fields using the <tt class="docutils literal"><span class="pre">ElasticFESimulation</span></tt> class. In this case we
+are going to look at a 15 by 15 two phase microstructure with values of
+elasic modulus values of 80 and 120. Both phases will have a Poisson&#8217;s
+ratio of 0.3.</p>
 <div class="code python highlight-python"><pre>%matplotlib inline
 %load_ext autoreload
 %autoreload 2
@@ -213,16 +216,15 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable</pre>
 <span class="n">draw_microstructure_strain</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">strains</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
-<img alt="../_images/intro_6_01.png" src="../_images/intro_6_01.png" />
+<img alt="../_images/intro_5_01.png" src="../_images/intro_5_01.png" />
 <div class="section" id="create-the-delta-microstructures">
 <h2>Create the Delta Microstructures<a class="headerlink" href="#create-the-delta-microstructures" title="Permalink to this headline">¶</a></h2>
-<p>The goal of the MKS it to quickly reproduce the finite element
-simulation shown above. In the case of linear elasticity where we are
-looking at distinct phases, the MKS model can be calibrated with a delta
-microstructures and the <tt class="docutils literal"><span class="pre">fit</span></tt> method. The
+<p>The goal of the MKS it to quickly reproduce finite element simulations
+like the one shown above. In the case of linear elasticity, which has
+distinct phases, the MKS model can be calibrated with two delta
+microstructures rather than hundreds of random microstructures. The
 <tt class="docutils literal"><span class="pre">make_delta_microstructures</span></tt> function from <tt class="docutils literal"><span class="pre">pymks.datasets</span></tt> provides
-an interface to produce the delta microstructures that can be used to
-calibration the influence coefficients.</p>
+a convenient interface to produce the delta microstructures.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_microstructures</span>
 <span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_delta_microstructures</span>
 
@@ -230,14 +232,14 @@ calibration the influence coefficients.</p>
 <span class="n">draw_microstructures</span><span class="p">(</span><span class="n">X_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">X_delta</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 </pre></div>
 </div>
-<img alt="../_images/intro_8_01.png" src="../_images/intro_8_01.png" />
+<img alt="../_images/intro_7_01.png" src="../_images/intro_7_01.png" />
 </div>
 <div class="section" id="create-the-responses">
 <h2>Create the Responses<a class="headerlink" href="#create-the-responses" title="Permalink to this headline">¶</a></h2>
-<p>The <tt class="docutils literal"><span class="pre">make_elasticFEstrain_delta</span></tt> function from <tt class="docutils literal"><span class="pre">pymks.datasets</span></tt>
-creates not only the delta microstructures but also their strain fields.
-These strain fields and microstructures can then be used as in the
-inputs to calibrate the influence coefficients.</p>
+<p>The <tt class="docutils literal"><span class="pre">make_elasticFEstrain_delta</span></tt> function from the <tt class="docutils literal"><span class="pre">datasets</span></tt>
+submodule of <tt class="docutils literal"><span class="pre">pymks</span></tt> returns both the delta microstructure and the
+strain field. The strain fields and microstructures are used as inputs
+to calibrate the influence coefficients.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_elasticFEstrain_delta</span>
 
 <span class="n">X_delta</span><span class="p">,</span> <span class="n">strains_delta</span> <span class="o">=</span> <span class="n">make_elasticFEstrain_delta</span><span class="p">(</span><span class="n">elastic_modulus</span><span class="o">=</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">120</span><span class="p">),</span>
@@ -247,14 +249,16 @@ inputs to calibrate the influence coefficients.</p>
 <span class="n">draw_microstructure_strain</span><span class="p">(</span><span class="n">X_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">strains_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
-<img alt="../_images/intro_10_01.png" src="../_images/intro_10_01.png" />
+<img alt="../_images/intro_9_01.png" src="../_images/intro_9_01.png" />
 </div>
 <div class="section" id="calibrate-the-mks-model">
 <h2>Calibrate the MKS Model<a class="headerlink" href="#calibrate-the-mks-model" title="Permalink to this headline">¶</a></h2>
-<p>Now lets instantiate a<tt class="docutils literal"><span class="pre">DiscreteIndicatorBasis</span></tt> and a
-<tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> and use the microstructures and strain fields
-created by <tt class="docutils literal"><span class="pre">make_elasticFEstrain_delta</span></tt> to calibrate the influence
-coefficients using the <tt class="docutils literal"><span class="pre">fit</span></tt> method.</p>
+<p>The first step is to calibrate the influence coefficients using the
+microstructures and strain fields returned by
+<tt class="docutils literal"><span class="pre">make_elasticFEstrain_delta</span></tt>. The <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> calibrates
+the model in the <tt class="docutils literal"><span class="pre">fit</span></tt> method. A <tt class="docutils literal"><span class="pre">DiscreteIndicatorBasis</span></tt> is needed
+to discretize the microstructure before passing it to the <tt class="docutils literal"><span class="pre">fit</span></tt>
+method.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks</span> <span class="kn">import</span> <span class="n">MKSRegressionModel</span>
 <span class="kn">from</span> <span class="nn">pymks.bases</span> <span class="kn">import</span> <span class="n">DiscreteIndicatorBasis</span>
 
@@ -279,7 +283,7 @@ into the <tt class="docutils literal"><span class="pre">predict</span></tt> meth
 <span class="n">draw_strains_compare</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
 </pre></div>
 </div>
-<img alt="../_images/intro_14_01.png" src="../_images/intro_14_01.png" />
+<img alt="../_images/intro_13_01.png" src="../_images/intro_13_01.png" />
 <p>The <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> has done quite a good job of predicting the
 results from the original FE simulation after calibrating the influence
 coefficients using delta microstructures.</p>
@@ -290,7 +294,9 @@ coefficients using delta microstructures.</p>
 simulations using only the small FE simulation to seed the MKS model.</p>
 <p>** Note that the cells close to the left and right side of the domain
 are not well predicted. This is due to issues with the SfePy FE solver
-and periodic boundary conditions. This should be ironed out soon. **</p>
+and periodic boundary conditions. This should be ironed out soon. This
+is not an issue with the <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt>, but only the FE tool
+used to produce the calibration data.**</p>
 </div>
 </div>
 
