@@ -540,5 +540,5 @@ class ElasticFESimulationPD(ElasticFESimulation):
     def _get_periodicBCs(self, domain):
         dims = domain.get_mesh_bounding_box().shape[1]
 
-        bc_list, func_list = list(zip(*[self._get_periodicBC(domain, i) for i in range(1, dims)]))
+        bc_list, func_list = list(zip(*[self._get_periodicBC(domain, i) for i in range(0, dims)]))
         return Conditions(bc_list), Functions(func_list)
