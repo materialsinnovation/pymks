@@ -438,7 +438,7 @@ class ElasticFESimulationPD(ElasticFESimulation):
                                            functions=Functions([xminus]))
         match_x_plane = Function('match_x_plane', per.match_x_plane)
         def shift_(ts, coors, region):
-            return -np.ones_like(coors[:, 0]) * self.macro_strain * (max_xyz[0] - min_xyz[0])
+            return 0.3 * np.ones_like(coors[:, 0])# * self.macro_strain * (max_xyz[0] - min_xyz[0])
         shift = Function('shift', shift_)
         lcbc = LinearCombinationBC('lcbc', [region_x_minus, region_x_plus], {'u.0' : 'u.0'}, match_x_plane, 'shifted_periodic', arguments=(shift,))
         
@@ -540,5 +540,5 @@ class ElasticFESimulationPD(ElasticFESimulation):
     def _get_periodicBCs(self, domain):
         dims = domain.get_mesh_bounding_box().shape[1]
 
-        bc_list, func_list = list(zip(*[self._get_periodicBC(domain, i) for i in range(0, dims)]))
+        bc_list, func_list = list(zip(*[self._get_periodicBC(domain, i) for i in range(1, dims)]))
         return Conditions(bc_list), Functions(func_list)
