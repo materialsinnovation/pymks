@@ -441,7 +441,7 @@ class ElasticFESimulation(object):
         if dim == 0:
             bc_dict = {'u.1': 'u.1'}
             if dims == 3:
-                bc_dict = {'u.2': 'u.2'}
+                bc_dict['u.2'] = 'u.2'
         else:
             bc_dict = {'u.all': 'u.all'}
         bc = PeriodicBC('periodic_{0}'.format(dim_string),
