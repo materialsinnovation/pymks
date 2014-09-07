@@ -268,7 +268,7 @@ class ElasticFESimulation(object):
         material_func = Function('material_func', _material_func_)
         return Material('m', function=material_func)
 
-    def _subdomain_func(self, x=(), y=(), z=()):
+    def _subdomain_func(self, x=(), y=(), z=(), max_x=None):
         """
         Creates a function to mask subdomains in Sfepy.
 
@@ -296,7 +296,10 @@ class ElasticFESimulation(object):
             for z_ in z:
                 flag = (coords[:, 2] < (z_ + eps)) & (coords[:, 2] > (z_ - eps))
                 flag_z = flag_z | flag
-            return np.where(flag_x & flag_y & flag_z)[0]
+            flag = flag_x & flag_y & flag_z
+            if max_x is not None:
+                flag = flag & (coords[:,0] < (max_x - eps))
+            return np.where(flag)[0]
 
         return _func
     
@@ -358,13 +361,13 @@ class ElasticFESimulation(object):
         """
         min_xyz = domain.get_mesh_bounding_box()[0]
         max_xyz = domain.get_mesh_bounding_box()[1]
-
         kwargs = {}
-        displacement = self.macro_strain * (max_xyz[0] - min_xyz[0])
-        shift_points_dict = {'u.0': displacement, 'u.1': 0.0}
         if len(min_xyz) == 3:
             kwargs = {'z': (max_xyz[2], min_xyz[2])}
-            shift_points_dict['u.2'] = 0.0
+
+        displacement = self.macro_strain * (max_xyz[0] - min_xyz[0])
+        shift_points_dict = {'u.0': displacement}
+
         shift_x_points_ = self._subdomain_func(x=(max_xyz[0],),
                                                y=(max_xyz[1], min_xyz[1]),
                                                **kwargs)
@@ -415,7 +418,39 @@ class ElasticFESimulation(object):
         
         return Conditions([lcbc])
 
-    def _get_periodicBC(self, domain, dim):
+    def _get_periodicBC_X(self, domain, dim):
+        dim_dict = {1: ('y', per.match_y_plane),
+                    2: ('z', per.match_z_plane)}
+        dim_string = dim_dict[dim][0]
+        match_plane = dim_dict[dim][1]
+        min_, max_ = domain.get_mesh_bounding_box()[:, dim]
+        min_x, max_x = domain.get_mesh_bounding_box()[:, 0]
+        plus_ = self._subdomain_func(max_x=max_x, **{dim_string: (max_,)})
+        minus_ = self._subdomain_func(max_x=max_x, **{dim_string: (min_,)})
+        plus_string = dim_string + 'plus'
+        minus_string = dim_string + 'minus'
+        plus = Function(plus_string, plus_)
+        minus = Function(minus_string, minus_)
+        region_plus = domain.create_region('region_{0}_plus'.format(dim_string),
+                                           'vertices by {0}'.format(plus_string),
+                                           'facet',
+                                           functions=Functions([plus]))
+        region_minus = domain.create_region('region_{0}_minus'.format(dim_string),
+                                            'vertices by {0}'.format(minus_string),
+                                            'facet',
+                                            functions=Functions([minus]))
+        match_plane = Function('match_{0}_plane'.format(dim_string), match_plane)
+        
+        bc_dict = {'u.0': 'u.0'}
+            
+        bc = PeriodicBC('periodic_{0}'.format(dim_string),
+                        [region_plus, region_minus],
+                        bc_dict,
+                        match='match_{0}_plane'.format(dim_string))
+        return bc, match_plane
+    
+    
+    def _get_periodicBC_YZ(self, domain, dim):
         dims = domain.get_mesh_bounding_box().shape[1]
         dim_dict = {0: ('x', per.match_x_plane),
                     1: ('y', per.match_y_plane),
@@ -438,18 +473,17 @@ class ElasticFESimulation(object):
                                             'facet',
                                             functions=Functions([minus]))
         match_plane = Function('match_{0}_plane'.format(dim_string), match_plane)
-        if dim == 0:
-            bc_dict = {'u.1': 'u.1'}
-            if dims == 3:
-                bc_dict['u.2'] = 'u.2'
-        else:
-            bc_dict = {'u.all': 'u.all'}
+        
+        bc_dict = {'u.1': 'u.1'}
+        if dims == 3:
+            bc_dict['u.2'] = 'u.2'
+            
         bc = PeriodicBC('periodic_{0}'.format(dim_string),
                         [region_plus, region_minus],
                         bc_dict,
                         match='match_{0}_plane'.format(dim_string))
         return bc, match_plane
-
+    
     def _solve(self, property_array):
         """
         Solve the Sfepy problem for one sample.
@@ -478,7 +512,7 @@ class ElasticFESimulation(object):
 
         m = self._get_material(property_array, domain)
 
-        integral = Integral('i', order=3)
+        integral = Integral('i', order=4)
 
         t1 = Term.new('dw_lin_elastic_iso(m.lam, m.mu, v, u)',
                       integral, region_all, m=m, v=v, u=u)
@@ -512,10 +546,10 @@ class ElasticFESimulation(object):
         strain_reshape = np.reshape(strain, (shape + strain.shape[-1:]))
 
         return strain_reshape, u_reshape
-    
 
     def _get_periodicBCs(self, domain):
         dims = domain.get_mesh_bounding_box().shape[1]
 
-        bc_list, func_list = list(zip(*[self._get_periodicBC(domain, i) for i in range(0, dims)]))
-        return Conditions(bc_list), Functions(func_list)
+        bc_list_YZ, func_list_YZ = list(zip(*[self._get_periodicBC_YZ(domain, i) for i in range(0, dims)]))
+        bc_list_X, func_list_X = list(zip(*[self._get_periodicBC_X(domain, i) for i in range(1, dims)]))
+        return Conditions(bc_list_YZ + bc_list_X), Functions(func_list_YZ + func_list_X)

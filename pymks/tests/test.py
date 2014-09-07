@@ -1,22 +1,9 @@
 import numpy as np
 
 
-def test_elastic_FE_simulation_2D():
-    from pymks.datasets.elastic_FE_simulation import ElasticFESimulation
-    nx = 5
-    ii = (nx - 1) / 2
-    X = np.zeros((1, nx, nx), dtype=int)
-    X[0, ii, ii] = 1
-    model = ElasticFESimulation(elastic_modulus=(1., 10.),
-                                poissons_ratio=(0.3, 0.3))
-    strain = model.get_strain(X)
-    solution = (1.518e-1, -1.672e-2, 0.)
-    assert np.allclose(strain[0, ii, ii], solution, rtol=1e-3)
-
-
 def test_elastic_FE_simulation_3D():
     from pymks.datasets.elastic_FE_simulation import ElasticFESimulation
-    nx = 4
+    nx = 5
     ii = (nx - 1) / 2
     X = np.zeros((1, nx, nx, nx), dtype=int)
     X[0, :, ii] = 1
@@ -24,10 +11,7 @@ def test_elastic_FE_simulation_3D():
                                 poissons_ratio=(0., 0.))
     strain = model.get_strain(X)
     solution = [1., 0., 0., 0., 0., 0.]
-    print 'solution',solution
-    print '([np.mean(strain[0, ..., i]) for i in range(6)]',[np.mean(strain[0, ..., i]) for i in range(6)]
-    assert np.allclose([np.mean(strain[0, ..., i]) for i in range(6)],
-                       solution)
+    assert np.allclose([np.mean(strain[0, ..., i]) for i in range(6)], solution)
 
 def test_elastic_FE_simulation_3D_BCs():
     from pymks.datasets.elastic_FE_simulation import ElasticFESimulation
@@ -38,7 +22,6 @@ def test_elastic_FE_simulation_3D_BCs():
     sim = ElasticFESimulation((10.0,1.0), (0.3,0.3), macro_strain=0.1)
     u = sim.get_displacement(X)[0]
     ## Check the left/right offset
-    print u[-1,...,0] - u[0,...,0]
     assert np.allclose(u[-1,...,0] - u[0,...,0], N * macro_strain)
     ## Check the left/right y-periodicity
     assert np.allclose(u[0,...,1], u[-1,...,1])
@@ -69,7 +52,6 @@ def test_MKS_elastic_delta():
     model = MKSRegressionModel(basis)
     model.fit(X, y_test)
     y_pred = model.predict(X)
-    print y_pred - y_test
     assert np.allclose(y_pred, y_test, rtol=1e-3, atol=1e-3)
 
 def test_MKS_elastic_random():
@@ -150,8 +132,6 @@ def test_multiphase_FE_strain():
                                               macro_strain=macro_strain)
     strain_pred = MKSmodel.predict(X)
 
-    print(strain[0])
-    print(strain_pred[0])
     assert np.allclose(strain_pred[0, i:-i], strain[0, i:-i],
                        rtol=1e-2, atol=6.1e-3)
 
@@ -179,4 +159,4 @@ def test_cahn_hilliard():
     assert mse(y_test, y_pred) < 0.03
 
 if __name__ == '__main__':
-    test_elastic_FE_simulation_3D_BCs()
+    test_MKS_elastic_delta()
