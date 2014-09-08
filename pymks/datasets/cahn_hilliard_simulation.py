@@ -78,10 +78,6 @@ class CahnHilliardSimulation(object):
           X: Array representing the concentration field between -1 and
              1 with shape (n_samples, N, N)
 
-        Returns:
-          Array representing the microstructure at one time step ahead
-          of 'X'
-
         """
         N = X.shape[1]
         if not np.all(np.array(X.shape[1:]) == N):
