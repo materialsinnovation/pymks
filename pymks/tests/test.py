@@ -9,9 +9,9 @@ def test_elastic_FE_simulation_3D():
     X[0, :, ii] = 1
     model = ElasticFESimulation(elastic_modulus=(1., 10.),
                                 poissons_ratio=(0., 0.))
-    strain = model.get_strain(X)
+    model.run(X)
     solution = [1., 0., 0., 0., 0., 0.]
-    assert np.allclose([np.mean(strain[0, ..., i]) for i in range(6)], solution)
+    assert np.allclose([np.mean(model.strain[0, ..., i]) for i in range(6)], solution)
 
 def test_elastic_FE_simulation_3D_BCs():
     from pymks.datasets.elastic_FE_simulation import ElasticFESimulation
@@ -20,7 +20,8 @@ def test_elastic_FE_simulation_3D_BCs():
     X = np.random.randint(2, size=(1, N, N, N))
     macro_strain = 0.1
     sim = ElasticFESimulation((10.0,1.0), (0.3,0.3), macro_strain=0.1)
-    u = sim.get_displacement(X)[0]
+    sim.run(X)
+    u = sim.displacement[0]
     ## Check the left/right offset
     assert np.allclose(u[-1,...,0] - u[0,...,0], N * macro_strain)
     ## Check the left/right y-periodicity
@@ -154,7 +155,8 @@ def test_cahn_hilliard():
     model.fit(X, y)
     X_test = np.array([np.random.random((n_spaces, n_spaces)) for i in range(1)])
     CHSim = CahnHilliardSimulation(dt=dt)
-    y_test = CHSim.get_response(X_test)
+    CHSim.run(X_test)
+    y_test = CHSim.response
     y_pred = model.predict(X_test)
     assert mse(y_test, y_pred) < 0.03
 

@@ -37,7 +37,8 @@ class ElasticFESimulation(object):
 
     >>> sim = ElasticFESimulation(elastic_modulus=(1.0, 10.0),
     ...                           poissons_ratio=(0., 0.))
-    >>> y = sim.get_strain(X)
+    >>> sim.run(X)
+    >>> y = sim.strain
 
     y is the strain with components as follows
 
@@ -63,7 +64,8 @@ class ElasticFESimulation(object):
     >>> Nsample, N, N = X.shape
     >>> macro_strain = 0.1
     >>> sim = ElasticFESimulation((10.0,1.0), (0.3,0.3), macro_strain=0.1)
-    >>> u = sim.get_displacement(X)[0]
+    >>> sim.run(X)
+    >>> u = sim.displacement[0]
 
     Check that the offset for the left/right planes is `N *
     macro_strain`.
@@ -179,63 +181,22 @@ class ElasticFESimulation(object):
              (n_samples, Nx, Ny, Nz)
         """
         X_property = self._get_property_array(X)
-        strains = []
-        displacements = []
+        strain = []
+        displacement = []
+        stress = []
         for x in X_property:
-            strain, displacement = self._solve(x)
-            strains.append(strain)
-            displacements.append(displacement)
-        self.strains = np.array(strains)
-        self.displacements = np.array(displacements)
-        
-    def get_response(self, X):
-        """
-        Get the xx strain field.
+            strain_, displacement_, stress_ = self._solve(x)
+            strain.append(strain_)
+            displacement.append(displacement_)
+            stress.append(stress_)
+        self.strain = np.array(strain)
+        self.displacement = np.array(displacement)
+        self.stress = np.array(stress)
 
-        Args:
-          X: microstructure with shape (n_samples, Nx, Ny) or
-             (n_samples, Nx, Ny, Nz)
-    
-        Returns:
-          the xx strain field
+    @property
+    def response(self):
+        return self.strain[...,0]
 
-        """
-        if not hasattr(self, 'strains'):
-            self.run(X)
-        return self.get_strain(X)[...,0]
-
-    def get_strain(self, X):
-        """
-        Get the full strain tensor.
-
-        Args:
-          X: microstructure with shape (n_samples, Nx, Ny) or
-             (n_samples, Nx, Ny, Nz)
-    
-        Returns:
-          the strain tensor
-
-        """
-
-        if not hasattr(self, 'strains'):
-            self.run(X)
-        return self.strains
-
-    def get_displacement(self, X):
-        """
-        Get the displacement vector.
-
-        Args:
-          X: microstructure with shape (n_samples, Nx, Ny) or
-             (n_samples, Nx, Ny, Nz)
-    
-        Returns:
-          the displacement vector
-        """
-        if not hasattr(self, 'displacements'):
-            self.run(X)
-        return self.displacements
-    
     def _get_material(self, property_array, domain):
         """
         Creates an SfePy material from the material property fields for the
@@ -249,7 +210,8 @@ class ElasticFESimulation(object):
 
         """
         min_xyz = domain.get_mesh_bounding_box()[0]
-
+        dims = domain.get_mesh_bounding_box().shape[1]
+        
         def _material_func_(ts, coors, mode=None, **kwargs):
             if mode == 'qp':
                 ijk_out = np.empty_like(coors, dtype=int)
@@ -261,7 +223,10 @@ class ElasticFESimulation(object):
                 mu = property_array_qp[..., 1]
                 lam = np.ascontiguousarray(lam.reshape((lam.shape[0], 1, 1)))
                 mu = np.ascontiguousarray(mu.reshape((mu.shape[0], 1, 1)))
-                return {'lam': lam, 'mu': mu}
+
+                from sfepy.mechanics.matcoefs import stiffness_from_lame
+                stiffness = stiffness_from_lame(dims, lam=lam, mu=mu)
+                return {'lam': lam, 'mu': mu, 'D': stiffness}
             else:
                 return
 
@@ -540,12 +505,17 @@ class ElasticFESimulation(object):
 
         u = vec.create_output_dict()['u'].data
         u_reshape = np.reshape(u, (tuple(x + 1 for x in shape) + u.shape[-1:]))
-        
-        strain = np.squeeze(pb.evaluate('ev_cauchy_strain.3.region_all(u)',
+
+        dims = domain.get_mesh_bounding_box().shape[1]
+        strain = np.squeeze(pb.evaluate('ev_cauchy_strain.{dim}.region_all(u)'.format(dim=dims),
                                         mode='el_avg'))
         strain_reshape = np.reshape(strain, (shape + strain.shape[-1:]))
 
-        return strain_reshape, u_reshape
+        stress = np.squeeze(pb.evaluate('ev_cauchy_stress.{dim}.region_all(m.D, u)'.format(dim=dims),
+                                        mode='el_avg'))
+        stress_reshape = np.reshape(stress, (shape + stress.shape[-1:]))
+
+        return strain_reshape, u_reshape, stress_reshape
 
     def _get_periodicBCs(self, domain):
         dims = domain.get_mesh_bounding_box().shape[1]
