@@ -25,12 +25,13 @@ class LegendreBasis(_AbstractMicrostructureBasis):
     >>> n_states = 3
     >>> X = np.array([[0.25, 0.1],
     ...               [0.5, 0.25]])
-    >>> X_Legendre = np.array([[[-0.3125, -0.75, 0.5],
-    ...                         [ 1.15,   -1.2, 0.5]],
-    ...                        [[-1.25,      0, 0.5],
-    ...                         [-0.3125, -0.75, 0.5]]])
+    >>> def P(x):
+    ...    x = 4 * x - 1
+    ...    polys = np.array((np.ones_like(x), x, (3.*x**2 - 1.) / 2.))
+    ...    tmp = (2. * np.arange(3)[:, None, None] + 1.) / 2. * polys
+    ...    return np.rollaxis(tmp, 0, 3)[:,:,::-1]
     >>> basis = LegendreBasis(n_states, [0., 0.5])
-    >>> assert(np.allclose(basis.discretize(X), X_Legendre))
+    >>> assert(np.allclose(basis.discretize(X), P(X)))
 
     """
 
@@ -46,11 +47,11 @@ class LegendreBasis(_AbstractMicrostructureBasis):
         >>> X = np.array([[-1, 1],
         ...               [0, -1]])
         >>> basis = LegendreBasis(3, [-1, 1])
-        >>> X_Legendre = np.array([[[  2.5, -1.5, 0.5],
-        ...                         [  2.5,  1.5, 0.5]],
-        ...                        [[-1.25,   0., 0.5,],
-        ...                         [  2.5, -1.5, 0.5]]])
-        >>> assert(np.allclose(basis.discretize(X), X_Legendre))
+        >>> def P(x):
+        ...    polys = np.array((np.ones_like(x), x, (3.*x**2 - 1.) / 2.))
+        ...    tmp = (2. * np.arange(3)[:, None, None] + 1.) / 2. * polys
+        ...    return np.rollaxis(tmp, 0, 3)[:,:,::-1]
+        >>> assert(np.allclose(basis.discretize(X), P(X)))
 
         """
         self.check(X)
