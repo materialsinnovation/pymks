@@ -1,7 +1,6 @@
 import numpy as np
 from sfepy.base.goptions import goptions
 goptions['verbose'] = False
-from sfepy.base.base import IndexedStruct
 from sfepy.discrete.fem import Field
 try:
     from sfepy.discrete.fem import FEDomain as Domain
@@ -18,6 +17,8 @@ from sfepy.discrete import Functions
 from sfepy.mesh.mesh_generators import gen_block_mesh
 from sfepy.mechanics.matcoefs import ElasticConstants
 from sfepy.base.base import output
+from sfepy.discrete.conditions import LinearCombinationBC
+
 output.set_output(quiet=True)
 
 
@@ -34,9 +35,10 @@ class ElasticFESimulation(object):
     >>> X = np.zeros((1, 3, 3), dtype=int)
     >>> X[0, :, 1] = 1
 
-    >>> model = ElasticFESimulation(elastic_modulus=(1.0, 10.0),
-    ...                             poissons_ratio=(0., 0.))
-    >>> y = model.get_response(X, slice(None))
+    >>> sim = ElasticFESimulation(elastic_modulus=(1.0, 10.0),
+    ...                           poissons_ratio=(0., 0.))
+    >>> sim.run(X)
+    >>> y = sim.strain
 
     y is the strain with components as follows
 
@@ -44,14 +46,40 @@ class ElasticFESimulation(object):
     >>> eyy = y[..., 1]
     >>> exy = y[..., 2]
 
-    Since there is no contrast in the microstructure the strain is only
-    in the x-direction and has a uniform value of 1 since the
-    displacement is always 1 and the size of the domain is 1.
+    In this example, the strain is only in the x-direction and has a
+    uniform value of 1 since the displacement is always 1 and the size
+    of the domain is 1.
 
     >>> assert np.allclose(exx, 1)
     >>> assert np.allclose(eyy, 0)
     >>> assert np.allclose(exy, 0)
 
+    The following example is for a system with contrast. It tests the
+    left/right periodic offset and the top/bottom periodicity.
+
+    >>> X = np.array([[[1, 0, 0, 1],
+    ...                [0, 1, 1, 1],
+    ...                [0, 0, 1, 1],
+    ...                [1, 0, 0, 1]]])
+    >>> Nsample, N, N = X.shape
+    >>> macro_strain = 0.1
+    >>> sim = ElasticFESimulation((10.0,1.0), (0.3,0.3), macro_strain=0.1)
+    >>> sim.run(X)
+    >>> u = sim.displacement[0]
+
+    Check that the offset for the left/right planes is `N *
+    macro_strain`.
+
+    >>> assert np.allclose(u[-1,:,0] - u[0,:,0], N * macro_strain)
+
+    Check that the left/right side planes are periodic in y.
+
+    >>> assert np.allclose(u[0,:,1], u[-1,:,1])
+
+    Check that the top/bottom planes are periodic in both x and y.
+
+    >>> assert np.allclose(u[:,0], u[:,-1])
+    
     """
     def __init__(self, elastic_modulus, poissons_ratio, macro_strain=1.,):
         """
@@ -143,26 +171,31 @@ class ElasticFESimulation(object):
             raise RuntimeError("the shape of X is incorrect")
         return self._convert_properties(dim)[X]
 
-    def get_response(self, X, strain_index=0):
+
+    def run(self, X):
         """
-        Get the strain fields given an initial microstructure
-        with a macroscopic strain applied in the x direction.
+        Run the simulation.
 
         Args:
           X: microstructure with shape (n_samples, Nx, Ny) or
              (n_samples, Nx, Ny, Nz)
-          strain_index: interger value to return
-             a particular strain field.  0 returns exx, 1 returns eyy,
-             etc. To return all strain fields set `strain_index` equal to
-             `slice(None)`.
-
-        Returns:
-          the strain fields over each cell
-
         """
         X_property = self._get_property_array(X)
-        y_strain = np.array([self._solve(x) for x in X_property])
-        return y_strain[..., strain_index]
+        strain = []
+        displacement = []
+        stress = []
+        for x in X_property:
+            strain_, displacement_, stress_ = self._solve(x)
+            strain.append(strain_)
+            displacement.append(displacement_)
+            stress.append(stress_)
+        self.strain = np.array(strain)
+        self.displacement = np.array(displacement)
+        self.stress = np.array(stress)
+
+    @property
+    def response(self):
+        return self.strain[...,0]
 
     def _get_material(self, property_array, domain):
         """
@@ -177,7 +210,8 @@ class ElasticFESimulation(object):
 
         """
         min_xyz = domain.get_mesh_bounding_box()[0]
-
+        dims = domain.get_mesh_bounding_box().shape[1]
+        
         def _material_func_(ts, coors, mode=None, **kwargs):
             if mode == 'qp':
                 ijk_out = np.empty_like(coors, dtype=int)
@@ -189,14 +223,17 @@ class ElasticFESimulation(object):
                 mu = property_array_qp[..., 1]
                 lam = np.ascontiguousarray(lam.reshape((lam.shape[0], 1, 1)))
                 mu = np.ascontiguousarray(mu.reshape((mu.shape[0], 1, 1)))
-                return {'lam': lam, 'mu': mu}
+
+                from sfepy.mechanics.matcoefs import stiffness_from_lame
+                stiffness = stiffness_from_lame(dims, lam=lam, mu=mu)
+                return {'lam': lam, 'mu': mu, 'D': stiffness}
             else:
                 return
 
         material_func = Function('material_func', _material_func_)
         return Material('m', function=material_func)
 
-    def _subdomain_func(self, x=(), y=(), z=()):
+    def _subdomain_func(self, x=(), y=(), z=(), max_x=None):
         """
         Creates a function to mask subdomains in Sfepy.
 
@@ -224,12 +261,164 @@ class ElasticFESimulation(object):
             for z_ in z:
                 flag = (coords[:, 2] < (z_ + eps)) & (coords[:, 2] > (z_ - eps))
                 flag_z = flag_z | flag
-            return np.where(flag_x & flag_y & flag_z)[0]
+            flag = flag_x & flag_y & flag_z
+            if max_x is not None:
+                flag = flag & (coords[:,0] < (max_x - eps))
+            return np.where(flag)[0]
 
         return _func
+    
+    def _get_mesh(self, shape):
+        """
+        Generate an Sfepy rectangular mesh
 
-    def _get_periodicBC(self, domain, dim):
+        Args:
+          shape: proposed shape of domain (vertex shape) (Nx, Ny)
+
+        Returns:
+          Sfepy mesh
+
+        """
+        center = np.zeros_like(shape)
+        return gen_block_mesh(shape, np.array(shape) + 1, center,
+                              verbose=False)
+
+    def _get_fixed_displacementsBCs(self, domain):
+        """
+        Fix the left top and bottom points in x, y and z
+
+        Args:
+          domain: an Sfepy domain
+
+        Returns:
+          the Sfepy boundary conditions
+
+        """
+        min_xyz = domain.get_mesh_bounding_box()[0]
+        max_xyz = domain.get_mesh_bounding_box()[1]
+
+        kwargs = {}
+        fix_points_dict = {'u.0': 0.0, 'u.1': 0.0}
+        if len(min_xyz) == 3:
+            kwargs = {'z': (max_xyz[2], min_xyz[2])}
+            fix_points_dict['u.2'] = 0.0
+        fix_x_points_ = self._subdomain_func(x=(min_xyz[0],),
+                                             y=(max_xyz[1], min_xyz[1]),
+                                             **kwargs)
+
+        fix_x_points = Function('fix_x_points', fix_x_points_)
+        region_fix_points = domain.create_region('region_fix_points',
+                                                 'vertices by fix_x_points',
+                                                 'vertex',
+                                                 functions=Functions([fix_x_points]))
+        return EssentialBC('fix_points_BC', region_fix_points, fix_points_dict)
+
+    def _get_shift_displacementsBCs(self, domain):
+        """
+        Fix the right top and bottom points in x, y and z
+
+        Args:
+          domain: an Sfepy domain
+
+        Returns:
+          the Sfepy boundary conditions
+
+        """
+        min_xyz = domain.get_mesh_bounding_box()[0]
+        max_xyz = domain.get_mesh_bounding_box()[1]
+        kwargs = {}
+        if len(min_xyz) == 3:
+            kwargs = {'z': (max_xyz[2], min_xyz[2])}
+
+        displacement = self.macro_strain * (max_xyz[0] - min_xyz[0])
+        shift_points_dict = {'u.0': displacement}
+
+        shift_x_points_ = self._subdomain_func(x=(max_xyz[0],),
+                                               y=(max_xyz[1], min_xyz[1]),
+                                               **kwargs)
+
+        shift_x_points = Function('shift_x_points', shift_x_points_)
+        region_shift_points = domain.create_region('region_shift_points',
+                                                   'vertices by shift_x_points',
+                                                   'vertex',
+                                                   functions=Functions([shift_x_points]))
+        return EssentialBC('shift_points_BC', region_shift_points, shift_points_dict)
+    
+    def _get_displacementBCs(self, domain):
+        shift_points_BC = self._get_shift_displacementsBCs(domain)
+        fix_points_BC = self._get_fixed_displacementsBCs(domain)
+        return Conditions([fix_points_BC, shift_points_BC])
+    
+    def _get_linear_combinationBCs(self, domain):
+        """
+        The right nodes are periodic with the left nodes but also displaced.
+
+        Args:
+          domain: an Sfepy domain
+
+        Returns:
+          the Sfepy boundary conditions
+
+        """
+        min_xyz = domain.get_mesh_bounding_box()[0]
+        max_xyz = domain.get_mesh_bounding_box()[1]
+        xplus_ = self._subdomain_func(x=(max_xyz[0],))
+        xminus_ = self._subdomain_func(x=(min_xyz[0],))
+
+        xplus = Function('xplus', xplus_)
+        xminus = Function('xminus', xminus_)
+        region_x_plus = domain.create_region('region_x_plus',
+                                             'vertices by xplus',
+                                             'facet',
+                                             functions=Functions([xplus]))
+        region_x_minus = domain.create_region('region_x_minus',
+                                           'vertices by xminus',
+                                           'facet',
+                                           functions=Functions([xminus]))
+        match_x_plane = Function('match_x_plane', per.match_x_plane)
+        def shift_(ts, coors, region):
+            return np.ones_like(coors[:, 0]) * self.macro_strain * (max_xyz[0] - min_xyz[0])
+        shift = Function('shift', shift_)
+        lcbc = LinearCombinationBC('lcbc', [region_x_plus, region_x_minus], {'u.0' : 'u.0'}, match_x_plane, 'shifted_periodic', arguments=(shift,))
+        
+        return Conditions([lcbc])
+
+    def _get_periodicBC_X(self, domain, dim):
         dim_dict = {1: ('y', per.match_y_plane),
+                    2: ('z', per.match_z_plane)}
+        dim_string = dim_dict[dim][0]
+        match_plane = dim_dict[dim][1]
+        min_, max_ = domain.get_mesh_bounding_box()[:, dim]
+        min_x, max_x = domain.get_mesh_bounding_box()[:, 0]
+        plus_ = self._subdomain_func(max_x=max_x, **{dim_string: (max_,)})
+        minus_ = self._subdomain_func(max_x=max_x, **{dim_string: (min_,)})
+        plus_string = dim_string + 'plus'
+        minus_string = dim_string + 'minus'
+        plus = Function(plus_string, plus_)
+        minus = Function(minus_string, minus_)
+        region_plus = domain.create_region('region_{0}_plus'.format(dim_string),
+                                           'vertices by {0}'.format(plus_string),
+                                           'facet',
+                                           functions=Functions([plus]))
+        region_minus = domain.create_region('region_{0}_minus'.format(dim_string),
+                                            'vertices by {0}'.format(minus_string),
+                                            'facet',
+                                            functions=Functions([minus]))
+        match_plane = Function('match_{0}_plane'.format(dim_string), match_plane)
+        
+        bc_dict = {'u.0': 'u.0'}
+            
+        bc = PeriodicBC('periodic_{0}'.format(dim_string),
+                        [region_plus, region_minus],
+                        bc_dict,
+                        match='match_{0}_plane'.format(dim_string))
+        return bc, match_plane
+    
+    
+    def _get_periodicBC_YZ(self, domain, dim):
+        dims = domain.get_mesh_bounding_box().shape[1]
+        dim_dict = {0: ('x', per.match_x_plane),
+                    1: ('y', per.match_y_plane),
                     2: ('z', per.match_z_plane)}
         dim_string = dim_dict[dim][0]
         match_plane = dim_dict[dim][1]
@@ -249,80 +438,17 @@ class ElasticFESimulation(object):
                                             'facet',
                                             functions=Functions([minus]))
         match_plane = Function('match_{0}_plane'.format(dim_string), match_plane)
+        
+        bc_dict = {'u.1': 'u.1'}
+        if dims == 3:
+            bc_dict['u.2'] = 'u.2'
+            
         bc = PeriodicBC('periodic_{0}'.format(dim_string),
                         [region_plus, region_minus],
-                        {'u.all': 'u.all'},
+                        bc_dict,
                         match='match_{0}_plane'.format(dim_string))
         return bc, match_plane
-
-    def _get_periodicBCs(self, domain):
-        dims = domain.get_mesh_bounding_box().shape[1]
-
-        bc_list, func_list = list(zip(*[self._get_periodicBC(domain, i) for i in range(1, dims)]))
-        return Conditions(bc_list), Functions(func_list)
-
-    def _get_displacementBCs(self, domain):
-        """
-        Fix the left plane in x, displace the right plane by 1 and fix
-        the y-direction with the top and bottom points on the left x
-        plane.
-
-        Args:
-          domain: an Sfepy domain
-
-        Returns:
-          the Sfepy boundary conditions
-
-        """
-        min_xyz = domain.get_mesh_bounding_box()[0]
-        max_xyz = domain.get_mesh_bounding_box()[1]
-        xplus_ = self._subdomain_func(x=(max_xyz[0],))
-        xminus_ = self._subdomain_func(x=(min_xyz[0],))
-
-        kwargs = {}
-        if len(min_xyz) == 3:
-            kwargs = {'z': (max_xyz[2], min_xyz[2])}
-        fix_x_points_ = self._subdomain_func(x=(min_xyz[0],),
-                                             y=(max_xyz[1], min_xyz[1]),
-                                             **kwargs)
-
-        xplus = Function('xplus', xplus_)
-        xminus = Function('xminus', xminus_)
-        fix_x_points = Function('fix_x_points', fix_x_points_)
-        region_x_plus = domain.create_region('region_x_plus',
-                                             'vertices by xplus',
-                                             'facet',
-                                             functions=Functions([xplus]))
-        region_left = domain.create_region('region_x_minus',
-                                           'vertices by xminus',
-                                           'facet',
-                                           functions=Functions([xminus]))
-        region_fix_points = domain.create_region('region_fix_points',
-                                                 'vertices by fix_x_points',
-                                                 'vertex',
-                                                 functions=Functions([fix_x_points]))
-        fixed_BC = EssentialBC('fixed_BC', region_left, {'u.0': 0.0})
-        displaced_BC = EssentialBC('displaced_BC', region_x_plus,
-                                   {'u.0': self.macro_strain * (max_xyz[0] - min_xyz[0])})
-        fix_points_BC = EssentialBC('fix_points_BC', region_fix_points,
-                                    {'u.1': 0.0})
-        return Conditions([fixed_BC, displaced_BC, fix_points_BC])
-
-    def _get_mesh(self, shape):
-        """
-        Generate an Sfepy rectangular mesh
-
-        Args:
-          shape: proposed shape of domain (vertex shape) (Nx, Ny)
-
-        Returns:
-          Sfepy mesh
-
-        """
-        center = np.zeros_like(shape)
-        return gen_block_mesh(shape, np.array(shape) + 1, center,
-                              verbose=False)
-
+    
     def _solve(self, property_array):
         """
         Solve the Sfepy problem for one sample.
@@ -351,26 +477,49 @@ class ElasticFESimulation(object):
 
         m = self._get_material(property_array, domain)
 
-        integral = Integral('i', order=3)
+        integral = Integral('i', order=4)
 
         t1 = Term.new('dw_lin_elastic_iso(m.lam, m.mu, v, u)',
                       integral, region_all, m=m, v=v, u=u)
         eq = Equation('balance_of_forces', t1)
         eqs = Equations([eq])
 
-        ls = ScipyDirect({})
-        nls_status = IndexedStruct()
-        nls = Newton({}, lin_solver=ls, status=nls_status)
-
-        pb = Problem('elasticity', equations=eqs, nls=nls, ls=ls)
-        pb.save_regions_as_groups('regions')
-
         epbcs, functions = self._get_periodicBCs(domain)
         ebcs = self._get_displacementBCs(domain)
+        lcbcs = self._get_linear_combinationBCs(domain)
 
-        pb.time_update(ebcs=ebcs, epbcs=epbcs, functions=functions)
-        pb.solve()
+        ls = ScipyDirect({})
 
-        strain = np.squeeze(pb.evaluate('ev_cauchy_strain.3.region_all(u)',
+        pb = Problem('elasticity', equations=eqs, auto_solvers=None)
+        pb.save_regions_as_groups('regions')
+
+        pb.time_update(ebcs=ebcs, epbcs=epbcs, lcbcs=lcbcs, functions=functions)
+
+        ev = pb.get_evaluator()
+        nls = Newton({}, lin_solver=ls,
+                     fun=ev.eval_residual, fun_grad=ev.eval_tangent_matrix)
+
+        pb.set_solvers_instances(ls, nls)
+
+        vec = pb.solve()
+
+        u = vec.create_output_dict()['u'].data
+        u_reshape = np.reshape(u, (tuple(x + 1 for x in shape) + u.shape[-1:]))
+
+        dims = domain.get_mesh_bounding_box().shape[1]
+        strain = np.squeeze(pb.evaluate('ev_cauchy_strain.{dim}.region_all(u)'.format(dim=dims),
                                         mode='el_avg'))
-        return np.reshape(strain, (shape + strain.shape[-1:]))
+        strain_reshape = np.reshape(strain, (shape + strain.shape[-1:]))
+
+        stress = np.squeeze(pb.evaluate('ev_cauchy_stress.{dim}.region_all(m.D, u)'.format(dim=dims),
+                                        mode='el_avg'))
+        stress_reshape = np.reshape(stress, (shape + stress.shape[-1:]))
+
+        return strain_reshape, u_reshape, stress_reshape
+
+    def _get_periodicBCs(self, domain):
+        dims = domain.get_mesh_bounding_box().shape[1]
+
+        bc_list_YZ, func_list_YZ = list(zip(*[self._get_periodicBC_YZ(domain, i) for i in range(0, dims)]))
+        bc_list_X, func_list_X = list(zip(*[self._get_periodicBC_X(domain, i) for i in range(1, dims)]))
+        return Conditions(bc_list_YZ + bc_list_X), Functions(func_list_YZ + func_list_X)

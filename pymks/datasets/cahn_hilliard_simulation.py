@@ -33,7 +33,8 @@ class CahnHilliardSimulation(object):
     >>> phi = 0.01 * (2 * np.random.random((2, N)) - 1)
     >>> ch = CahnHilliardSimulation(gamma=4)
     >>> for i in range(10000):
-    ...     phi[:] = ch.get_response(phi)
+    ...     ch.run(phi)
+    ...     phi[:] = ch.response
     >>> assert (max(phi.flat) > 2e-3) and (min(phi.flat) < -2e-3)
 
     In 2D.
@@ -41,7 +42,8 @@ class CahnHilliardSimulation(object):
     >>> phi = 0.01 * (2 * np.random.random((2, N, N)) - 1)
     >>> ch = CahnHilliardSimulation(gamma=4.)
     >>> for i in range(100):
-    ...     phi[:] = ch.get_response(phi)
+    ...     ch.run(phi)
+    ...     phi[:] = ch.response
     >>> assert (max(phi.flat) > 0.001) and (min(phi.flat) < -0.001)
 
     In 3D.
@@ -49,7 +51,8 @@ class CahnHilliardSimulation(object):
     >>> phi = 0.01 * (2 * np.random.random((2, N, N, N)) - 1)
     >>> ch = CahnHilliardSimulation(gamma=4.)
     >>> for i in range(10):
-    ...     phi[:] = ch.get_response(phi)
+    ...     ch.run(phi)
+    ...     phi[:] = ch.response
 
     >>> assert (max(phi.flat) > 0.0005) and (min(phi.flat) < -0.0005)
 
@@ -67,17 +70,13 @@ class CahnHilliardSimulation(object):
         self.dt = dt
         self.gamma = gamma
 
-    def get_response(self, X):
+    def run(self, X):
         r"""
         Return the response field
 
         Args:
           X: Array representing the concentration field between -1 and
              1 with shape (n_samples, N, N)
-
-        Returns:
-          Array representing the microstructure at one time step ahead
-          of 'X'
 
         """
         N = X.shape[1]
@@ -103,4 +102,5 @@ class CahnHilliardSimulation(object):
         dt = self.dt
 
         Fy = (FX * (1 + dt * explicit) - ksq * dt * FX3) / (1 - dt * implicit)
-        return np.fft.ifftn(Fy, axes=axes).real
+        self.response = np.fft.ifftn(Fy, axes=axes).real
+
