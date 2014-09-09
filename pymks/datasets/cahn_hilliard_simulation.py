@@ -10,7 +10,8 @@ class CahnHilliardSimulation(object):
 
     .. math::
 
-       \dot{\phi} = \nabla^2 \left( \phi^3 - \phi \right) - \gamma \nabla^4 \phi
+       \dot{\phi} = \nabla^2 \left( \phi^3 -
+                                    \phi \right) - \gamma \nabla^4 \phi
 
     The discretiztion scheme used here is from `Chang and Rutenberg
     <http://dx.doi.org/10.1103/PhysRevE.72.055701>`__. The scheme is a
@@ -22,12 +23,13 @@ class CahnHilliardSimulation(object):
        + \left(1 - a_1\right) \Delta t \nabla^2 \phi_{t+\Delta t}
        + \left(1 - a_2\right) \Delta t \gamma \nabla^4 \phi_{t+\Delta t}
        = \phi_t
-       - \Delta t \nabla^2 \left(a_1 \phi_t + a_2 \gamma \nabla^2 \phi_t - \phi_t^3 \right)
+       - \Delta t \nabla^2 \left(a_1 \phi_t + a_2
+                                 \gamma \nabla^2 \phi_t - \phi_t^3 \right)
 
     where :math:`a_1=3` and :math:`a_2=0`.
-    
-    In 1D. 
-    
+
+    In 1D.
+
     >>> np.random.seed(99)
     >>> N = 100
     >>> phi = 0.01 * (2 * np.random.random((2, N)) - 1)
