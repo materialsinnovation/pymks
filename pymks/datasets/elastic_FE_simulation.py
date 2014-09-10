@@ -163,10 +163,8 @@ class ElasticFESimulation(object):
         n_phases = len(self.elastic_modulus)
         if not issubclass(X.dtype.type, np.integer):
             raise TypeError("X must be an integer array")
-        if n_phases != np.max(X) + 1:
-            raise RuntimeError("X has the wrong number of phases.")
-        if np.min(X) != 0:
-            raise RuntimeError("Phases must be zero indexed.")
+        if np.max(X) >= n_phases or np.min(X) < 0:
+            raise RuntimeError("X must be between 0 and {N}.".format(N=n_phases - 1))
         if not (2 <= dim <= 3):
             raise RuntimeError("the shape of X is incorrect")
         return self._convert_properties(dim)[X]
