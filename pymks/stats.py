@@ -39,24 +39,21 @@ def crosscorrelate(X_):
     >>> n_states = 3
     >>> basis = DiscreteIndicatorBasis(n_states=n_states)
     >>> X_ = basis.discretize(X)
-    >>> print(crosscorrelate(X_).shape)
-    (1, 3, 3, 3)
+    >>> assert(crosscorrelate(X_).shape == (1, 3, 3, 3))
 
     Test for 4 states
 
     >>> n_states = 4
     >>> basis = DiscreteIndicatorBasis(n_states=n_states)
     >>> X_ = basis.discretize(X)
-    >>> print(crosscorrelate(X_).shape)
-    (1, 3, 3, 6)
+    >>> assert(crosscorrelate(X_).shape == (1, 3, 3, 6))
 
     Test for 5 states
 
     >>> n_states = 5
     >>> basis = DiscreteIndicatorBasis(n_states=n_states)
     >>> X_ = basis.discretize(X)
-    >>> print(crosscorrelate(X_).shape)
-    (1, 3, 3, 10)
+    >>> assert(crosscorrelate(X_).shape == (1, 3, 3, 10))
 
     Args:
       X: microstructure
