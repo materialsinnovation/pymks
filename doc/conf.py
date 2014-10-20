@@ -110,7 +110,7 @@ html_theme_options = {
         ("Installation", "rst/INSTALLATION.html", True),
         ("Examples", "EXAMPLES.html", True),
         ("API", "API.html", True),
-        ("Github", "https://github.com/wd15/pymks/", True),
+        ("Github", "https://github.com/openmaterials/pymks/", True),
         ],
     'navbar_pagenav': False,
     'navbar_sidebarrel': False,
