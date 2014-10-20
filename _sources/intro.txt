@@ -29,8 +29,6 @@ and :math:`n` is the number of states. For example if
 
 .. math::  m_h = \delta_{hm} 
 
-.. math:: m_h \left[i\right] = \delta_{hm\left[i\right]}
-
 since the :math:`m`'s are just indices representing the state (the
 :math:`\left[i\right]` has been dropped).
 
@@ -115,15 +113,14 @@ ratio of 0.3.
     
     import numpy as np
     import matplotlib.pyplot as plt
-    from mpl_toolkits.axes_grid1 import make_axes_locatable
 .. code:: python
 
     from pymks.tools import draw_microstructure_strain
-    from pymks.datasets import make_elasticFEstrain_random
+    from pymks.datasets import make_elastic_FE_strain_random
     
     np.random.seed(21)
-    X, strains = make_elasticFEstrain_random(n_samples=1, elastic_modulus=(80, 120),
-                                             poissons_ratio=(0.3, 0.3), size=(15, 15))
+    X, strains = make_elastic_FE_strain_random(n_samples=1, elastic_modulus=(80, 120),
+                                               poissons_ratio=(0.3, 0.3), size=(15, 15))
     
     draw_microstructure_strain(X[0], strains[0])
 
@@ -163,11 +160,11 @@ to calibrate the influence coefficients.
 
 .. code:: python
 
-    from pymks.datasets import make_elasticFEstrain_delta
+    from pymks.datasets import make_elastic_FE_strain_delta
     
-    X_delta, strains_delta = make_elasticFEstrain_delta(elastic_modulus=(80, 120),
-                                                        poissons_ratio=(0.3, 0.3),
-                                                        size=(15, 15))
+    X_delta, strains_delta = make_elastic_FE_strain_delta(elastic_modulus=(80, 120),
+                                                          poissons_ratio=(0.3, 0.3),
+                                                          size=(15, 15))
     
     draw_microstructure_strain(X_delta[0], strains_delta[0])
 
@@ -224,9 +221,3 @@ Comments
 
 The MKS coefficients can then be scaled up to reproduce larger FE
 simulations using only the small FE simulation to seed the MKS model.
-
-\*\* Note that the cells close to the left and right side of the domain
-are not well predicted. This is due to issues with the SfePy FE solver
-and periodic boundary conditions. This should be ironed out soon. This
-is not an issue with the ``MKSRegressionModel``, but only the FE tool
-used to produce the calibration data.\*\*

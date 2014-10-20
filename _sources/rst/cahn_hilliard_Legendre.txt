@@ -160,10 +160,16 @@ look at one of them.
 
     from pymks.tools import draw_concentrations
     
-    draw_concentrations(X[0], y[0], title0='time=0', title1='time = 1')
+    draw_concentrations(X[0], y[0], title0='time = 0', title1='time = 1')
+
+.. parsed-literal::
+
+    c:\Users\dbrough3\AppData\Local\Continuum\Anaconda\lib\site-packages\matplotlib\figure.py:1595: UserWarning: This figure includes Axes that are not compatible with tight_layout, so its results might be incorrect.
+      warnings.warn("This figure includes Axes that are not "
 
 
-.. image:: cahn_hilliard_Legendre_files/cahn_hilliard_Legendre_7_0.png
+
+.. image:: cahn_hilliard_Legendre_files/cahn_hilliard_Legendre_7_1.png
 
 
 Calibrate Influence Coefficients
@@ -220,7 +226,7 @@ terms. More terms don't improve the mean square error.
 
 .. parsed-literal::
 
-    MKSRegressionModel(basis=<pymks.bases.legendre.LegendreBasis object at 0x7fb8f3061f50>,
+    MKSRegressionModel(basis=<pymks.bases.legendre.LegendreBasis object at 0x0000000013B0A5F8>,
               n_states=4)
     1.0
 
@@ -270,14 +276,8 @@ First the binned basis influence coefficients
     
     draw_coeff(BinModel.coeff)
 
-.. parsed-literal::
 
-    /home/wd15/anaconda/lib/python2.7/site-packages/matplotlib/figure.py:1595: UserWarning: This figure includes Axes that are not compatible with tight_layout, so its results might be incorrect.
-      warnings.warn("This figure includes Axes that are not "
-
-
-
-.. image:: cahn_hilliard_Legendre_files/cahn_hilliard_Legendre_17_1.png
+.. image:: cahn_hilliard_Legendre_files/cahn_hilliard_Legendre_17_0.png
 
 
 Now for the Legendre polynomial basis influence coefficients.
@@ -353,8 +353,8 @@ and the simulation.
 
 .. parsed-literal::
 
-    Bin mse = 2.3883216066e-05
-    Legendre mse = 2.56654150508e-26
+    Bin mse = 2.38832160661e-05
+    Legendre mse = 1.36417883712e-27
 
 
 
@@ -435,8 +435,8 @@ look at the difference between the simulation and the MKS models.
 
 .. parsed-literal::
 
-    Bin mse = 0.0192607235162
-    Legendre mse = 7.11131823004e-05
+    Bin mse = 0.0192607235163
+    Legendre mse = 7.11131823002e-05
 
 
 

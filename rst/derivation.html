@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1-dev.eecb0e2',
+        VERSION:     '0.1-dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -57,7 +57,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1-dev.eecb0e2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -67,7 +67,7 @@
                 <li><a href="INSTALLATION.html">Installation</a></li>
                 <li><a href="../EXAMPLES.html">Examples</a></li>
                 <li><a href="../API.html">API</a></li>
-                <li><a href="https://github.com/wd15/pymks/">Github</a></li>
+                <li><a href="https://github.com/openmaterials/pymks/">Github</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -194,7 +194,7 @@ following equation [1].</p>
 <div class="math">
 \[I_{ikjl}^{\infty} = \lim_{r \rightarrow \infty} \int_S\frac{\big (G_{ik,l}(r) + G_{il,k}(r)\big)}{2} \Big [C'_{ijlk}(x-r)\bar{\varepsilon}_{lk} + \big [C'_{ijlk}(x-r)\varepsilon'_{lk}(x-r)\big ]\Big ]n_l dS\]</div>
 <div class="math">
-\[E_{ikjl}(x) = \Big [C'_{ijlk}(x)\bar{\varepsilon}_{lk} + \big [C'_{ijlk}(x)\varepsilon'_{lk}(x)\big ]\Big ]\lim_{r \rightarrow 0} \int_S\frac{\big (G_{ik,l}(r) + G_{il,k}(r)\big)}{2} n_l dS\]</div>
+\[E_{ikjl}(x) = \lim_{r \rightarrow 0} \int_S\frac{\big (G_{ik,l}(r) + G_{il,k}(r)\big)}{2} n_l dS\]</div>
 <p>are the contribution from the surface integrals at <span class="math">\(\infty\)</span> and
 from the singularity.</p>
 <p>Finally let</p>

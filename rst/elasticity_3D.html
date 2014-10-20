@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1-dev.eecb0e2',
+        VERSION:     '0.1-dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1-dev.eecb0e2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -64,7 +64,7 @@
                 <li><a href="INSTALLATION.html">Installation</a></li>
                 <li><a href="../EXAMPLES.html">Examples</a></li>
                 <li><a href="../API.html">API</a></li>
-                <li><a href="https://github.com/wd15/pymks/">Github</a></li>
+                <li><a href="https://github.com/openmaterials/pymks/">Github</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -233,7 +233,7 @@ the <tt class="docutils literal"><span class="pre">make_elasticFEstrain_delta</s
 <span class="k">print</span> <span class="s">&#39;Elapsed Time&#39;</span><span class="p">,</span><span class="n">tm</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t</span><span class="p">,</span> <span class="s">&#39;Seconds&#39;</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>Elapsed Time 60.3490719795 Seconds</pre>
+<div class="highlight-python"><pre>Elapsed Time 70.2430000305 Seconds</pre>
 </div>
 <p>Let&#8217;s take a look at one of the delta microstructures and the
 <span class="math">\(\varepsilon_{xx}\)</span> strain field.</p>
@@ -298,7 +298,7 @@ results from finite element analysis.</p>
 <span class="n">draw_microstructure_strain</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="p">]</span> <span class="p">,</span> <span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>Elapsed Time 26.1797120571 Seconds</pre>
+<div class="highlight-python"><pre>Elapsed Time 32.0750000477 Seconds</pre>
 </div>
 <img alt="../_images/elasticity_3D_18_1.png" src="../_images/elasticity_3D_18_1.png" />
 <p><strong>Note that the calibrated influence coefficients can only be used to
@@ -311,7 +311,7 @@ the same microstructure to the <tt class="docutils literal"><span class="pre">pr
 <span class="k">print</span> <span class="s">&#39;Elapsed Time&#39;</span><span class="p">,</span><span class="n">tm</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t</span><span class="p">,</span><span class="s">&#39;Seconds&#39;</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>Elapsed Time 0.00110197067261 Seconds</pre>
+<div class="highlight-python"><pre>Elapsed Time 0.000999927520752 Seconds</pre>
 </div>
 <p>Finally let&#8217;s compare the results from finite element simulation and the
 MKS model.</p>
@@ -321,6 +321,13 @@ MKS model.</p>
 </pre></div>
 </div>
 <img alt="../_images/elasticity_3D_22_0.png" src="../_images/elasticity_3D_22_0.png" />
+<p>Let&#8217;s look at the difference between the two plots.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_diff</span>
+
+<span class="n">draw_diff</span><span class="p">((</span><span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="p">]</span> <span class="o">-</span> <span class="n">strain_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="p">]),</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;Finite Element - MKS&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/elasticity_3D_24_0.png" src="../_images/elasticity_3D_24_0.png" />
 <p>The MKS model is able to capture the strain field for the random
 microstructure after being calibrated with delta microstructures.</p>
 </div>
@@ -359,9 +366,9 @@ argument of the <tt class="docutils literal"><span class="pre">predict</span></t
 <span class="n">draw_strains</span><span class="p">(</span><span class="n">strain_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;xx&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>Elapsed Time 0.0062620639801 Seconds</pre>
+<div class="highlight-python"><pre>Elapsed Time 0.00500011444092 Seconds</pre>
 </div>
-<img alt="../_images/elasticity_3D_29_1.png" src="../_images/elasticity_3D_29_1.png" />
+<img alt="../_images/elasticity_3D_31_1.png" src="../_images/elasticity_3D_31_1.png" />
 </div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>

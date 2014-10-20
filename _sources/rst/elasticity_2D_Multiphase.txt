@@ -78,14 +78,8 @@ generate the data
     X_delta = make_delta_microstructures(n_phases=n_phases, size=(L, L))
     draw_microstructures(X_delta[0], X_delta[1], X_delta[2], X_delta[3])
 
-.. parsed-literal::
 
-    /home/wd15/anaconda/lib/python2.7/site-packages/matplotlib/figure.py:1595: UserWarning: This figure includes Axes that are not compatible with tight_layout, so its results might be incorrect.
-      warnings.warn("This figure includes Axes that are not "
-
-
-
-.. image:: elasticity_2D_Multiphase_files/elasticity_2D_Multiphase_4_1.png
+.. image:: elasticity_2D_Multiphase_files/elasticity_2D_Multiphase_4_0.png
 
 
 Using delta microstructures for the calibration of the first order
@@ -242,6 +236,18 @@ MKS model.
 .. image:: elasticity_2D_Multiphase_files/elasticity_2D_Multiphase_23_0.png
 
 
+Let's plot the difference between the two strain fields.
+
+.. code:: python
+
+    from pymks.tools import draw_diff
+    
+    draw_diff((strain[0] - strain_pred[0]), title='Finite Element - MKS')
+
+
+.. image:: elasticity_2D_Multiphase_files/elasticity_2D_Multiphase_25_0.png
+
+
 The MKS model is able to capture the strain field for the random
 microstructure after being calibrated with delta microstructures.
 
@@ -272,7 +278,7 @@ generate a new larger random microstructure and its strain field.
 
 
 
-.. image:: elasticity_2D_Multiphase_files/elasticity_2D_Multiphase_26_1.png
+.. image:: elasticity_2D_Multiphase_files/elasticity_2D_Multiphase_28_1.png
 
 
 The influence coefficients that have already been calibrated on a
@@ -292,7 +298,7 @@ Let's now take a look that ther resized influence coefficients.
     draw_coeff(MKSmodel.coeff)
 
 
-.. image:: elasticity_2D_Multiphase_files/elasticity_2D_Multiphase_30_0.png
+.. image:: elasticity_2D_Multiphase_files/elasticity_2D_Multiphase_32_0.png
 
 
 Because the coefficients have been resized, they will no longer work for
@@ -308,13 +314,23 @@ argument of the ``predict`` method to get the strain field.
     draw_strains_compare(strain[0], strain_pred[0])
 
 
-.. image:: elasticity_2D_Multiphase_files/elasticity_2D_Multiphase_32_0.png
+.. image:: elasticity_2D_Multiphase_files/elasticity_2D_Multiphase_34_0.png
+
+
+Again, let's plot the difference between the two strain fields.
+
+.. code:: python
+
+    draw_diff((strain[0] - strain_pred[0]), title='Finite Element - MKS')
+
+
+.. image:: elasticity_2D_Multiphase_files/elasticity_2D_Multiphase_36_0.png
 
 
 As you can see, the results from the strain field computed with the
-resized influence coefficients is not as close to the finite element
-results as they were before they were resized. This decrease in accuracy
-is expected when using spectral interpolation [4].
+resized influence coefficients is not as accurate as they were before
+they were resized. This decrease in accuracy is expected when using
+spectral interpolation [4].
 
 References
 ----------

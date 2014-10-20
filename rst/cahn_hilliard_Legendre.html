@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1-dev.eecb0e2',
+        VERSION:     '0.1-dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1-dev.eecb0e2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -64,7 +64,7 @@
                 <li><a href="INSTALLATION.html">Installation</a></li>
                 <li><a href="../EXAMPLES.html">Examples</a></li>
                 <li><a href="../API.html">API</a></li>
-                <li><a href="https://github.com/wd15/pymks/">Github</a></li>
+                <li><a href="https://github.com/openmaterials/pymks/">Github</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -240,10 +240,14 @@ after they have evolved for one time step given by <tt class="docutils literal">
 look at one of them.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_concentrations</span>
 
-<span class="n">draw_concentrations</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title0</span><span class="o">=</span><span class="s">&#39;time=0&#39;</span><span class="p">,</span> <span class="n">title1</span><span class="o">=</span><span class="s">&#39;time = 1&#39;</span><span class="p">)</span>
+<span class="n">draw_concentrations</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title0</span><span class="o">=</span><span class="s">&#39;time = 0&#39;</span><span class="p">,</span> <span class="n">title1</span><span class="o">=</span><span class="s">&#39;time = 1&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/cahn_hilliard_Legendre_7_0.png" src="../_images/cahn_hilliard_Legendre_7_0.png" />
+<pre class="literal-block">
+c:Usersdbrough3AppDataLocalContinuumAnacondalibsite-packagesmatplotlibfigure.py:1595: UserWarning: This figure includes Axes that are not compatible with tight_layout, so its results might be incorrect.
+  warnings.warn(&quot;This figure includes Axes that are not &quot;
+</pre>
+<img alt="../_images/cahn_hilliard_Legendre_7_1.png" src="../_images/cahn_hilliard_Legendre_7_1.png" />
 </div>
 <div class="section" id="calibrate-influence-coefficients">
 <h2>Calibrate Influence Coefficients<a class="headerlink" href="#calibrate-influence-coefficients" title="Permalink to this headline">¶</a></h2>
@@ -290,7 +294,7 @@ terms. More terms don&#8217;t improve the mean square error.</p>
 <span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>MKSRegressionModel(basis=&lt;pymks.bases.legendre.LegendreBasis object at 0x7fb8f3061f50&gt;,
+<div class="highlight-python"><pre>MKSRegressionModel(basis=&lt;pymks.bases.legendre.LegendreBasis object at 0x0000000013B0A5F8&gt;,
           n_states=4)
 1.0</pre>
 </div>
@@ -332,10 +336,7 @@ lets select 4 local states for both bases.</p>
 <span class="n">draw_coeff</span><span class="p">(</span><span class="n">BinModel</span><span class="o">.</span><span class="n">coeff</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>/home/wd15/anaconda/lib/python2.7/site-packages/matplotlib/figure.py:1595: UserWarning: This figure includes Axes that are not compatible with tight_layout, so its results might be incorrect.
-  warnings.warn("This figure includes Axes that are not "</pre>
-</div>
-<img alt="../_images/cahn_hilliard_Legendre_17_1.png" src="../_images/cahn_hilliard_Legendre_17_1.png" />
+<img alt="../_images/cahn_hilliard_Legendre_17_0.png" src="../_images/cahn_hilliard_Legendre_17_0.png" />
 <p>Now for the Legendre polynomial basis influence coefficients.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="n">draw_coeff</span><span class="p">(</span><span class="n">LegendreModel</span><span class="o">.</span><span class="n">coeff</span><span class="p">)</span>
 </pre></div>
@@ -390,8 +391,8 @@ and the simulation.</p>
 <span class="k">print</span> <span class="s">&#39;Legendre mse =&#39;</span><span class="p">,</span><span class="n">mse</span><span class="p">(</span><span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">phi_legendre_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>Bin mse = 2.3883216066e-05
-Legendre mse = 2.56654150508e-26</pre>
+<div class="highlight-python"><pre>Bin mse = 2.38832160661e-05
+Legendre mse = 1.36417883712e-27</pre>
 </div>
 <img alt="../_images/cahn_hilliard_Legendre_28_1.png" src="../_images/cahn_hilliard_Legendre_28_1.png" />
 <p>The Legendre polynomial basis clearly out performs the binned basis for
@@ -442,8 +443,8 @@ look at the difference between the simulation and the MKS models.</p>
 <span class="k">print</span> <span class="s">&#39;Legendre mse =&#39;</span><span class="p">,</span><span class="n">mse</span><span class="p">(</span><span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">phi_legendre_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>Bin mse = 0.0192607235162
-Legendre mse = 7.11131823004e-05</pre>
+<div class="highlight-python"><pre>Bin mse = 0.0192607235163
+Legendre mse = 7.11131823002e-05</pre>
 </div>
 <img alt="../_images/cahn_hilliard_Legendre_40_1.png" src="../_images/cahn_hilliard_Legendre_40_1.png" />
 <p>With the resized influence coefficients, the Legendre polynomial

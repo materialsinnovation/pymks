@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1-dev.eecb0e2',
+        VERSION:     '0.1-dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1-dev.eecb0e2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -64,7 +64,7 @@
                 <li><a href="INSTALLATION.html">Installation</a></li>
                 <li><a href="../EXAMPLES.html">Examples</a></li>
                 <li><a href="../API.html">API</a></li>
-                <li><a href="https://github.com/wd15/pymks/">Github</a></li>
+                <li><a href="https://github.com/openmaterials/pymks/">Github</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -172,10 +172,7 @@ import matplotlib.pyplot as plt</pre>
 <span class="n">draw_microstructures</span><span class="p">(</span><span class="n">X_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">X_delta</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">X_delta</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">X_delta</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>/home/wd15/anaconda/lib/python2.7/site-packages/matplotlib/figure.py:1595: UserWarning: This figure includes Axes that are not compatible with tight_layout, so its results might be incorrect.
-  warnings.warn("This figure includes Axes that are not "</pre>
-</div>
-<img alt="../_images/elasticity_2D_Multiphase_4_1.png" src="../_images/elasticity_2D_Multiphase_4_1.png" />
+<img alt="../_images/elasticity_2D_Multiphase_4_0.png" src="../_images/elasticity_2D_Multiphase_4_0.png" />
 <p>Using delta microstructures for the calibration of the first order
 influence coefficients is essentially the same as using a unit <a class="reference external" href="http://en.wikipedia.org/wiki/Impulse_response">impulse
 response</a> to find the
@@ -300,6 +297,13 @@ MKS model.</p>
 </pre></div>
 </div>
 <img alt="../_images/elasticity_2D_Multiphase_23_0.png" src="../_images/elasticity_2D_Multiphase_23_0.png" />
+<p>Let&#8217;s plot the difference between the two strain fields.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_diff</span>
+
+<span class="n">draw_diff</span><span class="p">((</span><span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">strain_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;Finite Element - MKS&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/elasticity_2D_Multiphase_25_0.png" src="../_images/elasticity_2D_Multiphase_25_0.png" />
 <p>The MKS model is able to capture the strain field for the random
 microstructure after being calibrated with delta microstructures.</p>
 </div>
@@ -325,7 +329,7 @@ generate a new larger random microstructure and its strain field.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">63</span><span class="p">,</span> <span class="mi">63</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/elasticity_2D_Multiphase_26_1.png" src="../_images/elasticity_2D_Multiphase_26_1.png" />
+<img alt="../_images/elasticity_2D_Multiphase_28_1.png" src="../_images/elasticity_2D_Multiphase_28_1.png" />
 <p>The influence coefficients that have already been calibrated on a
 <span class="math">\(L\)</span> by <span class="math">\(L\)</span> delta microstructures, need to be resized to
 match the shape of the new larger <span class="math">\(N\)</span> by <span class="math">\(N\)</span> microstructure
@@ -339,7 +343,7 @@ passing the shape of the new larger microstructure into the
 <div class="code python highlight-python"><div class="highlight"><pre><span class="n">draw_coeff</span><span class="p">(</span><span class="n">MKSmodel</span><span class="o">.</span><span class="n">coeff</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/elasticity_2D_Multiphase_30_0.png" src="../_images/elasticity_2D_Multiphase_30_0.png" />
+<img alt="../_images/elasticity_2D_Multiphase_32_0.png" src="../_images/elasticity_2D_Multiphase_32_0.png" />
 <p>Because the coefficients have been resized, they will no longer work for
 our original <span class="math">\(L\)</span> by <span class="math">\(L\)</span> sized microstructures they were
 calibrated on, but they can now be used on the <span class="math">\(N\)</span> by <span class="math">\(N\)</span>
@@ -350,11 +354,16 @@ argument of the <tt class="docutils literal"><span class="pre">predict</span></t
 <span class="n">draw_strains_compare</span><span class="p">(</span><span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">strain_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
-<img alt="../_images/elasticity_2D_Multiphase_32_0.png" src="../_images/elasticity_2D_Multiphase_32_0.png" />
+<img alt="../_images/elasticity_2D_Multiphase_34_0.png" src="../_images/elasticity_2D_Multiphase_34_0.png" />
+<p>Again, let&#8217;s plot the difference between the two strain fields.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">draw_diff</span><span class="p">((</span><span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">strain_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;Finite Element - MKS&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/elasticity_2D_Multiphase_36_0.png" src="../_images/elasticity_2D_Multiphase_36_0.png" />
 <p>As you can see, the results from the strain field computed with the
-resized influence coefficients is not as close to the finite element
-results as they were before they were resized. This decrease in accuracy
-is expected when using spectral interpolation [4].</p>
+resized influence coefficients is not as accurate as they were before
+they were resized. This decrease in accuracy is expected when using
+spectral interpolation [4].</p>
 </div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>

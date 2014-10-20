@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1-dev.eecb0e2',
+        VERSION:     '0.1-dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1-dev.eecb0e2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -64,7 +64,7 @@
                 <li><a href="INSTALLATION.html">Installation</a></li>
                 <li><a href="../EXAMPLES.html">Examples</a></li>
                 <li><a href="../API.html">API</a></li>
-                <li><a href="https://github.com/wd15/pymks/">Github</a></li>
+                <li><a href="https://github.com/openmaterials/pymks/">Github</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -162,30 +162,13 @@ calculate the strain. The domain is a square box of side <span class="math">\(L\
 has an macroscopic strain <span class="math">\(\bar{\varepsilon}_{xx}\)</span> imposed.</p>
 <p>In general, generateing the calibration data for the MKS requires
 boundary conditions that are both periodic and displaced, which are
-quite unusual boundary conditions. The ideal boundary conditions are
-given by,</p>
+quite unusual boundary conditions and are given by,</p>
 <div class="math">
 \[u(L, y) = u(0, y) + L\bar{\varepsilon}_{xx}\]</div>
 <div class="math">
 \[u(0, L) = u(0, 0) = 0\]</div>
 <div class="math">
 \[u(x, 0) = u(x, L)\]</div>
-<p>Unfortunaltely, we can&#8217;t implement these boundary conditions with
-<a class="reference external" href="http://sfepy.org">SfePy</a>, the closest we can get is</p>
-<div class="math">
-\[u(L, y) = L\bar{\varepsilon}_{xx}\]</div>
-<div class="math">
-\[u(0, y) = 0\]</div>
-<div class="math">
-\[u(0, L) = u(0, 0) = 0\]</div>
-<div class="math">
-\[u(x, 0) = u(x, L)\]</div>
-<p>This leads to some issues near the edges of the domain and introduces
-errors into the resizing of the coefficients. We are working to fix this
-issue, but note that the problem is not with the MKS regression itself,
-but with the calibration data used. The finite element package ABAQUS
-includes the displaced periodic boundary condition and can be used to
-calibrate the MKS regression correctly.</p>
 </div>
 </div>
 <div class="section" id="modeling-with-mks">
@@ -254,38 +237,17 @@ number of phases.</p>
 <span class="n">macro_strain</span> <span class="o">=</span> <span class="mf">0.02</span>
 <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 
-<span class="n">X_delta</span><span class="p">,</span> <span class="n">strains_delta</span> <span class="o">=</span> <span class="n">make_elastic_FE_strain_delta</span><span class="p">(</span><span class="n">elastic_modulus</span><span class="o">=</span><span class="n">elastic_modulus</span><span class="p">,</span>
-                                                    <span class="n">poissons_ratio</span><span class="o">=</span><span class="n">poissons_ratio</span><span class="p">,</span>
-                                                    <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">macro_strain</span><span class="o">=</span><span class="n">macro_strain</span><span class="p">,</span>
-                                                    <span class="n">strain_index</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="bp">None</span><span class="p">))</span>
+<span class="n">X_delta</span><span class="p">,</span> <span class="n">y_delta</span> <span class="o">=</span> <span class="n">make_elastic_FE_strain_delta</span><span class="p">(</span><span class="n">elastic_modulus</span><span class="o">=</span><span class="n">elastic_modulus</span><span class="p">,</span>
+                                                <span class="n">poissons_ratio</span><span class="o">=</span><span class="n">poissons_ratio</span><span class="p">,</span>
+                                                <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">macro_strain</span><span class="o">=</span><span class="n">macro_strain</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Let&#8217;s take a look at one of the delta microstructures and the
 <span class="math">\(\varepsilon_{xx}\)</span> strain field.</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">draw_microstructure_strain</span><span class="p">(</span><span class="n">X_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">strains_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">draw_microstructure_strain</span><span class="p">(</span><span class="n">X_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
 <img alt="../_images/elasticity_2D_9_0.png" src="../_images/elasticity_2D_9_0.png" />
-<p>Because <tt class="docutils literal"><span class="pre">slice(None)</span></tt> (the default slice operator in Python,
-equivalent to array[:]) was passed in to the
-<tt class="docutils literal"><span class="pre">make_elasticFEstrain_delta</span></tt> function as the argument for
-<tt class="docutils literal"><span class="pre">strain_index</span></tt>, the function returns all the strain fields. Let&#8217;s also
-take a look at the <span class="math">\(\varepsilon_{yy}\)</span> and <span class="math">\(\varepsilon_{xy}\)</span>
-strain fields.</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_strains</span>
-<span class="n">draw_strains</span><span class="p">(</span><span class="n">strains_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">strains_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="n">title1</span><span class="o">=</span><span class="s">&#39;yy&#39;</span><span class="p">,</span> <span class="n">title2</span><span class="o">=</span><span class="s">&#39;xy&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<img alt="../_images/elasticity_2D_11_0.png" src="../_images/elasticity_2D_11_0.png" />
-<p>The default argument for <tt class="docutils literal"><span class="pre">strain_index</span></tt> is zero which makes
-<tt class="docutils literal"><span class="pre">make_elasticFEstrain_delta</span></tt> only return the <span class="math">\(\varepsilon_{xx}\)</span>
-strain field. For the rest of this example we are only going to use the
-<span class="math">\(\varepsilon_{xx}\)</span> field to calibrate the influence coefficients,
-and the term strain field will refer to the <span class="math">\(\varepsilon_{xx}\)</span>
-field. The calibration can also be done on the other strains fields.</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">strains_delta</span> <span class="o">=</span> <span class="n">strains_delta</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-</pre></div>
-</div>
 </div>
 <div class="section" id="calibrating-first-order-influence-coefficients">
 <h3>Calibrating First Order Influence Coefficients<a class="headerlink" href="#calibrating-first-order-influence-coefficients" title="Permalink to this headline">¶</a></h3>
@@ -304,7 +266,7 @@ to the <tt class="docutils literal"><span class="pre">fit</span></tt> method.</p
 </div>
 <p>Now, pass the delta microstructures and their strain fields into the
 <tt class="docutils literal"><span class="pre">fit</span></tt> method to calibrate the first order influence coefficients.</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">MKSmodel</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_delta</span><span class="p">,</span> <span class="n">strains_delta</span><span class="p">)</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">MKSmodel</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_delta</span><span class="p">,</span> <span class="n">y_delta</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>That&#8217;s it, the influence coefficient have be calibrated. Let&#8217;s take a
@@ -314,7 +276,7 @@ look at them.</p>
 <span class="n">draw_coeff</span><span class="p">(</span><span class="n">MKSmodel</span><span class="o">.</span><span class="n">coeff</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/elasticity_2D_19_0.png" src="../_images/elasticity_2D_19_0.png" />
+<img alt="../_images/elasticity_2D_15_0.png" src="../_images/elasticity_2D_15_0.png" />
 <p>The influence coefficients for <span class="math">\(h=0\)</span> have a Gaussian-like shape,
 while the influence coefficients for <span class="math">\(h=1\)</span> are constant-valued.
 The constant-valued influence coefficients may seem superfluous, but are
@@ -340,7 +302,7 @@ results from finite element analysis.</p>
 <span class="n">a</span> <span class="o">=</span> <span class="n">draw_microstructure_strain</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">,</span> <span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
-<img alt="../_images/elasticity_2D_22_0.png" src="../_images/elasticity_2D_22_0.png" />
+<img alt="../_images/elasticity_2D_18_0.png" src="../_images/elasticity_2D_18_0.png" />
 <p><strong>Note that the calibrated influence coefficients can only be used to
 reproduce the simulation with the same boundary conditions that they
 were calibrated with</strong></p>
@@ -356,7 +318,14 @@ MKS model.</p>
 <span class="n">draw_strains_compare</span><span class="p">(</span><span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">strain_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
-<img alt="../_images/elasticity_2D_26_0.png" src="../_images/elasticity_2D_26_0.png" />
+<img alt="../_images/elasticity_2D_22_0.png" src="../_images/elasticity_2D_22_0.png" />
+<p>Lastly, let&#8217;s look at the difference between the two strain fields.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_diff</span>
+
+<span class="n">draw_diff</span><span class="p">((</span><span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">strain_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;Finite Element - MKS&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/elasticity_2D_24_0.png" src="../_images/elasticity_2D_24_0.png" />
 <p>The MKS model is able to capture the strain field for the random
 microstructure after being calibrated with delta microstructures.</p>
 </div>
@@ -382,7 +351,7 @@ generate a new larger random microstructure and its strain field.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">63</span><span class="p">,</span> <span class="mi">63</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/elasticity_2D_29_1.png" src="../_images/elasticity_2D_29_1.png" />
+<img alt="../_images/elasticity_2D_27_1.png" src="../_images/elasticity_2D_27_1.png" />
 <p>The influence coefficients that have already been calibrated need to be
 resized to match the shape of the new larger microstructure that we want
 to compute the strain field for. This can be done by passing the shape
@@ -394,7 +363,7 @@ of the new larger microstructure into the &#8216;resize_coeff&#8217; method.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="n">draw_coeff</span><span class="p">(</span><span class="n">MKSmodel</span><span class="o">.</span><span class="n">coeff</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/elasticity_2D_33_0.png" src="../_images/elasticity_2D_33_0.png" />
+<img alt="../_images/elasticity_2D_31_0.png" src="../_images/elasticity_2D_31_0.png" />
 <p>Because the coefficients have been resized, they will no longer work for
 our original <span class="math">\(L\)</span> by <span class="math">\(L\)</span> sized microstructures they were
 calibrated on, but they can now be used on the <span class="math">\(N\)</span> by <span class="math">\(N\)</span>
@@ -403,6 +372,11 @@ argument of the <tt class="docutils literal"><span class="pre">predict</span></t
 <div class="code python highlight-python"><div class="highlight"><pre><span class="n">strain_pred</span> <span class="o">=</span> <span class="n">MKSmodel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
 <span class="n">draw_strains_compare</span><span class="p">(</span><span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">strain_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<img alt="../_images/elasticity_2D_33_0.png" src="../_images/elasticity_2D_33_0.png" />
+<p>Again, let&#8217;s look at the difference between the two strain fields.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">draw_diff</span><span class="p">((</span><span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">strain_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;Finite Element - MKS&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="../_images/elasticity_2D_35_0.png" src="../_images/elasticity_2D_35_0.png" />

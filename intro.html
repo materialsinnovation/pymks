@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.1-dev.eecb0e2',
+        VERSION:     '0.1-dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="index.html"><img src="_static/pymks_logo.png">
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1-dev.eecb0e2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -64,7 +64,7 @@
                 <li><a href="rst/INSTALLATION.html">Installation</a></li>
                 <li><a href="EXAMPLES.html">Examples</a></li>
                 <li><a href="API.html">API</a></li>
-                <li><a href="https://github.com/wd15/pymks/">Github</a></li>
+                <li><a href="https://github.com/openmaterials/pymks/">Github</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -130,8 +130,6 @@ and <span class="math">\(n\)</span> is the number of states. For example if
 <span class="math">\(m_h[i] = ((1, 0, 0), (0, 0, 1), (0, 1, 0))\)</span>. Thus,</p>
 <div class="math">
 \[m_h = \delta_{hm}\]</div>
-<div class="math">
-\[m_h \left[i\right] = \delta_{hm\left[i\right]}\]</div>
 <p>since the <span class="math">\(m\)</span>&#8216;s are just indices representing the state (the
 <span class="math">\(\left[i\right]\)</span> has been dropped).</p>
 </div>
@@ -203,15 +201,14 @@ ratio of 0.3.</p>
 %autoreload 2
 
 import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable</pre>
+import matplotlib.pyplot as plt</pre>
 </div>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_microstructure_strain</span>
-<span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_elasticFEstrain_random</span>
+<span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_elastic_FE_strain_random</span>
 
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">21</span><span class="p">)</span>
-<span class="n">X</span><span class="p">,</span> <span class="n">strains</span> <span class="o">=</span> <span class="n">make_elasticFEstrain_random</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">elastic_modulus</span><span class="o">=</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">120</span><span class="p">),</span>
-                                         <span class="n">poissons_ratio</span><span class="o">=</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">strains</span> <span class="o">=</span> <span class="n">make_elastic_FE_strain_random</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">elastic_modulus</span><span class="o">=</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">120</span><span class="p">),</span>
+                                           <span class="n">poissons_ratio</span><span class="o">=</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
 
 <span class="n">draw_microstructure_strain</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">strains</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
@@ -240,11 +237,11 @@ a convenient interface to produce the delta microstructures.</p>
 submodule of <tt class="docutils literal"><span class="pre">pymks</span></tt> returns both the delta microstructure and the
 strain field. The strain fields and microstructures are used as inputs
 to calibrate the influence coefficients.</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_elasticFEstrain_delta</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_elastic_FE_strain_delta</span>
 
-<span class="n">X_delta</span><span class="p">,</span> <span class="n">strains_delta</span> <span class="o">=</span> <span class="n">make_elasticFEstrain_delta</span><span class="p">(</span><span class="n">elastic_modulus</span><span class="o">=</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">120</span><span class="p">),</span>
-                                                    <span class="n">poissons_ratio</span><span class="o">=</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">),</span>
-                                                    <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="n">X_delta</span><span class="p">,</span> <span class="n">strains_delta</span> <span class="o">=</span> <span class="n">make_elastic_FE_strain_delta</span><span class="p">(</span><span class="n">elastic_modulus</span><span class="o">=</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">120</span><span class="p">),</span>
+                                                      <span class="n">poissons_ratio</span><span class="o">=</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">),</span>
+                                                      <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
 
 <span class="n">draw_microstructure_strain</span><span class="p">(</span><span class="n">X_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">strains_delta</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
@@ -292,11 +289,6 @@ coefficients using delta microstructures.</p>
 <h2>Comments<a class="headerlink" href="#comments" title="Permalink to this headline">¶</a></h2>
 <p>The MKS coefficients can then be scaled up to reproduce larger FE
 simulations using only the small FE simulation to seed the MKS model.</p>
-<p>** Note that the cells close to the left and right side of the domain
-are not well predicted. This is due to issues with the SfePy FE solver
-and periodic boundary conditions. This should be ironed out soon. This
-is not an issue with the <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt>, but only the FE tool
-used to produce the calibration data.**</p>
 </div>
 </div>
 

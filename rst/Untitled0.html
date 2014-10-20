@@ -1,0 +1,279 @@
+
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&lt;no title&gt; &mdash; PyMKS</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootswatch-3.1.0/cosmo/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pymks.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1-dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.1.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="../_static/pymks_logo.ico"/>
+    <link rel="top" title="PyMKS" href="../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+                <li><a href="INSTALLATION.html">Installation</a></li>
+                <li><a href="../EXAMPLES.html">Examples</a></li>
+                <li><a href="../API.html">API</a></li>
+                <li><a href="https://github.com/openmaterials/pymks/">Github</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">More <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../THEORY.html">Theory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="derivation.html">Derivation of Materials Knowledge Systems Equation using Linear Elasticity</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="CREDITS.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CITATION.html">Citing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="REQUIREMENTS.html">Requirements</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.datasets.elastic_FE_simulation</span> <span class="kn">import</span> <span class="n">ElasticFESimulation</span>
+<span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_elastic_FE_strain_delta</span>
+<span class="kn">from</span> <span class="nn">pymks</span> <span class="kn">import</span> <span class="n">MKSRegressionModel</span>
+<span class="kn">from</span> <span class="nn">pymks</span> <span class="kn">import</span> <span class="n">DiscreteIndicatorBasis</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">elastic_modulus</span> <span class="o">=</span> <span class="p">(</span><span class="mf">90.</span><span class="p">,</span> <span class="mf">110.</span><span class="p">)</span>
+<span class="n">poissons_ratio</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
+<span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">101</span><span class="p">,</span> <span class="mi">101</span><span class="p">)</span>
+<span class="c">#X = np.zeros((1,) + size, dtype=int)</span>
+<span class="c">#X[0, 30:70, 30:70] = 1</span>
+<span class="c">#I, J = 50, 50</span>
+<span class="c">#R = 25</span>
+<span class="c">#xyz = np.indices(size) + 0.5</span>
+<span class="c">#mask = R**2 &gt; ((xyz[0] - I)**2 + (xyz[1] - J)**2)</span>
+<span class="c">#X[0, mask] = 1</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">+</span> <span class="n">size</span><span class="p">)</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="n">ElasticFESimulation</span><span class="p">(</span><span class="n">elastic_modulus</span><span class="o">=</span><span class="n">elastic_modulus</span><span class="p">,</span> <span class="n">poissons_ratio</span><span class="o">=</span><span class="n">poissons_ratio</span><span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_regions.py:150: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
+  + ZeroOrMore(')'))
+/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_regions.py:189: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
+  region_expression &lt;&lt; atom + ZeroOrMore(aux)
+/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_equations.py:55: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
+  + ZeroOrMore(')')
+/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_equations.py:55: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
+  + ZeroOrMore(')')</pre>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>&lt;matplotlib.colorbar.Colorbar instance at 0x7f0b51443cb0&gt;</pre>
+</div>
+<img alt="../_images/Untitled0_2_1.png" src="../_images/Untitled0_2_1.png" />
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">X_delta</span><span class="p">,</span> <span class="n">strains_delta</span> <span class="o">=</span> <span class="n">make_elastic_FE_strain_delta</span><span class="p">(</span><span class="n">elastic_modulus</span><span class="o">=</span><span class="n">elastic_modulus</span><span class="p">,</span>
+                                                      <span class="n">poissons_ratio</span><span class="o">=</span><span class="n">poissons_ratio</span><span class="p">,</span>
+                                                      <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_regions.py:150: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
+  + ZeroOrMore(')'))
+/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_regions.py:189: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
+  region_expression &lt;&lt; atom + ZeroOrMore(aux)
+/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_equations.py:55: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
+  + ZeroOrMore(')')
+/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_equations.py:55: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
+  + ZeroOrMore(')')
+/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_regions.py:150: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
+  + ZeroOrMore(')'))
+/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_regions.py:189: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
+  region_expression &lt;&lt; atom + ZeroOrMore(aux)
+/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_equations.py:55: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
+  + ZeroOrMore(')')
+/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_equations.py:55: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
+  + ZeroOrMore(')')</pre>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">basis</span> <span class="o">=</span> <span class="n">DiscreteIndicatorBasis</span><span class="p">(</span><span class="n">n_states</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">basis</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_delta</span><span class="p">,</span> <span class="n">strains_delta</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>&lt;matplotlib.colorbar.Colorbar instance at 0x7f0b501ba4d0&gt;</pre>
+</div>
+<img alt="../_images/Untitled0_5_1.png" src="../_images/Untitled0_5_1.png" />
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>&lt;matplotlib.colorbar.Colorbar instance at 0x7f0b4b7c1638&gt;</pre>
+</div>
+<img alt="../_images/Untitled0_6_1.png" src="../_images/Untitled0_6_1.png" />
+<div class="code python highlight-python"><div class="highlight"><pre><span class="mf">0.008</span> <span class="o">/</span> <span class="mf">0.2</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">0.04</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">distance</span><span class="o">.</span><span class="n">squareform</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+
+&lt;ipython-input-22-2d2187dbfee2&gt; in &lt;module&gt;()
+----&gt; 1 distance.squareform(x)
+
+
+/home/wd15/anaconda/lib/python2.7/site-packages/scipy/spatial/distance.pyc in squareform(X, force, checks)
+   1469     elif len(s) == 2:
+   1470         if s[0] != s[1]:
+-&gt; 1471             raise ValueError('The matrix argument must be square.')
+   1472         if checks:
+   1473             is_valid_dm(X, throw=True, name='X')
+
+
+ValueError: The matrix argument must be square.</pre>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">y</span> <span class="o">=</span> <span class="n">distance</span><span class="o">.</span><span class="n">pdist</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">distance</span><span class="o">.</span><span class="n">squareform</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="bp">None</span><span class="p">,:]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[:,</span><span class="bp">None</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>  File "&lt;ipython-input-29-ba1c6fc79113&gt;", line 1
+    10!
+      ^
+SyntaxError: invalid syntax</pre>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">P0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mf">0.25</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">P1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">P0</span>
+<span class="p">(</span><span class="n">P0</span> <span class="o">*</span> <span class="mi">120</span> <span class="o">+</span> <span class="n">P1</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.02</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">1.4356194490192342</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="mi">60</span> <span class="o">*</span> <span class="mf">0.02</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">1.2</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="mi">120</span> <span class="o">*</span> <span class="mf">0.02</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">2.4</span>
+</pre></div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

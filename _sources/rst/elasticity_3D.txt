@@ -149,7 +149,7 @@ the ``make_elasticFEstrain_delta`` function.
 
 .. parsed-literal::
 
-    Elapsed Time 60.3490719795 Seconds
+    Elapsed Time 70.2430000305 Seconds
 
 
 Let's take a look at one of the delta microstructures and the
@@ -233,7 +233,7 @@ results from finite element analysis.
 
 .. parsed-literal::
 
-    Elapsed Time 26.1797120571 Seconds
+    Elapsed Time 32.0750000477 Seconds
 
 
 
@@ -255,7 +255,7 @@ the same microstructure to the ``predict`` method.
 
 .. parsed-literal::
 
-    Elapsed Time 0.00110197067261 Seconds
+    Elapsed Time 0.000999927520752 Seconds
 
 
 Finally let's compare the results from finite element simulation and the
@@ -269,6 +269,18 @@ MKS model.
 
 
 .. image:: elasticity_3D_files/elasticity_3D_22_0.png
+
+
+Let's look at the difference between the two plots.
+
+.. code:: python
+
+    from pymks.tools import draw_diff
+    
+    draw_diff((strain[0, center] - strain_pred[0, center]), title='Finite Element - MKS')
+
+
+.. image:: elasticity_3D_files/elasticity_3D_24_0.png
 
 
 The MKS model is able to capture the strain field for the random
@@ -315,11 +327,11 @@ argument of the ``predict`` method to get the strain field.
 
 .. parsed-literal::
 
-    Elapsed Time 0.0062620639801 Seconds
+    Elapsed Time 0.00500011444092 Seconds
 
 
 
-.. image:: elasticity_3D_files/elasticity_3D_29_1.png
+.. image:: elasticity_3D_files/elasticity_3D_31_1.png
 
 
 References
