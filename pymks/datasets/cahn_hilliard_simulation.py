@@ -41,6 +41,7 @@ class CahnHilliardSimulation(object):
 
     In 2D.
 
+    >>> N = 101
     >>> phi = 0.01 * (2 * np.random.random((2, N, N)) - 1)
     >>> ch = CahnHilliardSimulation(gamma=4.)
     >>> for i in range(100):
