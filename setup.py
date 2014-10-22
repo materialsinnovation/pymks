@@ -39,12 +39,11 @@ def getVersion(version, release=False):
         return version + '-dev.' + _git_version
 
 setup(name='pymks',
-      version=getVersion('0.1'),
+      version=getVersion('0.1', release=True),
       description='Package for the Materials Knowledge System (MKS)',
       author='Daniel Wheeler',
       author_email='daniel.wheeler2@gmail.com',
       url='http://pymks.org',
       packages=find_packages(),
       package_data={'' : ['tests/*.py']},
-      install_requires=['nose', 'numpy', 'scikit-learn', 'scipy']
       )
