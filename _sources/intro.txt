@@ -38,7 +38,7 @@ The Influence Coefficients
 Once the state space is discretized, the relationship between the
 response :math:`p` and microstructure :math:`m_h` can be written as,
 
-.. math::  p\left[i\right] = \sum_{h=0}^{n-1} \alpha_h\left[j\right] m_h\left[i + j\right] 
+.. math::  p\left[i\right] = \sum_{h=0}^{n-1} \alpha_h\left[j\right] m_h\left[i - j\right] 
 
 where the :math:`\alpha_h` are known as the influence coefficients and
 describe the relationship between :math:`p` and :math:`m_h`. The
@@ -59,7 +59,7 @@ regression is reduced from $ (N^2 N\_{} N^2 H )$ to
 :math:`\left(N_{\text{sample}} \times H \right)` for each point in the
 Fourier space of size :math:`N^2`. The convolution,
 
-.. math::  \sum_{h=0}^{n-1} \alpha_h\left[j\right] m_h \left[i + j\right] 
+.. math::  \sum_{h=0}^{n-1} \alpha_h\left[j\right] m_h \left[i - j\right] 
 
 can be deconvolved in Fourier space using the `circular convolution
 theorem <http://en.wikipedia.org/wiki/Discrete_Fourier_transform#Circular_convolution_theorem_and_cross-correlation_theorem>`__.
@@ -74,6 +74,23 @@ then we just need to solve
 
 with a linear regression at each discretization location in :math:`k` to
 calculate the :math:`\beta_h`.
+
+Note about Notation
+^^^^^^^^^^^^^^^^^^^
+
+Throughout PyMKS, the notation follows the signal processing convention
+of using square brackets [] for discrete variables and round () brackets
+for continuous variables. As an example, let :math:`x` be a continous
+variable and :math:`x_i` be a discrete value of :math:`x` at location
+:math:`i`. Then the discrete and continous version of a function
+:math:`h` have the following relationship,
+
+.. math::  h[i] = h(x_i) 
+
+A discrete convolution also has an implied sumation on repeated
+indicies,
+
+.. math::  h[i] = h(x_i) = \sum_j f(x_j) g(x_i - x_j) = \sum_j f[j] g[i - j] = f[j] g[i - j] 
 
 A PyMKS Example
 ---------------

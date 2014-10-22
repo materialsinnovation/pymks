@@ -36,12 +36,12 @@ Recall the previous `Cahn-Hilliard
 example <http://pymks.org/rst/cahn_hilliard_Legendre.html>`__, the
 convolution at time :math:`t` is given by
 
-.. math::  p^t\left[i\right] = \sum_{h=0}^{n-1} \alpha_h \left[j\right] m_h^{t}\left[i + j\right] 
+.. math::  p\left[i, t \right] = \sum_{h=0}^{n-1} \alpha_h \left[j\right] m_h\left[i - j, t\right] 
 
 In this example the :math:`p` are an approximation of the updated
 :math:`\phi` such that,
 
-.. math::  p^{t} \left[i\right] \approx \phi^{t+\Delta t} \left[i\right] 
+.. math::  p \left[i, t\right] \approx \phi \left[i, t + \Delta t \right] 
 
 The ``ContinuousIndicatorBasis`` uses a simple primitive or binned basis
 to discretize state space such that
@@ -78,21 +78,22 @@ from a value :math:`\phi` so it is arbitrary in terms of how this is
 achieved. The following steps show how to construct the :math:`c_h`.
 Start with a Legendre series,
 
-.. math::  f \left( \xi, \phi \right) = \sum_{l = 0}^\infty c_{l} \left(\phi\right) P_l (\xi) 
+.. math::  f \left( \eta, \phi \right) = \sum_{l = 0}^\infty c_{l} \left(\phi\right) P_l (\eta) 
 
-where :math:`\xi` is a continuous variable such :math:`-1 \le \xi \le 1`
-and :math:`\phi` is a fixed value at a location in discretized space
-(the :math:`[i]` is dropped for convenience). Using
+where :math:`\eta` is a continuous variable such
+:math:`-1 \le \eta \le 1` and :math:`\phi` is a fixed value at a
+location in discretized space (the :math:`[i]` is dropped for
+convenience). Using
 
-.. math::  \int_{-1}^{1} P_l \left( \xi \right)  P_h \left( \xi \right) d\xi = \delta_{lh}\frac{2}{2h + 1} 
+.. math::  \int_{-1}^{1} P_l \left( \eta \right)  P_h \left( \eta \right) d\xi = \delta_{lh}\frac{2}{2h + 1} 
 
 and the expression for :math:`f` above, we can write the :math:`c_l` as
 
-.. math::  c_h \left(\phi\right) = \frac{2h +1}{2} \int_{-1}^1 P_h \left(\xi\right) f\left( \xi, \phi \right) d\xi 
+.. math::  c_h \left(\phi\right) = \frac{2h +1}{2} \int_{-1}^1 P_h \left(\eta \right) f\left( \eta, \phi \right) d\eta 
 
 Now we choose :math:`f` such that
 
-.. math::  f \left(\xi, \phi\right) = \delta\left(\phi - \xi\right) 
+.. math::  f \left(\eta, \phi\right) = \delta\left(\phi - \eta \right) 
 
 where we are conveniently assuming that :math:`\phi` has the same range
 has :math:`\xi` (a linear mapping would be needed if this wasn't the
@@ -146,7 +147,7 @@ domain given by ``size``.
     import pymks
     from pymks.datasets import make_cahn_hilliard
     
-    L = 40
+    L = 41
     n_samples = 400
     dt = 1e-2
     np.random.seed(101)
@@ -162,14 +163,8 @@ look at one of them.
     
     draw_concentrations(X[0], y[0], title0='time = 0', title1='time = 1')
 
-.. parsed-literal::
 
-    c:\Users\dbrough3\AppData\Local\Continuum\Anaconda\lib\site-packages\matplotlib\figure.py:1595: UserWarning: This figure includes Axes that are not compatible with tight_layout, so its results might be incorrect.
-      warnings.warn("This figure includes Axes that are not "
-
-
-
-.. image:: cahn_hilliard_Legendre_files/cahn_hilliard_Legendre_7_1.png
+.. image:: cahn_hilliard_Legendre_files/cahn_hilliard_Legendre_7_0.png
 
 
 Calibrate Influence Coefficients
@@ -226,7 +221,7 @@ terms. More terms don't improve the mean square error.
 
 .. parsed-literal::
 
-    MKSRegressionModel(basis=<pymks.bases.legendre.LegendreBasis object at 0x0000000013B0A5F8>,
+    MKSRegressionModel(basis=<pymks.bases.legendre.LegendreBasis object at 0x7f0cd8778bd0>,
               n_states=4)
     1.0
 
@@ -322,7 +317,8 @@ into the Cahn-Hilliard simulation and the MKS models.
     time_steps = 55
     
     for ii in range(time_steps):
-        phi = CHSim.get_response(phi)
+        CHSim.run(phi)
+        phi = CHSim.response
         phi_bin_pred = BinModel.predict(phi_bin_pred)
         phi_legendre_pred = LegendreModel.predict(phi_legendre_pred)
 Let's take a look at the concentration fields.
@@ -353,8 +349,8 @@ and the simulation.
 
 .. parsed-literal::
 
-    Bin mse = 2.38832160661e-05
-    Legendre mse = 1.36417883712e-27
+    Bin mse = 1.80502822095e-05
+    Legendre mse = 2.41297167879e-28
 
 
 
@@ -409,7 +405,8 @@ models.
 .. code:: python
 
     for ii in range(1000):
-        phi = CHSim.get_response(phi)
+        CHSim.run(phi)
+        phi = CHSim.response
         phi_bin_pred = BinModel.predict(phi_bin_pred)
         phi_legendre_pred = LegendreModel.predict(phi_legendre_pred)
 .. code:: python
@@ -435,8 +432,8 @@ look at the difference between the simulation and the MKS models.
 
 .. parsed-literal::
 
-    Bin mse = 0.0192607235163
-    Legendre mse = 7.11131823002e-05
+    Bin mse = 0.0224155756811
+    Legendre mse = 4.50746556477e-08
 
 
 

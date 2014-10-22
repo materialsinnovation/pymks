@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1-dev',
+        VERSION:     '0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -157,7 +157,7 @@ time step using <tt class="docutils literal"><span class="pre">dt</span></tt>.</
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pymks</span>
 <span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_cahn_hilliard</span>
 
-<span class="n">L</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mi">41</span>
 <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">400</span>
 <span class="n">dt</span> <span class="o">=</span> <span class="mf">1e-2</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">99</span><span class="p">)</span>
@@ -200,7 +200,7 @@ split can be set using <tt class="docutils literal"><span class="pre">random_sta
 <span class="k">print</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">41</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>We are now going to calibrate the influence coefficients while varying
@@ -236,7 +236,7 @@ overfit the data.</p>
 </pre></div>
 </div>
 <div class="highlight-python"><pre>GridSearchCV(cv=5,
-       estimator=MKSRegressionModel(basis=&lt;pymks.bases.continuous.ContinuousIndicatorBasis object at 0xabfdc4ec&gt;,
+       estimator=MKSRegressionModel(basis=&lt;pymks.bases.continuous.ContinuousIndicatorBasis object at 0x7f484b2c68d0&gt;,
           n_states=2),
        fit_params={}, iid=True, loss_func=None, n_jobs=1,
        param_grid={'n_states': array([ 2,  3,  4,  5,  6,  7,  8,  9, 10])},
@@ -247,19 +247,16 @@ overfit the data.</p>
 <span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>MKSRegressionModel(basis=&lt;pymks.bases.continuous.ContinuousIndicatorBasis object at 0xabfdc0ac&gt;,
+<div class="highlight-python"><pre>MKSRegressionModel(basis=&lt;pymks.bases.continuous.ContinuousIndicatorBasis object at 0x7f484b3d64d0&gt;,
           n_states=10)
-0.999999081316</pre>
+0.99999908222</pre>
 </div>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_gridscores</span>
 
 <span class="n">draw_gridscores</span><span class="p">(</span><span class="n">gs</span><span class="o">.</span><span class="n">grid_scores_</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>/home/david/anaconda/lib/python2.7/site-packages/matplotlib/axes.py:4747: UserWarning: No labeled objects found. Use label='...' kwarg on individual plots.
-  warnings.warn("No labeled objects found. "</pre>
-</div>
-<img alt="../_images/cahn_hilliard_14_1.png" src="../_images/cahn_hilliard_14_1.png" />
+<img alt="../_images/cahn_hilliard_14_0.png" src="../_images/cahn_hilliard_14_0.png" />
 <p>As expected the accuracy of the MKS model monotonically increases as we
 increase n_states, but accuracy doesn&#8217;t improve significantly as
 n_states gets larger than signal digits.</p>
@@ -300,7 +297,8 @@ into the Cahn-Hilliard simulation and the MKS model.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="n">time_steps</span> <span class="o">=</span> <span class="mi">10</span>
 
 <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">time_steps</span><span class="p">):</span>
-    <span class="n">phi</span> <span class="o">=</span> <span class="n">CHSim</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">CHSim</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">CHSim</span><span class="o">.</span><span class="n">response</span>
     <span class="n">phi_pred</span> <span class="o">=</span> <span class="n">MKSmodel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">phi_pred</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -329,7 +327,8 @@ coefficients and provide a larger initial concentratio field.</p>
 concentration fields back into the Cahn-Hilliard simulation and the MKS
 model.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
-    <span class="n">phi</span> <span class="o">=</span> <span class="n">CHSim</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">CHSim</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">CHSim</span><span class="o">.</span><span class="n">response</span>
     <span class="n">phi_pred</span> <span class="o">=</span> <span class="n">MKSmodel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">phi_pred</span><span class="p">)</span>
 </pre></div>
 </div>

@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.1-dev',
+        VERSION:     '0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -55,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="#"><img src="_static/pymks_logo.png">
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -175,7 +175,7 @@ and <span class="math">\(n\)</span> is the number of states. For example if
 <p>Once the state space is discretized, the relationship between the
 response <span class="math">\(p\)</span> and microstructure <span class="math">\(m_h\)</span> can be written as,</p>
 <div class="math">
-\[p\left[i\right] = \sum_{h=0}^{n-1} \alpha_h\left[j\right] m_h\left[i + j\right]\]</div>
+\[p\left[i\right] = \sum_{h=0}^{n-1} \alpha_h\left[j\right] m_h\left[i - j\right]\]</div>
 <p>where the <span class="math">\(\alpha_h\)</span> are known as the influence coefficients and
 describe the relationship between <span class="math">\(p\)</span> and <span class="math">\(m_h\)</span>. The
 <span class="math">\(p\)</span> are a spatial convolution of <span class="math">\(\alpha_h\)</span> and <span class="math">\(m_h\)</span>.
@@ -193,7 +193,7 @@ regression is reduced from $ (N^2 N_{} N^2 H )$ to
 <span class="math">\(\left(N_{\text{sample}} \times H \right)\)</span> for each point in the
 Fourier space of size <span class="math">\(N^2\)</span>. The convolution,</p>
 <div class="math">
-\[\sum_{h=0}^{n-1} \alpha_h\left[j\right] m_h \left[i + j\right]\]</div>
+\[\sum_{h=0}^{n-1} \alpha_h\left[j\right] m_h \left[i - j\right]\]</div>
 <p>can be deconvolved in Fourier space using the <a class="reference external" href="http://en.wikipedia.org/wiki/Discrete_Fourier_transform#Circular_convolution_theorem_and_cross-correlation_theorem">circular convolution
 theorem</a>.</p>
 <p>If we write
@@ -205,6 +205,21 @@ then we just need to solve</p>
 \[P\left[k\right] = \sum_{h=0}^{n-1} \beta_h \left[k\right] M_h \left[k\right]\]</div>
 <p>with a linear regression at each discretization location in <span class="math">\(k\)</span> to
 calculate the <span class="math">\(\beta_h\)</span>.</p>
+<div class="section" id="note-about-notation">
+<h4>Note about Notation<a class="headerlink" href="#note-about-notation" title="Permalink to this headline">¶</a></h4>
+<p>Throughout PyMKS, the notation follows the signal processing convention
+of using square brackets [] for discrete variables and round () brackets
+for continuous variables. As an example, let <span class="math">\(x\)</span> be a continous
+variable and <span class="math">\(x_i\)</span> be a discrete value of <span class="math">\(x\)</span> at location
+<span class="math">\(i\)</span>. Then the discrete and continous version of a function
+<span class="math">\(h\)</span> have the following relationship,</p>
+<div class="math">
+\[h[i] = h(x_i)\]</div>
+<p>A discrete convolution also has an implied sumation on repeated
+indicies,</p>
+<div class="math">
+\[h[i] = h(x_i) = \sum_j f(x_j) g(x_i - x_j) = \sum_j f[j] g[i - j] = f[j] g[i - j]\]</div>
+</div>
 </div>
 </div>
 <div class="section" id="a-pymks-example">

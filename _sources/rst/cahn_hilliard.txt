@@ -61,7 +61,7 @@ time step using ``dt``.
     import pymks
     from pymks.datasets import make_cahn_hilliard
     
-    L = 40
+    L = 41
     n_samples = 400
     dt = 1e-2
     np.random.seed(99)
@@ -116,7 +116,7 @@ split can be set using ``random_state``.
 
 .. parsed-literal::
 
-    (200, 40, 40)
+    (200, 41, 41)
 
 
 We are now going to calibrate the influence coefficients while varying
@@ -160,7 +160,7 @@ overfit the data.
 .. parsed-literal::
 
     GridSearchCV(cv=5,
-           estimator=MKSRegressionModel(basis=<pymks.bases.continuous.ContinuousIndicatorBasis object at 0xabfdc4ec>,
+           estimator=MKSRegressionModel(basis=<pymks.bases.continuous.ContinuousIndicatorBasis object at 0x7f484b2c68d0>,
               n_states=2),
            fit_params={}, iid=True, loss_func=None, n_jobs=1,
            param_grid={'n_states': array([ 2,  3,  4,  5,  6,  7,  8,  9, 10])},
@@ -176,9 +176,9 @@ overfit the data.
 
 .. parsed-literal::
 
-    MKSRegressionModel(basis=<pymks.bases.continuous.ContinuousIndicatorBasis object at 0xabfdc0ac>,
+    MKSRegressionModel(basis=<pymks.bases.continuous.ContinuousIndicatorBasis object at 0x7f484b3d64d0>,
               n_states=10)
-    0.999999081316
+    0.99999908222
 
 
 .. code:: python
@@ -187,14 +187,8 @@ overfit the data.
     
     draw_gridscores(gs.grid_scores_)
 
-.. parsed-literal::
 
-    /home/david/anaconda/lib/python2.7/site-packages/matplotlib/axes.py:4747: UserWarning: No labeled objects found. Use label='...' kwarg on individual plots.
-      warnings.warn("No labeled objects found. "
-
-
-
-.. image:: cahn_hilliard_files/cahn_hilliard_14_1.png
+.. image:: cahn_hilliard_files/cahn_hilliard_14_0.png
 
 
 As expected the accuracy of the MKS model monotonically increases as we
@@ -250,7 +244,8 @@ into the Cahn-Hilliard simulation and the MKS model.
     time_steps = 10
     
     for ii in range(time_steps):
-        phi = CHSim.get_response(phi)
+        CHSim.run(phi)
+        phi = CHSim.response
         phi_pred = MKSmodel.predict(phi_pred)
 Let's take a look at the concentration fields.
 
@@ -288,7 +283,8 @@ model.
 .. code:: python
 
     for ii in range(1000):
-        phi = CHSim.get_response(phi)
+        CHSim.run(phi)
+        phi = CHSim.response
         phi_pred = MKSmodel.predict(phi_pred)
 Let's take a look at the results.
 

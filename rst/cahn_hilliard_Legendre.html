@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1-dev',
+        VERSION:     '0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -136,11 +136,11 @@ details.</p>
 example</a>, the
 convolution at time <span class="math">\(t\)</span> is given by</p>
 <div class="math">
-\[p^t\left[i\right] = \sum_{h=0}^{n-1} \alpha_h \left[j\right] m_h^{t}\left[i + j\right]\]</div>
+\[p\left[i, t \right] = \sum_{h=0}^{n-1} \alpha_h \left[j\right] m_h\left[i - j, t\right]\]</div>
 <p>In this example the <span class="math">\(p\)</span> are an approximation of the updated
 <span class="math">\(\phi\)</span> such that,</p>
 <div class="math">
-\[p^{t} \left[i\right] \approx \phi^{t+\Delta t} \left[i\right]\]</div>
+\[p \left[i, t\right] \approx \phi \left[i, t + \Delta t \right]\]</div>
 <p>The <tt class="docutils literal"><span class="pre">ContinuousIndicatorBasis</span></tt> uses a simple primitive or binned basis
 to discretize state space such that</p>
 <div class="math">
@@ -171,18 +171,19 @@ from a value <span class="math">\(\phi\)</span> so it is arbitrary in terms of h
 achieved. The following steps show how to construct the <span class="math">\(c_h\)</span>.
 Start with a Legendre series,</p>
 <div class="math">
-\[f \left( \xi, \phi \right) = \sum_{l = 0}^\infty c_{l} \left(\phi\right) P_l (\xi)\]</div>
-<p>where <span class="math">\(\xi\)</span> is a continuous variable such <span class="math">\(-1 \le \xi \le 1\)</span>
-and <span class="math">\(\phi\)</span> is a fixed value at a location in discretized space
-(the <span class="math">\([i]\)</span> is dropped for convenience). Using</p>
+\[f \left( \eta, \phi \right) = \sum_{l = 0}^\infty c_{l} \left(\phi\right) P_l (\eta)\]</div>
+<p>where <span class="math">\(\eta\)</span> is a continuous variable such
+<span class="math">\(-1 \le \eta \le 1\)</span> and <span class="math">\(\phi\)</span> is a fixed value at a
+location in discretized space (the <span class="math">\([i]\)</span> is dropped for
+convenience). Using</p>
 <div class="math">
-\[\int_{-1}^{1} P_l \left( \xi \right)  P_h \left( \xi \right) d\xi = \delta_{lh}\frac{2}{2h + 1}\]</div>
+\[\int_{-1}^{1} P_l \left( \eta \right)  P_h \left( \eta \right) d\xi = \delta_{lh}\frac{2}{2h + 1}\]</div>
 <p>and the expression for <span class="math">\(f\)</span> above, we can write the <span class="math">\(c_l\)</span> as</p>
 <div class="math">
-\[c_h \left(\phi\right) = \frac{2h +1}{2} \int_{-1}^1 P_h \left(\xi\right) f\left( \xi, \phi \right) d\xi\]</div>
+\[c_h \left(\phi\right) = \frac{2h +1}{2} \int_{-1}^1 P_h \left(\eta \right) f\left( \eta, \phi \right) d\eta\]</div>
 <p>Now we choose <span class="math">\(f\)</span> such that</p>
 <div class="math">
-\[f \left(\xi, \phi\right) = \delta\left(\phi - \xi\right)\]</div>
+\[f \left(\eta, \phi\right) = \delta\left(\phi - \eta \right)\]</div>
 <p>where we are conveniently assuming that <span class="math">\(\phi\)</span> has the same range
 has <span class="math">\(\xi\)</span> (a linear mapping would be needed if this wasn&#8217;t the
 case). This choice of a <span class="math">\(\delta\)</span> function is good in two ways, it
@@ -227,7 +228,7 @@ domain given by <tt class="docutils literal"><span class="pre">size</span></tt>.
 <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pymks</span>
 <span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_cahn_hilliard</span>
 
-<span class="n">L</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mi">41</span>
 <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">400</span>
 <span class="n">dt</span> <span class="o">=</span> <span class="mf">1e-2</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">101</span><span class="p">)</span>
@@ -243,11 +244,7 @@ look at one of them.</p>
 <span class="n">draw_concentrations</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title0</span><span class="o">=</span><span class="s">&#39;time = 0&#39;</span><span class="p">,</span> <span class="n">title1</span><span class="o">=</span><span class="s">&#39;time = 1&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="literal-block">
-c:Usersdbrough3AppDataLocalContinuumAnacondalibsite-packagesmatplotlibfigure.py:1595: UserWarning: This figure includes Axes that are not compatible with tight_layout, so its results might be incorrect.
-  warnings.warn(&quot;This figure includes Axes that are not &quot;
-</pre>
-<img alt="../_images/cahn_hilliard_Legendre_7_1.png" src="../_images/cahn_hilliard_Legendre_7_1.png" />
+<img alt="../_images/cahn_hilliard_Legendre_7_0.png" src="../_images/cahn_hilliard_Legendre_7_0.png" />
 </div>
 <div class="section" id="calibrate-influence-coefficients">
 <h2>Calibrate Influence Coefficients<a class="headerlink" href="#calibrate-influence-coefficients" title="Permalink to this headline">¶</a></h2>
@@ -294,7 +291,7 @@ terms. More terms don&#8217;t improve the mean square error.</p>
 <span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>MKSRegressionModel(basis=&lt;pymks.bases.legendre.LegendreBasis object at 0x0000000013B0A5F8&gt;,
+<div class="highlight-python"><pre>MKSRegressionModel(basis=&lt;pymks.bases.legendre.LegendreBasis object at 0x7f0cd8778bd0&gt;,
           n_states=4)
 1.0</pre>
 </div>
@@ -367,7 +364,8 @@ into the Cahn-Hilliard simulation and the MKS models.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="n">time_steps</span> <span class="o">=</span> <span class="mi">55</span>
 
 <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">time_steps</span><span class="p">):</span>
-    <span class="n">phi</span> <span class="o">=</span> <span class="n">CHSim</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">CHSim</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">CHSim</span><span class="o">.</span><span class="n">response</span>
     <span class="n">phi_bin_pred</span> <span class="o">=</span> <span class="n">BinModel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">phi_bin_pred</span><span class="p">)</span>
     <span class="n">phi_legendre_pred</span> <span class="o">=</span> <span class="n">LegendreModel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">phi_legendre_pred</span><span class="p">)</span>
 </pre></div>
@@ -391,8 +389,8 @@ and the simulation.</p>
 <span class="k">print</span> <span class="s">&#39;Legendre mse =&#39;</span><span class="p">,</span><span class="n">mse</span><span class="p">(</span><span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">phi_legendre_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>Bin mse = 2.38832160661e-05
-Legendre mse = 1.36417883712e-27</pre>
+<div class="highlight-python"><pre>Bin mse = 1.80502822095e-05
+Legendre mse = 2.41297167879e-28</pre>
 </div>
 <img alt="../_images/cahn_hilliard_Legendre_28_1.png" src="../_images/cahn_hilliard_Legendre_28_1.png" />
 <p>The Legendre polynomial basis clearly out performs the binned basis for
@@ -423,7 +421,8 @@ the same value of <tt class="docutils literal"><span class="pre">n_states</span>
 concentration fields back into the Cahn-Hilliard simulation and the MKS
 models.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
-    <span class="n">phi</span> <span class="o">=</span> <span class="n">CHSim</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">CHSim</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">CHSim</span><span class="o">.</span><span class="n">response</span>
     <span class="n">phi_bin_pred</span> <span class="o">=</span> <span class="n">BinModel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">phi_bin_pred</span><span class="p">)</span>
     <span class="n">phi_legendre_pred</span> <span class="o">=</span> <span class="n">LegendreModel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">phi_legendre_pred</span><span class="p">)</span>
 </pre></div>
@@ -443,8 +442,8 @@ look at the difference between the simulation and the MKS models.</p>
 <span class="k">print</span> <span class="s">&#39;Legendre mse =&#39;</span><span class="p">,</span><span class="n">mse</span><span class="p">(</span><span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">phi_legendre_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>Bin mse = 0.0192607235163
-Legendre mse = 7.11131823002e-05</pre>
+<div class="highlight-python"><pre>Bin mse = 0.0224155756811
+Legendre mse = 4.50746556477e-08</pre>
 </div>
 <img alt="../_images/cahn_hilliard_Legendre_40_1.png" src="../_images/cahn_hilliard_Legendre_40_1.png" />
 <p>With the resized influence coefficients, the Legendre polynomial
