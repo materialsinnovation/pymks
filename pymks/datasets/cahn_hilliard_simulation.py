@@ -86,8 +86,16 @@ class CahnHilliardSimulation(object):
             raise RuntimeError("X must represent a square domain")
 
         L = self.dx * N
-        k = np.arange(N)
-        k[N / 2:] = (k - N / 2)[:N / 2]
+        k = np.arange(N) 
+        
+        if N % 2 == 0:
+            N1 = N / 2
+            N2 = N1
+        else:
+            N1 = (N - 1) / 2
+            N2 = N1 + 1
+
+        k[N2:] = (k - N1)[:N1]
         k = k * 2 * np.pi / L
 
         i_ = np.indices(X.shape[1:])
