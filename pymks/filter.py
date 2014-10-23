@@ -97,15 +97,15 @@ class Correlation(Filter):
     >>> X_ = basis.discretize(X)
     >>> filter_ = Correlation(X_)
     >>> X_auto = filter_.convolve(X_)
-    >>> X_test = np.array([[[[1/3., 0.  ],
-    ...                      [2/3., 1/3.],
-    ...                      [1/3., 0.  ]],
-    ...                     [[1/3., 0.  ],
-    ...                      [2/3., 1/3.],
-    ...                      [1/3., 0.  ]],
-    ...                     [[1/3., 0.  ],
-    ...                      [2/3., 1/3.],
-    ...                      [1/3., 0.  ]]]])
+    >>> X_test = np.array([[[[3., 0.  ],
+    ...                      [6., 3.],
+    ...                      [3., 0.  ]],
+    ...                     [[3., 0.  ],
+    ...                      [6., 3.],
+    ...                      [3., 0.  ]],
+    ...                     [[3., 0.  ],
+    ...                      [6., 3.],
+    ...                      [3., 0.  ]]]])
     >>> assert(np.allclose(X_auto, X_test))
 
     Ags:
@@ -113,31 +113,11 @@ class Correlation(Filter):
     Returns:
       Autocorrelations for microstructure X
     '''
-    def __init__(self, kernel):
+    def __init__(self, kernel, Fkernel_shape=None):
         axes = np.arange(len(kernel.shape) - 2) + 1
-        Fkernel = np.conjugate(np.fft.fftn(kernel, axes=axes))
-        super(Correlation, self).__init__(Fkernel)
-
-    def convolve(self, X):
-        X_auto = super(Correlation, self).convolve(X)
-        return np.fft.fftshift(X_auto, axes=self.axes) / np.prod(X.shape[1:-1])
-
-    def _sum(self, Fy):
-        return Fy
-
-class CorrelationNonPeriodic(Correlation):
-    def __init__(self, kernel, periodic_axes=()):
-        axes = np.arange(len(kernel.shape) - 2) + 1
-        a = np.ones(len(axes), dtype=int)
-        a[periodic_axes] = 2
-        # Fkernel_shape = np.array(kernel.shape) * np.array((1,) + tuple(a) + (1,))
-        Fkernel_shape = np.array(kernel.shape)[axes] * a
-        print 'axes',axes
-        import pdb; pdb.set_trace()
         Fkernel = np.conjugate(np.fft.fftn(kernel, axes=axes, s=Fkernel_shape))
         super(Correlation, self).__init__(Fkernel)
 
-    
     def convolve(self, X):
         """
         Convolve X with a kernel in frequency space.
@@ -148,8 +128,11 @@ class CorrelationNonPeriodic(Correlation):
         Returns:
           convolution of X with the kernel
         """
-        if X.shape[1:] != self.Fkernel.shape[1:]:
-            raise RuntimeError("Dimensions of X are incorrect.")
-        FX = np.fft.fftn(X, axes=self.axes, s=self.Fkernel.shape)
+        Fkernel_shape = np.array(self.Fkernel.shape)[self.axes]
+        FX = np.fft.fftn(X, axes=self.axes, s=Fkernel_shape)
         Fy = self._sum(FX * self.Fkernel)
-        return np.fft.ifftn(Fy, axes=self.axes).real
+        correlation = np.fft.ifftn(Fy, axes=self.axes)
+        return np.fft.fftshift(correlation, axes=self.axes)
+
+    def _sum(self, Fy):
+        return Fy
