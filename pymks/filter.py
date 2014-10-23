@@ -124,3 +124,32 @@ class Correlation(Filter):
 
     def _sum(self, Fy):
         return Fy
+
+class CorrelationNonPeriodic(Correlation):
+    def __init__(self, kernel, periodic_axes=()):
+        axes = np.arange(len(kernel.shape) - 2) + 1
+        a = np.ones(len(axes), dtype=int)
+        a[periodic_axes] = 2
+        # Fkernel_shape = np.array(kernel.shape) * np.array((1,) + tuple(a) + (1,))
+        Fkernel_shape = np.array(kernel.shape)[axes] * a
+        print 'axes',axes
+        import pdb; pdb.set_trace()
+        Fkernel = np.conjugate(np.fft.fftn(kernel, axes=axes, s=Fkernel_shape))
+        super(Correlation, self).__init__(Fkernel)
+
+    
+    def convolve(self, X):
+        """
+        Convolve X with a kernel in frequency space.
+
+        Args:
+          X: array to be convolved
+
+        Returns:
+          convolution of X with the kernel
+        """
+        if X.shape[1:] != self.Fkernel.shape[1:]:
+            raise RuntimeError("Dimensions of X are incorrect.")
+        FX = np.fft.fftn(X, axes=self.axes, s=self.Fkernel.shape)
+        Fy = self._sum(FX * self.Fkernel)
+        return np.fft.ifftn(Fy, axes=self.axes).real
