@@ -73,6 +73,25 @@ def crosscorrelate(X_, periodic_axes=[]):
     return np.concatenate(tmp, axis=-1)[..., :Nslice] / normalize(X_, s)
 
 def normalize(X_, Fkernel_shape):
+    """
+    Returns the normalization for the statistics
+
+    The normalization should be Nx * Ny in the center of the domain.
+    
+    >>> Nx = Ny = 5
+    >>> X_ = np.zeros((1, Nx, Ny, 1))
+    >>> Fkernel_shape = np.array((2 * Nx, Ny))
+    >>> norm =  normalize(X_, Fkernel_shape)
+    >>> assert norm.shape == (1, 2 * Nx, Ny, 1)
+    >>> assert np.allclose(norm[0, Nx, Ny / 2, 0], 25)
+    
+    Args:
+      X_: discretized microstructure (array)
+      Fkernel_shape: the shape of the kernel is Fourier space (array)
+    Returns:
+      Normalization 
+      
+    """
     if (Fkernel_shape == X_.shape[1:-1]).all():
         return np.prod(X_.shape[1:-1])
     else:
@@ -81,6 +100,16 @@ def normalize(X_, Fkernel_shape):
         return corr.convolve(ones)
 
 def Fkernel_shape(X_, periodic_axes):
+    """
+    Returns the shape of the kernel in Fourier space with non-periodic padding.
+
+    >>> Nx = Ny = 5
+    >>> X_ = np.zeros((1, Nx, Ny, 1))
+    >>> periodic_axes = [1]
+    >>> print Fkernel_shape(X_, periodic_axes=periodic_axes)
+    [8 5]
+    
+    """
     axes = np.arange(len(X_.shape) - 2) + 1
     a = np.ones(len(axes), dtype=float) * 1.6
     a[periodic_axes] = 1
