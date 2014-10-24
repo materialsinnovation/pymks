@@ -64,12 +64,13 @@ def test_nonperiodic_crosscorrelation():
     X_ = basis.discretize(X)
     X_cross = crosscorrelate(X_)
 
-    X_result = np.array([[[1 / 3., 4 / 9., 0.5,  4 / 9, ],
+    X_result = np.array([[[1 / 3., 4 / 9., 0.5,  4 / 9., ],
                           [1 / 8., 0.25, 3 / 16, 0.25],
                           [0., 1 / 7.,  0., 1 / 7.],
                           [0., 1 / 20., 0.15, 1 / 20.],
                           [0,   0,    0,   0]]])
-
+    print X_cross[..., 0]
+    print X_cross[..., 0].shape
     assert(np.allclose(X_result, X_cross[..., 0]))
 
 
@@ -99,3 +100,6 @@ def test_periodic_crosscorrelation():
 
 if __name__ == '__main__':
     test_periodic_crosscorrelation()
+    test_nonperiodic_crosscorrelation()
+    test_periodic_autocorrelation()
+    test_nonperiodic_autocorrelation()

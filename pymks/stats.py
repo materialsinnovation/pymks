@@ -22,15 +22,14 @@ def autocorrelate(X_, periodic_axes=[]):
     >>> basis = DiscreteIndicatorBasis(n_states=n_states)
     >>> X_ = basis.discretize(X)
     >>> X_auto = autocorrelate(X_)
-    >>> X_test = np.array([[[0., 0., 0., 0., 0.],
-    ...                   [0., 0., 0., 0., 0.],
-    ...                   [0., 0., 1./9, 0., 0.],
-    ...                   [0., 0., 0., 0., 0.],
-    ...                   [0., 0., 0., 0., 0.]]])
+    >>> X_test = np.array([[[0., 0., 0.],
+    ...                   [0., 1./9, 0.],
+    ...                   [0., 0., 0.]]])
     >>> assert(np.allclose(np.real_if_close(X_auto[0, ..., 1]), X_test[0]))
     """
     s = Fkernel_shape(X_, periodic_axes)
-    return Correlation(X_, Fkernel_shape=s).convolve(X_) / normalize(X_, s)
+    corr = Correlation(X_, Fkernel_shape=s).convolve(X_)
+    return truncate(corr, X_.shape[:-1]) / normalize(X_, s)
 
 
 def crosscorrelate(X_, periodic_axes=[]):
@@ -88,7 +87,8 @@ def crosscorrelate(X_, periodic_axes=[]):
                        Fkernel_shape=s).convolve(np.roll(X_, i,
                                                          axis=-1)) for i
            in range(1, Niter + 1)]
-    return np.concatenate(tmp, axis=-1)[..., :Nslice] / normalize(X_, s)
+    corr = np.concatenate(tmp, axis=-1)[..., :Nslice]
+    return truncate(corr, X_.shape[:-1]) / normalize(X_, s)
 
 
 def normalize(X_, Fkernel_shape):
@@ -101,8 +101,8 @@ def normalize(X_, Fkernel_shape):
     >>> X_ = np.zeros((1, Nx, Ny, 1))
     >>> Fkernel_shape = np.array((2 * Nx, Ny))
     >>> norm =  normalize(X_, Fkernel_shape)
-    >>> assert norm.shape == (1, 2 * Nx, Ny, 1)
-    >>> assert np.allclose(norm[0, Nx, Ny / 2, 0], 25)
+    >>> assert norm.shape == (1, Nx, Ny, 1)
+    >>> assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
 
     Args:
       X_: discretized microstructure (array)
@@ -116,7 +116,7 @@ def normalize(X_, Fkernel_shape):
     else:
         ones = np.ones(X_.shape)
         corr = Correlation(ones, Fkernel_shape=Fkernel_shape)
-        return corr.convolve(ones)
+        return truncate(corr.convolve(ones), X_.shape[:-1])
 
 
 def Fkernel_shape(X_, periodic_axes):
@@ -126,7 +126,7 @@ def Fkernel_shape(X_, periodic_axes):
     >>> Nx = Ny = 5
     >>> X_ = np.zeros((1, Nx, Ny, 1))
     >>> periodic_axes = [1]
-    >>> assert(Fkernel_shape(X_, periodic_axes=periodic_axes), [8, 5])
+    >>> assert (Fkernel_shape(X_, periodic_axes=periodic_axes) == [8, 5]).all()
 
     Args:
       X_ : microstructure funciton
@@ -137,6 +137,44 @@ def Fkernel_shape(X_, periodic_axes):
 
     """
     axes = np.arange(len(X_.shape) - 2) + 1
-    a = np.ones(len(axes), dtype=float) * 1.98
+    a = np.ones(len(axes), dtype=float) * 1.75
     a[list(periodic_axes)] = 1
     return (np.array(X_.shape)[axes] * a).astype(int)
+
+
+def truncate(a, shape):
+    """
+    Truncates the edges of the array, a, based on the shape. This is
+    used to unpad a padded convolution.
+
+    >>> print truncate(np.arange(10), (5,))
+    [3 4 5 6 7]
+    >>> print truncate(np.arange(9), (5,))
+    [2 3 4 5 6]
+    >>> print truncate(np.arange(10), (4,))
+    [3 4 5 6]
+    >>> print truncate(np.arange(9), (4,))
+    [3 4 5 6]
+
+    >>> a = np.arange(5 * 4).reshape((5, 4))
+    >>> print truncate(a, shape=(3, 2))
+    [[ 5  6]
+     [ 9 10]
+     [13 14]]
+
+    >>> a = np.arange(5 * 4 * 3).reshape((5, 4, 3))
+    >>> assert (truncate(a, (2, 2, 1)) == [[[28], [31]], [[40], [43]]]).all()
+
+    """
+    ashape = np.array(a.shape)
+    n = len(shape)
+    newshape = ashape.copy()
+    newshape[:n] = shape
+    print 'a.shape', a.shape
+    print 'newshape', newshape
+    index0 = (np.array(a.shape) - newshape + 1) / 2
+    index1 = index0 + newshape
+    print 'index0', index0
+    print 'index1', index1
+    multi_slice = tuple(slice(index0[ii], index1[ii]) for ii in range(n))
+    return a[multi_slice]
