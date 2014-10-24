@@ -115,4 +115,32 @@ def Fkernel_shape(X_, periodic_axes):
     a[periodic_axes] = 1
     return (np.array(X_.shape)[axes] * a).astype(int)
 
+def truncate(a, shape):
+    """
+    Truncates the edges of the array, a, based on the shape. This is
+    used to unpad a padded convolution.
 
+    >>> print truncate(np.arange(10), (5,))
+    [3 4 5 6 7]
+    >>> print truncate(np.arange(9), (5,))
+    [2 3 4 5 6]
+    >>> print truncate(np.arange(10), (4,))
+    [3 4 5 6]
+    >>> print truncate(np.arange(9), (4,))
+    [3 4 5 6]
+
+    >>> a = np.arange(5 * 4).reshape((5, 4))
+    >>> print truncate(a, shape=(3, 2))
+    [[ 5  6]
+     [ 9 10]
+     [13 14]]
+
+    >>> a = np.arange(5 * 4 * 3).reshape((5, 4, 3))
+    >>> assert (truncate(a, (2, 2, 1)) == [[[28], [31]], [[40], [43]]]).all()
+
+    """
+    s = np.array(shape)
+    index0 = (np.array(a.shape) - s + 1) / 2
+    index1 = index0 + s
+    multi_slice = tuple(slice(index0[ii], index1[ii]) for ii in range(len(s)))
+    return a[multi_slice]
