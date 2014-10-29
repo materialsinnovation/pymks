@@ -1,237 +1,174 @@
 
 .. code:: python
 
-    from pymks.datasets.elastic_FE_simulation import ElasticFESimulation
-    from pymks.datasets import make_elastic_FE_strain_delta
-    from pymks import MKSRegressionModel
-    from pymks import DiscreteIndicatorBasis
-.. code:: python
-
-    elastic_modulus = (90., 110.)
-    poissons_ratio = (0.3, 0.3)
-    size = (101, 101)
-    #X = np.zeros((1,) + size, dtype=int)
-    #X[0, 30:70, 30:70] = 1
-    #I, J = 50, 50
-    #R = 25
-    #xyz = np.indices(size) + 0.5
-    #mask = R**2 > ((xyz[0] - I)**2 + (xyz[1] - J)**2)
-    #X[0, mask] = 1
-    X = np.random.randint(2, size=(1,) + size)
-    sim = ElasticFESimulation(elastic_modulus=elastic_modulus, poissons_ratio=poissons_ratio)
-    sim.run(X)
-
-.. parsed-literal::
-
-    /home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_regions.py:150: DeprecationWarning: Operator '<<' is deprecated, use '<<=' instead
-      + ZeroOrMore(')'))
-    /home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_regions.py:189: DeprecationWarning: Operator '<<' is deprecated, use '<<=' instead
-      region_expression << atom + ZeroOrMore(aux)
-    /home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_equations.py:55: DeprecationWarning: Operator '<<' is deprecated, use '<<=' instead
-      + ZeroOrMore(')')
-    /home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_equations.py:55: DeprecationWarning: Operator '<<' is deprecated, use '<<=' instead
-      + ZeroOrMore(')')
-
+    
+    from pymks.datasets.cahn_hilliard_simulation import CahnHilliardSimulation
+    
+    np.random.seed(99)
+    N = 100
+    phi = 0.01 * (2 * np.random.random((2, N, N)) - 1)
+    ch = CahnHilliardSimulation(gamma=1)
+    for i in range(10000):
+        ch.run(phi)
+        phi[:] = ch.response
 
 .. code:: python
 
-    plt.imshow(sim.strain[0,...,0])
+    print N
+    plt.imshow(phi[0])
     plt.colorbar()
 
+.. parsed-literal::
+
+    101
+
+
 
 
 .. parsed-literal::
 
-    <matplotlib.colorbar.Colorbar instance at 0x7f0b51443cb0>
+    <matplotlib.colorbar.Colorbar instance at 0x7f3138ed37a0>
 
 
 
 
-.. image:: Untitled0_files/Untitled0_2_1.png
-
-
-.. code:: python
-
-    X_delta, strains_delta = make_elastic_FE_strain_delta(elastic_modulus=elastic_modulus,
-                                                          poissons_ratio=poissons_ratio,
-                                                          size=size)
-
-.. parsed-literal::
-
-    /home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_regions.py:150: DeprecationWarning: Operator '<<' is deprecated, use '<<=' instead
-      + ZeroOrMore(')'))
-    /home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_regions.py:189: DeprecationWarning: Operator '<<' is deprecated, use '<<=' instead
-      region_expression << atom + ZeroOrMore(aux)
-    /home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_equations.py:55: DeprecationWarning: Operator '<<' is deprecated, use '<<=' instead
-      + ZeroOrMore(')')
-    /home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_equations.py:55: DeprecationWarning: Operator '<<' is deprecated, use '<<=' instead
-      + ZeroOrMore(')')
-    /home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_regions.py:150: DeprecationWarning: Operator '<<' is deprecated, use '<<=' instead
-      + ZeroOrMore(')'))
-    /home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_regions.py:189: DeprecationWarning: Operator '<<' is deprecated, use '<<=' instead
-      region_expression << atom + ZeroOrMore(aux)
-    /home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_equations.py:55: DeprecationWarning: Operator '<<' is deprecated, use '<<=' instead
-      + ZeroOrMore(')')
-    /home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_equations.py:55: DeprecationWarning: Operator '<<' is deprecated, use '<<=' instead
-      + ZeroOrMore(')')
+.. image:: Untitled0_files/Untitled0_1_2.png
 
 
 .. code:: python
 
-    basis = DiscreteIndicatorBasis(n_states=2)
-    model = MKSRegressionModel(basis)
-    model.fit(X_delta, strains_delta)
-    y = model.predict(X)
-.. code:: python
-
-    plt.figure()
-    plt.subplot(121)
-    plt.imshow(y[0])
-    plt.colorbar()
-    plt.subplot(122)
-    plt.imshow(sim.strain[0,...,0])
+    print N
+    plt.imshow(phi[0])
     plt.colorbar()
 
-
-
 .. parsed-literal::
 
-    <matplotlib.colorbar.Colorbar instance at 0x7f0b501ba4d0>
+    100
 
-
-
-
-.. image:: Untitled0_files/Untitled0_5_1.png
-
-
-.. code:: python
-
-    plt.imshow(sim.strain[0,...,0] - y[0])
-    plt.colorbar()
 
 
 
 .. parsed-literal::
 
-    <matplotlib.colorbar.Colorbar instance at 0x7f0b4b7c1638>
+    <matplotlib.colorbar.Colorbar instance at 0x7f3138523098>
 
 
 
 
-.. image:: Untitled0_files/Untitled0_6_1.png
+.. image:: Untitled0_files/Untitled0_2_2.png
 
 
 .. code:: python
 
-    0.008 / 0.2
+    size = 500
+    
+    0 size/2 size/2 -1
+.. code:: python
 
+    N = 10
+    a = np.arange(N / 2)
+    a[a > (N / 2 - 1)] = a[::-1][a > (N / 2 - 1)]
+
+.. code:: python
+
+    a = np.arange(N / 2)
+    b = np.concatenate((a, a[::-1]))
+    print b
+
+.. parsed-literal::
+
+    [0 1 2 3 4 4 3 2 1 0]
+
+
+.. code:: python
+
+    s0 = 4, 3
+    s1 = 7, 6
+    #X = np.arange(s0[0] * s0[1]).reshape(s0)X
+    X = np.ones(s0)
+    Y = np.ones(s0)
+    print X
+    print Y
 
 
 .. parsed-literal::
 
-    0.04
-
+    [[ 1.  1.  1.]
+     [ 1.  1.  1.]
+     [ 1.  1.  1.]
+     [ 1.  1.  1.]]
+    [[ 1.  1.  1.]
+     [ 1.  1.  1.]
+     [ 1.  1.  1.]
+     [ 1.  1.  1.]]
 
 
 .. code:: python
 
-    distance.squareform(x)
-
-::
-
-
-    ---------------------------------------------------------------------------
-    ValueError                                Traceback (most recent call last)
-
-    <ipython-input-22-2d2187dbfee2> in <module>()
-    ----> 1 distance.squareform(x)
+    fX = np.fft.fftn(X, s=s1)
+    fY = np.fft.fftn(Y, s=s1)
+    fXY = fX * fY
+    fX_ = np.fft.fftn(X)
+    fY_ = np.fft.fftn(Y)
+    fXY_ = fX_ * fY_
     
 
-    /home/wd15/anaconda/lib/python2.7/site-packages/scipy/spatial/distance.pyc in squareform(X, force, checks)
-       1469     elif len(s) == 2:
-       1470         if s[0] != s[1]:
-    -> 1471             raise ValueError('The matrix argument must be square.')
-       1472         if checks:
-       1473             is_valid_dm(X, throw=True, name='X')
+.. code:: python
 
-
-    ValueError: The matrix argument must be square.
-
+    XY_ = np.fft.ifftn(fXY_)
+    XY = np.fft.ifftn(fXY)
 
 .. code:: python
 
-    x = np.random.random((10, 8))
-.. code:: python
-
-    y = distance.pdist(x)
-.. code:: python
-
-    distance.squareform(y).shape
-
-
+    print XY.shape
+    print X.shape
 
 .. parsed-literal::
 
-    (10, 10)
-
-
-
-.. code:: python
-
-    print (x[None,:] - x[:,None]).shape
-
-.. parsed-literal::
-
-    (10, 10, 1)
-
-
-
-
-::
-
-
-      File "<ipython-input-29-ba1c6fc79113>", line 1
-        10!
-          ^
-    SyntaxError: invalid syntax
-
+    (7, 6)
+    (4, 3)
 
 
 .. code:: python
 
-    P0 = np.pi * 0.25**2
-    P1 = 1 - P0
-    (P0 * 120 + P1 * 60) * 0.02
-
-
+    print XY.real
+    print XY_.real
 
 .. parsed-literal::
 
-    1.4356194490192342
-
+    [[  1.00000000e+00   2.00000000e+00   3.00000000e+00   2.00000000e+00
+        1.00000000e+00  -8.19450328e-17]
+     [  2.00000000e+00   4.00000000e+00   6.00000000e+00   4.00000000e+00
+        2.00000000e+00  -7.65828478e-16]
+     [  3.00000000e+00   6.00000000e+00   9.00000000e+00   6.00000000e+00
+        3.00000000e+00  -1.13008931e-15]
+     [  4.00000000e+00   8.00000000e+00   1.20000000e+01   8.00000000e+00
+        4.00000000e+00  -1.36854907e-15]
+     [  3.00000000e+00   6.00000000e+00   9.00000000e+00   6.00000000e+00
+        3.00000000e+00  -9.56116555e-16]
+     [  2.00000000e+00   4.00000000e+00   6.00000000e+00   4.00000000e+00
+        2.00000000e+00  -3.08183581e-16]
+     [  1.00000000e+00   2.00000000e+00   3.00000000e+00   2.00000000e+00
+        1.00000000e+00  -1.26239542e-16]]
+    [[ 12.  12.  12.]
+     [ 12.  12.  12.]
+     [ 12.  12.  12.]
+     [ 12.  12.  12.]]
 
 
 .. code:: python
 
-    60 * 0.02
-
-
+    tmp = np.roll(XY.real, -(s1[0] - s0[0]) / 2 + 1, axis=0)
+    print np.roll(tmp, -(s1[1] - s0[1]) / 2 + 1, axis=1)[:s0[0], :s0[1]]
 
 .. parsed-literal::
 
-    1.2
-
+    [[  4.   6.   4.]
+     [  6.   9.   6.]
+     [  8.  12.   8.]
+     [  6.   9.   6.]]
 
 
 .. code:: python
 
-    120 * 0.02
-
-
-
-.. parsed-literal::
-
-    2.4
-
-
-
+    ??slice

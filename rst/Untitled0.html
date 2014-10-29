@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1-dev',
+        VERSION:     '0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -105,158 +105,126 @@
   <div class="row">
     <div class="col-md-12">
       
-  <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.datasets.elastic_FE_simulation</span> <span class="kn">import</span> <span class="n">ElasticFESimulation</span>
-<span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_elastic_FE_strain_delta</span>
-<span class="kn">from</span> <span class="nn">pymks</span> <span class="kn">import</span> <span class="n">MKSRegressionModel</span>
-<span class="kn">from</span> <span class="nn">pymks</span> <span class="kn">import</span> <span class="n">DiscreteIndicatorBasis</span>
+  <div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.datasets.cahn_hilliard_simulation</span> <span class="kn">import</span> <span class="n">CahnHilliardSimulation</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">99</span><span class="p">)</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">phi</span> <span class="o">=</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">ch</span> <span class="o">=</span> <span class="n">CahnHilliardSimulation</span><span class="p">(</span><span class="n">gamma</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">):</span>
+    <span class="n">ch</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">phi</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">response</span>
 </pre></div>
 </div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">elastic_modulus</span> <span class="o">=</span> <span class="p">(</span><span class="mf">90.</span><span class="p">,</span> <span class="mf">110.</span><span class="p">)</span>
-<span class="n">poissons_ratio</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
-<span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">101</span><span class="p">,</span> <span class="mi">101</span><span class="p">)</span>
-<span class="c">#X = np.zeros((1,) + size, dtype=int)</span>
-<span class="c">#X[0, 30:70, 30:70] = 1</span>
-<span class="c">#I, J = 50, 50</span>
-<span class="c">#R = 25</span>
-<span class="c">#xyz = np.indices(size) + 0.5</span>
-<span class="c">#mask = R**2 &gt; ((xyz[0] - I)**2 + (xyz[1] - J)**2)</span>
-<span class="c">#X[0, mask] = 1</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">+</span> <span class="n">size</span><span class="p">)</span>
-<span class="n">sim</span> <span class="o">=</span> <span class="n">ElasticFESimulation</span><span class="p">(</span><span class="n">elastic_modulus</span><span class="o">=</span><span class="n">elastic_modulus</span><span class="p">,</span> <span class="n">poissons_ratio</span><span class="o">=</span><span class="n">poissons_ratio</span><span class="p">)</span>
-<span class="n">sim</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><pre>/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_regions.py:150: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
-  + ZeroOrMore(')'))
-/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_regions.py:189: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
-  region_expression &lt;&lt; atom + ZeroOrMore(aux)
-/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_equations.py:55: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
-  + ZeroOrMore(')')
-/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_equations.py:55: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
-  + ZeroOrMore(')')</pre>
-</div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">N</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>&lt;matplotlib.colorbar.Colorbar instance at 0x7f0b51443cb0&gt;</pre>
-</div>
-<img alt="../_images/Untitled0_2_1.png" src="../_images/Untitled0_2_1.png" />
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">X_delta</span><span class="p">,</span> <span class="n">strains_delta</span> <span class="o">=</span> <span class="n">make_elastic_FE_strain_delta</span><span class="p">(</span><span class="n">elastic_modulus</span><span class="o">=</span><span class="n">elastic_modulus</span><span class="p">,</span>
-                                                      <span class="n">poissons_ratio</span><span class="o">=</span><span class="n">poissons_ratio</span><span class="p">,</span>
-                                                      <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="mi">101</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_regions.py:150: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
-  + ZeroOrMore(')'))
-/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_regions.py:189: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
-  region_expression &lt;&lt; atom + ZeroOrMore(aux)
-/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_equations.py:55: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
-  + ZeroOrMore(')')
-/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_equations.py:55: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
-  + ZeroOrMore(')')
-/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_regions.py:150: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
-  + ZeroOrMore(')'))
-/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_regions.py:189: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
-  region_expression &lt;&lt; atom + ZeroOrMore(aux)
-/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_equations.py:55: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
-  + ZeroOrMore(')')
-/home/wd15/anaconda/lib/python2.7/site-packages/sfepy/discrete/parse_equations.py:55: DeprecationWarning: Operator '&lt;&lt;' is deprecated, use '&lt;&lt;=' instead
-  + ZeroOrMore(')')</pre>
+<div class="highlight-python"><pre>&lt;matplotlib.colorbar.Colorbar instance at 0x7f3138ed37a0&gt;</pre>
 </div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">basis</span> <span class="o">=</span> <span class="n">DiscreteIndicatorBasis</span><span class="p">(</span><span class="n">n_states</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">basis</span><span class="p">)</span>
-<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_delta</span><span class="p">,</span> <span class="n">strains_delta</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+<img alt="../_images/Untitled0_1_2.png" src="../_images/Untitled0_1_2.png" />
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">N</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>&lt;matplotlib.colorbar.Colorbar instance at 0x7f0b501ba4d0&gt;</pre>
-</div>
-<img alt="../_images/Untitled0_5_1.png" src="../_images/Untitled0_5_1.png" />
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="mi">100</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>&lt;matplotlib.colorbar.Colorbar instance at 0x7f0b4b7c1638&gt;</pre>
+<div class="highlight-python"><pre>&lt;matplotlib.colorbar.Colorbar instance at 0x7f3138523098&gt;</pre>
 </div>
-<img alt="../_images/Untitled0_6_1.png" src="../_images/Untitled0_6_1.png" />
-<div class="code python highlight-python"><div class="highlight"><pre><span class="mf">0.008</span> <span class="o">/</span> <span class="mf">0.2</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="mf">0.04</span>
-</pre></div>
-</div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">distance</span><span class="o">.</span><span class="n">squareform</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><pre>---------------------------------------------------------------------------
-ValueError                                Traceback (most recent call last)
+<img alt="../_images/Untitled0_2_2.png" src="../_images/Untitled0_2_2.png" />
+<div class="code python highlight-python"><pre>size = 500
 
-&lt;ipython-input-22-2d2187dbfee2&gt; in &lt;module&gt;()
-----&gt; 1 distance.squareform(x)
-
-
-/home/wd15/anaconda/lib/python2.7/site-packages/scipy/spatial/distance.pyc in squareform(X, force, checks)
-   1469     elif len(s) == 2:
-   1470         if s[0] != s[1]:
--&gt; 1471             raise ValueError('The matrix argument must be square.')
-   1472         if checks:
-   1473             is_valid_dm(X, throw=True, name='X')
-
-
-ValueError: The matrix argument must be square.</pre>
+0 size/2 size/2 -1</pre>
 </div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">N</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">a</span><span class="p">[</span><span class="n">a</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">N</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">a</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">a</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">N</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
 </pre></div>
 </div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">y</span> <span class="o">=</span> <span class="n">distance</span><span class="o">.</span><span class="n">pdist</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">a</span><span class="p">,</span> <span class="n">a</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+<span class="k">print</span> <span class="n">b</span>
 </pre></div>
 </div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">distance</span><span class="o">.</span><span class="n">squareform</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+<div class="highlight-python"><pre>[0 1 2 3 4 4 3 2 1 0]</pre>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">s0</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span>
+<span class="n">s1</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">6</span>
+<span class="c">#X = np.arange(s0[0] * s0[1]).reshape(s0)X</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">s0</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">s0</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">X</span>
+<span class="k">print</span> <span class="n">Y</span>
 </pre></div>
 </div>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<div class="highlight-python"><pre>[[ 1.  1.  1.]
+ [ 1.  1.  1.]
+ [ 1.  1.  1.]
+ [ 1.  1.  1.]]
+[[ 1.  1.  1.]
+ [ 1.  1.  1.]
+ [ 1.  1.  1.]
+ [ 1.  1.  1.]]</pre>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">fX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s1</span><span class="p">)</span>
+<span class="n">fY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s1</span><span class="p">)</span>
+<span class="n">fXY</span> <span class="o">=</span> <span class="n">fX</span> <span class="o">*</span> <span class="n">fY</span>
+<span class="n">fX_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">fY_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+<span class="n">fXY_</span> <span class="o">=</span> <span class="n">fX_</span> <span class="o">*</span> <span class="n">fY_</span>
 </pre></div>
 </div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="bp">None</span><span class="p">,:]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[:,</span><span class="bp">None</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">XY_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span><span class="n">fXY_</span><span class="p">)</span>
+<span class="n">XY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span><span class="n">fXY</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">XY</span><span class="o">.</span><span class="n">shape</span>
+<span class="k">print</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>  File "&lt;ipython-input-29-ba1c6fc79113&gt;", line 1
-    10!
-      ^
-SyntaxError: invalid syntax</pre>
-</div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">P0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mf">0.25</span><span class="o">**</span><span class="mi">2</span>
-<span class="n">P1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">P0</span>
-<span class="p">(</span><span class="n">P0</span> <span class="o">*</span> <span class="mi">120</span> <span class="o">+</span> <span class="n">P1</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.02</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-python"><div class="highlight"><pre><span class="mf">1.4356194490192342</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">XY</span><span class="o">.</span><span class="n">real</span>
+<span class="k">print</span> <span class="n">XY_</span><span class="o">.</span><span class="n">real</span>
 </pre></div>
 </div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="mi">60</span> <span class="o">*</span> <span class="mf">0.02</span>
+<div class="highlight-python"><pre>[[  1.00000000e+00   2.00000000e+00   3.00000000e+00   2.00000000e+00
+    1.00000000e+00  -8.19450328e-17]
+ [  2.00000000e+00   4.00000000e+00   6.00000000e+00   4.00000000e+00
+    2.00000000e+00  -7.65828478e-16]
+ [  3.00000000e+00   6.00000000e+00   9.00000000e+00   6.00000000e+00
+    3.00000000e+00  -1.13008931e-15]
+ [  4.00000000e+00   8.00000000e+00   1.20000000e+01   8.00000000e+00
+    4.00000000e+00  -1.36854907e-15]
+ [  3.00000000e+00   6.00000000e+00   9.00000000e+00   6.00000000e+00
+    3.00000000e+00  -9.56116555e-16]
+ [  2.00000000e+00   4.00000000e+00   6.00000000e+00   4.00000000e+00
+    2.00000000e+00  -3.08183581e-16]
+ [  1.00000000e+00   2.00000000e+00   3.00000000e+00   2.00000000e+00
+    1.00000000e+00  -1.26239542e-16]]
+[[ 12.  12.  12.]
+ [ 12.  12.  12.]
+ [ 12.  12.  12.]
+ [ 12.  12.  12.]]</pre>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">XY</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="o">-</span><span class="p">(</span><span class="n">s1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">s0</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="o">-</span><span class="p">(</span><span class="n">s1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">s0</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:</span><span class="n">s0</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:</span><span class="n">s0</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
 </pre></div>
 </div>
-<div class="highlight-python"><div class="highlight"><pre><span class="mf">1.2</span>
-</pre></div>
+<div class="highlight-python"><pre>[[  4.   6.   4.]
+ [  6.   9.   6.]
+ [  8.  12.   8.]
+ [  6.   9.   6.]]</pre>
 </div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="mi">120</span> <span class="o">*</span> <span class="mf">0.02</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="mf">2.4</span>
-</pre></div>
+<div class="code python highlight-python"><pre>??slice</pre>
 </div>
 
 

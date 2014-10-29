@@ -1,0 +1,152 @@
+
+.. code:: python
+
+    %load_ext autoreload
+    %autoreload 2
+    
+    from skimage import io
+    from pymks.filter import CorrelationNonPeriodic
+    from pymks import DiscreteIndicatorBasis
+
+.. parsed-literal::
+
+    The autoreload extension is already loaded. To reload it, use:
+      %reload_ext autoreload
+
+
+.. code:: python
+
+    url = 'https://farm8.staticflickr.com/7368/12972465885_1bcb9717bd_c.jpg'
+    # Load remote image
+    image_data = io.imread( url )
+    io.imshow(image_data)
+
+
+.. image:: PyMKS-reimplement_files/PyMKS-reimplement_1_0.png
+
+
+.. code:: python
+
+    X = (image_data.astype( 'double' ) / 255).round().astype(int)[None];
+    basis = DiscreteIndicatorBasis(2, domain=(0, 1))
+    X_ = basis.discretize(X)
+    cor_numer = CorrelationNonPeriodic(X_, periodic_axes=())
+    y_numer = cor_numer.convolve(X_)
+.. code:: python
+
+    ones = np.ones(X.shape)
+    #basis = DiscreteIndicatorBasis(2, domain=(0, 1))
+    #X_ = basis.discretize(X)
+    cor_denom = CorrelationNonPeriodic(ones[..., None], periodic_axes=())
+    y_denom = cor_denom.convolve(ones[..., None)]
+.. code:: python
+
+    y = np.divide(y_numer, y_denom)
+    print y[0, 0, 0, 1]
+
+.. parsed-literal::
+
+    (0.468413621262+0j)
+
+
+.. code:: python
+
+    np.min(y_denom)
+    np.max(y_denom)
+
+
+
+.. parsed-literal::
+
+    (481600+0j)
+
+
+
+.. code:: python
+
+    #print cor_numer.axes
+    #print y.shape
+    #y_shift = np.fft.fftshift(y, axes=cor_numer.axes)
+    #print y_shift[0, 0, 0, 1]
+    #print y[0, 0, :10, 1]
+    
+    #i = np.argmin(y[0, :, :, 1].flatten())
+    #print 'i:',i,'value:',y.flatten()[i]
+    #print np.argwhere(y==(-np.inf))
+    print y[0, 602, 220, 1]
+    plt.imshow(y[0,...,1].real)
+    plt.colorbar()
+
+.. parsed-literal::
+
+    (0.190491781885-0.0722255034714j)
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.colorbar.Colorbar instance at 0x7f5fa352ee60>
+
+
+
+
+.. image:: PyMKS-reimplement_files/PyMKS-reimplement_6_2.png
+
+
+.. code:: python
+
+    from pymks.stats import crosscorelate
+    
+    crosscorelate()
+.. code:: python
+
+    shift_numer = np.real_if_close(np.fft.fftshift(y_numer, axes=cor_numer.axes))
+    print shift_numer.shape
+    plt.imshow(shift_numer[0,...,1])
+    print y_numer[0, 0, 0, 1]
+
+.. parsed-literal::
+
+    (1, 1204, 1600, 2)
+    225588.0
+
+
+
+.. image:: PyMKS-reimplement_files/PyMKS-reimplement_8_1.png
+
+
+.. code:: python
+
+    print y_denom.shape
+    shift_denom = np.real_if_close(np.fft.fftshift(y_denom, axes=(1, 2)))
+    #print shift_numer.shape
+    print shift_denom.shape
+    plt.imshow(shift_denom[0, ..., 0])
+    print y_denom[0, 0, 0, 0]
+
+
+.. parsed-literal::
+
+    (1, 1204, 1600, 1)
+    (1, 1204, 1600, 1)
+    481600.0
+
+
+
+.. image:: PyMKS-reimplement_files/PyMKS-reimplement_9_1.png
+
+
+.. code:: python
+
+    225588. / 481600.
+
+
+
+
+.. parsed-literal::
+
+    0.46841362126245845
+
+
+
