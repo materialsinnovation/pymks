@@ -39,7 +39,7 @@ def getVersion(version, release=False):
         return version + '-dev.' + _git_version
 
 setup(name='pymks',
-      version=getVersion('0.1', release=True),
+      version=getVersion('0.2', release=False),
       description='Package for the Materials Knowledge System (MKS)',
       author='Daniel Wheeler',
       author_email='daniel.wheeler2@gmail.com',
