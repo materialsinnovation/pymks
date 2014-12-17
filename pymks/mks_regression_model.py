@@ -4,6 +4,7 @@ from .filter import Filter
 
 
 class MKSRegressionModel(LinearRegression):
+
     '''
     The `MKSRegressionModel` fits data using the Materials Knowledge
     System in Fourier Space. The following demonstrates the viability
@@ -203,18 +204,18 @@ class MKSRegressionModel(LinearRegression):
         >>> X = np.random.random((1, 3, 3))
         >>> basis = LegendreBasis(2, [0, 1])
         >>> model = MKSRegressionModel(basis=basis)
-        >>> #FX = model._discrtizefft(X)
         >>> X_ = basis.discretize(X)
         >>> FX = np.fft.fftn(X_, axes=(1, 2))
-        >>> FXtest = np.array([[[[-0.79735949+0. ,  4.50000000+0.j],
-        ...                      [-1.00887157-1.48005289j,  0.00000000+0.j],
-        ...                      [-1.00887157+1.48005289j,  0.00000000+0.j]],
-        ...                     [[ 0.62300683-4.97732233j,  0.00000000+0.j],
-        ...                      [ 1.09318216+0.10131035j,  0.00000000+0.j],
-        ...                      [ 0.37713401+1.87334545j,  0.00000000+0.j]],
-        ...                     [[ 0.62300683+4.97732233j,  0.00000000+0.j],
-        ...                      [ 0.37713401-1.87334545j,  0.00000000+0.j],
-        ...                      [ 1.09318216-0.10131035j,  0.00000000+0.j]]]])
+        >>>
+        >>> FXtest = np.array([[[[4.50000000+0.j, -0.79735949+0.],
+        ...                      [0.00000000+0.j, -1.00887157-1.48005289j],
+        ...                      [0.00000000+0.j, -1.00887157+1.48005289j]],
+        ...                     [[0.00000000+0.j, 0.62300683-4.97732233j],
+        ...                      [0.00000000+0.j, 1.09318216+0.10131035j],
+        ...                      [0.00000000+0.j, 0.37713401+1.87334545j]],
+        ...                     [[0.00000000+0.j, 0.62300683+4.97732233j],
+        ...                      [0.00000000+0.j, 0.37713401-1.87334545j],
+        ...                      [0.00000000+0.j, 1.09318216-0.10131035j]]]])
         >>> assert np.allclose(FX, FXtest)
         '''
         pass

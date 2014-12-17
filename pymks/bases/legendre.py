@@ -3,6 +3,7 @@ from .polynomial import _Polynomial
 
 
 class LegendreBasis(_Polynomial):
+
     r"""
     Discretize a continuous field into `deg` local states using a
     Legendre polynomial basis such that,
@@ -29,7 +30,7 @@ class LegendreBasis(_Polynomial):
     ...    x = 4 * x - 1
     ...    polys = np.array((np.ones_like(x), x, (3.*x**2 - 1.) / 2.))
     ...    tmp = (2. * np.arange(3)[:, None, None] + 1.) / 2. * polys
-    ...    return np.rollaxis(tmp, 0, 3)[:,:,::-1]
+    ...    return np.rollaxis(tmp, 0, 3)
     >>> basis = LegendreBasis(n_states, [0., 0.5])
     >>> assert(np.allclose(basis.discretize(X), P(X)))
 
@@ -50,7 +51,7 @@ class LegendreBasis(_Polynomial):
         >>> def P(x):
         ...    polys = np.array((np.ones_like(x), x, (3.*x**2 - 1.) / 2.))
         ...    tmp = (2. * np.arange(3)[:, None, None] + 1.) / 2. * polys
-        ...    return np.rollaxis(tmp, 0, 3)[:,:,::-1]
+        ...    return np.rollaxis(tmp, 0, 3)
         >>> assert(np.allclose(basis.discretize(X), P(X)))
 
         """
@@ -59,5 +60,5 @@ class LegendreBasis(_Polynomial):
         X_scaled = (2. * X - self.domain[0] - self.domain[1]) /\
                    (self.domain[1] - self.domain[0])
         norm = (2. * np.arange(self.n_states) + 1) / 2.
-        X_Legendre = (leg.legval(X_scaled, np.eye(self.n_states) * norm))[::-1]
+        X_Legendre = (leg.legval(X_scaled, np.eye(self.n_states) * norm))
         return np.rollaxis(X_Legendre, 0, len(X_Legendre.shape))

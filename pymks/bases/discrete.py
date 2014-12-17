@@ -3,6 +3,7 @@ from .indicator import _Indicator
 
 
 class DiscreteIndicatorBasis(_Indicator):
+
     r"""
     Digitize a discretly labeled microstructure such that,
 
@@ -52,6 +53,7 @@ class DiscreteIndicatorBasis(_Indicator):
 
 
     """
+
     def __init__(self, n_states=2, domain=None):
         super(DiscreteIndicatorBasis, self).__init__(n_states,
                                                      [0, n_states - 1])

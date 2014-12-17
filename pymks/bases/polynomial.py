@@ -15,10 +15,6 @@ class _Polynomial(_AbstractMicrostructureBasis):
         Fkernel = np.zeros(FX.shape[1:], dtype=np.complex)
         s0 = (slice(None),)
         for ijk in np.ndindex(X_.shape[1:-1]):
-            if np.all(np.array(ijk) == 0):
-                s1 = s0
-            else:
-                s1 = (slice(-1),)
-            Fkernel[ijk + s1] = np.linalg.lstsq(FX[s0 + ijk + s1],
+            Fkernel[ijk + s0] = np.linalg.lstsq(FX[s0 + ijk + s0],
                                                 Fy[s0 + ijk])[0]
         return Fkernel

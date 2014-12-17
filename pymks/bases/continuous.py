@@ -3,6 +3,7 @@ from .indicator import _Indicator
 
 
 class ContinuousIndicatorBasis(_Indicator):
+
     r"""
     Discretize a continuous field into `n_states` local states such
     that:
@@ -54,6 +55,7 @@ class ContinuousIndicatorBasis(_Indicator):
     >>> assert np.allclose(X_, X_test)
 
     """
+
     def discretize(self, X):
         """
         Discretize `X`.
