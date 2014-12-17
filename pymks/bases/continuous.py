@@ -1,8 +1,8 @@
 import numpy as np
-from .abstract import _AbstractMicrostructureBasis
+from .indicator import _Indicator
 
 
-class ContinuousIndicatorBasis(_AbstractMicrostructureBasis):
+class ContinuousIndicatorBasis(_Indicator):
     r"""
     Discretize a continuous field into `n_states` local states such
     that:

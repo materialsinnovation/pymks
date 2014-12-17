@@ -101,19 +101,7 @@ class MKSRegressionModel(LinearRegression):
         if y.shape != X.shape:
             raise RuntimeError("X and y must be the same shape.")
         X_ = self.basis.discretize(X)
-        axes = np.arange(len(X.shape) - 1) + 1
-        FX = np.fft.fftn(X_, axes=axes)
-        Fy = np.fft.fftn(y, axes=axes)
-        Fkernel = np.zeros(FX.shape[1:], dtype=np.complex)
-        s0 = (slice(None),)
-        for ijk in np.ndindex(X.shape[1:]):
-            if np.all(np.array(ijk) == 0):
-                s1 = s0
-            else:
-                s1 = (slice(-1),)
-            Fkernel[ijk + s1] = np.linalg.lstsq(FX[s0 + ijk + s1],
-                                                Fy[s0 + ijk])[0]
-
+        Fkernel = self.basis._regression_fit(X_, y)
         self._filter = Filter(Fkernel[None])
 
     @property

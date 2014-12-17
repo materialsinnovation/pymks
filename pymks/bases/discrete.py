@@ -1,8 +1,8 @@
 import numpy as np
-from .abstract import _AbstractMicrostructureBasis
+from .indicator import _Indicator
 
 
-class DiscreteIndicatorBasis(_AbstractMicrostructureBasis):
+class DiscreteIndicatorBasis(_Indicator):
     r"""
     Digitize a discretly labeled microstructure such that,
 

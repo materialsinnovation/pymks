@@ -1,8 +1,8 @@
 import numpy as np
-from .abstract import _AbstractMicrostructureBasis
+from .polynomial import _Polynomial
 
 
-class LegendreBasis(_AbstractMicrostructureBasis):
+class LegendreBasis(_Polynomial):
     r"""
     Discretize a continuous field into `deg` local states using a
     Legendre polynomial basis such that,
