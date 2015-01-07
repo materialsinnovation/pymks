@@ -88,10 +88,13 @@ class MKSRegressionModel(LinearRegression):
 
 
         Args:
-          X: the microstructure function, an `(S, N, ...)` shaped
+          X: The microstructure function, an `(S, N, ...)` shaped
              array where `S` is the number of samples and `N` is the
              spatial discretization.
           y: The response field, same shape as `X`.
+          size: Alters the shape of X and y during the calibration of the
+              influence coefficients. If None, the size of the influence
+              coefficients is the same shape as `X` and `y`.
         '''
         self.basis = self.basis.__class__(self.n_states, self.domain)
         if size is not None:
@@ -196,6 +199,7 @@ class MKSRegressionModel(LinearRegression):
         Returns:
             The resized influence coefficients to size.
         '''
+        self._X_size = size
         self._filter.resize(size)
 
     def _test(self):
@@ -237,8 +241,8 @@ class MKSRegressionModel(LinearRegression):
 
     def _reshape_feature(self, X):
         """
-        Helper funciton used to check the shape of the microstructure,
-        and change to appropreate shape.
+        Helper function used to check the shape of the microstructure,
+        and change to appropriate shape.
         """
         new_shape = (X.shape[0],) + self._X_size
         return X.reshape(new_shape)
