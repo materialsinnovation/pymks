@@ -66,13 +66,12 @@ class MKSRegressionModel(LinearRegression):
 
         """
         self.basis = basis
+        self.n_states = n_states
         if n_states is None:
             self.n_states = basis.n_states
-        else:
-            self.n_states = n_states
         self.domain = basis.domain
 
-    def fit(self, X, y):
+    def fit(self, X, y, size=None):
         '''
         Fits the data by calculating a set of influence coefficients.
 
@@ -95,7 +94,10 @@ class MKSRegressionModel(LinearRegression):
           y: The response field, same shape as `X`.
         '''
         self.basis = self.basis.__class__(self.n_states, self.domain)
-
+        if size is not None:
+            self._X_size = size
+            y = self._reshape_feature(y)
+            X = self._reshape_feature(X)
         if not len(y.shape) > 1:
             raise RuntimeError("The shape of y is incorrect.")
         if y.shape != X.shape:
@@ -113,7 +115,6 @@ class MKSRegressionModel(LinearRegression):
                 s1 = (slice(-1),)
             Fkernel[ijk + s1] = np.linalg.lstsq(FX[s0 + ijk + s1],
                                                 Fy[s0 + ijk])[0]
-
         self._filter = Filter(Fkernel[None])
 
     @property
@@ -154,7 +155,11 @@ class MKSRegressionModel(LinearRegression):
 
         if not hasattr(self, '_filter'):
             raise AttributeError("fit() method must be run before predict().")
+        if self._X_size is not None:
+            X = self._reshape_feature(X)
         X_ = self.basis.discretize(X)
+        print 'X_.shape', X_.shape
+        print 'self._filter.Fkernel', self._filter.Fkernel.shape
         return self._filter.convolve(X_)
 
     def resize_coeff(self, size):
@@ -230,3 +235,11 @@ class MKSRegressionModel(LinearRegression):
         >>> assert np.allclose(FX, FXtest)
         '''
         pass
+
+    def _reshape_feature(self, X):
+        """
+        Helper funciton used to check the shape of the microstructure,
+        and change to appropreate shape.
+        """
+        new_shape = (X.shape[0],) + self._X_size
+        return X.reshape(new_shape)
