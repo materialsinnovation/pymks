@@ -98,9 +98,8 @@ class MKSRegressionModel(LinearRegression):
         '''
         self.basis = self.basis.__class__(self.n_states, self.domain)
         if size is not None:
-            self._X_size = size
-            y = self._reshape_feature(y)
-            X = self._reshape_feature(X)
+            y = self._reshape_feature(y, size)
+            X = self._reshape_feature(X, size)
         if not len(y.shape) > 1:
             raise RuntimeError("The shape of y is incorrect.")
         if y.shape != X.shape:
@@ -159,8 +158,7 @@ class MKSRegressionModel(LinearRegression):
         if not hasattr(self, '_filter'):
             raise AttributeError("fit() method must be run before predict().")
         y_pred_shape = X.shape
-        if hasattr(self, '_X_size'):
-            X = self._reshape_feature(X)
+        X = self._reshape_feature(X, self._filter.Fkernel.shape[1:-1])
         X_ = self.basis.discretize(X)
         return self._filter.convolve(X_).reshape(y_pred_shape)
 
@@ -199,7 +197,6 @@ class MKSRegressionModel(LinearRegression):
         Returns:
             The resized influence coefficients to size.
         '''
-        self._X_size = size
         self._filter.resize(size)
 
     def _test(self):
@@ -239,10 +236,10 @@ class MKSRegressionModel(LinearRegression):
         '''
         pass
 
-    def _reshape_feature(self, X):
+    def _reshape_feature(self, X, size):
         """
         Helper function used to check the shape of the microstructure,
         and change to appropriate shape.
         """
-        new_shape = (X.shape[0],) + self._X_size
+        new_shape = (X.shape[0],) + size
         return X.reshape(new_shape)
