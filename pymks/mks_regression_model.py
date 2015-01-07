@@ -67,13 +67,12 @@ class MKSRegressionModel(LinearRegression):
 
         """
         self.basis = basis
+        self.n_states = n_states
         if n_states is None:
             self.n_states = basis.n_states
-        else:
-            self.n_states = n_states
         self.domain = basis.domain
 
-    def fit(self, X, y):
+    def fit(self, X, y, size=None):
         '''
         Fits the data by calculating a set of influence coefficients.
 
@@ -90,13 +89,18 @@ class MKSRegressionModel(LinearRegression):
 
 
         Args:
-          X: the microstructure function, an `(S, N, ...)` shaped
+          X: The microstructure function, an `(S, N, ...)` shaped
              array where `S` is the number of samples and `N` is the
              spatial discretization.
           y: The response field, same shape as `X`.
+          size: Alters the shape of X and y during the calibration of the
+              influence coefficients. If None, the size of the influence
+              coefficients is the same shape as `X` and `y`.
         '''
         self.basis = self.basis.__class__(self.n_states, self.domain)
-
+        if size is not None:
+            y = self._reshape_feature(y, size)
+            X = self._reshape_feature(X, size)
         if not len(y.shape) > 1:
             raise RuntimeError("The shape of y is incorrect.")
         if y.shape != X.shape:
@@ -151,8 +155,10 @@ class MKSRegressionModel(LinearRegression):
 
         if not hasattr(self, '_filter'):
             raise AttributeError("fit() method must be run before predict().")
+        y_pred_shape = X.shape
+        X = self._reshape_feature(X, self._filter.Fkernel.shape[1:-1])
         X_ = self.basis.discretize(X)
-        return self._filter.convolve(X_)
+        return self._filter.convolve(X_).reshape(y_pred_shape)
 
     def resize_coeff(self, size):
         '''Scale the size of the coefficients and pad with zeros.
@@ -227,3 +233,11 @@ class MKSRegressionModel(LinearRegression):
         >>> assert np.allclose(FX, FXtest)
         '''
         pass
+
+    def _reshape_feature(self, X, size):
+        """
+        Helper function used to check the shape of the microstructure,
+        and change to appropriate shape.
+        """
+        new_shape = (X.shape[0],) + size
+        return X.reshape(new_shape)
