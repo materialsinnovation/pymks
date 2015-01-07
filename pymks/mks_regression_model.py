@@ -155,12 +155,11 @@ class MKSRegressionModel(LinearRegression):
 
         if not hasattr(self, '_filter'):
             raise AttributeError("fit() method must be run before predict().")
-        if self._X_size is not None:
+        y_pred_shape = X.shape
+        if hasattr(self, '_X_size'):
             X = self._reshape_feature(X)
         X_ = self.basis.discretize(X)
-        print 'X_.shape', X_.shape
-        print 'self._filter.Fkernel', self._filter.Fkernel.shape
-        return self._filter.convolve(X_)
+        return self._filter.convolve(X_).reshape(y_pred_shape)
 
     def resize_coeff(self, size):
         '''Scale the size of the coefficients and pad with zeros.
