@@ -182,7 +182,7 @@ def draw_microstructures(*microstructures):
             ax.set_xticks(())
             ax.set_yticks(())
     else:
-        im = axs.imshow(microstructures.swapaxes(0, 1), cmap=plt.cm.gray,
+        im = axs.imshow(microstructures[0].swapaxes(0, 1), cmap=plt.cm.gray,
                         interpolation='none', vmin=vmin, vmax=vmax)
         axs.set_xticks(())
         axs.set_yticks(())
@@ -193,7 +193,6 @@ def draw_microstructures(*microstructures):
 
 
 def draw_strains(*strains, **titles):
-    n_strains = len(strains)
     plt.close('all')
     cmap = _get_response_cmap()
     fig, axs = plt.subplots(1, n_strains, figsize=(n_strains * 4, 4))
@@ -319,7 +318,7 @@ def draw_diff(*responses, **titles):
 def draw_gridscores(grid_scores, label=None, color='#f46d43'):
     tmp = [[params['n_states'], -mean_score, scores.std()] \
             for params, mean_score, scores in grid_scores]
-    
+
     n_states, errors, stddev = list(zip(*tmp))
     plt.errorbar(n_states, errors, yerr=stddev, linewidth=2, color=color, label=label)
 
