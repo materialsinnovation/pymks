@@ -4,6 +4,7 @@ from .filter import Filter
 
 
 class MKSRegressionModel(LinearRegression):
+
     '''
     The `MKSRegressionModel` fits data using the Materials Knowledge
     System in Fourier Space. The following demonstrates the viability
@@ -66,13 +67,12 @@ class MKSRegressionModel(LinearRegression):
 
         """
         self.basis = basis
+        self.n_states = n_states
         if n_states is None:
             self.n_states = basis.n_states
-        else:
-            self.n_states = n_states
         self.domain = basis.domain
 
-    def fit(self, X, y):
+    def fit(self, X, y, size=None):
         '''
         Fits the data by calculating a set of influence coefficients.
 
@@ -89,31 +89,32 @@ class MKSRegressionModel(LinearRegression):
 
 
         Args:
-          X: the microstructure function, an `(S, N, ...)` shaped
+          X: The microstructure function, an `(S, N, ...)` shaped
              array where `S` is the number of samples and `N` is the
              spatial discretization.
           y: The response field, same shape as `X`.
+          size: Alters the shape of X and y during the calibration of the
+              influence coefficients. If None, the size of the influence
+              coefficients is the same shape as `X` and `y`.
         '''
         self.basis = self.basis.__class__(self.n_states, self.domain)
-
+        if size is not None:
+            y = self._reshape_feature(y, size)
+            X = self._reshape_feature(X, size)
         if not len(y.shape) > 1:
             raise RuntimeError("The shape of y is incorrect.")
         if y.shape != X.shape:
             raise RuntimeError("X and y must be the same shape.")
         X_ = self.basis.discretize(X)
-        axes = np.arange(len(X.shape) - 1) + 1
+        axes = np.arange(X_.ndim)[1:-1]
         FX = np.fft.fftn(X_, axes=axes)
         Fy = np.fft.fftn(y, axes=axes)
         Fkernel = np.zeros(FX.shape[1:], dtype=np.complex)
         s0 = (slice(None),)
-        for ijk in np.ndindex(X.shape[1:]):
-            if np.all(np.array(ijk) == 0):
-                s1 = s0
-            else:
-                s1 = (slice(-1),)
+        for ijk in np.ndindex(X_.shape[1:-1]):
+            s1 = self.basis._get_basis_slice(ijk, s0)
             Fkernel[ijk + s1] = np.linalg.lstsq(FX[s0 + ijk + s1],
                                                 Fy[s0 + ijk])[0]
-
         self._filter = Filter(Fkernel[None])
 
     @property
@@ -154,8 +155,10 @@ class MKSRegressionModel(LinearRegression):
 
         if not hasattr(self, '_filter'):
             raise AttributeError("fit() method must be run before predict().")
+        y_pred_shape = X.shape
+        X = self._reshape_feature(X, self._filter.Fkernel.shape[1:-1])
         X_ = self.basis.discretize(X)
-        return self._filter.convolve(X_)
+        return self._filter.convolve(X_).reshape(y_pred_shape)
 
     def resize_coeff(self, size):
         '''Scale the size of the coefficients and pad with zeros.
@@ -215,18 +218,26 @@ class MKSRegressionModel(LinearRegression):
         >>> X = np.random.random((1, 3, 3))
         >>> basis = LegendreBasis(2, [0, 1])
         >>> model = MKSRegressionModel(basis=basis)
-        >>> #FX = model._discrtizefft(X)
         >>> X_ = basis.discretize(X)
         >>> FX = np.fft.fftn(X_, axes=(1, 2))
-        >>> FXtest = np.array([[[[-0.79735949+0. ,  4.50000000+0.j],
-        ...                      [-1.00887157-1.48005289j,  0.00000000+0.j],
-        ...                      [-1.00887157+1.48005289j,  0.00000000+0.j]],
-        ...                     [[ 0.62300683-4.97732233j,  0.00000000+0.j],
-        ...                      [ 1.09318216+0.10131035j,  0.00000000+0.j],
-        ...                      [ 0.37713401+1.87334545j,  0.00000000+0.j]],
-        ...                     [[ 0.62300683+4.97732233j,  0.00000000+0.j],
-        ...                      [ 0.37713401-1.87334545j,  0.00000000+0.j],
-        ...                      [ 1.09318216-0.10131035j,  0.00000000+0.j]]]])
+        >>>
+        >>> FXtest = np.array([[[[4.50000000+0.j, -0.79735949+0.],
+        ...                      [0.00000000+0.j, -1.00887157-1.48005289j],
+        ...                      [0.00000000+0.j, -1.00887157+1.48005289j]],
+        ...                     [[0.00000000+0.j, 0.62300683-4.97732233j],
+        ...                      [0.00000000+0.j, 1.09318216+0.10131035j],
+        ...                      [0.00000000+0.j, 0.37713401+1.87334545j]],
+        ...                     [[0.00000000+0.j, 0.62300683+4.97732233j],
+        ...                      [0.00000000+0.j, 0.37713401-1.87334545j],
+        ...                      [0.00000000+0.j, 1.09318216-0.10131035j]]]])
         >>> assert np.allclose(FX, FXtest)
         '''
         pass
+
+    def _reshape_feature(self, X, size):
+        """
+        Helper function used to check the shape of the microstructure,
+        and change to appropriate shape.
+        """
+        new_shape = (X.shape[0],) + size
+        return X.reshape(new_shape)

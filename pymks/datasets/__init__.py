@@ -4,8 +4,8 @@ from .cahn_hilliard_simulation import CahnHilliardSimulation
 from .microstructure_generator import MicrostructureGenerator
 
 __all__ = ['make_delta_microstructures', 'make_elastic_FE_strain_delta',
-           'make_elastic_FE_strain_random',
-           'make_cahn_hilliard', 'make_microstructure']
+           'make_elastic_FE_strain_random', 'make_cahn_hilliard',
+           'make_microstructure', 'make_checkerboard_microstructure']
 
 
 def make_elastic_FE_strain_delta(elastic_modulus=(1, 1), poissons_ratio=(1, 1),
@@ -42,7 +42,7 @@ def make_elastic_FE_strain_delta(elastic_modulus=(1, 1), poissons_ratio=(1, 1),
 
     """
     from .elastic_FE_simulation import ElasticFESimulation
-    
+
     FEsim = ElasticFESimulation(elastic_modulus=elastic_modulus,
                                 poissons_ratio=poissons_ratio,
                                 macro_strain=macro_strain)
@@ -131,7 +131,7 @@ def make_elastic_FE_strain_random(n_samples=1, elastic_modulus=(1, 1), poissons_
 
     """
     from .elastic_FE_simulation import ElasticFESimulation
-    
+
     FEsim = ElasticFESimulation(elastic_modulus=elastic_modulus,
                                 poissons_ratio=poissons_ratio,
                                 macro_strain=macro_strain)
@@ -166,7 +166,7 @@ def make_cahn_hilliard(n_samples=1, size=(21, 21), dx=0.25, width=1.,
       Array representing the microstructures at n_steps ahead of 'X'
 
     """
-    CHsim = CahnHilliardSimulation(dx=dx, dt=dt, gamma=width**2)
+    CHsim = CahnHilliardSimulation(dx=dx, dt=dt, gamma=width ** 2)
 
     X0 = 2 * np.random.random((n_samples,) + size) - 1
     X = X0.copy()
@@ -205,6 +205,35 @@ def make_microstructure(n_samples=10, size=(101, 101), n_phases=2,
 
     """
     MS = MicrostructureGenerator(n_samples=n_samples, size=size,
-                                  n_phases=n_phases, grain_size=grain_size,
-                                  seed=seed)
+                                 n_phases=n_phases, grain_size=grain_size,
+                                 seed=seed)
     return MS.generate()
+
+
+def make_checkerboard_microstructure(square_size, n_squares):
+    """
+    Constructs a checkerboard_microstructure with the `square_size` by
+    `square_size` size squares and on a `n_squares` by `n_squares`
+
+    >>> square_size, n_squares = 2, 2
+    >>> Xtest = np.array([[[0, 0, 1, 1],
+    ...                    [0, 0, 1, 1],
+    ...                    [1, 1, 0, 0],
+    ...                    [1, 1, 0, 0]]])
+    >>> X = make_checkerboard_microstructure(square_size, n_squares)
+    >>> assert(np.allclose(X, Xtest))
+
+    Args:
+        square_size: length of the side of one square in the checkerboard.
+        n_squares: number of squares along on size of the checkerboard.
+
+    Returns:
+        checkerboard microstructure with shape of (1, square_size * n_squares,
+        square_size * n_squares)
+    """
+
+    L = n_squares * square_size
+    X = np.ones((2 * square_size, 2 * square_size), dtype=int)
+    X[:square_size, :square_size] = 0
+    X[square_size:, square_size:] = 0
+    return np.tile(X, ((n_squares + 1) / 2, (n_squares + 1) / 2))[None, :L, :L]
