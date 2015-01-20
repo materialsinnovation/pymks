@@ -1,7 +1,9 @@
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
+import itertools
 
 
 def _set_colors():
@@ -26,13 +28,21 @@ def _get_diff_cmap():
     MediumRGB = np.array([255, 255, 191]) / 255.
     LowRGB = np.array([0, 0, 0]) / 255.
     cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
-    return colors.LinearSegmentedColormap('coeff_cmap', cdict, 256)
+    return colors.LinearSegmentedColormap('diff_cmap', cdict, 256)
+
+
+def _get_spatial_correlations_cmap():
+    HighRGB = np.array([118, 42, 131]) / 255.
+    MediumRGB = np.array([255, 255, 191]) / 255.
+    LowRGB = np.array([26, 152, 80]) / 255.
+    cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
+    return colors.LinearSegmentedColormap('diff_cmap', cdict, 256)
 
 
 def _set_cdict(HighRGB, MediumRGB, LowRGB):
     cdict = {'red': ((0.0, LowRGB[0], LowRGB[0]),
-                    (0.5, MediumRGB[0], MediumRGB[0]),
-                    (1.0, HighRGB[0], HighRGB[0])),
+                     (0.5, MediumRGB[0], MediumRGB[0]),
+                     (1.0, HighRGB[0], HighRGB[0])),
 
              'green': ((0.0, LowRGB[1], LowRGB[1]),
                        (0.5, MediumRGB[1], MediumRGB[1]),
@@ -45,7 +55,7 @@ def _set_cdict(HighRGB, MediumRGB, LowRGB):
     return cdict
 
 
-def _getCoeffCmap():
+def _get_coeff_cmap():
     HighRGB = np.array([244, 109, 67]) / 255.
     MediumRGB = np.array([255, 255, 191]) / 255.
     LowRGB = np.array([0, 0, 0]) / 255.
@@ -122,7 +132,7 @@ def draw_coeff(coeff):
     if coeff.dtype == 'complex':
         print(DeprecationWarning("Coefficients are complex."))
         coeff = coeff.real
-    coeff_cmap = _getCoeffCmap()
+    coeff_cmap = _get_coeff_cmap()
     plt.close('all')
     vmin = np.min(coeff)
     vmax = np.max(coeff)
@@ -193,6 +203,7 @@ def draw_microstructures(*microstructures):
 
 
 def draw_strains(*strains, **titles):
+    n_strains = len(strains)
     plt.close('all')
     cmap = _get_response_cmap()
     fig, axs = plt.subplots(1, n_strains, figsize=(n_strains * 4, 4))
@@ -316,11 +327,12 @@ def draw_diff(*responses, **titles):
 
 
 def draw_gridscores(grid_scores, label=None, color='#f46d43'):
-    tmp = [[params['n_states'], -mean_score, scores.std()] \
-            for params, mean_score, scores in grid_scores]
+    tmp = [[params['n_states'], -mean_score, scores.std()]
+           for params, mean_score, scores in grid_scores]
 
     n_states, errors, stddev = list(zip(*tmp))
-    plt.errorbar(n_states, errors, yerr=stddev, linewidth=2, color=color, label=label)
+    plt.errorbar(n_states, errors, yerr=stddev, linewidth=2,
+                 color=color, label=label)
 
     plt.legend()
     plt.ylabel('MSE', fontsize=20)
@@ -349,6 +361,156 @@ def bin(arr, n_bins):
     dX = X[1] - X[0]
 
     return np.maximum(1 - abs(arr[:, None] - X) / dX, 0)
+
+
+def draw_PCA(X, n_sets):
+    size = np.array(X.shape)
+    if size[-1] == 2:
+        _draw_PCA_2D(X, n_sets)
+    elif size[-1] == 3:
+        _draw_PCA_3D(X, n_sets)
+    else:
+        raise RuntimeError("n_components must be 2 or 3.")
+
+
+def _get_PCA_color_list(n_sets):
+    color_list = ['#1a9850', '#f46d43', '#762a83', '#1a1a1a',
+                  '#ffffbf', '#a6d96a', '#c2a5cf', '#878787']
+    return color_list[:n_sets]
+
+
+def _draw_PCA_2D(X, n_sets):
+    color_list = _get_PCA_color_list(n_sets)
+    sets = np.array(X.shape)[0] / n_sets
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.set_xlabel('PC 1', fontsize=15)
+    ax.set_ylabel('PC 2', fontsize=15)
+    ax.set_xticks(())
+    ax.set_yticks(())
+    for n in range(n_sets):
+        ax.scatter(X[n * sets:(n + 1) * sets, 0],
+                   X[n * sets:(n + 1) * sets, 1],
+                   color=color_list[n])
+
+
+def _draw_PCA_3D(X, n_sets):
+    color_list = _get_PCA_color_list(n_sets)
+    sets = np.array(X.shape)[0] / n_sets
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.set_xlabel('PC 1', fontsize=10)
+    ax.set_ylabel('PC 2', fontsize=10)
+    ax.set_zlabel('PC 3', fontsize=10)
+    ax.set_xticks(())
+    ax.set_yticks(())
+    ax.set_zticks(())
+    for n in range(n_sets):
+        ax.scatter(X[n * sets:(n + 1) * sets, 0],
+                   X[n * sets:(n + 1) * sets, 1],
+                   X[n * sets:(n + 1) * sets, 2],
+                   color=color_list[n])
+
+
+def draw_spatial_correlations(X_corr, correlation_plots=None):
+    corr_cmap = _get_spatial_correlations_cmap()
+    plt.close('all')
+    vmin = np.min(X_corr)
+    vmax = np.max(X_corr)
+    n_corr = X_corr.shape[-1]
+    n_states = ((np.sqrt(8 * n_corr + 1) - 1) / 2).astype(int)
+    correlation_dict = _get_spatial_correlation_dict(X_corr, n_states)
+    correlation_plot_names = _get_correlation_titles(correlation_dict,
+                                                     correlation_plots)
+    if correlation_plot_names is None:
+        correlation_plot_names = correlation_dict.keys()
+    n_plots = len(correlation_plot_names)
+    fig, axs = plt.subplots(1, n_plots, figsize=(n_plots * 4, 4))
+    ii = 0
+    for ax, title in zip(axs, correlation_plot_names):
+        if ii == 0:
+            im = ax.imshow(correlation_dict[title], cmap=corr_cmap,
+                           interpolation='none', vmin=vmin, vmax=vmax)
+        else:
+            ax.imshow(correlation_dict[title], cmap=corr_cmap,
+                      interpolation='none', vmin=vmin, vmax=vmax)
+        ax.set_xticks(())
+        ax.set_yticks(())
+        ax.set_title(r'Spatial Correlation $%s$' % title, fontsize=15)
+        ii = ii + 1
+    fig.subplots_adjust(right=0.8)
+    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
+    fig.colorbar(im, cax=cbar_ax)
+    plt.tight_layout()
+
+
+def _get_correlation_titles(correlation_dict, correlation_plots):
+    if correlation_plots is None:
+        return None
+    correlation_plots = map(str, correlation_plots)
+    new_names = correlation_plots
+    for plot_name in correlation_plots:
+        if not plot_name in correlation_dict:
+            name = list(plot_name)
+            name[1], name[4] = name[4], name[1]
+            new_name = ''.join(str(e) for e in name)
+            new_names[new_names.index(plot_name)] = new_name
+            if not new_name in correlation_dict:
+                raise RuntimeError("%s, correlation not found", plot_name)
+    return new_names
+
+
+def _get_spatial_correlation_dict(X_corr, n_states):
+    keys = _get_spatial_correlation_titles(n_states)
+    return dict(zip(keys, X_corr.swapaxes(0, -1)))
+
+
+def _get_spatial_correlation_titles(n_states):
+    auto = _get_autocorrelation_titles(n_states)
+    cross = _get_crosscorrelation_titles(n_states)
+    return map(str, auto + cross)
+
+
+def _get_autocorrelation_titles(n_states):
+    states = np.arange(n_states) + 1
+    return list(zip(states, states))
+
+
+def _get_crosscorrelation_titles(n_states):
+    states = np.arange(n_states) + 1
+    Niter = n_states / 2
+    Nslice = n_states * (n_states - 1) / 2
+    tmp = [zip(states, np.roll(states, i)) for i in range(1, Niter + 1)]
+    titles = list(itertools.chain.from_iterable(tmp))
+    return titles[:Nslice]
+
+
+def draw_autocorrelations(coeff):
+    if coeff.dtype == 'complex':
+        print(DeprecationWarning("Coefficients are complex."))
+        coeff = coeff.real
+    coeff_cmap = _get_coeff_cmap()
+    plt.close('all')
+    vmin = np.min(coeff)
+    vmax = np.max(coeff)
+    Ncoeff = coeff.shape[-1]
+    fig, axs = plt.subplots(1, Ncoeff, figsize=(Ncoeff * 4, 4))
+    ii = 0
+    for ax in axs:
+        if ii == 0:
+            im = ax.imshow(coeff[..., ii].swapaxes(0, 1), cmap=coeff_cmap,
+                           interpolation='none', vmin=vmin, vmax=vmax)
+        else:
+            ax.imshow(coeff[..., ii].swapaxes(0, 1), cmap=coeff_cmap,
+                      interpolation='none', vmin=vmin, vmax=vmax)
+        ax.set_xticks(())
+        ax.set_yticks(())
+        ax.set_title(r'Influence Coefficients $h = %s$' % ii, fontsize=15)
+        ii = ii + 1
+    fig.subplots_adjust(right=0.8)
+    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
+    fig.colorbar(im, cax=cbar_ax)
+    plt.tight_layout()
 
 
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
