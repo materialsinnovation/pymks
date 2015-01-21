@@ -485,32 +485,47 @@ def _get_crosscorrelation_titles(n_states):
     return titles[:Nslice]
 
 
-def draw_autocorrelations(coeff):
-    if coeff.dtype == 'complex':
-        print(DeprecationWarning("Coefficients are complex."))
-        coeff = coeff.real
-    coeff_cmap = _get_coeff_cmap()
+def draw_autocorrelations(X_auto):
+    if X_auto.dtype == 'complex':
+        print(DeprecationWarning("X_autoicients are complex."))
+        X_auto = X_auto.real
+    X_auto_cmap = _get_coeff_cmap()
     plt.close('all')
-    vmin = np.min(coeff)
-    vmax = np.max(coeff)
-    Ncoeff = coeff.shape[-1]
-    fig, axs = plt.subplots(1, Ncoeff, figsize=(Ncoeff * 4, 4))
+    vmin = np.min(X_auto)
+    vmax = np.max(X_auto)
+    n_X_auto = X_auto.shape[-1]
+    x_loc, x_labels = _get_ticks_params(X_auto.shape[0])
+    y_loc, y_labels = _get_ticks_params(X_auto.shape[1])
+    fig, axs = plt.subplots(1, n_X_auto, figsize=(n_X_auto * 4, 4))
     ii = 0
     for ax in axs:
+        ax.set_xticks(x_loc)
+        ax.set_xticklabels(x_labels, fontsize=12)
+        ax.set_yticks(y_loc)
+        ax.set_yticklabels(y_labels, fontsize=12)
         if ii == 0:
-            im = ax.imshow(coeff[..., ii].swapaxes(0, 1), cmap=coeff_cmap,
+            im = ax.imshow(X_auto[..., ii].swapaxes(0, 1), cmap=X_auto_cmap,
                            interpolation='none', vmin=vmin, vmax=vmax)
         else:
-            ax.imshow(coeff[..., ii].swapaxes(0, 1), cmap=coeff_cmap,
+            ax.imshow(X_auto[..., ii].swapaxes(0, 1), cmap=X_auto_cmap,
                       interpolation='none', vmin=vmin, vmax=vmax)
-        ax.set_xticks(())
-        ax.set_yticks(())
-        ax.set_title(r'Influence Coefficients $h = %s$' % ii, fontsize=15)
+        ax.set_title(r"Autocorrelation $h = {0}, h = {1}$".format(ii + 1,
+                                                                  ii + 1),
+                     fontsize=15)
         ii = ii + 1
     fig.subplots_adjust(right=0.8)
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
+
+
+def _get_ticks_params(X):
+    n = ((X + 1) / 2) / 5
+    if n == 0:
+        n = 1
+    tick_loc = range(0, X + n, n)
+    tick_labes = range(- (X - 1) / 2, (X + 1) / 2 + n, n)
+    return tick_loc, tick_labes
 
 
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
