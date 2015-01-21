@@ -2,6 +2,8 @@ import matplotlib.colors as colors
 import matplotlib.cm as cmx
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from matplotlib.colors import Normalize
 import numpy as np
 import itertools
 
@@ -450,12 +452,12 @@ def _get_correlation_titles(correlation_dict, correlation_plots):
     correlation_plots = map(str, correlation_plots)
     new_names = correlation_plots
     for plot_name in correlation_plots:
-        if not plot_name in correlation_dict:
+        if plot_name not in correlation_dict:
             name = list(plot_name)
             name[1], name[4] = name[4], name[1]
             new_name = ''.join(str(e) for e in name)
             new_names[new_names.index(plot_name)] = new_name
-            if not new_name in correlation_dict:
+            if new_name not in correlation_dict:
                 raise RuntimeError("%s, correlation not found", plot_name)
     return new_names
 
@@ -496,36 +498,42 @@ def draw_autocorrelations(X_auto):
     n_X_auto = X_auto.shape[-1]
     x_loc, x_labels = _get_ticks_params(X_auto.shape[0])
     y_loc, y_labels = _get_ticks_params(X_auto.shape[1])
-    fig, axs = plt.subplots(1, n_X_auto, figsize=(n_X_auto * 4, 4))
+    fig, axs = plt.subplots(1, n_X_auto, figsize=(n_X_auto * 5, 5))
     ii = 0
     for ax in axs:
         ax.set_xticks(x_loc)
         ax.set_xticklabels(x_labels, fontsize=12)
         ax.set_yticks(y_loc)
         ax.set_yticklabels(y_labels, fontsize=12)
-        if ii == 0:
-            im = ax.imshow(X_auto[..., ii].swapaxes(0, 1), cmap=X_auto_cmap,
-                           interpolation='none', vmin=vmin, vmax=vmax)
-        else:
-            ax.imshow(X_auto[..., ii].swapaxes(0, 1), cmap=X_auto_cmap,
-                      interpolation='none', vmin=vmin, vmax=vmax)
-        ax.set_title(r"Autocorrelation $h = {0}, h = {1}$".format(ii + 1,
-                                                                  ii + 1),
+        im = ax.imshow(X_auto[..., ii].swapaxes(0, 1), cmap=X_auto_cmap,
+                       interpolation='none', vmin=vmin, vmax=vmax)
+        ax.set_title(r"Autocorrelation $h = {0}$, $h = {1}$".format(ii + 1,
+                                                                    ii + 1),
                      fontsize=15)
+        fig.subplots_adjust(right=0.8)
+        divider = make_axes_locatable(ax)
+        cbar_ax = divider.append_axes("right", size="10%", pad=0.05)
+        cbar_ticks = _get_colorbar_ticks(X_auto[..., ii])
+        plt.colorbar(im, cax=cbar_ax, ticks=cbar_ticks,
+                     boundaries=np.arange(cbar_ticks[0],
+                                          cbar_ticks[-1] + 0.001, 0.001))
         ii = ii + 1
-    fig.subplots_adjust(right=0.8)
-    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
-    fig.colorbar(im, cax=cbar_ax)
-    plt.tight_layout()
+        fig.subplots_adjust(right=0.8)
+        plt.tight_layout()
 
 
 def _get_ticks_params(X):
-    n = ((X + 1) / 2) / 5
-    if n == 0:
-        n = 1
+    segments = np.roll(np.arange(4, 7, dtype=int), 1, 0)
+    m = segments[np.argmin(X % segments)]
+    n = max((X + 1) / m, 1)
     tick_loc = range(0, X + n, n)
-    tick_labes = range(- (X - 1) / 2, (X + 1) / 2 + n, n)
-    return tick_loc, tick_labes
+    tick_labels = range(- (X - 1) / 2, (X + 1) / 2 + n, n)
+    return tick_loc, tick_labels
+
+
+def _get_colorbar_ticks(X_):
+    tick_range = np.linspace(np.min(X_), np.max(X_), 5)
+    return tick_range.astype(float)
 
 
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
