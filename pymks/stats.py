@@ -65,6 +65,15 @@ def crosscorrelate(X_):
     Niter = n_states // 2
     Nslice = n_states * (n_states - 1) / 2
     tmp = [Correlation(X_).convolve(np.roll(X_, i,
-                                             axis=-1)) for i in range(1,
-                                                                      Niter + 1)]
+                                            axis=-1)) for i in range(1,
+                                                                     Niter + 1)]
     return np.concatenate(tmp, axis=-1)[..., :Nslice]
+
+
+def correlate(X_):
+    """
+    Computes the autocorrelations and crosscorrelations for a microstructure
+    """
+    X_auto = autocorrelate(X_)
+    X_cross = crosscorrelate(X_)
+    return np.concatenate((X_auto, X_cross), axis=-1)
