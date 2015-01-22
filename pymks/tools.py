@@ -491,7 +491,7 @@ def draw_correlations(X_corr, correlations=None):
     X_auto_dict = _get_autocorrelation_dict(X_corr[..., :n_states])
     X_cross_dict = _get_crosscorrelation_dict(X_corr[..., n_states:])
     X_corr_dict = dict(X_cross_dict.items() + X_auto_dict.items())
-    _draw_stats(X_corr, X_corr_dict, correlations=correlations)
+    _draw_stats(X_corr_dict, correlations=correlations)
 
 
 def draw_autocorrelations(X_auto, correlations=None):
@@ -499,7 +499,7 @@ def draw_autocorrelations(X_auto, correlations=None):
         print(DeprecationWarning("autocorrleation is complex."))
         X_auto = X_auto.real
     X_auto_dict = _get_autocorrelation_dict(X_auto)
-    _draw_stats(X_auto, X_auto_dict, correlations=correlations)
+    _draw_stats(X_auto_dict, correlations=correlations)
 
 
 def draw_crosscorrelations(X_cross, correlations=None):
@@ -507,7 +507,7 @@ def draw_crosscorrelations(X_cross, correlations=None):
         print(DeprecationWarning("crosscorrelation is complex"))
         X_cross = X_cross.real
     X_cross_dict = _get_crosscorrelation_dict(X_cross)
-    _draw_stats(X_cross, X_cross_dict, correlations=correlations)
+    _draw_stats(X_cross_dict, correlations=correlations)
 
 
 def _get_autocorrelation_dict(X_auto):
@@ -521,16 +521,18 @@ def _get_crosscorrelation_dict(X_cross):
     return dict(zip(cross_labels, X_cross.swapaxes(0, -1)))
 
 
-def _draw_stats(X_, X_dict, correlations=None):
+def _draw_stats(X_dict, correlations=None):
     X_cmap = _get_coeff_cmap()
     plt.close('all')
-    vmin = np.min(X_)
-    vmax = np.max(X_)
     correlation_labels = _get_correlation_titles(X_dict, correlations)
-    print correlation_labels
     if correlation_labels is None:
         correlation_labels = X_dict.keys()
     n_plots = len(correlation_labels)
+    X_list = [v[..., None]
+              for k, v in X_dict.items() if k in correlation_labels]
+    X_ = np.concatenate(tuple(X_list), axis=-1)
+    vmin = np.min(X_)
+    vmax = np.max(X_)
     x_loc, x_labels = _get_ticks_params(X_.shape[0])
     y_loc, y_labels = _get_ticks_params(X_.shape[1])
     fig, axs = plt.subplots(1, n_plots, figsize=(n_plots * 5, 5))
