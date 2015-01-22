@@ -65,12 +65,10 @@ def test_nonperiodic_crosscorrelation():
     X_cross = crosscorrelate(X_)
 
     X_result = np.array([[[1 / 3., 4 / 9., 0.5,  4 / 9., ],
-                          [1 / 8., 0.25, 3 / 16, 0.25],
-                          [0., 1 / 7.,  0., 1 / 7.],
-                          [0., 1 / 20., 0.15, 1 / 20.],
+                          [1 / 8., 0.25, 3 / 16., 0.25],
+                          [0., 2 / 15.,  0., 2 / 15.],
+                          [0., 1 / 12., 0, 1 / 12.],
                           [0,   0,    0,   0]]])
-    print X_cross[..., 0]
-    print X_cross[..., 0].shape
     assert(np.allclose(X_result, X_cross[..., 0]))
 
 

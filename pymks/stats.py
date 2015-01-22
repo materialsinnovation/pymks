@@ -21,7 +21,7 @@ def autocorrelate(X_, periodic_axes=[]):
     >>> from pymks.bases import DiscreteIndicatorBasis
     >>> basis = DiscreteIndicatorBasis(n_states=n_states)
     >>> X_ = basis.discretize(X)
-    >>> X_auto = autocorrelate(X_)
+    >>> X_auto = autocorrelate(X_, periodic_axes=(0, 1))
     >>> X_test = np.array([[[0., 0., 0.],
     ...                   [0., 1./9, 0.],
     ...                   [0., 0., 0.]]])
@@ -33,7 +33,7 @@ def autocorrelate(X_, periodic_axes=[]):
 
 
 def crosscorrelate(X_, periodic_axes=[]):
-    '''
+    """
     Computes the crosscorrelations for a microstructure.
 
     Test for 2 states.
@@ -76,7 +76,7 @@ def crosscorrelate(X_, periodic_axes=[]):
       X: microstructure
     Returns:
       Crosscorelations for microstructure X.
-    '''
+    """
 
     n_states = X_.shape[-1]
     Niter = n_states // 2
@@ -110,7 +110,7 @@ def normalize(X_, Fkernel_shape):
     >>> Fkernel_shape = np.array((2 * Nx, Ny))
     >>> norm =  normalize(X_, Fkernel_shape)
     >>> assert norm.shape == (1, Nx, Ny, 1)
-    >>> assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
+    >>> assert np.allclose(norm[0, (Nx + 1) / 2, (Ny + 1) / 2, 0], 25)
 
     Args:
       X_: discretized microstructure (array)
@@ -119,6 +119,7 @@ def normalize(X_, Fkernel_shape):
       Normalization
 
     """
+
     if (Fkernel_shape == X_.shape[1:-1]).all():
         return np.prod(X_.shape[1:-1])
     else:
@@ -155,35 +156,36 @@ def truncate(a, shape):
     Truncates the edges of the array, a, based on the shape. This is
     used to unpad a padded convolution.
 
-    >>> print truncate(np.arange(10), (5,))
-    [3 4 5 6 7]
-    >>> print truncate(np.arange(9), (5,))
+    >>> print truncate(np.arange(10).reshape(1, 10, 1), (1, 5))[0, ..., 0]
     [2 3 4 5 6]
-    >>> print truncate(np.arange(10), (4,))
-    [3 4 5 6]
-    >>> print truncate(np.arange(9), (4,))
-    [3 4 5 6]
+    >>> print truncate(np.arange(9).reshape(1, 9, 1), (1, 5))[0, ..., 0]
+    [2 3 4 5 6]
+    >>> print truncate(np.arange(10).reshape((1, 10, 1)), (1, 4))[0, ..., 0]
+    [1 2 3 4]
+    >>> print truncate(np.arange(9).reshape((1, 9, 1)), (1, 4))[0, ..., 0]
+    [1 2 3 4]
 
-    >>> a = np.arange(5 * 4).reshape((5, 4))
-    >>> print truncate(a, shape=(3, 2))
-    [[ 5  6]
-     [ 9 10]
-     [13 14]]
+    >>> a = np.arange(5 * 4).reshape((1, 5, 4, 1))
+    >>> print truncate(a, shape=(1, 3, 2))[0, ..., 0]
+    [[ 9 10]
+     [13 14]
+     [17 18]]
 
-    >>> a = np.arange(5 * 4 * 3).reshape((5, 4, 3))
-    >>> assert (truncate(a, (2, 2, 1)) == [[[28], [31]], [[40], [43]]]).all()
+    >>> a = np.arange(5 * 4 * 3).reshape((1, 5, 4, 3, 1))
+    >>> assert (truncate(a, (1, 2, 2, 1))[0, ..., 0]  ==
+    ...         [[[17], [20]], [[29], [32]]]).all()
 
     """
-    ashape = np.array(a.shape)
+    a_shape = np.array(a.shape)
     n = len(shape)
-    newshape = ashape.copy()
-    newshape[:n] = shape
-    index0 = (ashape - newshape + 1) / 2
-    index1 = index0 + newshape
-    print 'ashape', ashape
-    print 'newshape', newshape
-    print 'index0', index0
-    print 'index1', index1
+    new_shape = a_shape.copy()
+    new_shape[:n] = shape
+    tmp_shape = new_shape.copy()
+    if not np.allclose(new_shape, a_shape):
+        non_periodic_axes = np.nonzero(new_shape - a_shape)
+        tmp_shape[non_periodic_axes] = 2 * \
+            ((tmp_shape[non_periodic_axes] + 1) / 2) + 1
+    index0 = tmp_shape - new_shape
+    index1 = index0 + new_shape
     multi_slice = tuple(slice(index0[ii], index1[ii]) for ii in range(n))
-    print 'multi_slice', multi_slice, '\n'
     return a[multi_slice]

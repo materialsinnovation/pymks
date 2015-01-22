@@ -2,9 +2,11 @@ import numpy as np
 
 
 class Filter(object):
+
     """
     Wrapper class for convolution with a kernel and resizing of a kernel
     """
+
     def __init__(self, Fkernel):
         """
         Instantiate a Filter.
@@ -24,7 +26,7 @@ class Filter(object):
           an array in real space
         """
         return np.real_if_close(np.fft.fftshift(np.fft.ifftn(self.Fkernel,
-                                axes=self.axes), axes=self.axes))
+                                                             axes=self.axes), axes=self.axes))
 
     def _real_2_frequency(self, kernel):
         """
@@ -85,13 +87,14 @@ class Filter(object):
 
 
 class Correlation(Filter):
+
     '''
     Computes the autocorrelation for a microstructure
 
     >>> n_states = 2
     >>> X = np.array([[[0, 1, 0],
     ...                [0, 1, 0],
-    ... 			   [0, 1, 0]]])
+    ...                [0, 1, 0]]])
     >>> from pymks.bases import DiscreteIndicatorBasis
     >>> basis = DiscreteIndicatorBasis(n_states=n_states)
     >>> X_ = basis.discretize(X)
@@ -113,6 +116,7 @@ class Correlation(Filter):
     Returns:
       Autocorrelations for microstructure X
     '''
+
     def __init__(self, kernel, Fkernel_shape=None):
         axes = np.arange(len(kernel.shape) - 2) + 1
         Fkernel = np.conjugate(np.fft.fftn(kernel, axes=axes, s=Fkernel_shape))
@@ -131,7 +135,8 @@ class Correlation(Filter):
         Fkernel_shape = np.array(self.Fkernel.shape)[self.axes]
         FX = np.fft.fftn(X, axes=self.axes, s=Fkernel_shape)
         Fy = self._sum(FX * self.Fkernel)
-        correlation = np.fft.ifftn(Fy, axes=self.axes)
+        correlation = np.real_if_close(
+            np.fft.ifftn(Fy, axes=self.axes), tol=1000)
         return np.fft.fftshift(correlation, axes=self.axes)
 
     def _sum(self, Fy):
