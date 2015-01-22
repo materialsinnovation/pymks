@@ -80,8 +80,9 @@ class MKSKernelPCAModel(KernelPCA):
           Autocorrelations and crosscorrelations.
         """
         X_ = self.basis.discretize(X)
-        X_auto = autocorrelate(X_)
-        X_cross = crosscorrelate(X_)
+        periodic_axes = np.arange(len(X_.shape) - 2) 
+        X_auto = autocorrelate(X_, periodic_axes=periodic_axes)
+        X_cross = crosscorrelate(X_, periodic_axes=periodic_axes)
         return np.concatenate((X_auto, X_cross), axis=-1)
 
     def fit(self, X):

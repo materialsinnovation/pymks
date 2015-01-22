@@ -97,15 +97,15 @@ class Correlation(Filter):
     >>> X_ = basis.discretize(X)
     >>> filter_ = Correlation(X_)
     >>> X_auto = filter_.convolve(X_)
-    >>> X_test = np.array([[[[1/3., 0.  ],
-    ...                      [2/3., 1/3.],
-    ...                      [1/3., 0.  ]],
-    ...                     [[1/3., 0.  ],
-    ...                      [2/3., 1/3.],
-    ...                      [1/3., 0.  ]],
-    ...                     [[1/3., 0.  ],
-    ...                      [2/3., 1/3.],
-    ...                      [1/3., 0.  ]]]])
+    >>> X_test = np.array([[[[3., 0.  ],
+    ...                      [6., 3.],
+    ...                      [3., 0.  ]],
+    ...                     [[3., 0.  ],
+    ...                      [6., 3.],
+    ...                      [3., 0.  ]],
+    ...                     [[3., 0.  ],
+    ...                      [6., 3.],
+    ...                      [3., 0.  ]]]])
     >>> assert(np.allclose(X_auto, X_test))
 
     Ags:
@@ -113,14 +113,26 @@ class Correlation(Filter):
     Returns:
       Autocorrelations for microstructure X
     '''
-    def __init__(self, kernel):
+    def __init__(self, kernel, Fkernel_shape=None):
         axes = np.arange(len(kernel.shape) - 2) + 1
-        Fkernel = np.conjugate(np.fft.fftn(kernel, axes=axes))
+        Fkernel = np.conjugate(np.fft.fftn(kernel, axes=axes, s=Fkernel_shape))
         super(Correlation, self).__init__(Fkernel)
 
     def convolve(self, X):
-        X_auto = super(Correlation, self).convolve(X)
-        return np.fft.fftshift(X_auto, axes=self.axes) / np.prod(X.shape[1:-1])
+        """
+        Convolve X with a kernel in frequency space.
+
+        Args:
+          X: array to be convolved
+
+        Returns:
+          convolution of X with the kernel
+        """
+        Fkernel_shape = np.array(self.Fkernel.shape)[self.axes]
+        FX = np.fft.fftn(X, axes=self.axes, s=Fkernel_shape)
+        Fy = self._sum(FX * self.Fkernel)
+        correlation = np.fft.ifftn(Fy, axes=self.axes)
+        return np.fft.fftshift(correlation, axes=self.axes)
 
     def _sum(self, Fy):
         return Fy
