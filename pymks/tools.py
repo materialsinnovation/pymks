@@ -486,28 +486,28 @@ def _get_crosscorrelation_titles(n_states):
     return titles[:Nslice]
 
 
-def draw_correlations(X_corr):
+def draw_correlations(X_corr, correlations=None):
     n_states = ((np.sqrt(8 * X_corr.shape[-1] + 1) - 1) / 2).astype(int)
     X_auto_dict = _get_autocorrelation_dict(X_corr[..., :n_states])
     X_cross_dict = _get_crosscorrelation_dict(X_corr[..., n_states:])
     X_corr_dict = dict(X_cross_dict.items() + X_auto_dict.items())
-    _draw_stats(X_corr, X_corr_dict)
+    _draw_stats(X_corr, X_corr_dict, correlations=correlations)
 
 
-def draw_autocorrelations(X_auto):
+def draw_autocorrelations(X_auto, correlations=None):
     if X_auto.dtype == 'complex':
         print(DeprecationWarning("autocorrleation is complex."))
         X_auto = X_auto.real
     X_auto_dict = _get_autocorrelation_dict(X_auto)
-    _draw_stats(X_auto, X_auto_dict)
+    _draw_stats(X_auto, X_auto_dict, correlations=correlations)
 
 
-def draw_crosscorrelations(X_cross):
+def draw_crosscorrelations(X_cross, correlations=None):
     if X_cross.dtype == 'complex':
         print(DeprecationWarning("crosscorrelation is complex"))
         X_cross = X_cross.real
     X_cross_dict = _get_crosscorrelation_dict(X_cross)
-    _draw_stats(X_cross, X_cross_dict)
+    _draw_stats(X_cross, X_cross_dict, correlations=correlations)
 
 
 def _get_autocorrelation_dict(X_auto):
@@ -521,71 +521,44 @@ def _get_crosscorrelation_dict(X_cross):
     return dict(zip(cross_labels, X_cross.swapaxes(0, -1)))
 
 
-def _draw_stats(X_, X_dict):
+def _draw_stats(X_, X_dict, correlations=None):
     X_cmap = _get_coeff_cmap()
     plt.close('all')
     vmin = np.min(X_)
     vmax = np.max(X_)
-    n_X_ = X_.shape[-1]
-    if n_X_ == 1:
-        draw_stat(X_, X_dict)
-    else:
-        x_loc, x_labels = _get_ticks_params(X_.shape[0])
-        y_loc, y_labels = _get_ticks_params(X_.shape[1])
-        fig, axs = plt.subplots(1, n_X_, figsize=(n_X_ * 5, 5))
-        ii = 0
-        for ax, label, arr in zip(axs, X_dict.keys(), X_dict.values()):
-            ax.set_xticks(x_loc)
-            ax.set_xticklabels(x_labels, fontsize=12)
-            ax.set_yticks(y_loc)
-            ax.set_yticklabels(y_labels, fontsize=12)
-            im = ax.imshow(arr, cmap=X_cmap,
-                           interpolation='none', vmin=vmin, vmax=vmax)
-            ax.set_title(r"Correlation $h = {0}$, $h = {1}$".format(label[1],
-                                                                    label[-2]),
-                         fontsize=15)
-            fig.subplots_adjust(right=0.8)
-            divider = make_axes_locatable(ax)
-            cbar_ax = divider.append_axes("right", size="10%", pad=0.05)
-            cbar_ticks = _get_colorbar_ticks(X_[..., ii])
-            cbar = plt.colorbar(im, cax=cbar_ax, ticks=cbar_ticks,
-                                boundaries=np.arange(cbar_ticks[0],
-                                                     cbar_ticks[-1] + 0.005,
-                                                     0.005))
-            cbar.ax.tick_params(labelsize=12)
-            ii = ii + 1
-            fig.subplots_adjust(right=0.8)
-            plt.tight_layout()
-
-
-def draw_stat(X_, X_dict):
-    X_cmap = _get_coeff_cmap()
-    plt.close('all')
-    vmin = np.min(X_)
-    vmax = np.max(X_)
+    correlation_labels = _get_correlation_titles(X_dict, correlations)
+    print correlation_labels
+    if correlation_labels is None:
+        correlation_labels = X_dict.keys()
+    n_plots = len(correlation_labels)
     x_loc, x_labels = _get_ticks_params(X_.shape[0])
     y_loc, y_labels = _get_ticks_params(X_.shape[1])
+    fig, axs = plt.subplots(1, n_plots, figsize=(n_plots * 5, 5))
+    if n_plots == 1:
+        axs = list([axs])
     ii = 0
-    fig, ax = plt.subplots(1, 1, figsize=(5, 5))
-    ax.set_xticks(x_loc)
-    ax.set_xticklabels(x_labels, fontsize=12)
-    ax.set_yticks(y_loc)
-    ax.set_yticklabels(y_labels, fontsize=12)
-    im = ax.imshow(X_dict.values()[0], cmap=X_cmap,
-                   interpolation='none', vmin=vmin, vmax=vmax)
-    ax.set_title(r"Correlation $h = {0}$, $h = {1}$".format(X_dict.keys()[0][1],
-                                                            X_dict.keys()[0][-2]),
-                 fontsize=15)
-    fig.subplots_adjust(right=0.8)
-    divider = make_axes_locatable(ax)
-    cbar_ax = divider.append_axes("right", size="10%", pad=0.05)
-    cbar_ticks = _get_colorbar_ticks(X_[..., ii])
-    cbar = plt.colorbar(im, cax=cbar_ax, ticks=cbar_ticks,
-                        boundaries=np.arange(cbar_ticks[0],
-                                             cbar_ticks[-1] + 0.005, 0.005))
-    cbar.ax.tick_params(labelsize=12)
-    fig.subplots_adjust(right=0.8)
-    plt.tight_layout()
+    for ax, label in zip(axs, correlation_labels):
+        ax.set_xticks(x_loc)
+        ax.set_xticklabels(x_labels, fontsize=12)
+        ax.set_yticks(y_loc)
+        ax.set_yticklabels(y_labels, fontsize=12)
+        im = ax.imshow(X_dict[label], cmap=X_cmap,
+                       interpolation='none', vmin=vmin, vmax=vmax)
+        ax.set_title(r"Correlation $h = {0}$, $h = {1}$".format(label[1],
+                                                                label[-2]),
+                     fontsize=15)
+        fig.subplots_adjust(right=0.8)
+        divider = make_axes_locatable(ax)
+        cbar_ax = divider.append_axes("right", size="10%", pad=0.05)
+        cbar_ticks = _get_colorbar_ticks(X_dict[label])
+        cbar = plt.colorbar(im, cax=cbar_ax, ticks=cbar_ticks,
+                            boundaries=np.arange(cbar_ticks[0],
+                                                 cbar_ticks[-1] + 0.005,
+                                                 0.005))
+        cbar.ax.tick_params(labelsize=12)
+        ii = ii + 1
+        fig.subplots_adjust(right=0.8)
+        plt.tight_layout()
 
 
 def _get_ticks_params(X):
