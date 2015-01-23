@@ -1,5 +1,7 @@
 import numpy as np
 
+import matplotlib.pylab as plt
+
 
 class Filter(object):
 
@@ -88,7 +90,7 @@ class Filter(object):
 
 class Correlation(Filter):
 
-    '''
+    """
     Computes the autocorrelation for a microstructure
 
     >>> n_states = 2
@@ -115,7 +117,7 @@ class Correlation(Filter):
       X: microstructure
     Returns:
       Autocorrelations for microstructure X
-    '''
+    """
 
     def __init__(self, kernel, Fkernel_shape=None):
         axes = np.arange(len(kernel.shape) - 2) + 1
@@ -134,10 +136,19 @@ class Correlation(Filter):
         """
         Fkernel_shape = np.array(self.Fkernel.shape)[self.axes]
         FX = np.fft.fftn(X, axes=self.axes, s=Fkernel_shape)
+        # plt.imshow(
+        #     np.fft.ifftshift(np.fft.fftn(FX, axes=self.axes).real[0, ..., 0]),
+        #     interpolation='none'),
+        # plt.colorbar()
+        # plt.show()
         Fy = self._sum(FX * self.Fkernel)
         correlation = np.real_if_close(
-            np.fft.ifftn(Fy, axes=self.axes), tol=1000)
-        return np.fft.fftshift(correlation, axes=self.axes)
+            np.fft.ifftn(Fy, axes=self.axes))
+        # plt.imshow(correlation[0, ..., 0].real)
+        # plt.colorbar()
+        # plt.show()
+        return np.real_if_close(np.fft.fftshift(correlation, axes=self.axes),
+                                tol=1e7)
 
     def _sum(self, Fy):
         return Fy
