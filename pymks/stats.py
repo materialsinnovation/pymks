@@ -10,7 +10,7 @@ microstructures and the DiscreteIndicatorBasis.
 
 def autocorrelate(X_, periodic_axes=[]):
     """
-    Computes the autocorrelation for a microstructure
+    Computes the autocorrelation from a microstructure function.
 
     Test non-periodic autocorrelation.
 
@@ -26,6 +26,13 @@ def autocorrelate(X_, periodic_axes=[]):
     ...                   [0., 1./9, 0.],
     ...                   [0., 0., 0.]]])
     >>> assert(np.allclose(np.real_if_close(X_auto[0, ..., 1]), X_test[0]))
+
+    Args:
+      X_: microstructure funciton
+      periodic_axes: axes that are periodic. (0, 2) would indicate
+          that axes x and z are periodic in a 3D microstrucure.
+    Returns:
+      Autocorrelations for microstructure function X_.
     """
     s = Fkernel_shape(X_, periodic_axes)
     corr = Correlation(X_, Fkernel_shape=s).convolve(X_)
@@ -34,7 +41,7 @@ def autocorrelate(X_, periodic_axes=[]):
 
 def crosscorrelate(X_, periodic_axes=[]):
     """
-    Computes the crosscorrelations for a microstructure.
+    Computes the crosscorrelations from a microstructure function.
 
     Test for 2 states.
 
@@ -73,9 +80,11 @@ def crosscorrelate(X_, periodic_axes=[]):
     >>> assert(crosscorrelate(X_, periodic_axes=[0, 1]).shape == (1, 3, 3, 10))
 
     Args:
-      X: microstructure
+      X_: microstructure funciton
+      periodic_axes: axes that are periodic. (0, 2) would indicate
+          that axes x and z are periodic in a 3D microstrucure.
     Returns:
-      Crosscorelations for microstructure X.
+      Crosscorelations for microstructure function X_.
     """
 
     n_states = X_.shape[-1]
@@ -92,7 +101,15 @@ def crosscorrelate(X_, periodic_axes=[]):
 
 def correlate(X_, periodic_axes=[]):
     """
-    Computes the autocorrelations and crosscorrelations for a microstructure
+    Computes the autocorrelations and crosscorrelations from a microstructure
+    function.
+
+    Args:
+      X_: microstructure funciton
+      periodic_axes: axes that are periodic. (0, 2) would indicate
+          that axes x and z are periodic in a 3D microstrucure.
+    Returns:
+      Autocorrelations and crosscorrelations for microstructure funciton X_.
     """
     X_auto = autocorrelate(X_, periodic_axes=periodic_axes)
     X_cross = crosscorrelate(X_, periodic_axes=periodic_axes)
