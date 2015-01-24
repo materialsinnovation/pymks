@@ -1,8 +1,6 @@
 import numpy as np
 from .filter import Correlation
 
-import matplotlib.pylab as plt
-
 """
 The SpatialStatisticsModel takes in a microstructure and returns its two
 point statistics. Current the funciton only work for interger valued
@@ -31,28 +29,6 @@ def autocorrelate(X_, periodic_axes=[]):
     """
     s = Fkernel_shape(X_, periodic_axes)
     corr = Correlation(X_, Fkernel_shape=s).convolve(X_)
-    # tmp_turmc = truncate(corr, X_.shape[:-1])
-    # tmp_norm = normalize(X_, s)
-    # print 'trunc size', tmp_turmc.shape
-    # print 'norm size', tmp_norm.shape
-    # plt.imshow(tmp_norm[0, ..., 0].real)
-    # plt.colorbar()
-    # print 'norm max', np.max(tmp_norm)
-    # print 'norm max local', np.argmax(tmp_norm, axis=1)
-    # plt.show()
-    # plt.imshow(tmp_turmc[0, ..., 0].real)
-    # plt.colorbar()
-    # print 'trunc max', np.max(tmp_turmc)
-    # print 'trunc max local', np.argmax(tmp_turmc, axis=1)
-    # plt.show()
-    # tmp_auto = tmp_turmc / tmp_norm
-    # print tmp_auto[0, ..., 0].shape
-    # plt.imshow(tmp_auto[0, ..., 0].real)
-    # plt.colorbar()
-    # print 'auto max', np.max(tmp_auto, axis=1)
-    # print
-    # print 'auto max local', np.argmax(tmp_auto, axis=1)
-    # plt.show()
     return truncate(corr, X_.shape[:-1]) / normalize(X_, s)
 
 
@@ -111,8 +87,6 @@ def crosscorrelate(X_, periodic_axes=[]):
                                                          axis=-1)) for i
            in range(1, Niter + 1)]
     corr = np.concatenate(tmp, axis=-1)[..., :Nslice]
-    # print 'trunc size', truncate(corr, X_.shape[:-1])
-    # print 'norm size', normalize(X_, s)
     return truncate(corr, X_.shape[:-1]) / normalize(X_, s)
 
 
@@ -136,7 +110,7 @@ def normalize(X_, Fkernel_shape):
     >>> Fkernel_shape = np.array((2 * Nx, Ny))
     >>> norm =  normalize(X_, Fkernel_shape)
     >>> assert norm.shape == (1, Nx, Ny, 1)
-    >>> assert np.allclose(norm[0, (Nx + 1) / 2, (Ny + 1) / 2, 0], 25)
+    >>> assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
 
     Args:
       X_: discretized microstructure (array)
@@ -171,16 +145,10 @@ def Fkernel_shape(X_, periodic_axes):
       Shape of the new Fkernel array
 
     """
-    # print 'X_.shape', X_.shape
     axes = np.arange(len(X_.shape) - 2) + 1
-    # print 'axes', axes
+
     a = np.ones(len(axes), dtype=float) * 1.75
-    # print 'periodic_axes', periodic_axes
-    # print 'a', a
     a[list(periodic_axes)] = 1
-    # print 'a shape', a.shape
-    # print 'max for ones', np.max(a)
-    # print 'max norm', np.max((np.array(X_.shape)[axes] * a).astype(int))
     return (np.array(X_.shape)[axes] * a).astype(int)
 
 
@@ -190,47 +158,31 @@ def truncate(a, shape):
     used to unpad a padded convolution.
 
     >>> print truncate(np.arange(10).reshape(1, 10, 1), (1, 5))[0, ..., 0]
-    [2 3 4 5 6]
+    [3 4 5 6 7]
     >>> print truncate(np.arange(9).reshape(1, 9, 1), (1, 5))[0, ..., 0]
     [2 3 4 5 6]
     >>> print truncate(np.arange(10).reshape((1, 10, 1)), (1, 4))[0, ..., 0]
-    [1 2 3 4]
+    [3 4 5 6]
     >>> print truncate(np.arange(9).reshape((1, 9, 1)), (1, 4))[0, ..., 0]
-    [1 2 3 4]
+    [2 3 4 5]
 
     >>> a = np.arange(5 * 4).reshape((1, 5, 4, 1))
     >>> print truncate(a, shape=(1, 3, 2))[0, ..., 0]
-    [[ 9 10]
-     [13 14]
-     [17 18]]
+    [[ 5  6]
+     [ 9 10]
+     [13 14]]
 
     >>> a = np.arange(5 * 4 * 3).reshape((1, 5, 4, 3, 1))
     >>> assert (truncate(a, (1, 2, 2, 1))[0, ..., 0]  ==
-    ...         [[[17], [20]], [[29], [32]]]).all()
+    ...         [[[16], [19]], [[28], [31]]]).all()
 
     """
-    # plt.imshow(a[0, ..., 0].real)
-    # plt.show()
     a_shape = np.array(a.shape)
     n = len(shape)
     new_shape = a_shape.copy()
     new_shape[:n] = shape
-    # tmp_shape = new_shape.copy()
-    # print 'tmp_shape', tmp_shape
-    # print 'a_shape', a_shape
-    # index0 = np.zeros(a_shape.shape, dtype=int)
-    # if not np.allclose(new_shape, a_shape):
-    #     if np.allclose(tmp_shape[1:-1] % 2, np.zeros((tmp_shape[1:-1].shape))):
-    #         index0 = (a_shape - new_shape + 1) / 2
-    #     else:
-    #         aperiodic_axes = np.nonzero(new_shape - a_shape)
-    #         print 'aperiodic_axes', aperiodic_axes
-    #         tmp_shape[aperiodic_axes] = 2 * \
-    #             ((tmp_shape[aperiodic_axes] + 1) / 2) + 1
-    #         index0 = tmp_shape - new_shape
-    index0 = (a_shape - new_shape + 1) / 2
+    diff_shape = a_shape - new_shape
+    index0 = (diff_shape + (diff_shape % 2) * (new_shape % 2)) / 2
     index1 = index0 + new_shape
-    # print 'index0', index0
-    # print 'index1', index1
     multi_slice = tuple(slice(index0[ii], index1[ii]) for ii in range(n))
     return a[multi_slice]

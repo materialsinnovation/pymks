@@ -1,7 +1,5 @@
 import numpy as np
 
-import matplotlib.pylab as plt
-
 
 class Filter(object):
 
@@ -136,17 +134,9 @@ class Correlation(Filter):
         """
         Fkernel_shape = np.array(self.Fkernel.shape)[self.axes]
         FX = np.fft.fftn(X, axes=self.axes, s=Fkernel_shape)
-        # plt.imshow(
-        #     np.fft.ifftshift(np.fft.fftn(FX, axes=self.axes).real[0, ..., 0]),
-        #     interpolation='none'),
-        # plt.colorbar()
-        # plt.show()
         Fy = self._sum(FX * self.Fkernel)
         correlation = np.real_if_close(
             np.fft.ifftn(Fy, axes=self.axes))
-        # plt.imshow(correlation[0, ..., 0].real)
-        # plt.colorbar()
-        # plt.show()
         return np.real_if_close(np.fft.fftshift(correlation, axes=self.axes),
                                 tol=1e7)
 
