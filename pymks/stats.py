@@ -36,6 +36,16 @@ def autocorrelate(X_, periodic_axes=[]):
     """
     s = Fkernel_shape(X_, periodic_axes)
     corr = Correlation(X_, Fkernel_shape=s).convolve(X_)
+    num = truncate(corr, X_.shape[:-1])
+    for ii in range(num.shape[-1]):
+        print 'autocorrelation', str(ii + 1), 'numerator'
+        print truncate(corr, X_.shape[:-1])[0, ..., ii], '\n'
+    print 'autocorrelation denominator'
+    norm = normalize(X_, s)
+    if len(norm.shape) > 0:
+        print norm[0, ..., 0], '\n'
+    else:
+        print norm, '\n'
     return truncate(corr, X_.shape[:-1]) / normalize(X_, s)
 
 
@@ -96,6 +106,14 @@ def crosscorrelate(X_, periodic_axes=[]):
                                                          axis=-1)) for i
            in range(1, Niter + 1)]
     corr = np.concatenate(tmp, axis=-1)[..., :Nslice]
+    print 'crosscorrelation numerator'
+    print truncate(corr, X_.shape[:-1])[0, ..., 0], '\n'
+    print 'crosscorrelation denominator'
+    norm = normalize(X_, s)
+    if len(norm.shape) > 0:
+        print norm[0, ..., 0], '\n'
+    else:
+        print norm, '\n'
     return truncate(corr, X_.shape[:-1]) / normalize(X_, s)
 
 
@@ -164,7 +182,7 @@ def Fkernel_shape(X_, periodic_axes):
     """
     axes = np.arange(len(X_.shape) - 2) + 1
 
-    a = np.ones(len(axes), dtype=float) * 1.75
+    a = np.ones(len(axes), dtype=float) * 2.
     a[list(periodic_axes)] = 1
     return (np.array(X_.shape)[axes] * a).astype(int)
 
