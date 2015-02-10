@@ -1,4 +1,5 @@
 from pymks.stats import correlate
+import numpy as np
 
 
 class MKSHomogenizationModel(object):
@@ -9,7 +10,39 @@ class MKSHomogenizationModel(object):
     property linkage.
 
     The `MKSHomogenizationModel` model is designed to integrate with
-    dimensionality reduction and techniques
+    dimensionality reduction and techniques.
+
+    In ord
+
+    >>> n_states = 3
+    >>> domain = [-1, 1]
+
+
+    >>> from .bases import LegendreBasis
+    >>> basis = LegendreBasis(n_states=n_states, domain=domain)
+    >>> from sklearn.decomposition import PCA
+    >>> from sklearn.linear_model import LogisticRegression
+    >>> reducer = PCA(n_components=3)
+    >>> linker = LogisticRegression()
+    >>> model = MKSHomogenizationModel(basis=basis, dimension_reducer=reducer,
+    ...                                property_linker=linker)
+
+    >>> from .datasets import make_cahn_hilliard
+    >>> X0, X1 = make_cahn_hilliard(n_samples=25)
+    >>> y0 = np.zeros(X0.shape[0])
+    >>> y1 = np.ones(X1.shape[0])
+
+    >>> X = np.concatenate((X0, X1))
+    >>> y = np.concatenate((y0, y1))
+
+    >>> model.fit(X, y)
+
+    >>> X0_test, X1_test = make_cahn_hilliard(n_samples=3)
+    >>> y0_test = model.predict(X0_test)
+    >>> y1_test = model.predict(X1_test)
+    >>> assert(np.allclose(y0_test, [0, 0, 0]))
+    >>> assert(np.allclose(y1_test, [1, 1, 1]))
+
     '''
 
     def __init__(self, basis, dimension_reducer=None, property_linker=None):
@@ -26,6 +59,7 @@ class MKSHomogenizationModel(object):
         self.basis = basis
         self.reducer = dimension_reducer
         self.linker = property_linker
+        self.data = None
         if self.reducer is None:
             raise RuntimeError("dimension_reducer not specified")
         if self.linker is None:
@@ -59,6 +93,7 @@ class MKSHomogenizationModel(object):
         else:
             X_reduced = self.reducer.fit_transform(X_preped)
         self.linker.fit(X_reduced, y)
+        self.data = X_reduced
 
     def predict(self, X):
         '''Predicts macroscopic property for the microstructures `X`.
@@ -73,6 +108,7 @@ class MKSHomogenizationModel(object):
         '''
         X_preped = self._X_prep(X)
         X_reduced = self.reducer.transform(X_preped)
+        self.data = np.concatenate((self.data, X_reduced))
         return self.linker.predict(X_reduced)
 
     def _X_prep(self, X):
