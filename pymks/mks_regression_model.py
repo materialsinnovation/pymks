@@ -89,7 +89,7 @@ class MKSRegressionModel(LinearRegression):
 
 
         Args:
-          X: The microstructure function, an `(S, N, ...)` shaped
+          X: The microstructure, an `(S, N, ...)` shaped
              array where `S` is the number of samples and `N` is the
              spatial discretization.
           y: The response field, same shape as `X`.
@@ -125,7 +125,7 @@ class MKSRegressionModel(LinearRegression):
         return self._filter._frequency_2_real()[0]
 
     def predict(self, X):
-        r'''Calculate a new response from the microstructure function `X` with
+        '''Predicts a new response from the microstructure function `X` with
         calibrated influence coefficients.
 
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
