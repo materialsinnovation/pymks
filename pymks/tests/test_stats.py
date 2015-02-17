@@ -116,34 +116,6 @@ def test_nonperiodic_correlate():
     basis = DiscreteIndicatorBasis(n_states=2)
     X_ = basis.discretize(X)
     X_corr = correlate(X_)
-    X_result = [[0.67,  0.44,  0.75,  0.44],
-                [0.62,   0.5,  0.75,   0.5],
-                [0.6,  0.47,   0.8,  0.47],
-                [0.62,   0.5,  0.75,   0.5],
-                [0.5,  0.44,  0.75,  0.44]]
-    assert(np.allclose(X_result, X_corr[0, ..., 0]))
-
-
-def test_nonperiodic_correlate():
-    '''
-    test corrleate for non-periodic microstructures
-    '''
-    from pymks import DiscreteIndicatorBasis
-    from pymks.stats import correlate
-
-    X = np.array([[[0, 0, 1, 0],
-                   [0, 0, 1, 0],
-                   [0, 0, 1, 0],
-                   [0, 0, 0, 0],
-                   [0, 0, 1, 0]],
-                  [[0, 1, 0, 0],
-                   [0, 1, 0, 0],
-                   [0, 1, 0, 0],
-                   [0, 0, 0, 0],
-                   [0, 1, 0, 0]]])
-    basis = DiscreteIndicatorBasis(n_states=2)
-    X_ = basis.discretize(X)
-    X_corr = correlate(X_)
     X_result = [[2 / 3.,  4 / 9.,  0.75,  4 / 9.],
                 [5 / 8.,   0.5,  0.75,   0.5],
                 [0.6,  7 / 15.,   0.8,  7 / 15.],
