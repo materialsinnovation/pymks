@@ -152,6 +152,80 @@ def test_periodic_correlate():
     assert(np.allclose(X_result, X_corr[0, ..., 0]))
 
 
+def test_periodic_mask():
+    '''
+    test uncertainty masks for periodic axes.
+    '''
+    from pymks import DiscreteIndicatorBasis
+    from pymks.stats import autocorrelate
+    from pymks.datasets import make_checkerboard_microstructure
+
+    X = make_checkerboard_microstructure(1, 3)
+    basis = DiscreteIndicatorBasis(n_states=2)
+    X_ = basis.discretize(X)
+    mask = np.ones((X.shape))
+    mask[0, 0, 0] = 0
+    X_auto_periodic_mask = autocorrelate(X_, periodic_axes=[0, 1],
+                                         uncertainty_mask=mask)
+    X_result_0 = np.array([[[3 / 7., 2 / 7., 3 / 7.],
+                          [2 / 7., 5 / 8., 2 / 7.],
+                          [3 / 7., 2 / 7., 3 / 7.]]])
+    X_result_1 = np.array([[[2 / 7., 1 / 7., 2 / 7.],
+                          [1 / 7., 0.5, 1 / 7.],
+                          [2 / 7., 1 / 7., 2 / 7.]]])
+    X_result = np.concatenate((X_result_0[..., None],
+                               X_result_1[..., None]), axis=-1)
+    assert np.allclose(X_auto_periodic_mask, np.concatenate(X_result))
+
+
+def test_nonperiodic_mask():
+    '''
+    test uncertainty masks for nonperiodic axes.
+    '''
+    from pymks import DiscreteIndicatorBasis
+    from pymks.stats import autocorrelate
+    from pymks.datasets import make_checkerboard_microstructure
+
+    X = make_checkerboard_microstructure(1, 3)
+    basis = DiscreteIndicatorBasis(n_states=2)
+    X_ = basis.discretize(X)
+    mask = np.ones((X.shape))
+    mask[0, 0, 0] = 0
+    X_auto_nonperiodic_mask = autocorrelate(X_, uncertainty_mask=mask)
+    X_result_0 = np.array([[[2 / 3., 0, 0.5],
+                          [0, 5 / 8., 0.],
+                          [0.5, 0, 2 / 3.]]])
+    X_result_1 = np.array([[[2 / 3., 0, 0.5],
+                          [0, 0.5, 0.],
+                          [0.5, 0, 2 / 3.]]])
+    X_result = np.concatenate((X_result_0[..., None],
+                               X_result_1[..., None]), axis=-1)
+    assert np.allclose(X_auto_nonperiodic_mask, np.concatenate(X_result))
+
+
+def test_mixperdic_mask():
+    from pymks import DiscreteIndicatorBasis
+    from pymks.stats import autocorrelate
+    from pymks.datasets import make_checkerboard_microstructure
+
+    X = make_checkerboard_microstructure(1, 3)
+    basis = DiscreteIndicatorBasis(n_states=2)
+    X_ = basis.discretize(X)
+    mask = np.ones((X.shape))
+    mask[0, 0, 0] = 0
+    X_auto_mixperiodic_mask = autocorrelate(X_, periodic_axes=[0],
+                                            uncertainty_mask=mask)
+    X_result_0 = np.array([[[2 / 5., 2 / 7., 2 / 5.],
+                          [0, 5 / 8., 0],
+                          [2 / 5., 2 / 7., 2 / 5.]]])
+    X_result_1 = np.array([[[2 / 5., 1 / 7., 2 / 5.],
+                          [0, 0.5, 0.],
+                          [2 / 5., 1 / 7., 2 / 5.]]])
+    X_result = np.concatenate((X_result_0[..., None],
+                               X_result_1[..., None]), axis=-1)
+    assert np.allclose(X_auto_mixperiodic_mask, np.concatenate(X_result))
+
+
 if __name__ == '__main__':
     test_periodic_crosscorrelation()
     test_nonperiodic_crosscorrelation()
