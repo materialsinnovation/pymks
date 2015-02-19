@@ -36,6 +36,7 @@ def autocorrelate(X_, periodic_axes=[], uncertainty_mask=None):
     """
     if uncertainty_mask is not None:
         uncertainty_mask = _mask_check(X_, uncertainty_mask)
+        X_ = X_ * uncertainty_mask
     s = Fkernel_shape(X_, periodic_axes)
     corr = Correlation(X_, Fkernel_shape=s).convolve(X_)
     return truncate(corr, X_.shape[:-1]) / normalize(X_, s, uncertainty_mask)
@@ -91,6 +92,7 @@ def crosscorrelate(X_, periodic_axes=[], uncertainty_mask=None):
 
     if uncertainty_mask is not None:
         uncertainty_mask = _mask_check(X_, uncertainty_mask)
+        X_ = X_ * uncertainty_mask
     n_states = X_.shape[-1]
     Niter = n_states // 2
     Nslice = n_states * (n_states - 1) / 2
@@ -100,7 +102,8 @@ def crosscorrelate(X_, periodic_axes=[], uncertainty_mask=None):
                                                          axis=-1)) for i
            in range(1, Niter + 1)]
     corr = np.concatenate(tmp, axis=-1)[..., :Nslice]
-    return truncate(corr, X_.shape[:-1]) / normalize(X_, s, uncertainty_mask)
+    return truncate(corr, X_.shape[:-1]) /\
+        normalize(X_, s, uncertainty_mask)
 
 
 def correlate(X_, periodic_axes=[], uncertainty_mask=None):

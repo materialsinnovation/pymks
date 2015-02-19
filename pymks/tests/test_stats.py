@@ -167,9 +167,9 @@ def test_periodic_mask():
     mask[0, 0, 0] = 0
     X_auto_periodic_mask = autocorrelate(X_, periodic_axes=[0, 1],
                                          uncertainty_mask=mask)
-    X_result_0 = np.array([[[3 / 7., 2 / 7., 3 / 7.],
-                          [2 / 7., 5 / 8., 2 / 7.],
-                          [3 / 7., 2 / 7., 3 / 7.]]])
+    X_result_0 = np.array([[[1 / 7., 1 / 7., 3 / 7.],
+                          [1 / 7., 0.5, 1 / 7.],
+                          [3 / 7., 1 / 7., 1 / 7.]]])
     X_result_1 = np.array([[[2 / 7., 1 / 7., 2 / 7.],
                           [1 / 7., 0.5, 1 / 7.],
                           [2 / 7., 1 / 7., 2 / 7.]]])
@@ -192,9 +192,9 @@ def test_nonperiodic_mask():
     mask = np.ones((X.shape))
     mask[0, 0, 0] = 0
     X_auto_nonperiodic_mask = autocorrelate(X_, uncertainty_mask=mask)
-    X_result_0 = np.array([[[2 / 3., 0, 0.5],
-                          [0, 5 / 8., 0.],
-                          [0.5, 0, 2 / 3.]]])
+    X_result_0 = np.array([[[1 / 3., 0, 0.5],
+                          [0, 0.5, 0.],
+                          [0.5, 0, 1 / 3.]]])
     X_result_1 = np.array([[[2 / 3., 0, 0.5],
                           [0, 0.5, 0.],
                           [0.5, 0, 2 / 3.]]])
@@ -215,9 +215,9 @@ def test_mixperdic_mask():
     mask[0, 0, 0] = 0
     X_auto_mixperiodic_mask = autocorrelate(X_, periodic_axes=[0],
                                             uncertainty_mask=mask)
-    X_result_0 = np.array([[[2 / 5., 2 / 7., 2 / 5.],
-                          [0, 5 / 8., 0],
-                          [2 / 5., 2 / 7., 2 / 5.]]])
+    X_result_0 = np.array([[[1 / 5., 1 / 7., 2 / 5.],
+                          [0, 0.5, 0],
+                          [2 / 5., 1 / 7., 1 / 5.]]])
     X_result_1 = np.array([[[2 / 5., 1 / 7., 2 / 5.],
                           [0, 0.5, 0.],
                           [2 / 5., 1 / 7., 2 / 5.]]])
