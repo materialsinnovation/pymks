@@ -8,7 +8,7 @@ microstructures and the DiscreteIndicatorBasis.
 """
 
 
-def autocorrelate(X_, periodic_axes=[], uncertainty_mask=None):
+def autocorrelate(X_, periodic_axes=[], probability_mask=None):
     """
     Computes the autocorrelation from a microstructure function.
 
@@ -31,18 +31,21 @@ def autocorrelate(X_, periodic_axes=[], uncertainty_mask=None):
       X_: microstructure funciton
       periodic_axes: axes that are periodic. (0, 2) would indicate
           that axes x and z are periodic in a 3D microstrucure.
+      probability_mask: array of size (n_samples, Nx, Ny [,Nz) used assign
+          confidence value of data at each location. The mask must be the
+          same size on the microstructure X.
     Returns:
       Autocorrelations for microstructure function X_.
     """
-    if uncertainty_mask is not None:
-        uncertainty_mask = _mask_check(X_, uncertainty_mask)
-        X_ = X_ * uncertainty_mask
+    if probability_mask is not None:
+        probability_mask = _mask_check(X_, probability_mask)
+        X_ = X_ * probability_mask
     s = Fkernel_shape(X_, periodic_axes)
     corr = Correlation(X_, Fkernel_shape=s).convolve(X_)
-    return truncate(corr, X_.shape[:-1]) / normalize(X_, s, uncertainty_mask)
+    return truncate(corr, X_.shape[:-1]) / normalize(X_, s, probability_mask)
 
 
-def crosscorrelate(X_, periodic_axes=[], uncertainty_mask=None):
+def crosscorrelate(X_, periodic_axes=[], probability_mask=None):
     """
     Computes the crosscorrelations from a microstructure function.
 
@@ -86,27 +89,32 @@ def crosscorrelate(X_, periodic_axes=[], uncertainty_mask=None):
       X_: microstructure funciton
       periodic_axes: axes that are periodic. (0, 2) would indicate
           that axes x and z are periodic in a 3D microstrucure.
+      probability_mask: array of size (n_samples, Nx, Ny [,Nz) used assign
+          confidence value of data at each location. The mask must be the
+          same size on the microstructure X.
     Returns:
       Crosscorelations for microstructure function X_.
     """
 
-    if uncertainty_mask is not None:
-        uncertainty_mask = _mask_check(X_, uncertainty_mask)
-        X_ = X_ * uncertainty_mask
     n_states = X_.shape[-1]
     Niter = n_states // 2
     Nslice = n_states * (n_states - 1) / 2
+    if probability_mask is not None:
+        probability_mask = _mask_check(X_, probability_mask)
+        X_ = X_ * probability_mask
     s = Fkernel_shape(X_, periodic_axes)
     tmp = [Correlation(X_,
                        Fkernel_shape=s).convolve(np.roll(X_, i,
                                                          axis=-1)) for i
            in range(1, Niter + 1)]
     corr = np.concatenate(tmp, axis=-1)[..., :Nslice]
-    return truncate(corr, X_.shape[:-1]) /\
-        normalize(X_, s, uncertainty_mask)
+    norm = normalize(X_, s, probability_mask)
+    if not isinstance(norm, float):
+        norm = norm[..., :Nslice]
+    return truncate(corr, X_.shape[:-1]) / norm
 
 
-def correlate(X_, periodic_axes=[], uncertainty_mask=None):
+def correlate(X_, periodic_axes=[], probability_mask=None):
     """
     Computes the autocorrelations and crosscorrelations from a microstructure
     function.
@@ -115,17 +123,20 @@ def correlate(X_, periodic_axes=[], uncertainty_mask=None):
       X_: microstructure funciton
       periodic_axes: axes that are periodic. (0, 2) would indicate
           that axes x and z are periodic in a 3D microstrucure.
+      probability_mask: array of size (n_samples, Nx, Ny [,Nz) used assign
+          confidence value of data at each location. The mask must be the
+          same size on the microstructure X.
     Returns:
       Autocorrelations and crosscorrelations for microstructure funciton X_.
     """
     X_auto = autocorrelate(X_, periodic_axes=periodic_axes,
-                           uncertainty_mask=uncertainty_mask)
+                           probability_mask=probability_mask)
     X_cross = crosscorrelate(X_, periodic_axes=periodic_axes,
-                             uncertainty_mask=uncertainty_mask)
+                             probability_mask=probability_mask)
     return np.concatenate((X_auto, X_cross), axis=-1)
 
 
-def normalize(X_, Fkernel_shape, uncertainty_mask):
+def normalize(X_, Fkernel_shape, probability_mask):
     """
     Returns the normalization for the statistics
 
@@ -146,10 +157,10 @@ def normalize(X_, Fkernel_shape, uncertainty_mask):
 
     """
 
-    if (Fkernel_shape == X_.shape[1:-1]).all() and uncertainty_mask is None:
-        return np.prod(X_.shape[1:-1])
+    if (Fkernel_shape == X_.shape[1:-1]).all() and probability_mask is None:
+        return float(np.prod(X_.shape[1:-1]))
     else:
-        mask = uncertainty_mask
+        mask = probability_mask
         if mask is None:
             mask = np.ones(X_.shape)
         corr = Correlation(mask, Fkernel_shape=Fkernel_shape)
@@ -215,11 +226,11 @@ def truncate(a, shape):
     return a[multi_slice]
 
 
-def _mask_check(X_, uncertainty_mask):
+def _mask_check(X_, probability_mask):
     """
-    Helper function to verify that the uncertainty_mask is the correct
+    Helper function to verify that the probability_mask is the correct
     shape.
     """
-    if X_.shape[:-1] != uncertainty_mask.shape:
-        raise RuntimeError('uncertainty_mask does not match shape of X_')
-    return np.repeat(uncertainty_mask[..., None], X_.shape[-1], axis=-1)
+    if X_.shape[:-1] != probability_mask.shape:
+        raise RuntimeError('probability_mask does not match shape of X_')
+    return np.repeat(probability_mask[..., None], X_.shape[-1], axis=-1)
