@@ -37,12 +37,16 @@ def autocorrelate(X_, periodic_axes=[], probability_mask=None):
     Returns:
       Autocorrelations for microstructure function X_.
     """
-    if probability_mask is not None:
-        probability_mask = _mask_check(X_, probability_mask)
-        X_ = X_ * probability_mask
     s = Fkernel_shape(X_, periodic_axes)
-    corr = Correlation(X_, Fkernel_shape=s).convolve(X_)
-    return truncate(corr, X_.shape[:-1]) / normalize(X_, s, probability_mask)
+    auto = _autocorrelator(X_, s, probability_mask)
+    return auto / normalize(X_, s, probability_mask)
+
+
+def _autocorrelator(X_, s, probability_mask):
+    if probability_mask is not None:
+        X_ = _set_X(X_, probability_mask)
+    auto = Correlation(X_, Fkernel_shape=s).convolve(X_)
+    return truncate(auto, X_.shape[:-1])
 
 
 def crosscorrelate(X_, periodic_axes=[], probability_mask=None):
@@ -95,23 +99,23 @@ def crosscorrelate(X_, periodic_axes=[], probability_mask=None):
     Returns:
       Crosscorelations for microstructure function X_.
     """
+    s = Fkernel_shape(X_, periodic_axes)
+    cross = _crosscorrelator(X_, s, probability_mask)
+    return cross / normalize(X_, s, probability_mask)
 
+
+def _crosscorrelator(X_, s, probability_mask):
+    if probability_mask is not None:
+        X_ = _set_X(X_, probability_mask)
     n_states = X_.shape[-1]
     Niter = n_states // 2
     Nslice = n_states * (n_states - 1) / 2
-    if probability_mask is not None:
-        probability_mask = _mask_check(X_, probability_mask)
-        X_ = X_ * probability_mask
-    s = Fkernel_shape(X_, periodic_axes)
     tmp = [Correlation(X_,
                        Fkernel_shape=s).convolve(np.roll(X_, i,
                                                          axis=-1)) for i
            in range(1, Niter + 1)]
-    corr = np.concatenate(tmp, axis=-1)[..., :Nslice]
-    norm = normalize(X_, s, probability_mask)
-    if not isinstance(norm, float):
-        norm = norm[..., :Nslice]
-    return truncate(corr, X_.shape[:-1]) / norm
+    cross = np.concatenate(tmp, axis=-1)[..., :Nslice]
+    return truncate(cross, X_.shape[:-1])
 
 
 def correlate(X_, periodic_axes=[], probability_mask=None):
@@ -129,11 +133,11 @@ def correlate(X_, periodic_axes=[], probability_mask=None):
     Returns:
       Autocorrelations and crosscorrelations for microstructure funciton X_.
     """
-    X_auto = autocorrelate(X_, periodic_axes=periodic_axes,
-                           probability_mask=probability_mask)
-    X_cross = crosscorrelate(X_, periodic_axes=periodic_axes,
-                             probability_mask=probability_mask)
-    return np.concatenate((X_auto, X_cross), axis=-1)
+    s = Fkernel_shape(X_, periodic_axes)
+    auto = _autocorrelator(X_, s, probability_mask=probability_mask)
+    cross = _crosscorrelator(X_, s, probability_mask=probability_mask)
+    norm = normalize(X_, s, probability_mask)
+    return np.concatenate((auto / norm, cross / norm), axis=-1)
 
 
 def normalize(X_, Fkernel_shape, probability_mask):
@@ -162,9 +166,9 @@ def normalize(X_, Fkernel_shape, probability_mask):
     else:
         mask = probability_mask
         if mask is None:
-            mask = np.ones(X_.shape)
-        corr = Correlation(mask, Fkernel_shape=Fkernel_shape)
-        return truncate(corr.convolve(mask), X_.shape[:-1])
+            mask = np.ones(X_.shape[:-1])
+        corr = Correlation(mask[..., None], Fkernel_shape=Fkernel_shape)
+        return truncate(corr.convolve(mask[..., None]), X_.shape[:-1])
 
 
 def Fkernel_shape(X_, periodic_axes):
@@ -226,11 +230,11 @@ def truncate(a, shape):
     return a[multi_slice]
 
 
-def _mask_check(X_, probability_mask):
+def _set_X(X_, probability_mask):
     """
     Helper function to verify that the probability_mask is the correct
     shape.
     """
     if X_.shape[:-1] != probability_mask.shape:
-        raise RuntimeError('probability_mask does not match shape of X_')
-    return np.repeat(probability_mask[..., None], X_.shape[-1], axis=-1)
+        raise RuntimeError('probability_mask does not match shape of X')
+    return X_ * probability_mask[..., None]
