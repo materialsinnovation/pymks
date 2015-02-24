@@ -226,6 +226,41 @@ def test_mixperdic_mask():
     assert np.allclose(X_auto_mixperiodic_mask, np.concatenate(X_result))
 
 
+def test_mask_two_samples():
+    from pymks import DiscreteIndicatorBasis
+    from pymks.stats import correlate
+    from pymks.datasets import make_microstructure
+
+    X = make_microstructure(n_samples=2, n_phases=2, size=(3, 3),
+                            grain_size=(2, 2), seed=99)
+    basis = DiscreteIndicatorBasis(n_states=2)
+    X_ = basis.discretize(X)
+    mask = np.ones(X.shape)
+    mask[:, 0, 0] = 0.
+    X_corr = correlate(X_, probability_mask=mask)
+    X_result = np.array([[[[1 / 3., 1 / 3., 1 / 3.],
+                           [1 / 5., 1 / 5., 1 / 5.],
+                           [1 / 4., 1 / 4., 0]],
+                          [[1 / 5., 1 / 5., 2 / 5.],
+                           [1 / 2., 1 / 2., 0],
+                           [1 / 5., 1 / 5., 1 / 5.]],
+                          [[1 / 4., 1 / 4., 1 / 2.],
+                           [1 / 5., 1 / 5., 2 / 5.],
+                           [1 / 3., 1 / 3., 0]]],
+                         [[[0., 0., 1 / 3.],
+                           [2 / 5., 3 / 5., 0.],
+                           [0., 0., 1 / 2.]],
+                          [[0., 0., 2 / 5.],
+                           [3 / 8., 5 / 8., 0],
+                           [0., 0., 3 / 5.]],
+                          [[0., 0., 1 / 2.],
+                           [2 / 5., 3 / 5., 0.],
+                           [0., 0., 2 / 3.]]]])
+    print np.round(X_corr, decimals=4)
+    print X_result
+    assert np.allclose(X_corr, X_result)
+
+
 if __name__ == '__main__':
     test_periodic_crosscorrelation()
     test_nonperiodic_crosscorrelation()
