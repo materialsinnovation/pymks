@@ -137,7 +137,7 @@ class MKSHomogenizationModel(object):
         ...                                property_linker=linker)
         >>> model.fit(X, y)
         >>> X_test = np.random.randint(2, size=(1, 100))
-        >>> assert np.allclose(model.predict(X_test), 0.53036321)
+        >>> assert np.allclose(model.predict(X_test), 0.53031958)
 
 
         Args:
@@ -166,8 +166,8 @@ class MKSHomogenizationModel(object):
         >>> X = np.array([[0, 1],
         ...               [1, 0]])
         >>> X_prep = model._X_prep(X)
-        >>> X_test = np.array([[0, 0, 0, 0, 0.5, 0.5, 0, 0],
-        ...                    [0, 0, 1, 1, 0.5, 0.5, 0, 0]])
+        >>> X_test = np.array([[0, 0, 0, 0.5, 0.5, 0],
+        ...                    [0, 0, 1, 0.5, 0.5, 0]])
         >>> assert np.allclose(X_test, X_prep)
 
 
