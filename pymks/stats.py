@@ -37,14 +37,37 @@ def autocorrelate(X_, periodic_axes=[], probability_mask=None):
     Returns:
       Autocorrelations for microstructure function X_.
     """
+    X_ = _set_X(X_, probability_mask)
     s = Fkernel_shape(X_, periodic_axes)
-    auto = _autocorrelator(X_, s, probability_mask)
+    auto = _autocorrelator(X_, s)
     return auto / normalize(X_, s, probability_mask)
 
 
-def _autocorrelator(X_, s, probability_mask):
-    if probability_mask is not None:
-        X_ = _set_X(X_, probability_mask)
+def _autocorrelator(X_, s):
+    """
+    Helper function used to calculate the unnormalized autocorrelation counts.
+
+    >>> from pymks.datasets import make_microstructure
+    >>> from pymks.bases import DiscreteIndicatorBasis
+    >>> X = make_microstructure(n_samples=2, n_phases=3,
+    ...                         size=(2, 2), grain_size=(2, 2), seed=99)
+    >>> basis = DiscreteIndicatorBasis(n_states=3, domain=[0, 2])
+    >>> X_ = basis.discretize(X)
+    >>> X_auto = _autocorrelator(X_, X_.shape[1:-1])
+    >>> X_result = np.array([[[[0, 0, 0],
+    ...                        [0, 0, 2]],
+    ...                       [[0, 0, 0],
+    ...                        [1, 1, 2]]],
+    ...                      [[[0, 0, 0],
+    ...                        [0, 0, 0]],
+    ...                       [[2, 0, 2],
+    ...                        [2, 0, 2]]]])
+    >>> assert np.allclose(X_result, X_auto)
+
+    Args:
+      X_: microstructure function
+      s: shape of the Fkernel used for the convolution
+    """
     auto = Correlation(X_, Fkernel_shape=s).convolve(X_)
     return truncate(auto, X_.shape[:-1])
 
@@ -99,14 +122,38 @@ def crosscorrelate(X_, periodic_axes=[], probability_mask=None):
     Returns:
       Crosscorelations for microstructure function X_.
     """
+    X_ = _set_X(X_, probability_mask)
     s = Fkernel_shape(X_, periodic_axes)
-    cross = _crosscorrelator(X_, s, probability_mask)
+    cross = _crosscorrelator(X_, s)
     return cross / normalize(X_, s, probability_mask)
 
 
-def _crosscorrelator(X_, s, probability_mask):
-    if probability_mask is not None:
-        X_ = _set_X(X_, probability_mask)
+def _crosscorrelator(X_, s):
+    """
+    Helper function used to calculate the unnormalized croos-correlation
+    counts.
+
+    >>> from pymks.datasets import make_microstructure
+    >>> from pymks.bases import DiscreteIndicatorBasis
+    >>> X = make_microstructure(n_samples=2, n_phases=3,
+    ...                         size=(2, 2), grain_size=(2, 2), seed=90)
+    >>> basis = DiscreteIndicatorBasis(n_states=3, domain=[0, 2])
+    >>> X_ = basis.discretize(X)
+    >>> X_cross = _crosscorrelator(X_, X_.shape[1:-1])
+    >>> X_result = np.array([[[[2, 0, 0],
+    ...                        [2, 0, 0]],
+    ...                       [[0, 0, 0],
+    ...                        [0, 0, 0]]],
+    ...                      [[[0, 1, 0],
+    ...                        [0, 1, 0]],
+    ...                       [[0, 1, 0],
+    ...                        [0, 0, 0]]]])
+    >>> assert np.allclose(X_result, X_cross)
+
+    Args:
+      X_: microstructure function
+      s: shape of the Fkernel used for the convolution
+    """
     n_states = X_.shape[-1]
     Niter = n_states // 2
     Nslice = n_states * (n_states - 1) / 2
@@ -133,9 +180,10 @@ def correlate(X_, periodic_axes=[], probability_mask=None):
     Returns:
       Autocorrelations and crosscorrelations for microstructure funciton X_.
     """
+    X_ = _set_X(X_, probability_mask)
     s = Fkernel_shape(X_, periodic_axes)
-    auto = _autocorrelator(X_, s, probability_mask=probability_mask)
-    cross = _crosscorrelator(X_, s, probability_mask=probability_mask)
+    auto = _autocorrelator(X_, s)
+    cross = _crosscorrelator(X_, s)
     norm = normalize(X_, s, probability_mask)
     return np.concatenate((auto / norm, cross / norm), axis=-1)
 
@@ -235,6 +283,8 @@ def _set_X(X_, probability_mask):
     Helper function to verify that the probability_mask is the correct
     shape.
     """
-    if X_.shape[:-1] != probability_mask.shape:
-        raise RuntimeError('probability_mask does not match shape of X')
-    return X_ * probability_mask[..., None]
+    if probability_mask is not None:
+        if X_.shape[:-1] != probability_mask.shape:
+            raise RuntimeError('probability_mask does not match shape of X')
+        X_ = X_ * probability_mask[..., None]
+    return X_
