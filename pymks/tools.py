@@ -181,19 +181,20 @@ def draw_microstructure_strain(microstructure, strain):
 
 
 def draw_microstructures(*microstructures):
-    n_micros = len(microstructures)
+    n_micros = microstructures[0].shape[0]
     vmin = np.min(microstructures)
     vmax = np.max(microstructures)
     plt.close('all')
     fig, axs = plt.subplots(1, n_micros, figsize=(n_micros * 4, 4))
     if n_micros > 1:
-        for micro, ax in zip(microstructures, axs.flat):
-            im = ax.imshow(micro.swapaxes(0, 1), cmap=plt.cm.gray,
-                           interpolation='none', vmin=vmin, vmax=vmax)
+        for sample, ax in zip(np.arange(n_micros), axs.flat):
+            im = ax.imshow(microstructures[0][sample].swapaxes(0, 1),
+                           cmap=plt.cm.gray, interpolation='none',
+                           vmin=vmin, vmax=vmax)
             ax.set_xticks(())
             ax.set_yticks(())
     else:
-        im = axs.imshow(microstructures[0].swapaxes(0, 1), cmap=plt.cm.gray,
+        im = axs.imshow(microstructures[0][0].swapaxes(0, 1), cmap=plt.cm.gray,
                         interpolation='none', vmin=vmin, vmax=vmax)
         axs.set_xticks(())
         axs.set_yticks(())
