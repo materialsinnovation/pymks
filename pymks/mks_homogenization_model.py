@@ -1,8 +1,10 @@
 from pymks.stats import correlate
+from sklearn.preprocessing import scale
+from sklearn.base import BaseEstimator
 import numpy as np
 
 
-class MKSHomogenizationModel(object):
+class MKSHomogenizationModel(BaseEstimator):
 
     '''
     The `MKSHomogenizationModel` takes in microstructures and a their
@@ -57,22 +59,23 @@ class MKSHomogenizationModel(object):
         '''
 
         self.basis = basis
-        self.reducer = dimension_reducer
-        self.linker = property_linker
-        if self.reducer is None:
+        self.dimension_reducer = dimension_reducer
+        self.property_linker = property_linker
+        if self.dimension_reducer is None:
             raise RuntimeError("dimension_reducer not specified")
-        if self.linker is None:
+        if self.property_linker is None:
             raise RuntimeError("property_linker not specified.")
-        if not callable(getattr(self.reducer, "fit_transform", None)):
+        if not callable(getattr(self.dimension_reducer,
+                                "fit_transform", None)):
             raise RuntimeError(
                 "dimension_reducer does not have fit_transform() method.")
-        if not callable(getattr(self.reducer, "transform", None)):
+        if not callable(getattr(self.dimension_reducer, "transform", None)):
             raise RuntimeError(
                 "dimension_reducer does not have transform() method.")
-        if not callable(getattr(self.linker, "fit", None)):
+        if not callable(getattr(self.property_linker, "fit", None)):
             raise RuntimeError(
                 "property_linker does not have fit() method.")
-        if not callable(getattr(self.linker, "predict", None)):
+        if not callable(getattr(self.property_linker, "predict", None)):
             raise RuntimeError(
                 "property_linker does not have predict() method.")
 
@@ -114,10 +117,11 @@ class MKSHomogenizationModel(object):
         '''
         X_preped = self._X_prep(X)
         if reducer_label is not None:
-            X_reduced = self.reducer.fit_transform(X_preped, reducer_label)
+            X_reduced = self.dimension_reducer.fit_transform(X_preped,
+                                                             reducer_label)
         else:
-            X_reduced = self.reducer.fit_transform(X_preped)
-        self.linker.fit(X_reduced, y)
+            X_reduced = self.dimension_reducer.fit_transform(X_preped)
+        self.property_linker.fit(X_reduced, y)
         self.data = X_reduced
 
     def predict(self, X):
@@ -147,9 +151,9 @@ class MKSHomogenizationModel(object):
             The predicted macroscopic property for `X`.
         '''
         X_preped = self._X_prep(X)
-        X_reduced = self.reducer.transform(X_preped)
+        X_reduced = self.dimension_reducer.transform(X_preped)
         self.data = np.concatenate((self.data, X_reduced))
-        return self.linker.predict(X_reduced)
+        return self.property_linker.predict(X_reduced)
 
     def _X_prep(self, X):
         '''
@@ -180,4 +184,4 @@ class MKSHomogenizationModel(object):
         '''
         X_ = self.basis.discretize(X)
         X_corr = correlate(X_)
-        return X_corr.reshape((X_corr.shape[0], X_corr[0].size))
+        return scale(X_corr.reshape((X_corr.shape[0], X_corr[0].size)))
