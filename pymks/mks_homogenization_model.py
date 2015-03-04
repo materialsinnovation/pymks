@@ -76,7 +76,8 @@ class MKSHomogenizationModel(object):
             raise RuntimeError(
                 "property_linker does not have predict() method.")
 
-    def fit(self, X, y, reducer_label=None):
+    def fit(self, X, y, reducer_label=None,
+            periodic_axes=[], probability_mask=None):
         '''
         Fits data by calculating 2-point statistics from X, preforming
         dimension reduction using dimension_reducer, and fitting the reduced
@@ -111,8 +112,12 @@ class MKSHomogenizationModel(object):
           y: The material property associated with `X`.
           reducer_label: label for X used during the fit_transform method
              for the `dimension_reducer`.
+          periodic_axes: axes that are periodic. (0, 2) would indicate
+              that axes x and z are periodic in a 3D microstrucure.
+          probability_mask: array with same shape as X used to assign a
+              confidence value for each data point.
         '''
-        X_preped = self._X_prep(X)
+        X_preped = self._X_prep(X, periodic_axes, probability_mask)
         if reducer_label is not None:
             X_reduced = self.reducer.fit_transform(X_preped, reducer_label)
         else:
@@ -120,7 +125,7 @@ class MKSHomogenizationModel(object):
         self.linker.fit(X_reduced, y)
         self.data = X_reduced
 
-    def predict(self, X):
+    def predict(self, X, periodic_axes=[], probability_mask=None):
         '''Predicts macroscopic property for the microstructures `X`.
 
         >>> from sklearn.manifold import LocallyLinearEmbedding
@@ -137,21 +142,25 @@ class MKSHomogenizationModel(object):
         ...                                property_linker=linker)
         >>> model.fit(X, y)
         >>> X_test = np.random.randint(2, size=(1, 100))
-        >>> assert np.allclose(model.predict(X_test), 0.53036321)
+        >>> assert np.allclose(model.predict(X_test), 0.53031958)
 
 
         Args:
             X: The microstructre, an `(S, N, ...)` shaped array where `S` is
                the number of samples and `N` is the spatial discretization.
+            periodic_axes: axes that are periodic. (0, 2) would indicate
+                that axes x and z are periodic in a 3D microstrucure.
+            probability_mask: array with same shape as X used to assign a
+                confidence value for each data point.
         Returns:
             The predicted macroscopic property for `X`.
         '''
-        X_preped = self._X_prep(X)
+        X_preped = self._X_prep(X, periodic_axes, probability_mask)
         X_reduced = self.reducer.transform(X_preped)
         self.data = np.concatenate((self.data, X_reduced))
         return self.linker.predict(X_reduced)
 
-    def _X_prep(self, X):
+    def _X_prep(self, X, periodic_axes, probability_mask):
         '''
         Helper function used to calculated 2-point statistics from `X` and
         reshape them appropriately for fit and predict methods.
@@ -165,19 +174,24 @@ class MKSHomogenizationModel(object):
         >>> model = MKSHomogenizationModel(basis, reducer, linker)
         >>> X = np.array([[0, 1],
         ...               [1, 0]])
-        >>> X_prep = model._X_prep(X)
-        >>> X_test = np.array([[0, 0, 0, 0, 0.5, 0.5, 0, 0],
-        ...                    [0, 0, 1, 1, 0.5, 0.5, 0, 0]])
+        >>> X_prep = model._X_prep(X, [], None)
+        >>> X_test = np.array([[0, 0, 0, 0.5, 0.5, 0],
+        ...                    [0, 0, 1, 0.5, 0.5, 0]])
         >>> assert np.allclose(X_test, X_prep)
 
 
         Args:
             X: The microstructre, an `(S, N, ...)` shaped array where `S` is
                the number of samples and `N` is the spatial discretization.
+            periodic_axes: axes that are periodic. (0, 2) would indicate
+                that axes x and z are periodic in a 3D microstrucure.
+            probability_mask: array with same shape as X used to assign a
+                confidence value for each data point.
         Returns:
            Spatial correlations for each sample formated with dimensions
            (n_samples, n_features).
         '''
         X_ = self.basis.discretize(X)
-        X_corr = correlate(X_)
+        X_corr = correlate(X_, periodic_axes=periodic_axes,
+                           probability_mask=probability_mask)
         return X_corr.reshape((X_corr.shape[0], X_corr[0].size))
