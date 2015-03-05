@@ -327,9 +327,14 @@ def draw_diff(*responses, **titles):
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
 
+def draw_gridscores_matrix(grid_scores, parameters=[],
+                           title=None, axis_titles=[]):
+    tmp = [[params[parameters[0]]]]
 
-def draw_gridscores(grid_scores, label=None, color='#f46d43'):
-    tmp = [[params['n_states'], -mean_score, scores.std()]
+
+def draw_gridscores(grid_scores, label=None, color='#f46d43',
+                    parameter='n_stats', title_label=None):
+    tmp = [[params[parameter], -mean_score, scores.std()]
            for params, mean_score, scores in grid_scores]
 
     n_states, errors, stddev = list(zip(*tmp))
@@ -338,7 +343,7 @@ def draw_gridscores(grid_scores, label=None, color='#f46d43'):
 
     plt.legend()
     plt.ylabel('MSE', fontsize=20)
-    plt.xlabel('Number of Local States', fontsize=15)
+    plt.xlabel('Number of ' + title_label, fontsize=15)
 
 
 def bin(arr, n_bins):
@@ -365,29 +370,29 @@ def bin(arr, n_bins):
     return np.maximum(1 - abs(arr[:, None] - X) / dX, 0)
 
 
-def draw_PCA(X, n_sets):
+def draw_components(X, n_sets):
     size = np.array(X.shape)
     if size[-1] == 2:
-        _draw_PCA_2D(X, n_sets)
+        _draw_components_2D(X, n_sets)
     elif size[-1] == 3:
-        _draw_PCA_3D(X, n_sets)
+        _draw_components_3D(X, n_sets)
     else:
         raise RuntimeError("n_components must be 2 or 3.")
 
 
-def _get_PCA_color_list(n_sets):
+def _get_color_list(n_sets):
     color_list = ['#1a9850', '#f46d43', '#762a83', '#1a1a1a',
                   '#ffffbf', '#a6d96a', '#c2a5cf', '#878787']
     return color_list[:n_sets]
 
 
-def _draw_PCA_2D(X, n_sets):
-    color_list = _get_PCA_color_list(n_sets)
+def _draw_components_2D(X, n_sets):
+    color_list = _get_color_list(n_sets)
     sets = np.array(X.shape)[0] / n_sets
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.set_xlabel('PC 1', fontsize=15)
-    ax.set_ylabel('PC 2', fontsize=15)
+    ax.set_ylabel('Component 2', fontsize=15)
     ax.set_xticks(())
     ax.set_yticks(())
     for n in range(n_sets):
@@ -396,14 +401,14 @@ def _draw_PCA_2D(X, n_sets):
                    color=color_list[n])
 
 
-def _draw_PCA_3D(X, n_sets):
-    color_list = _get_PCA_color_list(n_sets)
+def _draw_components_3D(X, n_sets):
+    color_list = _get_color_list(n_sets)
     sets = np.array(X.shape)[0] / n_sets
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.set_xlabel('PC 1', fontsize=10)
-    ax.set_ylabel('PC 2', fontsize=10)
-    ax.set_zlabel('PC 3', fontsize=10)
+    ax.set_xlabel('Component 1', fontsize=10)
+    ax.set_ylabel('Component 2', fontsize=10)
+    ax.set_zlabel('Component 3', fontsize=10)
     ax.set_xticks(())
     ax.set_yticks(())
     ax.set_zticks(())
