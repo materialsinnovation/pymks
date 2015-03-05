@@ -35,5 +35,9 @@ description of how to use PyMKS is outlined below and example cases
 can be found [in the examples section](EXAMPLES.html). Both code and
 example contributions are welcome.
 
+## Mailing List
+
+Please feel free to ask open ended questions about PyMKS on the
+<pymks-general@googlegroups.com> list.
 
 

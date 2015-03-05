@@ -27,6 +27,16 @@ Basic administrative procedures.
  * All documentation with
    [Google Python doc styling](http://google-styleguide.googlecode.com/svn/trunk/pyguide.html#Comments).
 
+Steps to install
+
+    $ pip install sphinx
+    $ pip install sphinx_bootstrap_theme
+    $ pip install sphinxcontrib-napoleon
+    $ cd doc/
+    $ make
+
+The documentation should be in `_build/html`.
+
 ## Branching
 
  * In general make an issue before a major branch and call the branch
