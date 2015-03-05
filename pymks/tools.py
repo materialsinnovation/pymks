@@ -327,6 +327,7 @@ def draw_diff(*responses, **titles):
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
 
+
 def draw_gridscores_matrix(grid_scores, parameters=[],
                            title=None, axis_titles=[]):
     tmp = [[params[parameters[0]]]]
@@ -553,7 +554,7 @@ def _draw_stats(X_dict, correlations=None):
         im = ax.imshow(X_dict[label], cmap=X_cmap,
                        interpolation='none', vmin=vmin, vmax=vmax)
         ax.set_title(r"Correlation $h = {0}$, $h' = {1}$".format(label[1],
-                                                                label[-2]),
+                                                                 label[-2]),
                      fontsize=15)
         fig.subplots_adjust(right=0.8)
         divider = make_axes_locatable(ax)
@@ -583,8 +584,8 @@ def _get_colorbar_ticks(X_):
     return tick_range.astype(float)
 
 
-def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
-                        n_jobs=1, train_sizes=np.linspace(.1, 1.0, 5)):
+def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None, n_jobs=1,
+                        scoring=None, train_sizes=np.linspace(.1, 1.0, 5)):
     """Code taken from scikit-learn examples for version 0.15.
 
     Generate a simple plot of the test and traning learning curve.
@@ -624,6 +625,8 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
     """
     from sklearn.learning_curve import learning_curve
 
+    flat_shape = (X.shape[0],) + (np.prod(X.shape[1:]),)
+    X_flat = X.reshape(flat_shape)
     plt.figure()
     plt.title(title)
     if ylim is not None:
@@ -631,7 +634,8 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
     plt.xlabel("Training examples")
     plt.ylabel("Score")
     train_sizes, train_scores, test_scores = learning_curve(
-        estimator, X, y, cv=cv, n_jobs=n_jobs, train_sizes=train_sizes)
+        estimator, X_flat, y, cv=cv, n_jobs=n_jobs,
+        train_sizes=train_sizes, scoring=scoring)
     train_scores_mean = np.mean(train_scores, axis=1)
     train_scores_std = np.std(train_scores, axis=1)
     test_scores_mean = np.mean(test_scores, axis=1)
@@ -640,13 +644,14 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
 
     plt.fill_between(train_sizes, train_scores_mean - train_scores_std,
                      train_scores_mean + train_scores_std, alpha=0.1,
-                     color="r")
+                     color="#f46d43")
     plt.fill_between(train_sizes, test_scores_mean - test_scores_std,
-                     test_scores_mean + test_scores_std, alpha=0.1, color="g")
-    plt.plot(train_sizes, train_scores_mean, 'o-', color="r",
+                     test_scores_mean + test_scores_std, alpha=0.1,
+                     color="#1a9641")
+    plt.plot(train_sizes, train_scores_mean, 'o-', color="#f46d43",
              label="Training score")
-    plt.plot(train_sizes, test_scores_mean, 'o-', color="g",
+    plt.plot(train_sizes, test_scores_mean, 'o-', color="#1a9641",
              label="Cross-validation score")
 
     plt.legend(loc="best")
-    return plt
+    plt.show()
