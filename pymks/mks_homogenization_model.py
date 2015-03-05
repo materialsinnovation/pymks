@@ -105,7 +105,7 @@ class MKSHomogenizationModel(BaseEstimator):
 
         >>> X_pca = reducer.fit_transform(X_corr.reshape((X_corr.shape[0],
         ...                                               X_corr[0].size)))
-        >>> assert np.allclose(model.data, X_pca)
+        >>> assert np.allclose(model.fit_data, X_pca)
 
         Args:
           X: The microstructure, an `(S, N, ...)` shaped
@@ -122,7 +122,7 @@ class MKSHomogenizationModel(BaseEstimator):
         else:
             X_reduced = self.dimension_reducer.fit_transform(X_preped)
         self.property_linker.fit(X_reduced, y)
-        self.data = X_reduced
+        self.fit_data = X_reduced
 
     def predict(self, X):
         '''Predicts macroscopic property for the microstructures `X`.
@@ -143,7 +143,6 @@ class MKSHomogenizationModel(BaseEstimator):
         >>> X_test = np.random.randint(2, size=(1, 100))
         >>> assert np.allclose(model.predict(X_test), 0.53036321)
 
-
         Args:
             X: The microstructre, an `(S, N, ...)` shaped array where `S` is
                the number of samples and `N` is the spatial discretization.
@@ -152,7 +151,7 @@ class MKSHomogenizationModel(BaseEstimator):
         '''
         X_preped = self._X_prep(X)
         X_reduced = self.dimension_reducer.transform(X_preped)
-        self.data = np.concatenate((self.data, X_reduced))
+        self.predict_data = X_reduced
         return self.property_linker.predict(X_reduced)
 
     def _X_prep(self, X):
@@ -184,4 +183,16 @@ class MKSHomogenizationModel(BaseEstimator):
         '''
         X_ = self.basis.discretize(X)
         X_corr = correlate(X_)
-        return scale(X_corr.reshape((X_corr.shape[0], X_corr[0].size)))
+        return X_corr.reshape((X_corr.shape[0], X_corr[0].size))
+
+    def score(self, X, y):
+        '''
+        The score function for the MKSHomogenizationModel is formats the
+        data and uses the score method from the property_linker.
+        '''
+        if not callable(getattr(self.property_linker, "score", None)):
+            raise RuntimeError(
+                "property_linker does not have score() method.")
+        X_preped = self._X_prep(X)
+        X_reduced = self.dimension_reducer.transform(X_preped)
+        return self.property_linker.score(X_reduced, y)
