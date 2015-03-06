@@ -328,23 +328,27 @@ def draw_diff(*responses, **titles):
     plt.tight_layout()
 
 
-def draw_gridscores_matrix(grid_scores, parameters=[],
-                           title=None, axis_titles=[]):
-    tmp = [[params[parameters[0]]]]
-
-
 def draw_gridscores(grid_scores, label=None, color='#f46d43',
-                    parameter='n_stats', title_label=None):
+                    parameter=None, axis_label=None):
     tmp = [[params[parameter], -mean_score, scores.std()]
            for params, mean_score, scores in grid_scores]
 
-    n_states, errors, stddev = list(zip(*tmp))
-    plt.errorbar(n_states, errors, yerr=stddev, linewidth=2,
-                 color=color, label=label)
+    param, errors, stddev = list(zip(*tmp))
+    plt.fill_between(param, np.array(errors) - np.array(stddev),
+                     np.array(errors) + np.array(stddev), alpha=0.1,
+                     color=color)
+    plt.plot(param, errors, 'o-', color=color, label=label, linewidth=2)
 
     plt.legend()
     plt.ylabel('MSE', fontsize=20)
-    plt.xlabel('Number of ' + title_label, fontsize=15)
+    plt.xlabel(axis_label, fontsize=15)
+
+
+def draw_component_variance(variance):
+    plt.plot(np.cumsum(variance * 100), 'o-', color='#1a9641', linewidth=2)
+    plt.xlabel('Number of Components', fontsize=15)
+    plt.ylabel('Percent Variance', fontsize=15)
+    plt.show()
 
 
 def bin(arr, n_bins):
@@ -371,12 +375,12 @@ def bin(arr, n_bins):
     return np.maximum(1 - abs(arr[:, None] - X) / dX, 0)
 
 
-def draw_components(X, n_sets):
-    size = np.array(X.shape)
+def draw_components(*X, **labels):
+    size = np.array(X[0].shape)
     if size[-1] == 2:
-        _draw_components_2D(X, n_sets)
+        _draw_components_2D(X, labels)
     elif size[-1] == 3:
-        _draw_components_3D(X, n_sets)
+        _draw_components_3D(X, labels)
     else:
         raise RuntimeError("n_components must be 2 or 3.")
 
@@ -387,24 +391,25 @@ def _get_color_list(n_sets):
     return color_list[:n_sets]
 
 
-def _draw_components_2D(X, n_sets):
+def _draw_components_2D(X, labels):
+    n_sets = len(X)
     color_list = _get_color_list(n_sets)
-    sets = np.array(X.shape)[0] / n_sets
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.set_xlabel('PC 1', fontsize=15)
+    ax.set_xlabel('Component 1', fontsize=15)
     ax.set_ylabel('Component 2', fontsize=15)
     ax.set_xticks(())
     ax.set_yticks(())
-    for n in range(n_sets):
-        ax.scatter(X[n * sets:(n + 1) * sets, 0],
-                   X[n * sets:(n + 1) * sets, 1],
-                   color=color_list[n])
+    for key, n in zip(labels.keys(), np.arange(n_sets)):
+        ax.scatter(X[n][:, 0], X[n][:, 1], color=color_list[n],
+                   label=labels[key])
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.show()
 
 
-def _draw_components_3D(X, n_sets):
+def _draw_components_3D(X, labels):
+    n_sets = len(X)
     color_list = _get_color_list(n_sets)
-    sets = np.array(X.shape)[0] / n_sets
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.set_xlabel('Component 1', fontsize=10)
@@ -413,11 +418,23 @@ def _draw_components_3D(X, n_sets):
     ax.set_xticks(())
     ax.set_yticks(())
     ax.set_zticks(())
-    for n in range(n_sets):
-        ax.scatter(X[n * sets:(n + 1) * sets, 0],
-                   X[n * sets:(n + 1) * sets, 1],
-                   X[n * sets:(n + 1) * sets, 2],
-                   color=color_list[n])
+    for key, n in zip(labels.keys(), np.arange(n_sets)):
+        ax.scatter(X[n][:, 0], X[n][:, 1], X[n][:, 2], color=color_list[n],
+                   label=labels[key])
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.show()
+
+
+def draw_goodness_of_fit(y, y_predict):
+    plt.plot(y, y_predict, 'o', color='#1a9850')
+    y_total = np.concatenate((y, y_predict))
+    y_min, y_max = np.min(y_total), np.max(y_total)
+    line = np.arange(y_min - 1, y_max + 1)
+    plt.plot(line, line, '-', linewidth=2, color='#f46d43')
+    plt.title('Goodness of Fit', fontsize=20)
+    plt.xlabel('Actual', fontsize=15)
+    plt.ylabel('Predicted', fontsize=15)
+    plt.show()
 
 
 def draw_spatial_correlations(X_corr, correlation_plots=None):
@@ -584,7 +601,7 @@ def _get_colorbar_ticks(X_):
     return tick_range.astype(float)
 
 
-def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None, n_jobs=1,
+def draw_learning_curves(estimator, X, y, ylim=None, cv=None, n_jobs=1,
                         scoring=None, train_sizes=np.linspace(.1, 1.0, 5)):
     """Code taken from scikit-learn examples for version 0.15.
 
@@ -628,11 +645,11 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None, n_jobs=1,
     flat_shape = (X.shape[0],) + (np.prod(X.shape[1:]),)
     X_flat = X.reshape(flat_shape)
     plt.figure()
-    plt.title(title)
+    plt.title('Learning Curves', fontsize=20)
     if ylim is not None:
         plt.ylim(*ylim)
-    plt.xlabel("Training examples")
-    plt.ylabel("Score")
+    plt.xlabel("Training examples", fontsize=15)
+    plt.ylabel("Score", fontsize=15)
     train_sizes, train_scores, test_scores = learning_curve(
         estimator, X_flat, y, cv=cv, n_jobs=n_jobs,
         train_sizes=train_sizes, scoring=scoring)
@@ -649,9 +666,9 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None, n_jobs=1,
                      test_scores_mean + test_scores_std, alpha=0.1,
                      color="#1a9641")
     plt.plot(train_sizes, train_scores_mean, 'o-', color="#f46d43",
-             label="Training score")
+             linewidth=2, label="Training score")
     plt.plot(train_sizes, test_scores_mean, 'o-', color="#1a9641",
-             label="Cross-validation score")
+             linewidth=2, label="Cross-validation score")
 
     plt.legend(loc="best")
     plt.show()
