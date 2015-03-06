@@ -1,5 +1,9 @@
 from pymks.stats import correlate
 from sklearn.base import BaseEstimator
+from sklearn.decomposition import TruncatedSVD
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import Pipeline
 import numpy as np
 
 
@@ -45,7 +49,8 @@ class MKSHomogenizationModel(BaseEstimator):
 
     '''
 
-    def __init__(self, basis, dimension_reducer=None, property_linker=None):
+    def __init__(self, basis, n_components=None, poly_order=1,
+                 dimension_reducer=None, property_linker=None):
         '''
         Create an instance of a `MKSHomogenizationModel`.
 
@@ -59,11 +64,39 @@ class MKSHomogenizationModel(BaseEstimator):
 
         self.basis = basis
         self.dimension_reducer = dimension_reducer
-        self.property_linker = property_linker
         if self.dimension_reducer is None:
-            raise RuntimeError("dimension_reducer not specified")
-        if self.property_linker is None:
-            raise RuntimeError("property_linker not specified.")
+            self.dimension_reducer = TruncatedSVD()
+        if property_linker is None:
+            property_linker = LinearRegression()
+        self.linker = Pipeline([('poly', PolynomialFeatures(degree=1)),
+                                ('linker', property_linker)])
+        self._check_methods
+        self.poly_order = poly_order
+        self.n_components = n_components
+
+    @property
+    def n_components(self):
+        return self._n_components
+
+    @n_components.setter
+    def n_components(self, value):
+        self._n_components = value
+        self.dimension_reducer.n_components = value
+
+    @property
+    def poly_order(self):
+        return self._poly_order
+
+    @poly_order.setter
+    def poly_order(self, value):
+        self._poly_order = value
+        self.linker.set_params(poly__degree=value)
+
+    def _check_methods(self):
+        '''
+        Helper function to make check that the dimensionality reduction and
+        property linking methods have the appropriate methods.
+        '''
         if not callable(getattr(self.dimension_reducer,
                                 "fit_transform", None)):
             raise RuntimeError(
@@ -71,10 +104,10 @@ class MKSHomogenizationModel(BaseEstimator):
         if not callable(getattr(self.dimension_reducer, "transform", None)):
             raise RuntimeError(
                 "dimension_reducer does not have transform() method.")
-        if not callable(getattr(self.property_linker, "fit", None)):
+        if not callable(getattr(self.linker, "fit", None)):
             raise RuntimeError(
                 "property_linker does not have fit() method.")
-        if not callable(getattr(self.property_linker, "predict", None)):
+        if not callable(getattr(self.linker, "predict", None)):
             raise RuntimeError(
                 "property_linker does not have predict() method.")
 
@@ -94,8 +127,8 @@ class MKSHomogenizationModel(BaseEstimator):
         >>> linker = LinearRegression()
         >>> dbasis = DiscreteIndicatorBasis(n_states=2, domain=[0, 1])
         >>> model = MKSHomogenizationModel(dbasis,
-        ...                                    dimension_reducer=reducer,
-        ...                                    property_linker=linker)
+        ...                                dimension_reducer=reducer,
+        ...                                property_linker=linker)
         >>> np.random.seed(99)
         >>> X = np.random.randint(2, size=(3, 15))
         >>> y = np.array([1, 2, 3])
@@ -128,7 +161,7 @@ class MKSHomogenizationModel(BaseEstimator):
                                                              reducer_label)
         else:
             X_reduced = self.dimension_reducer.fit_transform(X_preped)
-        self.property_linker.fit(X_reduced, y)
+        self.linker.fit(X_reduced, y)
         self.fit_data = X_reduced
 
     def predict(self, X, periodic_axes=[], probability_mask=None):
@@ -143,7 +176,7 @@ class MKSHomogenizationModel(BaseEstimator):
         >>> reducer = LocallyLinearEmbedding()
         >>> linker = BayesianRidge()
         >>> basis = DiscreteIndicatorBasis(2, domain=[0, 1])
-        >>> model = MKSHomogenizationModel(basis,
+        >>> model = MKSHomogenizationModel(basis, n_components=2,
         ...                                dimension_reducer=reducer,
         ...                                property_linker=linker)
         >>> model.fit(X, y)
@@ -163,7 +196,7 @@ class MKSHomogenizationModel(BaseEstimator):
         X_preped = self._X_prep(X, periodic_axes, probability_mask)
         X_reduced = self.dimension_reducer.transform(X_preped)
         self.predict_data = X_reduced
-        return self.property_linker.predict(X_reduced)
+        return self.linker.predict(X_reduced)
 
     def _X_prep(self, X, periodic_axes=[], probability_mask=None):
         '''
@@ -206,9 +239,9 @@ class MKSHomogenizationModel(BaseEstimator):
         The score function for the MKSHomogenizationModel is formats the
         data and uses the score method from the property_linker.
         '''
-        if not callable(getattr(self.property_linker, "score", None)):
+        if not callable(getattr(self.linker, "score", None)):
             raise RuntimeError(
                 "property_linker does not have score() method.")
         X_preped = self._X_prep(X, periodic_axes, probability_mask)
         X_reduced = self.dimension_reducer.transform(X_preped)
-        return self.property_linker.score(X_reduced, y)
+        return self.linker.score(X_reduced, y)
