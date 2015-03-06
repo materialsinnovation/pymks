@@ -79,7 +79,7 @@ class MKSHomogenizationModel(BaseEstimator):
                 "property_linker does not have predict() method.")
 
     def fit(self, X, y, reducer_label=None,
-            periodic_axes=[], probability_mask=None):
+            periodic_axes=[], probability_mask=None, size=None):
         '''
         Fits data by calculating 2-point statistics from X, preforming
         dimension reduction using dimension_reducer, and fitting the reduced
@@ -119,6 +119,9 @@ class MKSHomogenizationModel(BaseEstimator):
           probability_mask: array with same shape as X used to assign a
               confidence value for each data point.
         '''
+        if size is not None:
+            new_shape = (X.shape[0],) + size
+            X = X.reshape(new_shape)
         X_preped = self._X_prep(X, periodic_axes, probability_mask)
         if reducer_label is not None:
             X_reduced = self.dimension_reducer.fit_transform(X_preped,
