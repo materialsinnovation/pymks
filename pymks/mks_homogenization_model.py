@@ -111,7 +111,7 @@ class MKSHomogenizationModel(BaseEstimator):
             raise RuntimeError(
                 "property_linker does not have predict() method.")
 
-    def fit(self, X, y, reducer_label=None,
+    def fit(self, X, y, X_reduce_label=None,
             periodic_axes=[], probability_mask=None, size=None):
         '''
         Fits data by calculating 2-point statistics from X, preforming
@@ -156,11 +156,8 @@ class MKSHomogenizationModel(BaseEstimator):
             new_shape = (X.shape[0],) + size
             X = X.reshape(new_shape)
         X_preped = self._X_prep(X, periodic_axes, probability_mask)
-        if reducer_label is not None:
-            X_reduced = self.dimension_reducer.fit_transform(X_preped,
-                                                             reducer_label)
-        else:
-            X_reduced = self.dimension_reducer.fit_transform(X_preped)
+        X_reduced = self.dimension_reducer.fit_transform(X_preped,
+                                                         X_reduce_label)
         self.linker.fit(X_reduced, y)
         self.fit_data = X_reduced
 
