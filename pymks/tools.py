@@ -328,19 +328,20 @@ def draw_diff(*responses, **titles):
     plt.tight_layout()
 
 
-def draw_gridscores(grid_scores, label=None, color='#f46d43',
-                    parameter=None, axis_label=None):
-    tmp = [[params[parameter], -mean_score, scores.std()]
+def draw_gridscores(grid_scores, parameter, score_label='', color='#1a9641',
+                    data_label=None, axis_label=''):
+    tmp = [[params[parameter], mean_score, scores.std()]
            for params, mean_score, scores in grid_scores]
 
     param, errors, stddev = list(zip(*tmp))
     plt.fill_between(param, np.array(errors) - np.array(stddev),
                      np.array(errors) + np.array(stddev), alpha=0.1,
                      color=color)
-    plt.plot(param, errors, 'o-', color=color, label=label, linewidth=2)
+    plt.plot(param, errors, 'o-', color=color, label=data_label,
+             linewidth=2)
 
-    plt.legend()
-    plt.ylabel('MSE', fontsize=20)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.ylabel(score_label, fontsize=20)
     plt.xlabel(axis_label, fontsize=15)
 
 
@@ -401,7 +402,7 @@ def _draw_components_2D(X, labels):
     ax.set_xticks(())
     ax.set_yticks(())
     for key, n in zip(labels.keys(), np.arange(n_sets)):
-        ax.scatter(X[n][:, 0], X[n][:, 1], color=color_list[n],
+        ax.plot(X[n][:, 0], X[n][:, 1], 'o', color=color_list[n],
                    label=labels[key])
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.show()
@@ -419,21 +420,24 @@ def _draw_components_3D(X, labels):
     ax.set_yticks(())
     ax.set_zticks(())
     for key, n in zip(labels.keys(), np.arange(n_sets)):
-        ax.scatter(X[n][:, 0], X[n][:, 1], X[n][:, 2], color=color_list[n],
-                   label=labels[key])
+        ax.plot(X[n][:, 0], X[n][:, 1], X[n][:, 2], 'o', color=color_list[n],
+                label=labels[key])
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.show()
 
 
-def draw_goodness_of_fit(y, y_predict):
-    y_total = np.concatenate((y, y_predict))
+def draw_goodness_of_fit(fit_data, pred_data):
+    y_total = np.concatenate((np.array(fit_data + pred_data)))
     y_min, y_max = np.min(y_total), np.max(y_total)
     line = np.arange(y_min - 1, y_max + 1)
-    plt.plot(line, line, '-', linewidth=2, color='#f46d43')
-    plt.plot(y, y_predict, 'o', color='#1a9850')
+    plt.plot(line, line, '-', linewidth=3, color='#000000')
+    plt.plot(fit_data[0], fit_data[1], 'o', color='#1a9850', label='Fit Data')
+    plt.plot(pred_data[0], pred_data[1], 'o',
+             color='#f46d43', label='Predicted Data')
     plt.title('Goodness of Fit', fontsize=20)
     plt.xlabel('Actual', fontsize=15)
     plt.ylabel('Predicted', fontsize=15)
+    plt.legend(loc=2)
     plt.show()
 
 
