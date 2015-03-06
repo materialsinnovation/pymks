@@ -426,11 +426,11 @@ def _draw_components_3D(X, labels):
 
 
 def draw_goodness_of_fit(y, y_predict):
-    plt.plot(y, y_predict, 'o', color='#1a9850')
     y_total = np.concatenate((y, y_predict))
     y_min, y_max = np.min(y_total), np.max(y_total)
     line = np.arange(y_min - 1, y_max + 1)
     plt.plot(line, line, '-', linewidth=2, color='#f46d43')
+    plt.plot(y, y_predict, 'o', color='#1a9850')
     plt.title('Goodness of Fit', fontsize=20)
     plt.xlabel('Actual', fontsize=15)
     plt.ylabel('Predicted', fontsize=15)
