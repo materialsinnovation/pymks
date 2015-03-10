@@ -403,7 +403,7 @@ def _draw_components_2D(X, labels):
     ax.set_yticks(())
     for key, n in zip(labels.keys(), np.arange(n_sets)):
         ax.plot(X[n][:, 0], X[n][:, 1], 'o', color=color_list[n],
-                   label=labels[key])
+                label=labels[key])
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.show()
 
@@ -427,9 +427,12 @@ def _draw_components_3D(X, labels):
 
 
 def draw_goodness_of_fit(fit_data, pred_data):
-    y_total = np.concatenate((np.array(fit_data + pred_data)))
+    y_total = np.concatenate((fit_data, pred_data), axis=-1)
     y_min, y_max = np.min(y_total), np.max(y_total)
-    line = np.arange(y_min - 1, y_max + 1)
+    middle = (y_max + y_min) / 2.
+    data_range = y_max - y_min
+    line = np.linspace(middle - data_range * 1.03 / 2,
+                       middle + data_range * 1.03 / 2, endpoint=False)
     plt.plot(line, line, '-', linewidth=3, color='#000000')
     plt.plot(fit_data[0], fit_data[1], 'o', color='#1a9850', label='Fit Data')
     plt.plot(pred_data[0], pred_data[1], 'o',
@@ -606,7 +609,7 @@ def _get_colorbar_ticks(X_):
 
 
 def draw_learning_curves(estimator, X, y, ylim=None, cv=None, n_jobs=1,
-                        scoring=None, train_sizes=np.linspace(.1, 1.0, 5)):
+                         scoring=None, train_sizes=np.linspace(.1, 1.0, 5)):
     """Code taken from scikit-learn examples for version 0.15.
 
     Generate a simple plot of the test and traning learning curve.
