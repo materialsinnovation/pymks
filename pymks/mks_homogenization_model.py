@@ -233,7 +233,7 @@ class MKSHomogenizationModel(BaseEstimator):
 
     def score(self, X, y, periodic_axes=[], probability_mask=None):
         '''
-        The score function for the MKSHomogenizationModel is formats the
+        The score function for the MKSHomogenizationModel. It formats the
         data and uses the score method from the property_linker.
         '''
         if not callable(getattr(self.linker, "score", None)):
