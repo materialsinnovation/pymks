@@ -32,9 +32,9 @@ def _get_diff_cmap():
     return colors.LinearSegmentedColormap('diff_cmap', cdict, 256)
 
 
-def _get_spatial_correlations_cmap():
-    HighRGB = np.array([118, 42, 131]) / 255.
-    MediumRGB = np.array([255, 255, 191]) / 255.
+def _grid_matrix_cmap():
+    HighRGB = np.array([255, 255, 191]) / 255.
+    MediumRGB = np.array([140, 203, 135]) / 255.
     LowRGB = np.array([26, 152, 80]) / 255.
     cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
     return colors.LinearSegmentedColormap('diff_cmap', cdict, 256)
@@ -328,9 +328,9 @@ def draw_diff(*responses, **titles):
     plt.tight_layout()
 
 
-def draw_gridscores(grid_scores, parameter, score_label='', color='#1a9641',
+def draw_gridscores(grid_scores, param, score_label='', color='#1a9641',
                     data_label=None, axis_label=''):
-    tmp = [[params[parameter], mean_score, scores.std()]
+    tmp = [[params[param], mean_score, scores.std()]
            for params, mean_score, scores in grid_scores]
 
     param, errors, stddev = list(zip(*tmp))
@@ -343,6 +343,39 @@ def draw_gridscores(grid_scores, parameter, score_label='', color='#1a9641',
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.ylabel(score_label, fontsize=20)
     plt.xlabel(axis_label, fontsize=15)
+
+
+def draw_gridscores_matrix(grid_scores, params, score_label='R-Squared',
+                           param_labels=['', '']):
+    tmp = [[params, mean_score, scores.std()]
+           for parameters, mean_score, scores in grid_scores.grid_scores_]
+    param, means, stddev = list(zip(*tmp))
+    param_range_0 = grid_scores.param_grid[params[0]]
+    param_range_1 = grid_scores.param_grid[params[1]]
+    mat_size = (len(param_range_0), len(param_range_1))
+    fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+    matrices = np.concatenate((np.array(means).reshape(mat_size)[None],
+                              np.array(stddev).reshape(mat_size)[None]))
+    X_cmap = _grid_matrix_cmap()
+    x_label = 'Number of Components'
+    y_label = 'Order of Polynomial'
+    plot_title = [score_label, 'Standard Deviation']
+    for ax, label, matrix, title in zip(axs, param_labels,
+                                        matrices, plot_title):
+        ax.set_xticklabels(param_range_0, fontsize=12)
+        ax.set_yticklabels(param_range_1, fontsize=12)
+        ax.set_xticks(np.arange(len(param_range_0)))
+        ax.set_yticks(np.arange(len(param_range_0)))
+        ax.set_xlabel(x_label, fontsize=14)
+        ax.set_ylabel(y_label, fontsize=14)
+        im = ax.imshow(np.swapaxes(matrix, 0, 1),
+                       cmap=X_cmap, interpolation='none')
+        ax.set_title(title, fontsize=22)
+        divider = make_axes_locatable(ax)
+        cbar_ax = divider.append_axes("right", size="10%", pad=0.05)
+        cbar = plt.colorbar(im, cax=cbar_ax)
+        cbar.ax.tick_params(labelsize=12)
+        fig.subplots_adjust(right=1.2)
 
 
 def draw_component_variance(variance):
@@ -444,38 +477,6 @@ def draw_goodness_of_fit(fit_data, pred_data):
     plt.show()
 
 
-def draw_spatial_correlations(X_corr, correlation_plots=None):
-    corr_cmap = _get_spatial_correlations_cmap()
-    plt.close('all')
-    vmin = np.min(X_corr)
-    vmax = np.max(X_corr)
-    n_corr = X_corr.shape[-1]
-    n_states = ((np.sqrt(8 * n_corr + 1) - 1) / 2).astype(int)
-    correlation_dict = _get_spatial_correlation_dict(X_corr, n_states)
-    correlation_plot_names = _get_correlation_titles(correlation_dict,
-                                                     correlation_plots)
-    if correlation_plot_names is None:
-        correlation_plot_names = correlation_dict.keys()
-    n_plots = len(correlation_plot_names)
-    fig, axs = plt.subplots(1, n_plots, figsize=(n_plots * 4, 4))
-    ii = 0
-    for ax, title in zip(axs, correlation_plot_names):
-        if ii == 0:
-            im = ax.imshow(correlation_dict[title], cmap=corr_cmap,
-                           interpolation='none', vmin=vmin, vmax=vmax)
-        else:
-            ax.imshow(correlation_dict[title], cmap=corr_cmap,
-                      interpolation='none', vmin=vmin, vmax=vmax)
-        ax.set_xticks(())
-        ax.set_yticks(())
-        ax.set_title(r'Spatial Correlation $%s$' % title, fontsize=15)
-        ii = ii + 1
-    fig.subplots_adjust(right=0.8)
-    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
-    fig.colorbar(im, cax=cbar_ax)
-    plt.tight_layout()
-
-
 def _get_correlation_titles(correlation_dict, correlation_plots):
     if correlation_plots is None:
         return None
@@ -569,7 +570,6 @@ def _draw_stats(X_dict, correlations=None):
     fig, axs = plt.subplots(1, n_plots, figsize=(n_plots * 5, 5))
     if n_plots == 1:
         axs = list([axs])
-    ii = 0
     for ax, label in zip(axs, correlation_labels):
         ax.set_xticks(x_loc)
         ax.set_xticklabels(x_labels, fontsize=12)
@@ -583,13 +583,12 @@ def _draw_stats(X_dict, correlations=None):
         fig.subplots_adjust(right=0.8)
         divider = make_axes_locatable(ax)
         cbar_ax = divider.append_axes("right", size="10%", pad=0.05)
-        cbar_ticks = _get_colorbar_ticks(X_dict[label])
+        cbar_ticks = _get_colorbar_ticks(X_dict[label], 5)
         cbar = plt.colorbar(im, cax=cbar_ax, ticks=cbar_ticks,
                             boundaries=np.arange(cbar_ticks[0],
                                                  cbar_ticks[-1] + 0.005,
                                                  0.005))
         cbar.ax.tick_params(labelsize=12)
-        ii = ii + 1
         fig.subplots_adjust(right=0.8)
         plt.tight_layout()
 
@@ -603,8 +602,8 @@ def _get_ticks_params(X):
     return tick_loc, tick_labels
 
 
-def _get_colorbar_ticks(X_):
-    tick_range = np.linspace(np.min(X_), np.max(X_), 5)
+def _get_colorbar_ticks(X_, n_ticks):
+    tick_range = np.linspace(np.min(X_), np.max(X_), n_ticks)
     return tick_range.astype(float)
 
 
