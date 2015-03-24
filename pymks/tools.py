@@ -33,9 +33,9 @@ def _get_diff_cmap():
 
 
 def _grid_matrix_cmap():
-    HighRGB = np.array([255, 255, 191]) / 255.
-    MediumRGB = np.array([140, 203, 135]) / 255.
-    LowRGB = np.array([26, 152, 80]) / 255.
+    HighRGB = np.array([255, 255, 255]) / 255.
+    MediumRGB = np.array([150, 150, 150]) / 255.
+    LowRGB = np.array([0, 0, 0]) / 255.
     cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
     return colors.LinearSegmentedColormap('diff_cmap', cdict, 256)
 
