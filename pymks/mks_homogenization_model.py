@@ -66,6 +66,8 @@ class MKSHomogenizationModel(BaseEstimator):
         self.dimension_reducer = dimension_reducer
         if self.dimension_reducer is None:
             self.dimension_reducer = TruncatedSVD()
+        if n_components is None:
+            n_components = self.dimension_reducer.n_components
         if property_linker is None:
             property_linker = LinearRegression()
         self.linker = Pipeline([('poly', PolynomialFeatures(degree=1)),
@@ -135,9 +137,9 @@ class MKSHomogenizationModel(BaseEstimator):
         >>> model.fit(X, y)
         >>> X_ = dbasis.discretize(X)
         >>> X_corr = correlate(X_)
-
-        >>> X_pca = reducer.fit_transform(X_corr.reshape((X_corr.shape[0],
-        ...                                               X_corr[0].size)))
+        >>> X_reshaped = X_corr.reshape((X_corr.shape[0], X_corr[0].size))
+        >>> X_pca = reducer.fit_transform(X_reshaped - np.mean(X_reshaped,
+        ...                               axis=1)[:, None])
         >>> assert np.allclose(model.fit_data, X_pca)
 
         Args:
@@ -210,8 +212,10 @@ class MKSHomogenizationModel(BaseEstimator):
         >>> X = np.array([[0, 1],
         ...               [1, 0]])
         >>> X_prep = model._X_prep(X, [], None)
-        >>> X_test = np.array([[0, 0, 0, 0.5, 0.5, 0],
-        ...                    [0, 0, 1, 0.5, 0.5, 0]])
+        >>> X_test = np.array([[-1 / 6., -1 / 6., -1 / 6.,
+        ...                      1 / 3., 1 / 3., -1 / 6.],
+        ...                    [-1 / 3., -1 / 3., 2 / 3.,
+        ...                      1 / 6., 1 / 6., -1 / 3.]])
         >>> assert np.allclose(X_test, X_prep)
 
 
@@ -229,7 +233,8 @@ class MKSHomogenizationModel(BaseEstimator):
         X_ = self.basis.discretize(X)
         X_corr = correlate(X_, periodic_axes=periodic_axes,
                            probability_mask=probability_mask)
-        return X_corr.reshape((X_corr.shape[0], X_corr[0].size))
+        X_reshaped = X_corr.reshape((X_corr.shape[0], X_corr[0].size))
+        return X_reshaped - np.mean(X_reshaped, axis=1)[:, None]
 
     def score(self, X, y, periodic_axes=[], probability_mask=None):
         '''
