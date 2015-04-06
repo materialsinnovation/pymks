@@ -1,8 +1,13 @@
 from pymks.stats import correlate
+from sklearn.base import BaseEstimator
+from sklearn.decomposition import TruncatedSVD
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import Pipeline
 import numpy as np
 
 
-class MKSHomogenizationModel(object):
+class MKSHomogenizationModel(BaseEstimator):
 
     '''
     The `MKSHomogenizationModel` takes in microstructures and a their
@@ -44,7 +49,8 @@ class MKSHomogenizationModel(object):
 
     '''
 
-    def __init__(self, basis, dimension_reducer=None, property_linker=None):
+    def __init__(self, basis, n_components=None, poly_order=1,
+                 dimension_reducer=None, property_linker=None):
         '''
         Create an instance of a `MKSHomogenizationModel`.
 
@@ -57,16 +63,47 @@ class MKSHomogenizationModel(object):
         '''
 
         self.basis = basis
-        self.reducer = dimension_reducer
-        self.linker = property_linker
-        if self.reducer is None:
-            raise RuntimeError("dimension_reducer not specified")
-        if self.linker is None:
-            raise RuntimeError("property_linker not specified.")
-        if not callable(getattr(self.reducer, "fit_transform", None)):
+        self.dimension_reducer = dimension_reducer
+        if self.dimension_reducer is None:
+            self.dimension_reducer = TruncatedSVD()
+        if n_components is None:
+            n_components = self.dimension_reducer.n_components
+        if property_linker is None:
+            property_linker = LinearRegression()
+        self.linker = Pipeline([('poly', PolynomialFeatures(degree=1)),
+                                ('linker', property_linker)])
+        self._check_methods
+        self.poly_order = poly_order
+        self.n_components = n_components
+
+    @property
+    def n_components(self):
+        return self._n_components
+
+    @n_components.setter
+    def n_components(self, value):
+        self._n_components = value
+        self.dimension_reducer.n_components = value
+
+    @property
+    def poly_order(self):
+        return self._poly_order
+
+    @poly_order.setter
+    def poly_order(self, value):
+        self._poly_order = value
+        self.linker.set_params(poly__degree=value)
+
+    def _check_methods(self):
+        '''
+        Helper function to make check that the dimensionality reduction and
+        property linking methods have the appropriate methods.
+        '''
+        if not callable(getattr(self.dimension_reducer,
+                                "fit_transform", None)):
             raise RuntimeError(
                 "dimension_reducer does not have fit_transform() method.")
-        if not callable(getattr(self.reducer, "transform", None)):
+        if not callable(getattr(self.dimension_reducer, "transform", None)):
             raise RuntimeError(
                 "dimension_reducer does not have transform() method.")
         if not callable(getattr(self.linker, "fit", None)):
@@ -76,8 +113,8 @@ class MKSHomogenizationModel(object):
             raise RuntimeError(
                 "property_linker does not have predict() method.")
 
-    def fit(self, X, y, reducer_label=None,
-            periodic_axes=[], probability_mask=None):
+    def fit(self, X, y, X_reduce_label=None,
+            periodic_axes=[], probability_mask=None, size=None):
         '''
         Fits data by calculating 2-point statistics from X, preforming
         dimension reduction using dimension_reducer, and fitting the reduced
@@ -92,18 +129,18 @@ class MKSHomogenizationModel(object):
         >>> linker = LinearRegression()
         >>> dbasis = DiscreteIndicatorBasis(n_states=2, domain=[0, 1])
         >>> model = MKSHomogenizationModel(dbasis,
-        ...                                    dimension_reducer=reducer,
-        ...                                    property_linker=linker)
+        ...                                dimension_reducer=reducer,
+        ...                                property_linker=linker)
         >>> np.random.seed(99)
         >>> X = np.random.randint(2, size=(3, 15))
         >>> y = np.array([1, 2, 3])
         >>> model.fit(X, y)
         >>> X_ = dbasis.discretize(X)
         >>> X_corr = correlate(X_)
-
-        >>> X_pca = reducer.fit_transform(X_corr.reshape((X_corr.shape[0],
-        ...                                               X_corr[0].size)))
-        >>> assert np.allclose(model.data, X_pca)
+        >>> X_reshaped = X_corr.reshape((X_corr.shape[0], X_corr[0].size))
+        >>> X_pca = reducer.fit_transform(X_reshaped - np.mean(X_reshaped,
+        ...                               axis=1)[:, None])
+        >>> assert np.allclose(model.fit_data, X_pca)
 
         Args:
           X: The microstructure, an `(S, N, ...)` shaped
@@ -117,13 +154,14 @@ class MKSHomogenizationModel(object):
           probability_mask: array with same shape as X used to assign a
               confidence value for each data point.
         '''
+        if size is not None:
+            new_shape = (X.shape[0],) + size
+            X = X.reshape(new_shape)
         X_preped = self._X_prep(X, periodic_axes, probability_mask)
-        if reducer_label is not None:
-            X_reduced = self.reducer.fit_transform(X_preped, reducer_label)
-        else:
-            X_reduced = self.reducer.fit_transform(X_preped)
+        X_reduced = self.dimension_reducer.fit_transform(X_preped,
+                                                         X_reduce_label)
         self.linker.fit(X_reduced, y)
-        self.data = X_reduced
+        self.fit_data = X_reduced
 
     def predict(self, X, periodic_axes=[], probability_mask=None):
         '''Predicts macroscopic property for the microstructures `X`.
@@ -137,13 +175,12 @@ class MKSHomogenizationModel(object):
         >>> reducer = LocallyLinearEmbedding()
         >>> linker = BayesianRidge()
         >>> basis = DiscreteIndicatorBasis(2, domain=[0, 1])
-        >>> model = MKSHomogenizationModel(basis,
+        >>> model = MKSHomogenizationModel(basis, n_components=2,
         ...                                dimension_reducer=reducer,
         ...                                property_linker=linker)
         >>> model.fit(X, y)
         >>> X_test = np.random.randint(2, size=(1, 100))
         >>> assert np.allclose(model.predict(X_test), 0.53031958)
-
 
         Args:
             X: The microstructre, an `(S, N, ...)` shaped array where `S` is
@@ -156,11 +193,11 @@ class MKSHomogenizationModel(object):
             The predicted macroscopic property for `X`.
         '''
         X_preped = self._X_prep(X, periodic_axes, probability_mask)
-        X_reduced = self.reducer.transform(X_preped)
-        self.data = np.concatenate((self.data, X_reduced))
+        X_reduced = self.dimension_reducer.transform(X_preped)
+        self.predict_data = X_reduced
         return self.linker.predict(X_reduced)
 
-    def _X_prep(self, X, periodic_axes, probability_mask):
+    def _X_prep(self, X, periodic_axes=[], probability_mask=None):
         '''
         Helper function used to calculated 2-point statistics from `X` and
         reshape them appropriately for fit and predict methods.
@@ -175,8 +212,10 @@ class MKSHomogenizationModel(object):
         >>> X = np.array([[0, 1],
         ...               [1, 0]])
         >>> X_prep = model._X_prep(X, [], None)
-        >>> X_test = np.array([[0, 0, 0, 0.5, 0.5, 0],
-        ...                    [0, 0, 1, 0.5, 0.5, 0]])
+        >>> X_test = np.array([[-1 / 6., -1 / 6., -1 / 6.,
+        ...                      1 / 3., 1 / 3., -1 / 6.],
+        ...                    [-1 / 3., -1 / 3., 2 / 3.,
+        ...                      1 / 6., 1 / 6., -1 / 3.]])
         >>> assert np.allclose(X_test, X_prep)
 
 
@@ -194,4 +233,17 @@ class MKSHomogenizationModel(object):
         X_ = self.basis.discretize(X)
         X_corr = correlate(X_, periodic_axes=periodic_axes,
                            probability_mask=probability_mask)
-        return X_corr.reshape((X_corr.shape[0], X_corr[0].size))
+        X_reshaped = X_corr.reshape((X_corr.shape[0], X_corr[0].size))
+        return X_reshaped - np.mean(X_reshaped, axis=1)[:, None]
+
+    def score(self, X, y, periodic_axes=[], probability_mask=None):
+        '''
+        The score function for the MKSHomogenizationModel. It formats the
+        data and uses the score method from the property_linker.
+        '''
+        if not callable(getattr(self.linker, "score", None)):
+            raise RuntimeError(
+                "property_linker does not have score() method.")
+        X_preped = self._X_prep(X, periodic_axes, probability_mask)
+        X_reduced = self.dimension_reducer.transform(X_preped)
+        return self.linker.score(X_reduced, y)

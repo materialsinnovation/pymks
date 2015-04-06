@@ -1,11 +1,12 @@
 import numpy as np
-
 from .cahn_hilliard_simulation import CahnHilliardSimulation
 from .microstructure_generator import MicrostructureGenerator
+from pymks import DiscreteIndicatorBasis, MKSRegressionModel
 
 __all__ = ['make_delta_microstructures', 'make_elastic_FE_strain_delta',
            'make_elastic_FE_strain_random', 'make_cahn_hilliard',
-           'make_microstructure', 'make_checkerboard_microstructure']
+           'make_microstructure', 'make_checkerboard_microstructure',
+           'make_elastic_stress_random']
 
 
 def make_elastic_FE_strain_delta(elastic_modulus=(1, 1), poissons_ratio=(1, 1),
@@ -97,8 +98,9 @@ def make_delta_microstructures(n_phases=2, size=(21, 21)):
     return X[mask]
 
 
-def make_elastic_FE_strain_random(n_samples=1, elastic_modulus=(1, 1), poissons_ratio=(1, 1),
-                                  size=(21, 21), macro_strain=1.0):
+def make_elastic_FE_strain_random(n_samples=1, elastic_modulus=(1, 1),
+                                  poissons_ratio=(1, 1), size=(21, 21),
+                                  macro_strain=1.0):
     """Generate random microstructures and responses
 
     Simple interface to generate random microstructures and their
@@ -237,3 +239,77 @@ def make_checkerboard_microstructure(square_size, n_squares):
     X[:square_size, :square_size] = 0
     X[square_size:, square_size:] = 0
     return np.tile(X, ((n_squares + 1) / 2, (n_squares + 1) / 2))[None, :L, :L]
+
+
+def make_elastic_stress_random(n_samples=1, elastic_modulus=(1, 2),
+                               poissons_ratio=(1, 1), size=(21, 21),
+                               macro_strain=1.0, grain_size=(3, 3), seed=10):
+    """
+    Generates microstructures and their macroscopic stress values for an
+    applied macroscopic strain.
+
+    >>> X, y = make_elastic_stress_random(elastic_modulus=(1, 1),
+    ...                                   poissons_ratio=(1, 1))
+    >>> assert np.allclose(y, np.ones(y.shape))
+    >>> X, y = make_elastic_stress_random(n_samples=1, grain_size=(1, 1),
+    ...                                   elastic_modulus=(100, 200),
+    ...                                   size=(2, 2), poissons_ratio=(1, 3),
+    ...                                   macro_strain=1., seed=3)
+    >>> X_result = np.array([[[1, 1],
+    ...                       [0, 1]]])
+    >>> assert np.allclose(X, X_result)
+    >>> assert float(np.round(y, decimals=5)[0]) == 228.74696
+    >>> X, y = make_elastic_stress_random(n_samples=1, grain_size=(1, 1, 1),
+    ...                                   elastic_modulus=(100, 200),
+    ...                                   poissons_ratio=(1, 3),  seed=3,
+    ...                                   macro_strain=1., size=(2, 2, 2))
+    >>> X_result = np.array([[[1, 1],
+    ...                       [0, 0]],
+    ...                      [[1, 1],
+    ...                       [0, 0]]])
+    >>> assert np.allclose(X, X_result)
+    >>> assert float(y[0]) == 150.
+
+
+    Args:
+        n_samples: number of samples
+        elastic_modulus: list of elastic moduli for the different phases.
+        poissons_ratio: list of poisson's ratio values for the phases.
+        size: size of the microstructures
+        macro_strain: macroscopic strain applied to the sample.
+        grain_size: effective dimensions of grains
+        seed: seed for random number generator
+
+    Returns:
+        X: array of microstructures with dimensions (n_samples, Nx, Ny, Nz)
+        y: effective stress values
+
+    """
+    if not isinstance(grain_size[0], (list, tuple, np.ndarray)):
+        grain_size = (grain_size,)
+    if not isinstance(n_samples, (list, tuple, np.ndarray)):
+        n_samples = (n_samples,)
+    if not isinstance(size, (list, tuple, np.ndarray)) or len(size) > 3:
+        raise RuntimeError('size must have length of 2 or 3')
+    [RuntimeError('dimensions of size and grain_size are not the same.')
+     for grains in grain_size if len(size) != len(grains)]
+    if len(elastic_modulus) != len(poissons_ratio):
+        raise RuntimeError('length of elastic_modulus and poissons_ratio are \
+                           not the same.')
+    X_cal, y_cal = make_elastic_FE_strain_delta(elastic_modulus,
+                                                poissons_ratio, size,
+                                                macro_strain)
+    n_states = len(elastic_modulus)
+    basis = DiscreteIndicatorBasis(n_states)
+    model = MKSRegressionModel(basis=basis)
+    model.fit(X_cal, y_cal)
+    X = np.concatenate([make_microstructure(n_samples=sample, size=size,
+                                            n_phases=n_states,
+                                            grain_size=gs, seed=seed) for gs,
+                        sample in zip(grain_size, n_samples)])
+    X_ = basis.discretize(X)
+    index = tuple([None for i in range(len(size) + 1)]) + (slice(None),)
+    modulus = np.sum(X_ * np.array(elastic_modulus)[index], axis=-1)
+    y_stress = model.predict(X) * modulus
+    return X, np.average(y_stress.reshape(np.sum(n_samples), y_stress[0].size),
+                         axis=1)

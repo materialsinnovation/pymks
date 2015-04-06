@@ -32,10 +32,10 @@ def _get_diff_cmap():
     return colors.LinearSegmentedColormap('diff_cmap', cdict, 256)
 
 
-def _get_spatial_correlations_cmap():
-    HighRGB = np.array([118, 42, 131]) / 255.
-    MediumRGB = np.array([255, 255, 191]) / 255.
-    LowRGB = np.array([26, 152, 80]) / 255.
+def _grid_matrix_cmap():
+    HighRGB = np.array([255, 255, 255]) / 255.
+    MediumRGB = np.array([150, 150, 150]) / 255.
+    LowRGB = np.array([0, 0, 0]) / 255.
     cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
     return colors.LinearSegmentedColormap('diff_cmap', cdict, 256)
 
@@ -181,19 +181,20 @@ def draw_microstructure_strain(microstructure, strain):
 
 
 def draw_microstructures(*microstructures):
-    n_micros = len(microstructures)
+    n_micros = microstructures[0].shape[0]
     vmin = np.min(microstructures)
     vmax = np.max(microstructures)
     plt.close('all')
     fig, axs = plt.subplots(1, n_micros, figsize=(n_micros * 4, 4))
     if n_micros > 1:
-        for micro, ax in zip(microstructures, axs.flat):
-            im = ax.imshow(micro.swapaxes(0, 1), cmap=plt.cm.gray,
-                           interpolation='none', vmin=vmin, vmax=vmax)
+        for sample, ax in zip(np.arange(n_micros), axs.flat):
+            im = ax.imshow(microstructures[0][sample].swapaxes(0, 1),
+                           cmap=plt.cm.gray, interpolation='none',
+                           vmin=vmin, vmax=vmax)
             ax.set_xticks(())
             ax.set_yticks(())
     else:
-        im = axs.imshow(microstructures[0].swapaxes(0, 1), cmap=plt.cm.gray,
+        im = axs.imshow(microstructures[0][0].swapaxes(0, 1), cmap=plt.cm.gray,
                         interpolation='none', vmin=vmin, vmax=vmax)
         axs.set_xticks(())
         axs.set_yticks(())
@@ -327,17 +328,61 @@ def draw_diff(*responses, **titles):
     plt.tight_layout()
 
 
-def draw_gridscores(grid_scores, label=None, color='#f46d43'):
-    tmp = [[params['n_states'], -mean_score, scores.std()]
+def draw_gridscores(grid_scores, param, score_label='', color='#1a9641',
+                    data_label=None, axis_label=''):
+    tmp = [[params[param], mean_score, scores.std()]
            for params, mean_score, scores in grid_scores]
 
-    n_states, errors, stddev = list(zip(*tmp))
-    plt.errorbar(n_states, errors, yerr=stddev, linewidth=2,
-                 color=color, label=label)
+    param, errors, stddev = list(zip(*tmp))
+    plt.fill_between(param, np.array(errors) - np.array(stddev),
+                     np.array(errors) + np.array(stddev), alpha=0.1,
+                     color=color)
+    plt.plot(param, errors, 'o-', color=color, label=data_label,
+             linewidth=2)
 
-    plt.legend()
-    plt.ylabel('MSE', fontsize=20)
-    plt.xlabel('Number of Local States', fontsize=15)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.ylabel(score_label, fontsize=20)
+    plt.xlabel(axis_label, fontsize=15)
+
+
+def draw_gridscores_matrix(grid_scores, params, score_label='R-Squared',
+                           param_labels=['', '']):
+    tmp = [[params, mean_score, scores.std()]
+           for parameters, mean_score, scores in grid_scores.grid_scores_]
+    param, means, stddev = list(zip(*tmp))
+    param_range_0 = grid_scores.param_grid[params[0]]
+    param_range_1 = grid_scores.param_grid[params[1]]
+    mat_size = (len(param_range_0), len(param_range_1))
+    fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+    matrices = np.concatenate((np.array(means).reshape(mat_size)[None],
+                              np.array(stddev).reshape(mat_size)[None]))
+    X_cmap = _grid_matrix_cmap()
+    x_label = 'Number of Components'
+    y_label = 'Order of Polynomial'
+    plot_title = [score_label, 'Standard Deviation']
+    for ax, label, matrix, title in zip(axs, param_labels,
+                                        matrices, plot_title):
+        ax.set_xticklabels(param_range_0, fontsize=12)
+        ax.set_yticklabels(param_range_1, fontsize=12)
+        ax.set_xticks(np.arange(len(param_range_0)))
+        ax.set_yticks(np.arange(len(param_range_0)))
+        ax.set_xlabel(x_label, fontsize=14)
+        ax.set_ylabel(y_label, fontsize=14)
+        im = ax.imshow(np.swapaxes(matrix, 0, 1),
+                       cmap=X_cmap, interpolation='none')
+        ax.set_title(title, fontsize=22)
+        divider = make_axes_locatable(ax)
+        cbar_ax = divider.append_axes("right", size="10%", pad=0.05)
+        cbar = plt.colorbar(im, cax=cbar_ax)
+        cbar.ax.tick_params(labelsize=12)
+        fig.subplots_adjust(right=1.2)
+
+
+def draw_component_variance(variance):
+    plt.plot(np.cumsum(variance * 100), 'o-', color='#1a9641', linewidth=2)
+    plt.xlabel('Number of Components', fontsize=15)
+    plt.ylabel('Percent Variance', fontsize=15)
+    plt.show()
 
 
 def bin(arr, n_bins):
@@ -364,85 +409,72 @@ def bin(arr, n_bins):
     return np.maximum(1 - abs(arr[:, None] - X) / dX, 0)
 
 
-def draw_PCA(X, n_sets):
-    size = np.array(X.shape)
+def draw_components(*X, **labels):
+    size = np.array(X[0].shape)
     if size[-1] == 2:
-        _draw_PCA_2D(X, n_sets)
+        _draw_components_2D(X, labels)
     elif size[-1] == 3:
-        _draw_PCA_3D(X, n_sets)
+        _draw_components_3D(X, labels)
     else:
         raise RuntimeError("n_components must be 2 or 3.")
 
 
-def _get_PCA_color_list(n_sets):
+def _get_color_list(n_sets):
     color_list = ['#1a9850', '#f46d43', '#762a83', '#1a1a1a',
                   '#ffffbf', '#a6d96a', '#c2a5cf', '#878787']
     return color_list[:n_sets]
 
 
-def _draw_PCA_2D(X, n_sets):
-    color_list = _get_PCA_color_list(n_sets)
-    sets = np.array(X.shape)[0] / n_sets
+def _draw_components_2D(X, labels):
+    n_sets = len(X)
+    color_list = _get_color_list(n_sets)
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.set_xlabel('PC 1', fontsize=15)
-    ax.set_ylabel('PC 2', fontsize=15)
+    ax.set_xlabel('Component 1', fontsize=15)
+    ax.set_ylabel('Component 2', fontsize=15)
     ax.set_xticks(())
     ax.set_yticks(())
-    for n in range(n_sets):
-        ax.scatter(X[n * sets:(n + 1) * sets, 0],
-                   X[n * sets:(n + 1) * sets, 1],
-                   color=color_list[n])
+    for key, n in zip(labels.keys(), np.arange(n_sets)):
+        ax.plot(X[n][:, 0], X[n][:, 1], 'o', color=color_list[n],
+                label=labels[key])
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.show()
 
 
-def _draw_PCA_3D(X, n_sets):
-    color_list = _get_PCA_color_list(n_sets)
-    sets = np.array(X.shape)[0] / n_sets
+def _draw_components_3D(X, labels):
+    n_sets = len(X)
+    color_list = _get_color_list(n_sets)
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.set_xlabel('PC 1', fontsize=10)
-    ax.set_ylabel('PC 2', fontsize=10)
-    ax.set_zlabel('PC 3', fontsize=10)
+    ax.set_xlabel('Component 1', fontsize=10)
+    ax.set_ylabel('Component 2', fontsize=10)
+    ax.set_zlabel('Component 3', fontsize=10)
     ax.set_xticks(())
     ax.set_yticks(())
     ax.set_zticks(())
-    for n in range(n_sets):
-        ax.scatter(X[n * sets:(n + 1) * sets, 0],
-                   X[n * sets:(n + 1) * sets, 1],
-                   X[n * sets:(n + 1) * sets, 2],
-                   color=color_list[n])
+    for key, n in zip(labels.keys(), np.arange(n_sets)):
+        ax.plot(X[n][:, 0], X[n][:, 1], X[n][:, 2], 'o', color=color_list[n],
+                label=labels[key])
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.show()
 
 
-def draw_spatial_correlations(X_corr, correlation_plots=None):
-    corr_cmap = _get_spatial_correlations_cmap()
-    plt.close('all')
-    vmin = np.min(X_corr)
-    vmax = np.max(X_corr)
-    n_corr = X_corr.shape[-1]
-    n_states = ((np.sqrt(8 * n_corr + 1) - 1) / 2).astype(int)
-    correlation_dict = _get_spatial_correlation_dict(X_corr, n_states)
-    correlation_plot_names = _get_correlation_titles(correlation_dict,
-                                                     correlation_plots)
-    if correlation_plot_names is None:
-        correlation_plot_names = correlation_dict.keys()
-    n_plots = len(correlation_plot_names)
-    fig, axs = plt.subplots(1, n_plots, figsize=(n_plots * 4, 4))
-    ii = 0
-    for ax, title in zip(axs, correlation_plot_names):
-        if ii == 0:
-            im = ax.imshow(correlation_dict[title], cmap=corr_cmap,
-                           interpolation='none', vmin=vmin, vmax=vmax)
-        else:
-            ax.imshow(correlation_dict[title], cmap=corr_cmap,
-                      interpolation='none', vmin=vmin, vmax=vmax)
-        ax.set_xticks(())
-        ax.set_yticks(())
-        ax.set_title(r'Spatial Correlation $%s$' % title, fontsize=15)
-        ii = ii + 1
-    fig.subplots_adjust(right=0.8)
-    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
-    fig.colorbar(im, cax=cbar_ax)
-    plt.tight_layout()
+def draw_goodness_of_fit(fit_data, pred_data):
+    y_total = np.concatenate((fit_data, pred_data), axis=-1)
+    y_min, y_max = np.min(y_total), np.max(y_total)
+    middle = (y_max + y_min) / 2.
+    data_range = y_max - y_min
+    line = np.linspace(middle - data_range * 1.03 / 2,
+                       middle + data_range * 1.03 / 2, endpoint=False)
+    plt.plot(line, line, '-', linewidth=3, color='#000000')
+    plt.plot(fit_data[0], fit_data[1], 'o', color='#1a9850', label='Fit Data')
+    plt.plot(pred_data[0], pred_data[1], 'o',
+             color='#f46d43', label='Predicted Data')
+    plt.title('Goodness of Fit', fontsize=20)
+    plt.xlabel('Actual', fontsize=15)
+    plt.ylabel('Predicted', fontsize=15)
+    plt.legend(loc=2)
+    plt.show()
 
 
 def _get_correlation_titles(correlation_dict, correlation_plots):
@@ -538,7 +570,6 @@ def _draw_stats(X_dict, correlations=None):
     fig, axs = plt.subplots(1, n_plots, figsize=(n_plots * 5, 5))
     if n_plots == 1:
         axs = list([axs])
-    ii = 0
     for ax, label in zip(axs, correlation_labels):
         ax.set_xticks(x_loc)
         ax.set_xticklabels(x_labels, fontsize=12)
@@ -547,18 +578,17 @@ def _draw_stats(X_dict, correlations=None):
         im = ax.imshow(X_dict[label], cmap=X_cmap,
                        interpolation='none', vmin=vmin, vmax=vmax)
         ax.set_title(r"Correlation $h = {0}$, $h' = {1}$".format(label[1],
-                                                                label[-2]),
+                                                                 label[-2]),
                      fontsize=15)
         fig.subplots_adjust(right=0.8)
         divider = make_axes_locatable(ax)
         cbar_ax = divider.append_axes("right", size="10%", pad=0.05)
-        cbar_ticks = _get_colorbar_ticks(X_dict[label])
+        cbar_ticks = _get_colorbar_ticks(X_dict[label], 5)
         cbar = plt.colorbar(im, cax=cbar_ax, ticks=cbar_ticks,
                             boundaries=np.arange(cbar_ticks[0],
                                                  cbar_ticks[-1] + 0.005,
                                                  0.005))
         cbar.ax.tick_params(labelsize=12)
-        ii = ii + 1
         fig.subplots_adjust(right=0.8)
         plt.tight_layout()
 
@@ -572,13 +602,13 @@ def _get_ticks_params(X):
     return tick_loc, tick_labels
 
 
-def _get_colorbar_ticks(X_):
-    tick_range = np.linspace(np.min(X_), np.max(X_), 5)
+def _get_colorbar_ticks(X_, n_ticks):
+    tick_range = np.linspace(np.min(X_), np.max(X_), n_ticks)
     return tick_range.astype(float)
 
 
-def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
-                        n_jobs=1, train_sizes=np.linspace(.1, 1.0, 5)):
+def draw_learning_curves(estimator, X, y, ylim=None, cv=None, n_jobs=1,
+                         scoring=None, train_sizes=np.linspace(.1, 1.0, 5)):
     """Code taken from scikit-learn examples for version 0.15.
 
     Generate a simple plot of the test and traning learning curve.
@@ -618,14 +648,17 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
     """
     from sklearn.learning_curve import learning_curve
 
+    flat_shape = (X.shape[0],) + (np.prod(X.shape[1:]),)
+    X_flat = X.reshape(flat_shape)
     plt.figure()
-    plt.title(title)
+    plt.title('Learning Curves', fontsize=20)
     if ylim is not None:
         plt.ylim(*ylim)
-    plt.xlabel("Training examples")
-    plt.ylabel("Score")
+    plt.xlabel("Training examples", fontsize=15)
+    plt.ylabel("Score", fontsize=15)
     train_sizes, train_scores, test_scores = learning_curve(
-        estimator, X, y, cv=cv, n_jobs=n_jobs, train_sizes=train_sizes)
+        estimator, X_flat, y, cv=cv, n_jobs=n_jobs,
+        train_sizes=train_sizes, scoring=scoring)
     train_scores_mean = np.mean(train_scores, axis=1)
     train_scores_std = np.std(train_scores, axis=1)
     test_scores_mean = np.mean(test_scores, axis=1)
@@ -634,13 +667,14 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
 
     plt.fill_between(train_sizes, train_scores_mean - train_scores_std,
                      train_scores_mean + train_scores_std, alpha=0.1,
-                     color="r")
+                     color="#f46d43")
     plt.fill_between(train_sizes, test_scores_mean - test_scores_std,
-                     test_scores_mean + test_scores_std, alpha=0.1, color="g")
-    plt.plot(train_sizes, train_scores_mean, 'o-', color="r",
-             label="Training score")
-    plt.plot(train_sizes, test_scores_mean, 'o-', color="g",
-             label="Cross-validation score")
+                     test_scores_mean + test_scores_std, alpha=0.1,
+                     color="#1a9641")
+    plt.plot(train_sizes, train_scores_mean, 'o-', color="#f46d43",
+             linewidth=2, label="Training score")
+    plt.plot(train_sizes, test_scores_mean, 'o-', color="#1a9641",
+             linewidth=2, label="Cross-validation score")
 
     plt.legend(loc="best")
-    return plt
+    plt.show()

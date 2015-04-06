@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
 from .filter import Filter
 
 
@@ -235,9 +236,9 @@ class MKSRegressionModel(LinearRegression):
         pass
 
     def _reshape_feature(self, X, size):
-        """
+        '''
         Helper function used to check the shape of the microstructure,
         and change to appropriate shape.
-        """
+        '''
         new_shape = (X.shape[0],) + size
         return X.reshape(new_shape)
