@@ -4,12 +4,12 @@ from sklearn.metrics import r2_score
 from .filter import Filter
 
 
-class MKSRegressionModel(LinearRegression):
+class MKSLocalizationModel(LinearRegression):
 
     '''
-    The `MKSRegressionModel` fits data using the Materials Knowledge
+    The `MKSLocalizationModel` fits data using the Materials Knowledge
     System in Fourier Space. The following demonstrates the viability
-    of the `MKSRegressionModel` with a simple 1D filter.
+    of the `MKSLocalizationModel` with a simple 1D filter.
 
     >>> n_states = 2
     >>> n_spaces = 81
@@ -41,11 +41,11 @@ class MKSRegressionModel(LinearRegression):
     >>> Fy = np.sum(Fcoeff[None] * FX, axis=-1)
     >>> y = np.fft.ifft(Fy, axis=1).real
 
-    Use the `MKSRegressionModel` to reconstruct the coefficients
+    Use the `MKSLocalizationModel` to reconstruct the coefficients
 
     >>> from .bases import ContinuousIndicatorBasis
     >>> basis = ContinuousIndicatorBasis(n_states, [0, 1])
-    >>> model = MKSRegressionModel(basis=basis)
+    >>> model = MKSLocalizationModel(basis=basis)
     >>> model.fit(X, y)
 
     Check the result
@@ -61,7 +61,7 @@ class MKSRegressionModel(LinearRegression):
 
     def __init__(self, basis, n_states=None):
         """
-        Instantiate a MKSRegressionModel.
+        Instantiate a MKSLocalizationModel.
 
         Args:
           basis: an instance of a bases class.
@@ -81,7 +81,7 @@ class MKSRegressionModel(LinearRegression):
         >>> y = X.swapaxes(1, 2)
         >>> from .bases import ContinuousIndicatorBasis
         >>> basis = ContinuousIndicatorBasis(2, [0, 1])
-        >>> model = MKSRegressionModel(basis=basis)
+        >>> model = MKSLocalizationModel(basis=basis)
         >>> model.fit(X, y)
         >>> assert np.allclose(model._filter.Fkernel, [[[ 0.5,  0.5],
         ...                                             [  -2,    0]],
@@ -133,14 +133,14 @@ class MKSRegressionModel(LinearRegression):
         >>> y = X.swapaxes(1, 2)
         >>> from .bases import ContinuousIndicatorBasis
         >>> basis = ContinuousIndicatorBasis(2, [0, 1])
-        >>> model = MKSRegressionModel(basis=basis)
+        >>> model = MKSLocalizationModel(basis=basis)
         >>> model.fit(X, y)
         >>> assert np.allclose(y, model.predict(X))
 
         The fit method must be called to calibrate the coefficients before
         the predict method can be used.
 
-        >>> MKSmodel = MKSRegressionModel(basis)
+        >>> MKSmodel = MKSLocalizationModel(basis)
         >>> MKSmodel.predict(X)
         Traceback (most recent call last):
         ...
@@ -169,7 +169,7 @@ class MKSRegressionModel(LinearRegression):
 
         >>> from pymks.bases import DiscreteIndicatorBasis
         >>> basis = DiscreteIndicatorBasis(n_states=2)
-        >>> model = MKSRegressionModel(basis)
+        >>> model = MKSLocalizationModel(basis)
         >>> coeff = np.arange(20).reshape((5, 4, 1))
         >>> coeff = np.concatenate((coeff , np.ones_like(coeff)), axis=2)
         >>> coeff = np.fft.ifftshift(coeff, axes=(0, 1))
@@ -218,7 +218,7 @@ class MKSRegressionModel(LinearRegression):
         >>> np.random.seed(3)
         >>> X = np.random.random((1, 3, 3))
         >>> basis = LegendreBasis(2, [0, 1])
-        >>> model = MKSRegressionModel(basis=basis)
+        >>> model = MKSLocalizationModel(basis=basis)
         >>> X_ = basis.discretize(X)
         >>> FX = np.fft.fftn(X_, axes=(1, 2))
         >>>
