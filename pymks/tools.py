@@ -575,7 +575,7 @@ def _draw_stats(X_dict, correlations=None):
         ax.set_xticklabels(x_labels, fontsize=12)
         ax.set_yticks(y_loc)
         ax.set_yticklabels(y_labels, fontsize=12)
-        im = ax.imshow(X_dict[label], cmap=X_cmap,
+        im = ax.imshow(np.swapaxes(X_dict[label], 0, 1), cmap=X_cmap,
                        interpolation='none', vmin=vmin, vmax=vmax)
         ax.set_title(r"Correlation $h = {0}$, $h' = {1}$".format(label[1],
                                                                  label[-2]),
