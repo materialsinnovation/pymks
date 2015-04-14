@@ -434,10 +434,18 @@ def _draw_components_2D(X, labels):
     ax.set_ylabel('Component 2', fontsize=15)
     ax.set_xticks(())
     ax.set_yticks(())
+    X_array = np.concatenate(X)
+    x_min, x_max = [np.min(X_array[:, 0]), np.max(X_array[:, 0])]
+    y_min, y_max = [np.min(X_array[:, 1]), np.max(X_array[:, 1])]
+    x_epsilon = (x_max - x_min) * 0.05
+    y_epsilon = (y_max - y_min) * 0.05
+    ax.set_xlim([x_min - x_epsilon, x_max + x_epsilon])
+    ax.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
     for key, n in zip(labels.keys(), np.arange(n_sets)):
         ax.plot(X[n][:, 0], X[n][:, 1], 'o', color=color_list[n],
                 label=labels[key])
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.title('Low Dimensional Representation', fontsize=20)
     plt.show()
 
 
@@ -452,9 +460,20 @@ def _draw_components_3D(X, labels):
     ax.set_xticks(())
     ax.set_yticks(())
     ax.set_zticks(())
+    X_array = np.concatenate(X)
+    x_min, x_max = [np.min(X_array[:, 0]), np.max(X_array[:, 0])]
+    y_min, y_max = [np.min(X_array[:, 1]), np.max(X_array[:, 1])]
+    z_min, z_max = [np.min(X_array[:, 2]), np.max(X_array[:, 2])]
+    x_epsilon = (x_max - x_min) * 0.05
+    y_epsilon = (y_max - y_min) * 0.05
+    z_epsilon = (z_max - z_min) * 0.05
+    ax.set_xlim([x_min - x_epsilon, x_max + x_epsilon])
+    ax.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
+    ax.set_zlim([z_min - z_epsilon, z_max + z_epsilon])
     for key, n in zip(labels.keys(), np.arange(n_sets)):
         ax.plot(X[n][:, 0], X[n][:, 1], X[n][:, 2], 'o', color=color_list[n],
                 label=labels[key])
+    plt.title('Low Dimensional Representation', fontsize=15)
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.show()
 
