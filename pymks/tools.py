@@ -8,6 +8,9 @@ import itertools
 
 
 def _set_colors():
+    '''
+    Helper function used to set the color map.
+    '''
     HighRGB = np.array([26, 152, 80]) / 255.
     MediumRGB = np.array([255, 255, 191]) / 255.
     LowRGB = np.array([0, 0, 0]) / 255.
@@ -17,6 +20,12 @@ def _set_colors():
 
 
 def _get_response_cmap():
+    '''
+    Helper function used to set the response color map.
+
+    Returns:
+        dictionary with colors and localizations on color bar.
+    '''
     HighRGB = np.array([26, 152, 80]) / 255.
     MediumRGB = np.array([255, 255, 191]) / 255.
     LowRGB = np.array([0, 0, 0]) / 255.
@@ -25,6 +34,12 @@ def _get_response_cmap():
 
 
 def _get_diff_cmap():
+    '''
+    Helper function used to set the difference color map.
+
+    Returns:
+        dictionary with colors and localizations on color bar.
+    '''
     HighRGB = np.array([118, 42, 131]) / 255.
     MediumRGB = np.array([255, 255, 191]) / 255.
     LowRGB = np.array([0, 0, 0]) / 255.
@@ -33,6 +48,12 @@ def _get_diff_cmap():
 
 
 def _grid_matrix_cmap():
+    '''
+    Helper function used to set the grid matrix color map.
+
+    Returns:
+        dictionary with colors and localizations on color bar.
+    '''
     HighRGB = np.array([255, 255, 255]) / 255.
     MediumRGB = np.array([150, 150, 150]) / 255.
     LowRGB = np.array([0, 0, 0]) / 255.
@@ -41,6 +62,17 @@ def _grid_matrix_cmap():
 
 
 def _set_cdict(HighRGB, MediumRGB, LowRGB):
+    '''
+    Helper function used to set color map from 3 RGB values.
+
+    Args:
+        HighRGB: RGB with highest values
+        MediumRGB: RGB with medium values
+        LowRGB: RGB with lowest values
+
+    Returns:
+        dictionary with colors and localizations on color bar.
+    '''
     cdict = {'red': ((0.0, LowRGB[0], LowRGB[0]),
                      (0.5, MediumRGB[0], MediumRGB[0]),
                      (1.0, HighRGB[0], HighRGB[0])),
@@ -57,6 +89,11 @@ def _set_cdict(HighRGB, MediumRGB, LowRGB):
 
 
 def _get_coeff_cmap():
+    '''
+    Helper function used to set the influence coefficients color map.
+
+    Returns
+    '''
     HighRGB = np.array([244, 109, 67]) / 255.
     MediumRGB = np.array([255, 255, 191]) / 255.
     LowRGB = np.array([0, 0, 0]) / 255.
@@ -64,17 +101,33 @@ def _get_coeff_cmap():
     return colors.LinearSegmentedColormap('coeff_cmap', cdict, 256)
 
 
+def _get_color_list(n_sets):
+    '''
+    color list for dimensionality reduction plots
+
+    Args:
+        n_sets: number of dataset
+
+    Returns:
+        list of colors for n_sets
+    '''
+    color_list = ['#1a9850', '#f46d43', '#762a83', '#1a1a1a',
+                  '#ffffbf', '#a6d96a', '#c2a5cf', '#878787']
+    return color_list[:n_sets]
+
+
 def draw_microstructure_discretization(M, a=0, s=0, Nbin=6,
                                        bound=0.016, height=1.7, ax=None):
-    r""" Creates a diagram to illustrate the binning of a continues values
+    ''' Creates a diagram to illustrate the binning of a continues values
     in local state space.
 
     Args:
         Array representing a microstructure with a continuous variable.
+
     Returns:
         Image of the continuous local state binned discretely in the local
         state space.
-    """
+    '''
     if ax is not None:
         ax = plt.axes()
     dx = 1. / (Nbin - 1.)
@@ -130,6 +183,12 @@ def draw_microstructure_discretization(M, a=0, s=0, Nbin=6,
 
 
 def draw_coeff(coeff):
+    '''
+    Visualize influence coefficients.
+
+    Args:
+        coeff: influence coefficients
+    '''
     if coeff.dtype == 'complex':
         print(DeprecationWarning("Coefficients are complex."))
         coeff = coeff.real
@@ -329,7 +388,18 @@ def draw_diff(*responses, **titles):
 
 
 def draw_gridscores(grid_scores, param, score_label='', color='#1a9641',
-                    data_label=None, axis_label=''):
+                    data_label=None, param_label=''):
+    '''
+    Visualize the score values and standard deviations from grids
+    scores result from GridSearchCV while varying 1 parameters.
+
+    Args:
+        grid_scores: grid_scores_ attribute from GridSearchCV
+        param: list of 2 parameters used in grid_scores
+        score_label: label for score value axis
+        color: color used for this specified parameter
+        param_label: list of parameter titles to appear on plot
+    '''
     tmp = [[params[param], mean_score, scores.std()]
            for params, mean_score, scores in grid_scores]
 
@@ -347,6 +417,16 @@ def draw_gridscores(grid_scores, param, score_label='', color='#1a9641',
 
 def draw_gridscores_matrix(grid_scores, params, score_label='R-Squared',
                            param_labels=['', '']):
+    '''
+    Visualize the score value matrix and standard deviation matrix from grids
+    scores result from GridSearchCV while varying 2 parameters.
+
+    Args:
+        grid_scores: grid_scores_ attribute from GridSearchCV
+        params: list of 2 parameters used in grid_scores
+        score_label: label for score value axis
+        param_labels: list of parameter titles to appear on plot
+    '''
     tmp = [[params, mean_score, scores.std()]
            for parameters, mean_score, scores in grid_scores.grid_scores_]
     param, means, stddev = list(zip(*tmp))
@@ -379,6 +459,13 @@ def draw_gridscores_matrix(grid_scores, params, score_label='R-Squared',
 
 
 def draw_component_variance(variance):
+    '''
+    Visualize the percent variance as a function of components.
+
+    Args:
+        variance: variance ration explanation function for dimensional
+            reduction technique.
+    '''
     plt.plot(np.cumsum(variance * 100), 'o-', color='#1a9641', linewidth=2)
     plt.xlabel('Number of Components', fontsize=15)
     plt.ylabel('Percent Variance', fontsize=15)
@@ -386,7 +473,7 @@ def draw_component_variance(variance):
 
 
 def bin(arr, n_bins):
-    r"""
+    '''
     Discretize the array `arr`, which must be between 0 and 1.
 
     >>> res = bin(np.array((0.2, 0.5, 0.7)), 4)
@@ -400,9 +487,10 @@ def bin(arr, n_bins):
         arr: Array that must be between 0 and 1.
         n_bins: Integer value representing the number of local states
              in the local state space of the microstructure function.
+
     Returns:
         Microstructure function for array `arr`.
-    """
+    '''
     X = np.linspace(0, 1, n_bins)
     dX = X[1] - X[0]
 
@@ -410,6 +498,15 @@ def bin(arr, n_bins):
 
 
 def draw_components(*X, **labels):
+    '''
+    Visualize low dimensional representations of microstructures.
+
+    Args:
+        X: arrays with low dimensional data with dimensions [n_samplles,
+            n_componts]. The length of n_components must be 2 or 3.
+        labels: labes for each of each array X
+
+    '''
     size = np.array(X[0].shape)
     if size[-1] == 2:
         _draw_components_2D(X, labels)
@@ -419,13 +516,14 @@ def draw_components(*X, **labels):
         raise RuntimeError("n_components must be 2 or 3.")
 
 
-def _get_color_list(n_sets):
-    color_list = ['#1a9850', '#f46d43', '#762a83', '#1a1a1a',
-                  '#ffffbf', '#a6d96a', '#c2a5cf', '#878787']
-    return color_list[:n_sets]
-
-
 def _draw_components_2D(X, labels):
+    '''
+    Helper function to plot 2 components.
+
+    Args:
+        X: Arrays with low dimensional data
+        labels: labels for each of the low dimensional arrays
+    '''
     n_sets = len(X)
     color_list = _get_color_list(n_sets)
     fig = plt.figure()
@@ -450,6 +548,13 @@ def _draw_components_2D(X, labels):
 
 
 def _draw_components_3D(X, labels):
+    '''
+    Helper function to plot 2 components.
+
+    Args:
+        X: Arrays with low dimensional data
+        labels: labels for each of the low dimensional arrays
+    '''
     n_sets = len(X)
     color_list = _get_color_list(n_sets)
     fig = plt.figure()
@@ -479,6 +584,13 @@ def _draw_components_3D(X, labels):
 
 
 def draw_goodness_of_fit(fit_data, pred_data):
+    '''
+    Visualize goodness of fit plot for MKSHomogenizationModel.
+
+    Args:
+        fit_data: Low dimensional data used to fit the MKSHomogenizationModel
+        pred_data: Low dimensional data used for prediction
+    '''
     y_total = np.concatenate((fit_data, pred_data), axis=-1)
     y_min, y_max = np.min(y_total), np.max(y_total)
     middle = (y_max + y_min) / 2.
@@ -496,12 +608,29 @@ def draw_goodness_of_fit(fit_data, pred_data):
     plt.show()
 
 
-def _get_correlation_titles(correlation_dict, correlation_plots):
-    if correlation_plots is None:
+def _get_correlation_titles(correlation_dict, selected_correlation_plots):
+    '''
+    Helper function to get the correct spatial correlation keys.
+
+    >>> corr_dict = {'(1, 1)': np.ones((3, 3)), '(2, 1)':np.zeros((3, 3))}
+    >>> corr_plots = [(1, 1), (1, 2)]
+    >>> result = ['(1, 1)', '(2, 1)']
+    >>> assert result == _get_correlation_titles(corr_dict, corr_plots)
+
+    Args:
+        correlation_dict: dictionary that has spatial correlation lab as
+            keys and spatial correlations as values
+        selected_correlation_plots: list of correlations that will be drawn.
+
+    Returns:
+        list of correlation computed with local state labels in the correct
+            order.
+    '''
+    if selected_correlation_plots is None:
         return None
-    correlation_plots = map(str, correlation_plots)
-    new_names = correlation_plots
-    for plot_name in correlation_plots:
+    selected_correlation_plots = map(str, selected_correlation_plots)
+    new_names = selected_correlation_plots
+    for plot_name in selected_correlation_plots:
         if plot_name not in correlation_dict:
             name = list(plot_name)
             name[1], name[4] = name[4], name[1]
@@ -513,22 +642,88 @@ def _get_correlation_titles(correlation_dict, correlation_plots):
 
 
 def _get_spatial_correlation_dict(X_corr, n_states):
+    '''
+    Helper function to get a dictionary with the keys as the local state labels
+    and the values as the spatial correlations.
+
+    >>> X_corr = np.ones((2, 2, 6)) * np.arange(6)[None, None, None]
+    >>> result = {'(1, 1)': X_corr.swapaxes(0, -1)[0],
+    ...           '(2, 2)': X_corr.swapaxes(0, -1)[1],
+    ...           '(3, 3)': X_corr.swapaxes(0, -1)[2],
+    ...           '(1, 3)': X_corr.swapaxes(0, -1)[3],
+    ...           '(2, 1)': X_corr.swapaxes(0, -1)[4],
+    ...           '(3, 2)': X_corr.swapaxes(0, -1)[5]}
+    >>> X_corr_dict = _get_spatial_correlation_dict(X_corr, 3)
+    >>> result_keys = sorted(result.keys())
+    >>> result_values = np.concatenate([result[key] for key in result_keys])
+    >>> correlation_values = np.concatenate([X_corr_dict[key] for
+    ...                                      key in result_keys])
+    >>> assert np.allclose(correlation_values, result_values)
+
+    Args:
+        X_corr: spatial correlations
+        n_states: number of local states
+
+    Returns:
+        dictionary with local state labels as the keys and spatial correlations
+        as values
+    '''
     keys = _get_spatial_correlation_titles(n_states)
     return dict(zip(keys, X_corr.swapaxes(0, -1)))
 
 
 def _get_spatial_correlation_titles(n_states):
+    '''
+    Helper function to get the spatial correlations computed and returns them
+    in a list.
+
+    >>> result = ['(1, 1)', '(2, 2)', '(3, 3)', '(1, 3)', '(2, 1)', '(3, 2)']
+    >>> assert result == _get_spatial_correlation_titles(3)
+
+    Args:
+        n_states: number of local states
+
+    Returns:
+        list of spatial correlation computed
+    '''
     auto = _get_autocorrelation_titles(n_states)
     cross = _get_crosscorrelation_titles(n_states)
     return map(str, auto + cross)
 
 
 def _get_autocorrelation_titles(n_states):
+    '''
+    Helper function to get the autocorrelations computed and returns them in
+    a list.
+
+    >>> result = [(1, 1), (2, 2), (3, 3), (4, 4)]
+    >>> assert result == _get_autocorrelation_titles(4)
+
+    Args:
+        n_states: number of local states
+
+    Returns:
+        list of computed autocorrelations
+    '''
     states = np.arange(n_states) + 1
     return list(zip(states, states))
 
 
 def _get_crosscorrelation_titles(n_states):
+    '''
+    Helper function to get the crosscorrelations computed and returns them in
+    a list.
+
+    >>> result = [(1, 4), (2, 1), (3, 2), (4, 3), (1, 3), (2, 4)]
+    >>> assert result == _get_crosscorrelation_titles(4)
+
+    Args:
+        n_states: number of local states
+
+    Returns:
+        list of computed crosscorrelations
+    '''
+
     states = np.arange(n_states) + 1
     Niter = n_states / 2
     Nslice = n_states * (n_states - 1) / 2
@@ -538,6 +733,13 @@ def _get_crosscorrelation_titles(n_states):
 
 
 def draw_correlations(X_corr, correlations=None):
+    '''
+    Visualize spatial correlations.
+
+    Args:
+        X_corr: correlations
+        correlations: correlations that will be displayed.
+    '''
     n_states = ((np.sqrt(8 * X_corr.shape[-1] + 1) - 1) / 2).astype(int)
     X_auto_dict = _get_autocorrelation_dict(X_corr[..., :n_states])
     X_cross_dict = _get_crosscorrelation_dict(X_corr[..., n_states:])
@@ -546,6 +748,13 @@ def draw_correlations(X_corr, correlations=None):
 
 
 def draw_autocorrelations(X_auto, correlations=None):
+    '''
+    Visualize spatial autocorrelations.
+
+    Args:
+        X_auto: autocorrelations
+        correlations: correlations that will be displayed.
+    '''
     if X_auto.dtype == 'complex':
         print(DeprecationWarning("autocorrleation is complex."))
         X_auto = X_auto.real
@@ -554,6 +763,13 @@ def draw_autocorrelations(X_auto, correlations=None):
 
 
 def draw_crosscorrelations(X_cross, correlations=None):
+    '''
+    Visualize spatial crosscorrelations.
+
+    Args:
+        X_cross: crosscorrelations
+        correlations: correlations that will be displayed.
+    '''
     if X_cross.dtype == 'complex':
         print(DeprecationWarning("crosscorrelation is complex"))
         X_cross = X_cross.real
@@ -562,17 +778,68 @@ def draw_crosscorrelations(X_cross, correlations=None):
 
 
 def _get_autocorrelation_dict(X_auto):
+    '''
+    Helper function to label autocorrelations.
+
+    >>> X_auto = np.ones((3, 3, 2))
+    >>> X_auto[..., 1] = 2.
+    >>> X_auto_dict = _get_autocorrelation_dict(X_auto)
+    >>> X_result = {'(1, 1)': X_auto[..., 0], '(2, 2)': X_auto[..., 1]}
+    >>> result_keys = sorted(X_result.keys())
+    >>> result_values = np.concatenate([X_result[key] for key in result_keys])
+    >>> correlation_values = np.concatenate([X_auto_dict[key] for
+    ...                                      key in result_keys])
+    >>> assert np.allclose(correlation_values, result_values)
+
+    Args:
+        X_auto: autocorrelations
+
+    Returns:
+        dictionary with the local states as the key and the spatial
+            correlations as the value.
+    '''
     auto_labels = map(str, _get_autocorrelation_titles(X_auto.shape[-1]))
     return dict(zip(auto_labels, X_auto.swapaxes(0, -1)))
 
 
 def _get_crosscorrelation_dict(X_cross):
+    '''
+    Helper function to label autocorrelations.
+
+    >>> X_cross = np.zeros((3, 3, 3))
+    >>> X_cross[..., 1] = 1
+    >>> X_cross[..., 2] = 2
+    >>> X_cross_dict = _get_crosscorrelation_dict(X_cross)
+    >>> X_result = {'(1, 3)': X_cross[..., 0], '(2, 1)': X_cross[..., 1],
+    ...             '(3, 2)': X_cross[..., 2]}
+    >>> result_keys = sorted(X_result.keys())
+    >>> result_values = np.concatenate([X_result[key] for key in result_keys])
+    >>> correlation_values = np.concatenate([X_cross_dict[key] for
+    ...                                      key in result_keys])
+    >>> assert np.allclose(correlation_values, result_values)
+
+    Args:
+        X_cross: crosscorrelations
+
+    Returns:
+        dictionary with the local states as the key and the spatial
+        correlations as the value.
+    '''
     n_states = 0.5 + np.sqrt(1 + 8 * X_cross.shape[-1]) / 2.
     cross_labels = map(str, _get_crosscorrelation_titles(int(n_states)))
     return dict(zip(cross_labels, X_cross.swapaxes(0, -1)))
 
 
 def _draw_stats(X_dict, correlations=None):
+    '''
+    Helper function used by visualize the spatial correlations.
+
+    Args:
+        X_dict: dictionary with local states as the key and spatial
+            correlations as values.
+        correlations: list of tuples to select the spatial correlations
+            that will be displayed.
+    '''
     X_cmap = _get_coeff_cmap()
     plt.close('all')
     correlation_labels = _get_correlation_titles(X_dict, correlations)
@@ -610,18 +877,37 @@ def _draw_stats(X_dict, correlations=None):
         cbar.ax.tick_params(labelsize=12)
         fig.subplots_adjust(right=0.8)
         plt.tight_layout()
+    plt.show()
 
 
-def _get_ticks_params(X):
+def _get_ticks_params(l):
+    '''
+    Helper function used to tick locations and lables for spatila correlation
+    plots.
+
+    >>> l = 4
+    >>> result = ([0, 1, 2, 3, 4], [-2, -1, 0, 1, 2])
+    >>> assert result == _get_ticks_params(l)
+
+    Args:
+        l: shape of array along the axis
+    '''
     segments = np.roll(np.arange(4, 7, dtype=int), 1, 0)
-    m = segments[np.argmin(X % segments)]
-    n = max((X + 1) / m, 1)
-    tick_loc = range(0, X + n, n)
-    tick_labels = range(- (X - 1) / 2, (X + 1) / 2 + n, n)
+    m = segments[np.argmin(l % segments)]
+    n = max((l + 1) / m, 1)
+    tick_loc = range(0, l + n, n)
+    tick_labels = range(- (l - 1) / 2, (l + 1) / 2 + n, n)
     return tick_loc, tick_labels
 
 
 def _get_colorbar_ticks(X_, n_ticks):
+    '''
+    Helper function to get colorbar color tick locations.
+
+    Args:
+        X: sspatial correlations array
+           (n_samples, x,  y, local_state_correlation)
+    '''
     tick_range = np.linspace(np.min(X_), np.max(X_), n_ticks)
     return tick_range.astype(float)
 
