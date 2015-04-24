@@ -214,6 +214,7 @@ def draw_coeff(coeff):
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
+    plt.show()
 
 
 def draw_microstructure_strain(microstructure, strain):
@@ -237,6 +238,7 @@ def draw_microstructure_strain(microstructure, strain):
     fig.colorbar(im1, cax=cbar_ax)
 
     plt.tight_layout()
+    plt.show()
 
 
 def draw_microstructures(*microstructures):
@@ -261,6 +263,7 @@ def draw_microstructures(*microstructures):
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
+    plt.show()
 
 
 def draw_strains(*strains, **titles):
@@ -315,6 +318,7 @@ def draw_concentrations(*concentrations, **titles):
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
+    plt.show()
 
 
 def draw_strains_compare(strain1, strain2):
@@ -337,6 +341,7 @@ def draw_strains_compare(strain1, strain2):
     fig.colorbar(im, cax=cbar_ax)
 
     plt.tight_layout()
+    plt.show()
 
 
 def draw_concentrations_compare(con1, con2):
@@ -359,6 +364,7 @@ def draw_concentrations_compare(con1, con2):
     fig.colorbar(im, cax=cbar_ax)
 
     plt.tight_layout()
+    plt.show()
 
 
 def draw_diff(*responses, **titles):
@@ -385,6 +391,7 @@ def draw_diff(*responses, **titles):
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
+    plt.show()
 
 
 def draw_gridscores(grid_scores, param, score_label='', color='#1a9641',
@@ -412,7 +419,8 @@ def draw_gridscores(grid_scores, param, score_label='', color='#1a9641',
 
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.ylabel(score_label, fontsize=20)
-    plt.xlabel(axis_label, fontsize=15)
+    plt.xlabel(param_label, fontsize=15)
+    plt.show()
 
 
 def draw_gridscores_matrix(grid_scores, params, score_label='R-Squared',
@@ -456,6 +464,7 @@ def draw_gridscores_matrix(grid_scores, params, score_label='R-Squared',
         cbar = plt.colorbar(im, cax=cbar_ax)
         cbar.ax.tick_params(labelsize=12)
         fig.subplots_adjust(right=1.2)
+    plt.show()
 
 
 def draw_component_variance(variance):
@@ -637,7 +646,7 @@ def _get_correlation_titles(correlation_dict, selected_correlation_plots):
             new_name = ''.join(str(e) for e in name)
             new_names[new_names.index(plot_name)] = new_name
             if new_name not in correlation_dict:
-                raise RuntimeError("%s, correlation not found", plot_name)
+                raise RuntimeError(str(plot_name) + " correlation not found", )
     return new_names
 
 
