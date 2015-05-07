@@ -1,4 +1,10 @@
 import numpy as np
+try:
+    import pyfftw
+    np.fft = pyfftw.interfaces.numpy_fft
+    pyfftw.interfaces.cache.enable()
+except:
+    pass
 
 
 class Filter(object):
@@ -26,7 +32,8 @@ class Filter(object):
           an array in real space
         """
         return np.real_if_close(np.fft.fftshift(np.fft.ifftn(self.Fkernel,
-                                                             axes=self.axes), axes=self.axes))
+                                                             axes=self.axes),
+                                                axes=self.axes))
 
     def _real_2_frequency(self, kernel):
         """
