@@ -352,8 +352,12 @@ def _draw_fields(fields, field_cmap, fontsize, titles=None):
         axs.set_title(titles[0], fontsize=fontsize)
     fig.subplots_adjust(right=0.8)
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
+    cbar_font = np.floor(0.8 * fontsize)
+    cbar_ax.tick_params(labelsize=cbar_font)
+    cbar_ax.yaxis.set_offset_position('right')
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
+    plt.rc('font', **{'size': str(cbar_font)})
     plt.show()
 
 
@@ -385,7 +389,7 @@ def draw_gridscores(grid_scores, param, score_label='', colors=('#1a9641',),
         plt.plot(param_, errors, 'o-', color=color, label=data_label,
                  linewidth=2)
     if data_labels[0] is not None:
-        plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        plt.legend(loc=1, borderaxespad=0.)
     plt.ylabel(score_label, fontsize=fontsize)
     plt.xlabel(param_label, fontsize=fontsize)
     plt.show()
