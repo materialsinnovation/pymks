@@ -316,14 +316,14 @@ def draw_differences(differences, titles=None, fontsize=15):
     _draw_fields(differences, cmap, fontsize, titles)
 
 
-def _draw_fields(fields, field_cmap, fontsize, titles=None):
+def _draw_fields(fields, field_cmap, fontsize, titles):
     '''
     Helper function used to draw fields.
 
     Args:
         fields - iterable object with 2D numpy arrays
         field_cmap - color map for plot
-        fontsize - font size for titles
+        fontsize - font size for titles and color bar text
         titles - titles for plot
     '''
     vmin = np.min(fields)
@@ -389,7 +389,7 @@ def draw_gridscores(grid_scores, param, score_label='', colors=('#1a9641',),
         plt.plot(param_, errors, 'o-', color=color, label=data_label,
                  linewidth=2)
     if data_labels[0] is not None:
-        plt.legend(loc=1, borderaxespad=0.)
+        plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.ylabel(score_label, fontsize=fontsize)
     plt.xlabel(param_label, fontsize=fontsize)
     plt.show()
