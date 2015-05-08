@@ -1,0 +1,84 @@
+import numpy as np
+
+
+def test_n_componets_from_reducer():
+    from pymks import MKSHomogenizationModel, DiscreteIndicatorBasis
+    from sklearn.manifold import LocallyLinearEmbedding
+    reducer = LocallyLinearEmbedding(n_components=7)
+    dbasis = DiscreteIndicatorBasis(n_states=3, domain=[0, 2])
+    model = MKSHomogenizationModel(dimension_reducer=reducer, basis=dbasis)
+    assert model.n_components == 7
+
+
+def test_n_components_with_reducer():
+    from pymks import MKSHomogenizationModel, DiscreteIndicatorBasis
+    from sklearn.manifold import SpectralEmbedding
+    reducer = SpectralEmbedding(n_components=7)
+    dbasis = DiscreteIndicatorBasis(n_states=3, domain=[0, 2])
+    model = MKSHomogenizationModel(dimension_reducer=reducer, basis=dbasis,
+                                   n_components=9)
+    assert model.n_components == 9
+
+
+def stress_test():
+    from pymks.datasets import make_elastic_stress_random
+    from pymks import MKSHomogenizationModel, DiscreteIndicatorBasis
+    sample_size = 200
+    grain_size = [(15, 2), (2, 15), (7, 7)]
+    n_samples = [sample_size] * 3
+    elastic_modulus = (410, 200)
+    poissons_ratio = (0.28, 0.3)
+    macro_strain = 0.001
+    size = (21, 21)
+    X, y = make_elastic_stress_random(n_samples=n_samples, size=size,
+                                      grain_size=grain_size,
+                                      elastic_modulus=elastic_modulus,
+                                      poissons_ratio=poissons_ratio,
+                                      macro_strain=macro_strain, seed=0)
+    dbasis = DiscreteIndicatorBasis(n_states=2, domain=[0, 1])
+    model = MKSHomogenizationModel(basis=dbasis, n_components=3, degree=3)
+    model.fit(X, y)
+    test_sample_size = 1
+    n_samples = [test_sample_size] * 3
+    X_new, y_new = make_elastic_stress_random(n_samples=n_samples,
+                                              size=size, grain_size=grain_size,
+                                              elastic_modulus=elastic_modulus,
+                                              poissons_ratio=poissons_ratio,
+                                              macro_strain=macro_strain,
+                                              seed=9)
+    y_result = model.predict(X_new)
+    assert np.allclose(np.round(y_new, decimals=2),
+                       np.round(y_result, decimals=2))
+
+
+def test_n_components_change():
+    from pymks import MKSHomogenizationModel, DiscreteIndicatorBasis
+    dbasis = DiscreteIndicatorBasis(n_states=2)
+    model = MKSHomogenizationModel(basis=dbasis)
+    model.n_components = 27
+    assert model.n_components == 27
+
+
+def test_degree_change():
+    from pymks import MKSHomogenizationModel, DiscreteIndicatorBasis
+    dbasis = DiscreteIndicatorBasis(n_states=2)
+    model = MKSHomogenizationModel(basis=dbasis)
+    model.degree = 4
+    assert model.degree == 4
+
+
+def test_default_degree():
+    from pymks import MKSHomogenizationModel, DiscreteIndicatorBasis
+    dbasis = DiscreteIndicatorBasis(n_states=2)
+    model = MKSHomogenizationModel(basis=dbasis)
+    assert model.degree == 1
+
+
+def test_default_n_components():
+    from pymks import MKSHomogenizationModel, DiscreteIndicatorBasis
+    dbasis = DiscreteIndicatorBasis(n_states=2)
+    model = MKSHomogenizationModel(basis=dbasis)
+    assert model.n_components == 2
+
+if __name__ == '__main__':
+    stress_test()
