@@ -24,8 +24,8 @@ def stress_test():
     from pymks.datasets import make_elastic_stress_random
     from pymks import MKSHomogenizationModel, DiscreteIndicatorBasis
     sample_size = 200
-    grain_size = [(15, 2), (2, 15), (7, 7)]
-    n_samples = [sample_size] * 3
+    grain_size = [(7, 7), (8, 3), (3, 9), (2, 2)]
+    n_samples = [sample_size] * len(grain_size)
     elastic_modulus = (410, 200)
     poissons_ratio = (0.28, 0.3)
     macro_strain = 0.001
@@ -39,14 +39,16 @@ def stress_test():
     model = MKSHomogenizationModel(basis=dbasis, n_components=3, degree=3)
     model.fit(X, y)
     test_sample_size = 1
-    n_samples = [test_sample_size] * 3
+    n_samples = [test_sample_size] * len(grain_size)
     X_new, y_new = make_elastic_stress_random(n_samples=n_samples,
                                               size=size, grain_size=grain_size,
                                               elastic_modulus=elastic_modulus,
                                               poissons_ratio=poissons_ratio,
                                               macro_strain=macro_strain,
-                                              seed=9)
+                                              seed=8)
     y_result = model.predict(X_new)
+    print np.round(y_result, decimals=2)
+    print np.round(y_new, decimals=2)
     assert np.allclose(np.round(y_new, decimals=2),
                        np.round(y_result, decimals=2))
 

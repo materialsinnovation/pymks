@@ -17,9 +17,10 @@ def git_version():
         env['LANGUAGE'] = 'C'
         env['LANG'] = 'C'
         env['LC_ALL'] = 'C'
-        out = subprocess.Popen(cmd, stdout = subprocess.PIPE, env=env).communicate()[0]
+        out = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, env=env).communicate()[0]
         return out
-    
+
     try:
         out = _minimal_ext_cmd(['git', 'rev-parse', 'HEAD'])
         GIT_REVISION = out.strip().decode('ascii')
@@ -27,6 +28,7 @@ def git_version():
         GIT_REVISION = ""
 
     return GIT_REVISION
+
 
 def getVersion(version, release=False):
     if os.path.exists('.git'):
@@ -45,5 +47,5 @@ setup(name='pymks',
       author_email='daniel.wheeler2@gmail.com',
       url='http://pymks.org',
       packages=find_packages(),
-      package_data={'' : ['tests/*.py']},
+      package_data={'': ['tests/*.py']},
       )
