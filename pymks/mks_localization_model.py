@@ -1,7 +1,12 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import r2_score
 from .filter import Filter
+try:
+    import pyfftw
+    np.fft = pyfftw.interfaces.numpy_fft
+    pyfftw.interfaces.cache.enable()
+except:
+    pass
 
 
 class MKSLocalizationModel(LinearRegression):

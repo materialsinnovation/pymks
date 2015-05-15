@@ -1,4 +1,10 @@
 import numpy as np
+try:
+    import pyfftw
+    np.fft = pyfftw.interfaces.numpy_fft
+    pyfftw.interfaces.cache.enable()
+except:
+    pass
 
 
 class CahnHilliardSimulation(object):
@@ -87,8 +93,8 @@ class CahnHilliardSimulation(object):
             raise RuntimeError("X must represent a square domain")
 
         L = self.dx * N
-        k = np.arange(N) 
-        
+        k = np.arange(N)
+
         if N % 2 == 0:
             N1 = N / 2
             N2 = N1

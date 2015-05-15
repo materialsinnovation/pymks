@@ -2,6 +2,12 @@ import numpy as np
 from pymks.filter import Filter
 from scipy.ndimage.fourier import fourier_gaussian
 from .base_microstructure_generator import BaseMicrostructureGenerator
+try:
+    import pyfftw
+    np.fft = pyfftw.interfaces.numpy_fft
+    pyfftw.interfaces.cache.enable()
+except:
+    pass
 
 
 class MicrostructureGenerator(BaseMicrostructureGenerator):

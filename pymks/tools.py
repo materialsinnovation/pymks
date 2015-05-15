@@ -5,6 +5,9 @@ from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 import itertools
+import warnings
+
+warnings.filterwarnings("ignore")
 
 
 def _set_colors():
@@ -182,41 +185,30 @@ def draw_microstructure_discretization(M, a=0, s=0, Nbin=6,
              color='r')
 
 
-def draw_coeff(coeff):
+def draw_coeff(coeff, fontsize=15):
     '''
     Visualize influence coefficients.
 
     Args:
-        coeff: influence coefficients
+        coeff: influence coefficients with dimensions (x, y, n_states)
+        fontsize - scalar values used for the title font size
     '''
-    if coeff.dtype == 'complex':
-        print(DeprecationWarning("Coefficients are complex."))
-        coeff = coeff.real
     coeff_cmap = _get_coeff_cmap()
-    plt.close('all')
-    vmin = np.min(coeff)
-    vmax = np.max(coeff)
-    Ncoeff = coeff.shape[-1]
-    fig, axs = plt.subplots(1, Ncoeff, figsize=(Ncoeff * 4, 4))
-    ii = 0
-    for ax in axs:
-        if ii == 0:
-            im = ax.imshow(coeff[..., ii].swapaxes(0, 1), cmap=coeff_cmap,
-                           interpolation='none', vmin=vmin, vmax=vmax)
-        else:
-            ax.imshow(coeff[..., ii].swapaxes(0, 1), cmap=coeff_cmap,
-                      interpolation='none', vmin=vmin, vmax=vmax)
-        ax.set_xticks(())
-        ax.set_yticks(())
-        ax.set_title(r'Influence Coefficients $h = %s$' % ii, fontsize=15)
-        ii = ii + 1
-    fig.subplots_adjust(right=0.8)
-    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
-    fig.colorbar(im, cax=cbar_ax)
-    plt.tight_layout()
+    n_coeff = coeff.shape[-1]
+    titles = [r'Influence Coefficients $l = %s$' % ii for ii
+              in np.arange(n_coeff)]
+    _draw_fields(np.rollaxis(coeff, -1, 0), coeff_cmap,
+                 fontsize=fontsize, titles=titles)
 
 
 def draw_microstructure_strain(microstructure, strain):
+    '''
+    Draw microstructure and its associated strain
+
+    Args:
+        microstructure - numpy array with dimensions (x, y)
+        strain - numpy array with dimensions (x, y)
+    '''
     plt.close('all')
     cmap = _get_response_cmap()
     fig = plt.figure(figsize=(8, 4))
@@ -231,188 +223,176 @@ def draw_microstructure_strain(microstructure, strain):
     ax1.set_yticks(())
     ax1.set_title(r'$\mathbf{\varepsilon_{xx}}$', fontsize=25)
     ax0.set_title('Microstructure', fontsize=20)
-
     fig.subplots_adjust(right=0.8)
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
     fig.colorbar(im1, cax=cbar_ax)
-
     plt.tight_layout()
+    plt.show()
 
 
 def draw_microstructures(*microstructures):
-    n_micros = microstructures[0].shape[0]
-    vmin = np.min(microstructures)
-    vmax = np.max(microstructures)
+    '''
+    Draw microstructures
+
+    Args:
+        microstructures - numpy array with dimensions (n_samples, x, y)
+    '''
+    cmap = plt.cm.gray
+    titles = [' ' for s in np.arange(microstructures[0].shape[0])]
+    _draw_fields(microstructures[0], cmap, 10, titles)
+
+
+def draw_strains(strains, titles=None, fontsize=15):
+    '''
+    Draw strain fields
+
+    Args:
+        strains - numpy arrays with dimensions (n_samples, x, y)
+        titles - list of titles for strain fields
+        fontsize - scalar values used for the title font size
+    '''
+    cmap = _get_response_cmap()
+    if titles is None:
+        titles = [' ' for s in strains]
+    _draw_fields(strains, cmap, fontsize, titles)
+
+
+def draw_concentrations(concentrations, titles=None, fontsize=15):
+    '''
+    Draw comparison fields
+
+    Args:
+        concentrations - list of numpy arrays with dimensions (x, y)
+        titles - list of titles for concentrations
+        fontsize - scalar values used for the title font size
+    '''
+    if titles is None:
+        titles = [" " for s in concentrations]
+    cmap = _get_response_cmap()
+    _draw_fields(concentrations, cmap, fontsize, titles)
+
+
+def draw_strains_compare(strain_FEM, strain_MKS, fontsize=20):
+    '''
+    Draw comparison of strain fields.
+
+    Args:
+        strain_FEM - numpy arrays with dimensions (x, y) from finite element
+        strain_MKS - numpy arrays with dimensions (x, y) from MKS
+        fontsize - scalar values used for the title font size
+    '''
+    cmap = _get_response_cmap()
+    titles = ['Finite Element', 'MKS']
+    titles_ = [r'$\mathbf{\varepsilon_{xx}}$ - %s' % title for title in titles]
+    _draw_fields((strain_FEM, strain_MKS), cmap, fontsize, titles_)
+
+
+def draw_concentrations_compare(con1, con2, fontsize=15):
+    '''
+    Draw comparesion of concentrations.
+
+    Args:
+        differences - list of difference arrays with dimensions (x, y)
+        titles - list of titles for difference arrays
+        fontsize - scalar values used for the title font size
+    '''
+    titles = ['Simulation', 'MKS']
+    cmap = _get_response_cmap()
+    _draw_fields((con1, con2), cmap, fontsize, titles)
+
+
+def draw_differences(differences, titles=None, fontsize=15):
+    '''
+    Draw differences in predicted response fields.
+
+    Args:
+        differences - list of difference arrays with dimesions (x, y)
+        titles - list of titles for difference arrays
+        fontsize - scalar values used for the title font size
+    '''
+    cmap = _get_diff_cmap()
+    if titles is None:
+        titles = [' ' for s in differences]
+    _draw_fields(differences, cmap, fontsize, titles)
+
+
+def _draw_fields(fields, field_cmap, fontsize, titles):
+    '''
+    Helper function used to draw fields.
+
+    Args:
+        fields - iterable object with 2D numpy arrays
+        field_cmap - color map for plot
+        fontsize - font size for titles and color bar text
+        titles - titles for plot
+    '''
+    vmin = np.min(fields)
+    vmax = np.max(fields)
+    n_fields = len(fields)
+    if titles is not None:
+        n_titles = len(titles)
+        if n_fields != n_titles:
+            raise RuntimeError(
+                "number of plots does not make number of titles.")
     plt.close('all')
-    fig, axs = plt.subplots(1, n_micros, figsize=(n_micros * 4, 4))
-    if n_micros > 1:
-        for sample, ax in zip(np.arange(n_micros), axs.flat):
-            im = ax.imshow(microstructures[0][sample].swapaxes(0, 1),
-                           cmap=plt.cm.gray, interpolation='none',
+    fig, axs = plt.subplots(1, n_fields, figsize=(n_fields * 4, 4))
+    if n_fields > 1:
+        for field, ax, title in zip(fields, axs.flat, titles):
+            im = ax.imshow(field.swapaxes(0, 1),
+                           cmap=field_cmap, interpolation='none',
                            vmin=vmin, vmax=vmax)
             ax.set_xticks(())
             ax.set_yticks(())
+            ax.set_title(title, fontsize=fontsize)
     else:
-        im = axs.imshow(microstructures[0][0].swapaxes(0, 1), cmap=plt.cm.gray,
+        im = axs.imshow(fields[0].swapaxes(0, 1), cmap=field_cmap,
                         interpolation='none', vmin=vmin, vmax=vmax)
         axs.set_xticks(())
         axs.set_yticks(())
+        axs.set_title(titles[0], fontsize=fontsize)
     fig.subplots_adjust(right=0.8)
     cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
+    cbar_font = np.floor(0.8 * fontsize)
+    cbar_ax.tick_params(labelsize=cbar_font)
+    cbar_ax.yaxis.set_offset_position('right')
     fig.colorbar(im, cax=cbar_ax)
     plt.tight_layout()
+    plt.rc('font', **{'size': str(cbar_font)})
+    plt.show()
 
 
-def draw_strains(*strains, **titles):
-    n_strains = len(strains)
-    plt.close('all')
-    cmap = _get_response_cmap()
-    fig, axs = plt.subplots(1, n_strains, figsize=(n_strains * 4, 4))
-    if n_strains > 1:
-        for micro, ax, title in zip(strains, axs, titles):
-            im = ax.imshow(micro.swapaxes(0, 1), cmap=cmap,
-                           interpolation='none')
-            ax.set_xticks(())
-            ax.set_yticks(())
-            ax.set_title(r'$\mathbf{\varepsilon_{%s}}$' % titles[title],
-                         fontsize=25)
-    else:
-        micro = np.array(strains)[0]
-        im = axs.imshow(micro.swapaxes(0, 1), cmap=cmap, interpolation='none')
-        axs.set_xticks(())
-        axs.set_yticks(())
-        axs.set_title(r'$\mathbf{\varepsilon_{%s}}$'
-                      % next(iter(titles.values())), fontsize=25)
-    fig.subplots_adjust(right=0.8)
-    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
-    fig.colorbar(im, cax=cbar_ax)
-    plt.tight_layout()
-
-
-def draw_concentrations(*concentrations, **titles):
-    n_concens = len(concentrations)
-    vmin = np.min(concentrations)
-    vmax = np.max(concentrations)
-    cmap = _get_response_cmap()
-    plt.close('all')
-    fig, axs = plt.subplots(1, n_concens, figsize=(n_concens * 4, 4))
-    if n_concens > 1:
-        for concen, ax, title in zip(concentrations, axs, titles):
-            im = ax.imshow(concen.swapaxes(0, 1), cmap=cmap,
-                           interpolation='none', vmin=vmin, vmax=vmax)
-            ax.set_xticks(())
-            ax.set_yticks(())
-            ax.set_title('Concentration (%s)' % titles[title],
-                         fontsize=15)
-    else:
-        im = axs.imshow(concentrations[0].swapaxes(0, 1), cmap=cmap,
-                        interpolation='none', vmin=vmin, vmax=vmax)
-        axs.set_xticks(())
-        axs.set_yticks(())
-        axs.set_title('Concentration (%s)' % next(iter(titles.values())),
-                      fontsize=15)
-    fig.subplots_adjust(right=0.8)
-    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
-    fig.colorbar(im, cax=cbar_ax)
-    plt.tight_layout()
-
-
-def draw_strains_compare(strain1, strain2):
-    plt.close('all')
-    cmap = _get_response_cmap()
-    vmin = min((strain1.flatten().min(), strain2.flatten().min()))
-    vmax = max((strain1.flatten().max(), strain2.flatten().max()))
-    fig, axs = plt.subplots(1, 2, figsize=(8, 4))
-    titles = ['Finite Element', 'MKS']
-    strains = (strain1, strain2)
-    for strain, ax, title in zip(strains, axs, titles):
-        im = ax.imshow(strain.swapaxes(0, 1), cmap=cmap,
-                       interpolation='none', vmin=vmin, vmax=vmax)
-        ax.set_xticks(())
-        ax.set_yticks(())
-        ax.set_title(r'$\mathbf{\varepsilon_{xx}}$ (%s)' % title, fontsize=20)
-
-    fig.subplots_adjust(right=0.8)
-    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
-    fig.colorbar(im, cax=cbar_ax)
-
-    plt.tight_layout()
-
-
-def draw_concentrations_compare(con1, con2):
-    plt.close('all')
-    cmap = _get_response_cmap()
-    vmin = min((con1.flatten().min(), con2.flatten().min()))
-    vmax = max((con1.flatten().max(), con2.flatten().max()))
-    fig, axs = plt.subplots(1, 2, figsize=(8, 4))
-    titles = ['Simulation', 'MKS']
-    cons = (con1, con2)
-    for con, ax, title in zip(cons, axs, titles):
-        im = ax.imshow(con.swapaxes(0, 1), cmap=cmap, interpolation='none',
-                       vmin=vmin, vmax=vmax)
-        ax.set_xticks(())
-        ax.set_yticks(())
-        ax.set_title('Concentration (%s)' % title, fontsize=15)
-
-    fig.subplots_adjust(right=0.8)
-    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
-    fig.colorbar(im, cax=cbar_ax)
-
-    plt.tight_layout()
-
-
-def draw_diff(*responses, **titles):
-    n_responses = len(responses)
-    vmin = np.min(responses)
-    vmax = np.max(responses)
-    cmap = _get_diff_cmap()
-    plt.close('all')
-    fig, axs = plt.subplots(1, n_responses, figsize=(n_responses * 4, 4))
-    if n_responses > 1:
-        for response, ax, title in zip(responses, axs, titles):
-            im = ax.imshow(response.swapaxes(0, 1), cmap=cmap,
-                           interpolation='none', vmin=vmin, vmax=vmax)
-            ax.set_xticks(())
-            ax.set_yticks(())
-            ax.set_title('%s' % titles[title], fontsize=15)
-    else:
-        im = axs.imshow(responses[0].swapaxes(0, 1), cmap=cmap,
-                        interpolation='none', vmin=vmin, vmax=vmax)
-        axs.set_xticks(())
-        axs.set_yticks(())
-        axs.set_title('%s' % next(iter(titles.values())), fontsize=15)
-    fig.subplots_adjust(right=0.8)
-    cbar_ax = fig.add_axes([1.0, 0.05, 0.05, 0.9])
-    fig.colorbar(im, cax=cbar_ax)
-    plt.tight_layout()
-
-
-def draw_gridscores(grid_scores, param, score_label='', color='#1a9641',
-                    data_label=None, param_label=''):
+def draw_gridscores(grid_scores, param, score_label='', colors=('#1a9641',),
+                    data_labels=[None], param_label='', fontsize=20):
     '''
     Visualize the score values and standard deviations from grids
     scores result from GridSearchCV while varying 1 parameters.
 
     Args:
-        grid_scores: grid_scores_ attribute from GridSearchCV
-        param: list of 2 parameters used in grid_scores
+        grid_scores: list of grid_scores_ attribute from GridSearchCV
+        param: list of parameters used in grid_scores
         score_label: label for score value axis
-        color: color used for this specified parameter
+        colors: list of colors used for this specified parameter
         param_label: list of parameter titles to appear on plot
     '''
-    tmp = [[params[param], mean_score, scores.std()]
-           for params, mean_score, scores in grid_scores]
-
-    param, errors, stddev = list(zip(*tmp))
-    plt.fill_between(param, np.array(errors) - np.array(stddev),
-                     np.array(errors) + np.array(stddev), alpha=0.1,
-                     color=color)
-    plt.plot(param, errors, 'o-', color=color, label=data_label,
-             linewidth=2)
-
-    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-    plt.ylabel(score_label, fontsize=20)
-    plt.xlabel(axis_label, fontsize=15)
+    if type(grid_scores[0]) is not list:
+        grid_scores = [grid_scores]
+    if len(grid_scores) != len(data_labels) or len(data_labels) != len(colors):
+        raise RuntimeError(
+            "grid_scores, colors, and param_lables must have the same length.")
+    for grid_score, data_label, color in zip(grid_scores, data_labels, colors):
+        tmp = [[params[param], mean_score, scores.std()]
+               for params, mean_score, scores in grid_score]
+        param_, errors, stddev = list(zip(*tmp))
+        plt.fill_between(param_, np.array(errors) - np.array(stddev),
+                         np.array(errors) + np.array(stddev), alpha=0.1,
+                         color=color)
+        plt.plot(param_, errors, 'o-', color=color, label=data_label,
+                 linewidth=2)
+    if data_labels[0] is not None:
+        plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.ylabel(score_label, fontsize=fontsize)
+    plt.xlabel(param_label, fontsize=fontsize)
+    plt.show()
 
 
 def draw_gridscores_matrix(grid_scores, params, score_label='R-Squared',
@@ -432,16 +412,17 @@ def draw_gridscores_matrix(grid_scores, params, score_label='R-Squared',
     param, means, stddev = list(zip(*tmp))
     param_range_0 = grid_scores.param_grid[params[0]]
     param_range_1 = grid_scores.param_grid[params[1]]
-    mat_size = (len(param_range_0), len(param_range_1))
+    mat_size = (len(param_range_1), len(param_range_0))
     fig, axs = plt.subplots(1, 2, figsize=(10, 5))
     matrices = np.concatenate((np.array(means).reshape(mat_size)[None],
-                              np.array(stddev).reshape(mat_size)[None]))
+                               np.array(stddev).reshape(mat_size)[None]))
     X_cmap = _grid_matrix_cmap()
-    x_label = 'Number of Components'
-    y_label = 'Order of Polynomial'
+    x_label = param_labels[0]
+    y_label = param_labels[1]
     plot_title = [score_label, 'Standard Deviation']
     for ax, label, matrix, title in zip(axs, param_labels,
-                                        matrices, plot_title):
+                                        np.swapaxes(matrices, -1, -2),
+                                        plot_title):
         ax.set_xticklabels(param_range_0, fontsize=12)
         ax.set_yticklabels(param_range_1, fontsize=12)
         ax.set_xticks(np.arange(len(param_range_0)))
@@ -456,6 +437,7 @@ def draw_gridscores_matrix(grid_scores, params, score_label='R-Squared',
         cbar = plt.colorbar(im, cax=cbar_ax)
         cbar.ax.tick_params(labelsize=12)
         fig.subplots_adjust(right=1.2)
+    plt.show()
 
 
 def draw_component_variance(variance):
@@ -583,7 +565,7 @@ def _draw_components_3D(X, labels):
     plt.show()
 
 
-def draw_goodness_of_fit(fit_data, pred_data):
+def draw_goodness_of_fit(fit_data, pred_data, labels):
     '''
     Visualize goodness of fit plot for MKSHomogenizationModel.
 
@@ -598,9 +580,9 @@ def draw_goodness_of_fit(fit_data, pred_data):
     line = np.linspace(middle - data_range * 1.03 / 2,
                        middle + data_range * 1.03 / 2, endpoint=False)
     plt.plot(line, line, '-', linewidth=3, color='#000000')
-    plt.plot(fit_data[0], fit_data[1], 'o', color='#1a9850', label='Fit Data')
+    plt.plot(fit_data[0], fit_data[1], 'o', color='#1a9850', label=labels[0])
     plt.plot(pred_data[0], pred_data[1], 'o',
-             color='#f46d43', label='Predicted Data')
+             color='#f46d43', label=labels[1])
     plt.title('Goodness of Fit', fontsize=20)
     plt.xlabel('Actual', fontsize=15)
     plt.ylabel('Predicted', fontsize=15)
@@ -637,7 +619,7 @@ def _get_correlation_titles(correlation_dict, selected_correlation_plots):
             new_name = ''.join(str(e) for e in name)
             new_names[new_names.index(plot_name)] = new_name
             if new_name not in correlation_dict:
-                raise RuntimeError("%s, correlation not found", plot_name)
+                raise RuntimeError(str(plot_name) + " correlation not found", )
     return new_names
 
 
@@ -863,17 +845,18 @@ def _draw_stats(X_dict, correlations=None):
         ax.set_yticklabels(y_labels, fontsize=12)
         im = ax.imshow(np.swapaxes(X_dict[label], 0, 1), cmap=X_cmap,
                        interpolation='none', vmin=vmin, vmax=vmax)
-        ax.set_title(r"Correlation $h = {0}$, $h' = {1}$".format(label[1],
+        ax.set_title(r"Correlation $l = {0}$, $l' = {1}$".format(label[1],
                                                                  label[-2]),
                      fontsize=15)
         fig.subplots_adjust(right=0.8)
         divider = make_axes_locatable(ax)
         cbar_ax = divider.append_axes("right", size="10%", pad=0.05)
         cbar_ticks = _get_colorbar_ticks(X_dict[label], 5)
+        cbar_ticks_diff = cbar_ticks[-1] - cbar_ticks[0]
         cbar = plt.colorbar(im, cax=cbar_ax, ticks=cbar_ticks,
                             boundaries=np.arange(cbar_ticks[0],
                                                  cbar_ticks[-1] + 0.005,
-                                                 0.005))
+                                                 cbar_ticks_diff * 0.005))
         cbar.ax.tick_params(labelsize=12)
         fig.subplots_adjust(right=0.8)
         plt.tight_layout()

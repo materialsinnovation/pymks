@@ -49,7 +49,7 @@ class MKSHomogenizationModel(BaseEstimator):
 
     '''
 
-    def __init__(self, basis, n_components=None, poly_order=1,
+    def __init__(self, basis, n_components=None, degree=1,
                  dimension_reducer=None, property_linker=None):
         '''
         Create an instance of a `MKSHomogenizationModel`.
@@ -60,6 +60,8 @@ class MKSHomogenizationModel(BaseEstimator):
                 class with a fit_transform method.
             property_linker: an instance for a machine learning class with fit
                 and predict methods.
+            n_components: number of components kept by the dimension_reducer
+            degree: degree of the polynomial used by property_linker.
         '''
 
         self.basis = basis
@@ -70,10 +72,10 @@ class MKSHomogenizationModel(BaseEstimator):
             n_components = self.dimension_reducer.n_components
         if property_linker is None:
             property_linker = LinearRegression()
-        self.linker = Pipeline([('poly', PolynomialFeatures(degree=1)),
+        self.linker = Pipeline([('poly', PolynomialFeatures(degree=degree)),
                                 ('linker', property_linker)])
         self._check_methods
-        self.poly_order = poly_order
+        self.degree = degree
         self.n_components = n_components
 
     @property
@@ -86,12 +88,12 @@ class MKSHomogenizationModel(BaseEstimator):
         self.dimension_reducer.n_components = value
 
     @property
-    def poly_order(self):
-        return self._poly_order
+    def degree(self):
+        return self._degree
 
-    @poly_order.setter
-    def poly_order(self, value):
-        self._poly_order = value
+    @degree.setter
+    def degree(self, value):
+        self._degree = value
         self.linker.set_params(poly__degree=value)
 
     def _check_methods(self):
