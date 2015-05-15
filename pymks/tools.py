@@ -412,16 +412,17 @@ def draw_gridscores_matrix(grid_scores, params, score_label='R-Squared',
     param, means, stddev = list(zip(*tmp))
     param_range_0 = grid_scores.param_grid[params[0]]
     param_range_1 = grid_scores.param_grid[params[1]]
-    mat_size = (len(param_range_0), len(param_range_1))
+    mat_size = (len(param_range_1), len(param_range_0))
     fig, axs = plt.subplots(1, 2, figsize=(10, 5))
     matrices = np.concatenate((np.array(means).reshape(mat_size)[None],
                                np.array(stddev).reshape(mat_size)[None]))
     X_cmap = _grid_matrix_cmap()
-    x_label = 'Number of Components'
-    y_label = 'Order of Polynomial'
+    x_label = param_labels[0]
+    y_label = param_labels[1]
     plot_title = [score_label, 'Standard Deviation']
     for ax, label, matrix, title in zip(axs, param_labels,
-                                        matrices, plot_title):
+                                        np.swapaxes(matrices, -1, -2),
+                                        plot_title):
         ax.set_xticklabels(param_range_0, fontsize=12)
         ax.set_yticklabels(param_range_1, fontsize=12)
         ax.set_xticks(np.arange(len(param_range_0)))
@@ -564,7 +565,7 @@ def _draw_components_3D(X, labels):
     plt.show()
 
 
-def draw_goodness_of_fit(fit_data, pred_data):
+def draw_goodness_of_fit(fit_data, pred_data, labels):
     '''
     Visualize goodness of fit plot for MKSHomogenizationModel.
 
@@ -579,9 +580,9 @@ def draw_goodness_of_fit(fit_data, pred_data):
     line = np.linspace(middle - data_range * 1.03 / 2,
                        middle + data_range * 1.03 / 2, endpoint=False)
     plt.plot(line, line, '-', linewidth=3, color='#000000')
-    plt.plot(fit_data[0], fit_data[1], 'o', color='#1a9850', label='Fit Data')
+    plt.plot(fit_data[0], fit_data[1], 'o', color='#1a9850', label=labels[0])
     plt.plot(pred_data[0], pred_data[1], 'o',
-             color='#f46d43', label='Predicted Data')
+             color='#f46d43', label=labels[1])
     plt.title('Goodness of Fit', fontsize=20)
     plt.xlabel('Actual', fontsize=15)
     plt.ylabel('Predicted', fontsize=15)
