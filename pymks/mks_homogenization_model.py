@@ -1,6 +1,6 @@
 from pymks.stats import correlate
 from sklearn.base import BaseEstimator
-from sklearn.decomposition import TruncatedSVD
+from sklearn.decomposition import RandomizedPCA
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import Pipeline
@@ -67,9 +67,11 @@ class MKSHomogenizationModel(BaseEstimator):
         self.basis = basis
         self.dimension_reducer = dimension_reducer
         if self.dimension_reducer is None:
-            self.dimension_reducer = TruncatedSVD()
+            self.dimension_reducer = RandomizedPCA()
         if n_components is None:
             n_components = self.dimension_reducer.n_components
+        if n_components is None:
+            n_components = 2
         if property_linker is None:
             property_linker = LinearRegression()
         self.linker = Pipeline([('poly', PolynomialFeatures(degree=degree)),
