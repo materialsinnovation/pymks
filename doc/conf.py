@@ -44,7 +44,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pymks'
-copyright = u'2014, Daniel Wheeler'
+copyright = u'2015, David Brough'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -104,7 +104,7 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    'navbar_title': " ",
+    'navbar_title': "PyMKS",
     'navbar_site_name': "More",
     'navbar_links': [
         ("Installation", "rst/INSTALLATION.html", True),
@@ -235,7 +235,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'extremefill', u'Extreme Fill Documentation',
-     [u'Daniel Wheeler'], 1)
+     [u'David Brough'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -249,7 +249,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'extremefill', u'Extreme Fill Documentation',
-   u'Daniel Wheeler', 'extremefill', 'Reproduce Extreme fill Paper.',
+   u'David Brough', 'extremefill', 'Reproduce Extreme fill Paper.',
    'Miscellaneous'),
 ]
 
