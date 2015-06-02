@@ -1,13 +1,14 @@
 Requirements
 ============
 
-**Packages Required for PyMKS**
+Packages Required for PyMKS
 
+ - nose==1.3.6
  - numpy==1.9.2
  - scikit-learn==0.16.1
  - scipy==0.15.1
 
-**Packages Required to Run Tests and Examples**
+Packages Required to Run Tests and Examples
 
  - backports.ssl-match-hostname==3.4.0.2
  - certifi==14.5.14
@@ -18,7 +19,6 @@ Requirements
  - jsonschema==2.4.0
  - markupsafe==0.23
  - matplotlib==1.4.3
- - nose==1.3.6
  - numexpr==2.3.1
  - pip==7.0.1
  - pyparsing==2.0.3
