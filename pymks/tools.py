@@ -3,6 +3,7 @@ import matplotlib.cm as cmx
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from sklearn.learning_curve import learning_curve
 import numpy as np
 import itertools
 import warnings
@@ -193,6 +194,7 @@ def draw_coeff(coeff, fontsize=15):
         coeff: influence coefficients with dimensions (x, y, n_states)
         fontsize - scalar values used for the title font size
     """
+    plt.close('all')
     coeff_cmap = _get_coeff_cmap()
     n_coeff = coeff.shape[-1]
     titles = [r'Influence Coefficients $l = %s$' % ii for ii
@@ -326,6 +328,7 @@ def _draw_fields(fields, field_cmap, fontsize, titles):
         fontsize - font size for titles and color bar text
         titles - titles for plot
     """
+    plt.close('all')
     vmin = np.min(fields)
     vmax = np.max(fields)
     n_fields = len(fields)
@@ -374,6 +377,7 @@ def draw_gridscores(grid_scores, param, score_label='', colors=('#1a9641',),
         colors: list of colors used for this specified parameter
         param_label: list of parameter titles to appear on plot
     """
+    plt.close('all')
     if type(grid_scores[0]) is not list:
         grid_scores = [grid_scores]
     if len(grid_scores) != len(data_labels) or len(data_labels) != len(colors):
@@ -389,7 +393,8 @@ def draw_gridscores(grid_scores, param, score_label='', colors=('#1a9641',),
         plt.plot(param_, errors, 'o-', color=color, label=data_label,
                  linewidth=2)
     if data_labels[0] is not None:
-        plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.,
+                   fontsize=15)
     plt.ylabel(score_label, fontsize=fontsize)
     plt.xlabel(param_label, fontsize=fontsize)
     plt.show()
@@ -407,6 +412,7 @@ def draw_gridscores_matrix(grid_scores, params, score_label='R-Squared',
         score_label: label for score value axis
         param_labels: list of parameter titles to appear on plot
     """
+    plt.close('all')
     tmp = [[params, mean_score, scores.std()]
            for parameters, mean_score, scores in grid_scores.grid_scores_]
     param, means, stddev = list(zip(*tmp))
@@ -448,6 +454,7 @@ def draw_component_variance(variance):
         variance: variance ration explanation function for dimensional
             reduction technique.
     """
+    plt.close('all')
     plt.plot(np.cumsum(variance * 100), 'o-', color='#1a9641', linewidth=2)
     plt.xlabel('Number of Components', fontsize=15)
     plt.ylabel('Percent Variance', fontsize=15)
@@ -489,6 +496,7 @@ def draw_components(*X, **labels):
         labels: labes for each of each array X
 
     """
+    plt.close('all')
     size = np.array(X[0].shape)
     if size[-1] == 2:
         _draw_components_2D(X, labels)
@@ -524,7 +532,7 @@ def _draw_components_2D(X, labels):
     for key, n in zip(labels.keys(), np.arange(n_sets)):
         ax.plot(X[n][:, 0], X[n][:, 1], 'o', color=color_list[n],
                 label=labels[key])
-    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=15)
     plt.title('Low Dimensional Representation', fontsize=20)
     plt.show()
 
@@ -561,7 +569,7 @@ def _draw_components_3D(X, labels):
         ax.plot(X[n][:, 0], X[n][:, 1], X[n][:, 2], 'o', color=color_list[n],
                 label=labels[key])
     plt.title('Low Dimensional Representation', fontsize=15)
-    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=15)
     plt.show()
 
 
@@ -573,6 +581,7 @@ def draw_goodness_of_fit(fit_data, pred_data, labels):
         fit_data: Low dimensional data used to fit the MKSHomogenizationModel
         pred_data: Low dimensional data used for prediction
     """
+    plt.close('all')
     y_total = np.concatenate((fit_data, pred_data), axis=-1)
     y_min, y_max = np.min(y_total), np.max(y_total)
     middle = (y_max + y_min) / 2.
@@ -584,9 +593,9 @@ def draw_goodness_of_fit(fit_data, pred_data, labels):
     plt.plot(pred_data[0], pred_data[1], 'o',
              color='#f46d43', label=labels[1])
     plt.title('Goodness of Fit', fontsize=20)
-    plt.xlabel('Actual', fontsize=15)
-    plt.ylabel('Predicted', fontsize=15)
-    plt.legend(loc=2)
+    plt.xlabel('Actual', fontsize=18)
+    plt.ylabel('Predicted', fontsize=18)
+    plt.legend(loc=2, fontsize=15)
     plt.show()
 
 
@@ -767,23 +776,23 @@ def _draw_stats(X_lists, correlations=None):
         correlations: list of tuples to select the spatial correlations
             that will be displayed.
     """
-    X_cmap = _get_coeff_cmap()
     plt.close('all')
+    X_cmap = _get_coeff_cmap()
     correlation_labels = _get_correlation_titles(X_lists[0], correlations)
     if correlation_labels is None:
         correlation_labels = X_lists[0]
     n_plots = len(correlation_labels)
     X_corr_index = [X_lists[0].index(s) for s in correlation_labels]
-    X_list = [X_lists[1][..., s] for s in X_corr_index]
+    X_list = [X_lists[1][..., s][None] for s in X_corr_index]
     X_ = np.concatenate(tuple(X_list))
     vmin = np.min(X_)
     vmax = np.max(X_)
-    x_loc, x_labels = _get_ticks_params(X_.shape[0])
-    y_loc, y_labels = _get_ticks_params(X_.shape[1])
+    x_loc, x_labels = _get_ticks_params(X_.shape[1])
+    y_loc, y_labels = _get_ticks_params(X_.shape[2])
     fig, axs = plt.subplots(1, n_plots, figsize=(n_plots * 5, 5))
     if n_plots == 1:
         axs = list([axs])
-    for ax, label, img in zip(axs, correlation_labels, X_list):
+    for ax, label, img in zip(axs, correlation_labels, X_):
         ax.set_xticks(x_loc)
         ax.set_xticklabels(x_labels, fontsize=12)
         ax.set_yticks(y_loc)
@@ -879,8 +888,7 @@ def draw_learning_curves(estimator, X, y, ylim=None, cv=None, n_jobs=1,
             A plot of the learning curves for both the training curve and the
             cross-validation curve.
     """
-    from sklearn.learning_curve import learning_curve
-
+    plt.close('all')
     flat_shape = (X.shape[0],) + (np.prod(X.shape[1:]),)
     X_flat = X.reshape(flat_shape)
     plt.figure()
