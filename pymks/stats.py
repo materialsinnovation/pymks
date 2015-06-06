@@ -14,6 +14,19 @@ def autocorrelate(X_, periodic_axes=[], probability_mask=None):
 
     Test non-periodic autocorrelation.
 
+    Args:
+        X_: The discretized microstructure function, an
+            `(n_samples, n_x, ..., n_states)` shaped array
+            where `n_samples` is the number of samples, `n_x` is thes
+            patial discretization, and n_states is the number of local states.
+        periodic_axes: axes that are periodic. (0, 2) would indicate
+            that axes x and z are periodic in a 3D microstrucure.
+        probability_mask: array with same shape as X used to assign a
+            confidence value for each data point.
+
+    Returns:
+        Autocorrelations for microstructure function X_.
+
     >>> n_states = 2
     >>> X = np.array([[[0, 0, 0],
     ...                [0, 1, 0],
@@ -26,16 +39,6 @@ def autocorrelate(X_, periodic_axes=[], probability_mask=None):
     ...                   [0., 1./9, 0.],
     ...                   [0., 0., 0.]]])
     >>> assert(np.allclose(np.real_if_close(X_auto[0, ..., 1]), X_test[0]))
-
-    Args:
-      X_: microstructure funciton
-      periodic_axes: axes that are periodic. (0, 2) would indicate
-          that axes x and z are periodic in a 3D microstrucure.
-      probability_mask: array with same shape as X used to assign a
-          confidence value for each data point.
-
-    Returns:
-      Autocorrelations for microstructure function X_.
     """
     X_ = _set_X(X_, probability_mask)
     s = _Fkernel_shape(X_, periodic_axes)
@@ -46,6 +49,16 @@ def autocorrelate(X_, periodic_axes=[], probability_mask=None):
 def _autocorrelator(X_, s):
     """
     Helper function used to calculate the unnormalized autocorrelation counts.
+
+    Args:
+        X_: The discretized microstructure function, an
+            `(n_samples, n_x, ..., n_states)` shaped array
+            where `n_samples` is the number of samples, `n_x` is thes
+            patial discretization, and n_states is the number of local states.
+        s: shape of the Fkernel used for the convolution
+
+    Returns:
+        autocorrelation counts for a given microstructure function
 
     >>> from pymks.datasets import make_microstructure
     >>> from pymks.bases import DiscreteIndicatorBasis
@@ -63,14 +76,8 @@ def _autocorrelator(X_, s):
     ...                       [[2, 0, 2],
     ...                        [2, 0, 2]]]])
     >>> assert np.allclose(X_result, X_auto)
-
-    Args:
-      X_: microstructure function
-      s: shape of the Fkernel used for the convolution
-
-    Returns:
-      autocorrelation counts for a given microstructure function
     """
+
     auto = Correlation(X_, Fkernel_shape=s).convolve(X_)
     return _truncate(auto, X_.shape[:-1])
 
@@ -78,6 +85,19 @@ def _autocorrelator(X_, s):
 def crosscorrelate(X_, periodic_axes=[], probability_mask=None):
     """
     Computes the crosscorrelations from a microstructure function.
+
+    Args:
+        X_: The discretized microstructure function, an
+            `(n_samples, n_x, ..., n_states)` shaped array
+            where `n_samples` is the number of samples, `n_x` is thes
+            patial discretization, and n_states is the number of local states.
+        periodic_axes: axes that are periodic. (0, 2) would indicate
+            that axes x and z are periodic in a 3D microstrucure.
+        probability_mask: array with same shape as X used to assign a
+            confidence value for each data point.
+
+    Returns:
+        Crosscorelations for microstructure function X_.
 
     Test for 2 states.
 
@@ -114,15 +134,6 @@ def crosscorrelate(X_, periodic_axes=[], probability_mask=None):
     >>> basis = DiscreteIndicatorBasis(n_states=n_states)
     >>> X_ = basis.discretize(X)
     >>> assert(crosscorrelate(X_, periodic_axes=[0, 1]).shape == (1, 3, 3, 10))
-
-    Args:
-      X_: microstructure funciton
-      periodic_axes: axes that are periodic. (0, 2) would indicate
-          that axes x and z are periodic in a 3D microstrucure.
-      probability_mask: array with same shape as X used to assign a
-          confidence value for each data point.
-    Returns:
-      Crosscorelations for microstructure function X_.
     """
     X_ = _set_X(X_, probability_mask)
     s = _Fkernel_shape(X_, periodic_axes)
@@ -134,6 +145,16 @@ def _crosscorrelator(X_, s):
     """
     Helper function used to calculate the unnormalized croos-correlation
     counts.
+
+    Args:
+        X_: The discretized microstructure function, an
+            `(n_samples, n_x, ..., n_states)` shaped array
+            where `n_samples` is the number of samples, `n_x` is thes
+            patial discretization, and n_states is the number of local states.
+        s: shape of the Fkernel used for the convolution
+
+    Returns:
+        cross-correlation counts for a given microstructure function
 
     >>> from pymks.datasets import make_microstructure
     >>> from pymks.bases import DiscreteIndicatorBasis
@@ -151,13 +172,6 @@ def _crosscorrelator(X_, s):
     ...                       [[0, 1, 0],
     ...                        [0, 0, 0]]]])
     >>> assert np.allclose(X_result, X_cross)
-
-    Args:
-      X_: microstructure function
-      s: shape of the Fkernel used for the convolution
-
-    Returns:
-      cross-correlation counts for a given microstructure function
     """
     n_states = X_.shape[-1]
     Niter = n_states // 2
@@ -176,14 +190,29 @@ def correlate(X_, periodic_axes=[], probability_mask=None):
     function.
 
     Args:
-      X_: microstructure funciton
-      periodic_axes: axes that are periodic. (0, 2) would indicate
-          that axes x and z are periodic in a 3D microstrucure.
-      probability_mask: array with same shape as X used to assign a
-          confidence value for each data point.
+        X_: The discretized microstructure function, an
+            `(n_samples, n_x, ..., n_states)` shaped array
+            where `n_samples` is the number of samples, `n_x` is thes
+            patial discretization, and n_states is the number of local states.
+        periodic_axes: axes that are periodic. (0, 2) would indicate
+            that axes x and z are periodic in a 3D microstrucure.
+        probability_mask: array with same shape as X used to assign a
+            confidence value for each data point.
 
     Returns:
-      Autocorrelations and crosscorrelations for microstructure funciton X_.
+        Autocorrelations and crosscorrelations for microstructure funciton X_.
+
+    >>> from pymks import DiscreteIndicatorBasis
+    >>> dbasis = DiscreteIndicatorBasis(2, [0, 1])
+    >>>
+    >>> np.random.seed(0)
+    >>> X = np.random.randint(2, size=(1, 3))
+    >>> X_ = dbasis.discretize(X)
+    >>> X_corr = correlate(X_)
+    >>> X_result = np.array([[0, 0.5, 0],
+    ...                      [1 / 3., 2 / 3., 0],
+    ...                      [0, 0.5, 0.5]])
+    >>> assert np.allclose(X_corr, X_result)
     """
     X_ = _set_X(X_, probability_mask)
     s = _Fkernel_shape(X_, periodic_axes)
@@ -199,22 +228,24 @@ def _normalize(X_, s, probability_mask):
 
     The normalization should be Nx * Ny in the center of the domain.
 
+    Args:
+        X_: The discretized microstructure function, an
+            `(n_samples, n_x, ..., n_states)` shaped array
+            where `n_samples` is the number of samples, `n_x` is thes
+            patial discretization, and n_states is the number of local states.
+        _Fkernel_shape : the shape of the kernel is Fourier space (array)
+        probability_mask: array with same shape as X used to assign a
+            confidence value for each data point.
+
+    Returns:
+        Normalization
+
     >>> Nx = Ny = 5
     >>> X_ = np.zeros((1, Nx, Ny, 1))
     >>> _Fkernel_shape  = np.array((2 * Nx, Ny))
     >>> norm =  _normalize(X_, _Fkernel_shape , None)
     >>> assert norm.shape == (1, Nx, Ny, 1)
     >>> assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
-
-    Args:
-      X_: discretized microstructure (array)
-      _Fkernel_shape : the shape of the kernel is Fourier space (array)
-      probability_mask: array with same shape as X used to assign a
-        confidence value for each data point.
-
-    Returns:
-      Normalization
-
     """
 
     if (s == X_.shape[1:-1]).all() and probability_mask is None:
@@ -231,19 +262,21 @@ def _Fkernel_shape(X_, periodic_axes):
     """
     Returns the shape of the kernel in Fourier space with non-periodic padding.
 
+    Args:
+        X_: The discretized microstructure function, an
+            `(n_samples, n_x, ..., n_states)` shaped array
+            where `n_samples` is the number of samples, `n_x` is thes
+            patial discretization, and n_states is the number of local states.
+        periodic_axes: the axes of the array that are periodic
+
+    Returns:
+        shape of the new Fkernel array
+
     >>> Nx = Ny = 5
     >>> X_ = np.zeros((1, Nx, Ny, 1))
     >>> periodic_axes = [1]
     >>> assert (_Fkernel_shape(X_,
     ...                        periodic_axes=periodic_axes) == [8, 5]).all()
-
-    Args:
-      X_ : microstructure funciton
-      periodic_axes: the axes of the array that are periodic
-
-    Returns:
-      Shape of the new Fkernel array
-
     """
     axes = np.arange(len(X_.shape) - 2) + 1
     a = np.ones(len(axes), dtype=float) * 1.75
@@ -255,6 +288,13 @@ def _truncate(a, shape):
     """
     _truncates the edges of the array, a, based on the shape. This is
     used to unpad a padded convolution.
+
+    Args:
+        a: array to be truncated
+        shape: new shape of array
+
+    Returns:
+        truncated array
 
     >>> print _truncate(np.arange(10).reshape(1, 10, 1), (1, 5))[0, ..., 0]
     [3 4 5 6 7]
@@ -275,13 +315,6 @@ def _truncate(a, shape):
     >>> assert (_truncate(a, (1, 2, 2, 1))[0, ..., 0]  ==
     ...         [[[16], [19]], [[28], [31]]]).all()
 
-    Args:
-      a: array to be truncated
-      shape: new shape of array
-
-    Returns:
-      truncated array
-
     """
     a_shape = np.array(a.shape)
     n = len(shape)
@@ -298,6 +331,18 @@ def _set_X(X_, probability_mask):
     """
     Helper function to verify that the probability_mask is the correct
     shape.
+
+    Args:
+        X_: The discretized microstructure function, an
+            `(n_samples, n_x, ..., n_states)` shaped array
+            where `n_samples` is the number of samples, `n_x` is thes
+            patial discretization, and n_states is the number of local states.
+        probability_mask: array with same shape as X used to assign a
+            confidence value for each data point.
+
+    Returns:
+        The discretized microstructure function scaled by the probability_mask.
+
     """
     if probability_mask is not None:
         if X_.shape[:-1] != probability_mask.shape:

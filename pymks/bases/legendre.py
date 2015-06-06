@@ -41,9 +41,11 @@ class LegendreBasis(_Polynomial):
         Discretize `X`.
 
         Args:
-          X: field representing the microstructure
+            X: The microstructure, an `(n_samples, n_x, ...)` shaped array
+                where `n_samples` is the number of samples and `n_x` is thes
+                patial discretization.
         Returns:
-          field of local states
+            Float valued field of of Legendre polynomial coefficients.
 
         >>> X = np.array([[-1, 1],
         ...               [0, -1]])

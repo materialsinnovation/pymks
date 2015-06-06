@@ -11,10 +11,16 @@ except:
 
 class MKSLocalizationModel(LinearRegression):
 
-    '''
+    """
     The `MKSLocalizationModel` fits data using the Materials Knowledge
     System in Fourier Space. The following demonstrates the viability
     of the `MKSLocalizationModel` with a simple 1D filter.
+
+    Attributes:
+        basis: Basis function used to discretize the microstucture.
+        n_states: Interger value for number of local states, if a basis is
+            specified, n_states indicates the order of the polynomial.
+        coef: Array of values that are the influence coefficients
 
     >>> n_states = 2
     >>> n_spaces = 81
@@ -56,20 +62,14 @@ class MKSLocalizationModel(LinearRegression):
     Check the result
 
     >>> assert np.allclose(np.fft.fftshift(coeff, axes=(0,)), model.coeff)
-
-    Attributes:
-        n_states: Interger value for number of local states, if a basis is
-          specified, n_states indicates the order of the polynomial.
-        coef: Array of values that are the influence coefficients
-        Fcoef: Frequency space representation of coef
-    '''
+    """
 
     def __init__(self, basis, n_states=None):
         """
         Instantiate a MKSLocalizationModel.
 
         Args:
-          basis: an instance of a bases class.
+            basis: an instance of a bases class.
 
         """
         self.basis = basis
@@ -79,8 +79,17 @@ class MKSLocalizationModel(LinearRegression):
         self.domain = basis.domain
 
     def fit(self, X, y, size=None):
-        '''
+        """
         Fits the data by calculating a set of influence coefficients.
+
+        Args:
+            X: The microstructure, an `(n_samples, n_x, ...)` shaped
+               array where `n_samples` is the number of samples and `n_x`
+               is the spatial discretization.
+            y: The response field, same shape as `X`.
+            size: Alters the shape of X and y during the calibration of the
+                influence coefficients. If None, the size of the influence
+                coefficients is the same shape as `X` and `y`.
 
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
         >>> y = X.swapaxes(1, 2)
@@ -92,17 +101,7 @@ class MKSLocalizationModel(LinearRegression):
         ...                                             [  -2,    0]],
         ...                                            [[-0.5,  0  ],
         ...                                             [  -1,  0  ]]])
-
-
-        Args:
-          X: The microstructure, an `(S, N, ...)` shaped
-             array where `S` is the number of samples and `N` is the
-             spatial discretization.
-          y: The response field, same shape as `X`.
-          size: Alters the shape of X and y during the calibration of the
-              influence coefficients. If None, the size of the influence
-              coefficients is the same shape as `X` and `y`.
-        '''
+        """
         self.basis = self.basis.__class__(self.n_states, self.domain)
         if size is not None:
             y = self._reshape_feature(y, size)
@@ -125,14 +124,21 @@ class MKSLocalizationModel(LinearRegression):
 
     @property
     def coeff(self):
-        '''Returns the coefficients in real space with origin shifted to the
+        """Returns the coefficients in real space with origin shifted to the
         center.
-        '''
+        """
         return self._filter._frequency_2_real()[0]
 
     def predict(self, X):
-        '''Predicts a new response from the microstructure function `X` with
+        """Predicts a new response from the microstructure function `X` with
         calibrated influence coefficients.
+
+        Args:
+            X: The microstructure, an `(n_samples, n_x, ...)` shaped array
+                where `n_samples` is the number of samples and `n_x` is thes
+                patial discretization.
+        Returns:
+            The predicted response field the same shape as `X`.
 
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
         >>> y = X.swapaxes(1, 2)
@@ -150,14 +156,7 @@ class MKSLocalizationModel(LinearRegression):
         Traceback (most recent call last):
         ...
         AttributeError: fit() method must be run before predict().
-
-        Args:
-            X: The microstructre function, an `(S, N, ...)` shaped
-                array where `S` is the number of samples and `N`
-                is the spatial discretization.
-        Returns:
-            The predicted response field the same shape as `X`.
-        '''
+        """
 
         if not hasattr(self, '_filter'):
             raise AttributeError("fit() method must be run before predict().")
@@ -167,7 +166,13 @@ class MKSLocalizationModel(LinearRegression):
         return self._filter.convolve(X_).reshape(y_pred_shape)
 
     def resize_coeff(self, size):
-        '''Scale the size of the coefficients and pad with zeros.
+        """Scale the size of the coefficients and pad with zeros.
+
+        Args:
+            size: The new size of the influence coefficients.
+
+        Returns:
+            The resized influence coefficients to size.
 
         Let's first instantitate a model and fabricate some
         coefficients.
@@ -195,16 +200,11 @@ class MKSLocalizationModel(LinearRegression):
         ...                     [0, 0,16,17,18,19, 0],
         ...                     [0, 0, 0, 0, 0, 0, 0],
         ...                     [0, 0, 0, 0, 0, 0, 0]])
-
-        Args:
-            size: The new size of the influence coefficients.
-        Returns:
-            The resized influence coefficients to size.
-        '''
+        """
         self._filter.resize(size)
 
     def _test(self):
-        '''Tests
+        """Tests
 
         >>> n_states = 10
         >>> np.random.seed(3)
@@ -237,13 +237,21 @@ class MKSLocalizationModel(LinearRegression):
         ...                      [0.00000000+0.j, 0.37713401-1.87334545j],
         ...                      [0.00000000+0.j, 1.09318216-0.10131035j]]]])
         >>> assert np.allclose(FX, FXtest)
-        '''
+        """
         pass
 
     def _reshape_feature(self, X, size):
-        '''
+        """
         Helper function used to check the shape of the microstructure,
         and change to appropriate shape.
-        '''
+
+        Args:
+            X: The microstructure, an `(n_samples, n_x, ...)` shaped array
+                where `n_samples` is the number of samples and `n_x` is thes
+                patial discretization.
+
+        Returns:
+            microstructure with shape (n_samples, size)
+        """
         new_shape = (X.shape[0],) + size
         return X.reshape(new_shape)

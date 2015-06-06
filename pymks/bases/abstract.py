@@ -8,8 +8,9 @@ class _AbstractMicrostructureBasis(object):
         Instantiate a `Basis`
 
         Args:
-          n_states: The number of local states
-          domain: indicate the range of expected values for the microstructure.
+            n_states: The number of local states
+            domain: indicate the range of expected values for the
+                microstructure.
         """
         self.n_states = n_states
         self.domain = domain

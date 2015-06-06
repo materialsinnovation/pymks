@@ -61,9 +61,11 @@ class ContinuousIndicatorBasis(_Indicator):
         Discretize `X`.
 
         Args:
-          X: continuous field between the domain bounds
+            X: The microstructure, an `(n_samples, n_x, ...)` shaped array
+                where `n_samples` is the number of samples and `n_x` is thes
+                patial discretization.
         Returns:
-          field of local states between 0 and 1
+            Float valued field of local states between 0 and 1.
         """
         self.check(X)
         H = np.linspace(self.domain[0], self.domain[1], self.n_states)

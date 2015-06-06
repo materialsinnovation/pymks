@@ -59,14 +59,16 @@ class DiscreteIndicatorBasis(_Indicator):
                                                      [0, n_states - 1])
 
     def discretize(self, X):
-        '''
+        """
         Discretize `X`.
 
         Args:
-          X: Integer valued field
+            X: The microstructure, an `(n_samples, n_x, ...)` shaped array
+                where `n_samples` is the number of samples and `n_x` is thes
+                patial discretization.
         Returns:
-          Integer valued field, either 0 or 1
-        '''
+            Integer valued field, either 0 or 1
+        """
         if not issubclass(X.dtype.type, np.integer):
             raise RuntimeError("X must be an integer array")
         self.check(X)
