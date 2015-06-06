@@ -9,8 +9,9 @@ __all__ = ['make_delta_microstructures', 'make_elastic_FE_strain_delta',
            'make_elastic_stress_random']
 
 
-def make_elastic_FE_strain_delta(elastic_modulus=(1, 1), poissons_ratio=(1, 1),
-                                 size=(21, 21), macro_strain=1.0):
+def make_elastic_FE_strain_delta(elastic_modulus=(100, 150),
+                                 poissons_ratio=(0.3, 0.3),
+                                 size=(21, 21), macro_strain=0.01):
     """Generate delta microstructures and responses
 
     Simple interface to generate delta microstructures and their
@@ -98,9 +99,9 @@ def make_delta_microstructures(n_phases=2, size=(21, 21)):
     return X[mask]
 
 
-def make_elastic_FE_strain_random(n_samples=1, elastic_modulus=(1, 1),
-                                  poissons_ratio=(1, 1), size=(21, 21),
-                                  macro_strain=1.0):
+def make_elastic_FE_strain_random(n_samples=1, elastic_modulus=(100, 150),
+                                  poissons_ratio=(0.3, 0.3), size=(21, 21),
+                                  macro_strain=0.01):
     """Generate random microstructures and responses
 
     Simple interface to generate random microstructures and their
@@ -241,8 +242,8 @@ def make_checkerboard_microstructure(square_size, n_squares):
     return np.tile(X, ((n_squares + 1) / 2, (n_squares + 1) / 2))[None, :L, :L]
 
 
-def make_elastic_stress_random(n_samples=1, elastic_modulus=(1, 2),
-                               poissons_ratio=(1, 1), size=(21, 21),
+def make_elastic_stress_random(n_samples=1, elastic_modulus=(100, 150),
+                               poissons_ratio=(0.3, 0.3), size=(21, 21),
                                macro_strain=1.0, grain_size=(3, 3), seed=10):
     """
     Generates microstructures and their macroscopic stress values for an
