@@ -1,110 +1,12 @@
 
-Technical Overview
-------------------
+Meet PyMKS
+----------
 
-An important component of the MKS is the regression technique for rapid
-calculation of a response field :math:`p\left[i\right]` based on a
-microstructure :math:`m\left[i\right]`, where :math:`i` refers to a
-discretized spatial location often in 2D or 3D and
-:math:`\left[\cdot\right]` indicates a discrete argument over the
-spatial domain. For example, the microstructure might represent values
-of material properties that vary based on phase such as elastic modulus
-or Poisson's ratio while the response might be the stress or strain
-field.
-
-Discretize in State Space
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The first step in the MKS is to bin (or discretize) the state space. To
-do this, the microstructure :math:`\mu` is discretized and then
-represented by :math:`m[l, s]` such that
-
-.. math::  \mu \left[s\right] = \sum_{l=0}^{L-1} m\left[l, s\right] l
-
-where :math:`\chi_h` is the basis representation for the microstructure
-and :math:`n` is the number of states. For example if
-:math:`m \left[i\right] = (0, 2, 1)`, and :math:`n=3`, then
-:math:`\chi_h = (0, 1, 2)` and
-:math:`m_h[i] = ((1, 0, 0), (0, 0, 1), (0, 1, 0))`. Thus,
-
-.. math::  m_h = \delta_{hm} 
-
-since the :math:`m`'s are just indices representing the state (the
-:math:`\left[i\right]` has been dropped).
-
-The Influence Coefficients
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Once the state space is discretized, the relationship between the
-response :math:`p` and microstructure :math:`m_h` can be written as,
-
-.. math::  p\left[i\right] = \sum_{h=0}^{n-1} \alpha_h\left[j\right] m_h\left[i - j\right] 
-
-where the :math:`\alpha_h` are known as the influence coefficients and
-describe the relationship between :math:`p` and :math:`m_h`. The
-:math:`p` are a spatial convolution of :math:`\alpha_h` and :math:`m_h`.
-In general, it is assumed that both :math:`m_h` and :math:`p` are
-periodic.
-
-\*\*\* Note that the formulation above has dropped an index representing
-the samples for simplicity. Generally the MKS is calibrated using many
-samples. \*\*\*
-
-The Convolution
-~~~~~~~~~~~~~~~
-
-The efficiency of the MKS is due to solving the linear regression in
-Fourier space. For a 2D problem of size :math:`N^2`, the size of the
-regression is reduced from
-:math:`\left(N^2 N_{\text{sample}} \times N^2 H \right)` to
-:math:`\left(N_{\text{sample}} \times H \right)` for each point in the
-Fourier space of size :math:`N^2`. The convolution,
-
-.. math::  \sum_{h=0}^{n-1} \alpha_h\left[j\right] m_h \left[i - j\right] 
-
-can be deconvolved in Fourier space using the `circular convolution
-theorem <http://en.wikipedia.org/wiki/Discrete_Fourier_transform#Circular_convolution_theorem_and_cross-correlation_theorem>`__.
-
-If we write
-:math:`P \left[k \right] =  \mathcal{F}_k \{ p\left[i\right] \}`,
-:math:`M_h \left[k\right]= \mathcal{F}_k  \{ m_h\left[i\right] \}` and
-:math:`\beta\left[k\right] = \mathcal{F}_k \{  \alpha_h \left[i\right] \}`,
-then we just need to solve
-
-.. math::  P\left[k\right] = \sum_{h=0}^{n-1} \beta_h \left[k\right] M_h \left[k\right] 
-
-with a linear regression at each discretization location in :math:`k` to
-calculate the :math:`\beta_h`.
-
-A PyMKS Example
----------------
-
-One important application of the MKS is to accurately and rapidly
-reproduce simulations for any given microstructure. In order to do this
-we need to instantiate a ``MKSRegressionModel`` and calibrate the
-influence coefficients using the ``fit`` method. Once the influence
-coefficients have been calibrated, the ``predict`` method can be used to
-quickly reproduce the same simulation for any microstructure. The rest
-of the page will demonstrate how to do this for a finite element
-simulation for linear elastic strain.
-
-Linear Elasticity
------------------
-
-Let's start by running a finite element simulation on a two phase random
-microstructure with different elastic moduli. The
-``ElasticFESimulation`` class encapsulates the code needed to run a
-plain strain problem using SfePy. It solves a plain strain problem on a
-square domain by straining in the x-direction and applying periodic
-boundary conditions in the y-direction. The two phase microstructure is
-represented by ``X``.
-
-The ``make_elasticFEstrain_random`` function from ``pymks.datasets``
-provides a convenient interface to get random microstructures and their
-strain fields using the ``ElasticFESimulation`` class. In this case we
-are going to look at a 15 by 15 two phase microstructure with values of
-elastic modulus values of 80 and 120. Both phases will have a Poisson's
-ratio of 0.3.
+In this short intro, we will demonstrate how to use 2-point statistics
+to objectively quantify microstructures, predict effective properties
+using homogenization and predict local properties using localization.
+More technical details can be found `in the theory
+section <THEORY.html>`__.
 
 .. code:: python
 
@@ -114,111 +16,236 @@ ratio of 0.3.
     
     import numpy as np
     import matplotlib.pyplot as plt
+Quantify Microstructures using 2-Point Statistics
+-------------------------------------------------
+
+Lets make two dual phase microstructures with different morphologies.
+
 .. code:: python
 
-    from pymks.tools import draw_microstructure_strain
-    from pymks.datasets import make_elastic_FE_strain_random
+    from pymks.datasets import make_microstructure
     
-    np.random.seed(21)
-    X, strains = make_elastic_FE_strain_random(n_samples=1, elastic_modulus=(80, 120),
-                                               poissons_ratio=(0.3, 0.3), size=(15, 15))
+    X_1 = make_microstructure(n_samples=1, grain_size=(25, 25))
+    X_2 = make_microstructure(n_samples=1, grain_size=(15, 95))
     
-    draw_microstructure_strain(X[0], strains[0])
+    X = np.concatenate((X_1, X_2))
+Throughout PyMKS ``X`` is used to represent microstructures. Now that we
+have made the two microstructures, lets take a look at them.
+
+.. code:: python
+
+    from pymks.tools import draw_microstructures
+    
+    draw_microstructures(X)
 
 
 .. image:: intro_files/intro_5_0.png
 
 
-Create the Delta Microstructures
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The goal of the MKS it to quickly reproduce finite element simulations
-like the one shown above. In the case of linear elasticity, which has
-distinct phases, the MKS model can be calibrated with two delta
-microstructures rather than hundreds of random microstructures. The
-``make_delta_microstructures`` function from ``pymks.datasets`` provides
-a convenient interface to produce the delta microstructures.
+We can compute their 2-point statistics for these two periodic
+microstructures using the ``correlate`` function from ``pymks.stats``.
+This function computes all of the autocorrelations and
+cross-correlation(s) for a microstructure. Before we compute the 2-point
+statistics, we will discretize them using the ``DiscreteIndicatorBasis``
+function.
 
 .. code:: python
 
-    from pymks.tools import draw_microstructures
-    from pymks.datasets import make_delta_microstructures
+    from pymks import DiscreteIndicatorBasis
+    from pymks.stats import correlate
     
-    X_delta = make_delta_microstructures(n_phases=2, size=(15, 15))
-    draw_microstructures(X_delta)
-
-
-.. image:: intro_files/intro_7_0.png
-
-
-Create the Responses
-~~~~~~~~~~~~~~~~~~~~
-
-The ``make_elasticFEstrain_delta`` function from the ``datasets``
-submodule of ``pymks`` returns both the delta microstructure and the
-strain field. The strain fields and microstructures are used as inputs
-to calibrate the influence coefficients.
+    dbasis = DiscreteIndicatorBasis(n_states=2, domain=[0, 1])
+    X_ = dbasis.discretize(X)
+    X_corr = correlate(X_, periodic_axes=[0, 1])
+Let's take a look at the two autocorrelations and the cross-correlation
+for these two microstructures.
 
 .. code:: python
 
-    from pymks.datasets import make_elastic_FE_strain_delta
+    from pymks.tools import draw_correlations
     
-    X_delta, strains_delta = make_elastic_FE_strain_delta(elastic_modulus=(80, 120),
-                                                          poissons_ratio=(0.3, 0.3),
-                                                          size=(15, 15))
-    
-    draw_microstructure_strain(X_delta[0], strains_delta[0])
+    draw_correlations(X_corr[0])
 
 
 .. image:: intro_files/intro_9_0.png
 
 
-Calibrate the MKS Model
-~~~~~~~~~~~~~~~~~~~~~~~
+.. code:: python
 
-The first step is to calibrate the influence coefficients using the
-microstructures and strain fields returned by
-``make_elasticFEstrain_delta``. The ``MKSRegressionModel`` calibrates
-the model in the ``fit`` method. A ``DiscreteIndicatorBasis`` is needed
-to discretize the microstructure before passing it to the ``fit``
-method.
+    draw_correlations(X_corr[1])
+
+
+.. image:: intro_files/intro_10_0.png
+
+
+2-Point statistics provide an object way to compare microstructures, and
+have been shown as an effective input to machine learning methods.
+
+Predict Homogenize Properties
+-----------------------------
+
+In this section of the intro, we are going to predict the effective
+stiffness for two phase microstructures using the
+``MKSHomogenizationModel``, but we could have chosen any other effective
+material property.
+
+First we need to make some microstructures and their effective stress
+values to fit our model with. Let's create 200 examples of 3 different
+types of microstructures, totaling 600 microstructures.
 
 .. code:: python
 
-    from pymks import MKSRegressionModel
-    from pymks.bases import DiscreteIndicatorBasis
+    from pymks.datasets import make_elastic_stress_random
     
-    basis = DiscreteIndicatorBasis(n_states=2)
+    grain_size = [(37, 6), (4, 39), (14, 14)]
+    n_samples = [200, 200, 200]
     
-    X_delta, y_delta = X_delta, strains_delta
-    model = MKSRegressionModel(basis=basis)
-    model.fit(X_delta, y_delta)
-Reproduce the Finite Element Simulation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    X_train, y_train = make_elastic_stress_random(n_samples=n_samples, size=(51, 51),
+                                                  grain_size=grain_size, seed=1)
+Once again, ``X_train`` is our microstructures. Throughout PyMKS ``y``
+is used as either the prpoerty or the field we would like to predict. In
+this case ``y_train`` is the effective stress values for ``X_train``.
+Let's look at one of each of the three different types of
+microstructures.
 
-Now that the influence coefficients have been calibrated using the
-``fit`` method, the original finite element simulation can be reproduced
-using the ``MKSRegressionmModel`` by passing the original microstructure
-into the ``predict`` method.
+.. code:: python
+
+    draw_microstructures(X_train[::200])
+
+
+.. image:: intro_files/intro_16_0.png
+
+
+The ``MKSHomogenizationModel`` uses 2-point statistics, so we need
+provide a basis function to discretize the microstructure with.
+
+.. code:: python
+
+    from pymks import MKSHomogenizationModel
+    
+    dbasis = DiscreteIndicatorBasis(n_states=2, domain=[0, 1])
+    homogenize_model = MKSHomogenizationModel(basis=dbasis)
+Let's fit our model.
+
+.. code:: python
+
+    homogenize_model.fit(X_train, y_train, periodic_axes=[0, 1])
+Now let's make some new data to see how good our model is.
+
+.. code:: python
+
+    n_samples = [10, 10, 10]
+    X_test, y_test = make_elastic_stress_random(n_samples=n_samples, size=(51, 51),
+                                                grain_size=grain_size, seed=100)
+We will try and predict the effective stress of our ``X_test``
+microstructures.
+
+.. code:: python
+
+    y_pred = homogenize_model.predict(X_test, periodic_axes=[0, 1])
+The ``MKSHomogenizationModel`` generates low dimensional representations
+of microstructures and regression methods to predict effective
+properties. Let's take a look at the low dimensional representations.
+
+.. code:: python
+
+    from pymks.tools import draw_components
+    
+    draw_components(homogenize_model.fit_data, homogenize_model.predict_data, 
+                    label_1='Training Data', label_2='Testing Data')
+
+
+.. image:: intro_files/intro_26_0.png
+
+
+Now let's look at a goodness of fit plot for our
+``MKSHomogenizationModel``.
+
+.. code:: python
+
+    from pymks.tools import draw_goodness_of_fit
+    
+    fit_data = np.array([y_train, 
+                         homogenize_model.predict(X_train, periodic_axes=[0, 1])])
+    pred_data = np.array([y_test, y_pred])
+    
+    draw_goodness_of_fit(fit_data, pred_data, ['Training Data', 'Testing Data'])
+
+
+.. image:: intro_files/intro_28_0.png
+
+
+Looks good.
+
+The ``MKSHomogenizationModel`` can be used to predict effective
+properties and processing-structure evolutions.
+
+Predict Local Properties
+------------------------
+
+In this section of the intro, we are going to predict the local strain
+field in a microstructure using ``MKSLocalizationModel``, but we could
+have predicted another local property.
+
+First we need some data, so let's make some.
+
+.. code:: python
+
+    from pymks.datasets import make_elastic_FE_strain_delta
+    
+    X_delta, y_delta = make_elastic_FE_strain_delta()
+Once again, ``X_delta`` is our microstructures and ``y_delta`` is our
+local strain fields. We need to discretize the microstructure again so
+we will also use the same basis function.
+
+.. code:: python
+
+    from pymks import MKSLocalizationModel
+    
+    dbasis = DiscreteIndicatorBasis(n_states=2)
+    localize_model = MKSLocalizationModel(basis=dbasis)
+Let's use the data to fit our ``MKSLocalizationModel``.
+
+.. code:: python
+
+    localize_model.fit(X_delta, y_delta)
+Now that we have fit our model, we will create a random microstructure
+and compute its local strain field using finite element analysis. We
+will then try and reproduce the same strain field with our model.
+
+.. code:: python
+
+    from pymks.datasets import make_elastic_FE_strain_random
+    
+    X_test, y_test = make_elastic_FE_strain_random()
+Let's look at the microstructure and its local strain field.
+
+.. code:: python
+
+    from pymks.tools import draw_microstructure_strain
+    
+    draw_microstructure_strain(X_test[0], y_test[0])
+
+
+.. image:: intro_files/intro_40_0.png
+
+
+Now let's pass that same microstructure to our ``MKSLocalizationModel``
+and compare the predicted and computed local strain fields.
 
 .. code:: python
 
     from pymks.tools import draw_strains_compare
     
-    X, y = X, strains
-    y_pred = model.predict(X)
-    draw_strains_compare(y[0], y_pred[0]);
+    
+    y_pred = localize_model.predict(X_test)
+    draw_strains_compare(y_test[0], y_pred[0])
 
 
-.. image:: intro_files/intro_13_0.png
+.. image:: intro_files/intro_42_0.png
 
 
-The ``MKSRegressionModel`` has done quite a good job of predicting the
-results from the original FE simulation after calibrating the influence
-coefficients using delta microstructures.
+Not bad!
 
-Comments
-~~~~~~~~
-
-The MKS coefficients can then be scaled up to reproduce larger FE
-simulations using only the small FE simulation to seed the MKS model.
+The ``MKSLocalizationModel`` can be used to predict local properties and
+local processing-structure evolutions.
