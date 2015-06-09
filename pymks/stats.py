@@ -2,9 +2,8 @@ import numpy as np
 from .filter import Correlation
 
 """
-The SpatialStatisticsModel takes in a microstructure and returns its two
-point statistics. Current the funciton only work for interger valued
-microstructures and the DiscreteIndicatorBasis.
+The stats functions take in a microstructure and returns its two
+point statistics.
 """
 
 
@@ -12,10 +11,8 @@ def autocorrelate(X_, periodic_axes=[], probability_mask=None):
     """
     Computes the autocorrelation from a microstructure function.
 
-    Test non-periodic autocorrelation.
-
     Args:
-        X_: The discretized microstructure function, an
+        `X_`: The discretized microstructure function, an
             `(n_samples, n_x, ..., n_states)` shaped array
             where `n_samples` is the number of samples, `n_x` is thes
             patial discretization, and n_states is the number of local states.
@@ -25,9 +22,9 @@ def autocorrelate(X_, periodic_axes=[], probability_mask=None):
             confidence value for each data point.
 
     Returns:
-        Autocorrelations for microstructure function X_.
+        Autocorrelations for microstructure function `X_`.
 
-    Example
+    Non-periodic example
 
     >>> n_states = 2
     >>> X = np.array([[[0, 0, 0],
@@ -53,7 +50,7 @@ def _autocorrelator(X_, s):
     Helper function used to calculate the unnormalized autocorrelation counts.
 
     Args:
-        X_: The discretized microstructure function, an
+        `X_`: The discretized microstructure function, an
             `(n_samples, n_x, ..., n_states)` shaped array
             where `n_samples` is the number of samples, `n_x` is thes
             patial discretization, and n_states is the number of local states.
@@ -91,7 +88,7 @@ def crosscorrelate(X_, periodic_axes=[], probability_mask=None):
     Computes the crosscorrelations from a microstructure function.
 
     Args:
-        X_: The discretized microstructure function, an
+        `X_`: The discretized microstructure function, an
             `(n_samples, n_x, ..., n_states)` shaped array
             where `n_samples` is the number of samples, `n_x` is thes
             patial discretization, and n_states is the number of local states.
@@ -101,7 +98,7 @@ def crosscorrelate(X_, periodic_axes=[], probability_mask=None):
             confidence value for each data point.
 
     Returns:
-        Crosscorelations for microstructure function X_.
+        Crosscorelations for microstructure function `X_`.
 
     Examples
 
@@ -153,7 +150,7 @@ def _crosscorrelator(X_, s):
     counts.
 
     Args:
-        X_: The discretized microstructure function, an
+        `X_`: The discretized microstructure function, an
             `(n_samples, n_x, ..., n_states)` shaped array
             where `n_samples` is the number of samples, `n_x` is thes
             patial discretization, and n_states is the number of local states.
@@ -198,7 +195,7 @@ def correlate(X_, periodic_axes=[], probability_mask=None):
     function.
 
     Args:
-        X_: The discretized microstructure function, an
+        `X_`: The discretized microstructure function, an
             `(n_samples, n_x, ..., n_states)` shaped array
             where `n_samples` is the number of samples, `n_x` is thes
             patial discretization, and n_states is the number of local states.
@@ -208,7 +205,8 @@ def correlate(X_, periodic_axes=[], probability_mask=None):
             confidence value for each data point.
 
     Returns:
-        Autocorrelations and crosscorrelations for microstructure funciton X_.
+        Autocorrelations and crosscorrelations for microstructure funciton
+        `X_`.
 
     Example
 
@@ -239,7 +237,7 @@ def _normalize(X_, s, probability_mask):
     The normalization should be Nx * Ny in the center of the domain.
 
     Args:
-        X_: The discretized microstructure function, an
+        `X_`: The discretized microstructure function, an
             `(n_samples, n_x, ..., n_states)` shaped array
             where `n_samples` is the number of samples, `n_x` is thes
             patial discretization, and n_states is the number of local states.
@@ -275,7 +273,7 @@ def _Fkernel_shape(X_, periodic_axes):
     Returns the shape of the kernel in Fourier space with non-periodic padding.
 
     Args:
-        X_: The discretized microstructure function, an
+        `X_`: The discretized microstructure function, an
             `(n_samples, n_x, ..., n_states)` shaped array
             where `n_samples` is the number of samples, `n_x` is thes
             patial discretization, and n_states is the number of local states.
@@ -349,7 +347,7 @@ def _set_X(X_, probability_mask):
     shape.
 
     Args:
-        X_: The discretized microstructure function, an
+        `X_`: The discretized microstructure function, an
             `(n_samples, n_x, ..., n_states)` shaped array
             where `n_samples` is the number of samples, `n_x` is thes
             patial discretization, and n_states is the number of local states.
