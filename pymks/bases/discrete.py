@@ -55,6 +55,13 @@ class DiscreteIndicatorBasis(_Indicator):
     """
 
     def __init__(self, n_states=2, domain=None):
+        """Instantiate a Basis
+
+        Args:
+            n_states: The number of local states
+            domain: indicate the range of expected values for the
+                microstructure.
+        """
         super(DiscreteIndicatorBasis, self).__init__(n_states,
                                                      [0, n_states - 1])
 

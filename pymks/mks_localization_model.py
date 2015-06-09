@@ -91,6 +91,8 @@ class MKSLocalizationModel(LinearRegression):
                 influence coefficients. If None, the size of the influence
                 coefficients is the same shape as `X` and `y`.
 
+        Example
+
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
         >>> y = X.swapaxes(1, 2)
         >>> from .bases import ContinuousIndicatorBasis
@@ -140,6 +142,8 @@ class MKSLocalizationModel(LinearRegression):
         Returns:
             The predicted response field the same shape as `X`.
 
+        Example
+
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
         >>> y = X.swapaxes(1, 2)
         >>> from .bases import ContinuousIndicatorBasis
@@ -173,6 +177,8 @@ class MKSLocalizationModel(LinearRegression):
 
         Returns:
             The resized influence coefficients to size.
+
+        Example
 
         Let's first instantitate a model and fabricate some
         coefficients.

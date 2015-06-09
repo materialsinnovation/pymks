@@ -27,6 +27,8 @@ def autocorrelate(X_, periodic_axes=[], probability_mask=None):
     Returns:
         Autocorrelations for microstructure function X_.
 
+    Example
+
     >>> n_states = 2
     >>> X = np.array([[[0, 0, 0],
     ...                [0, 1, 0],
@@ -59,6 +61,8 @@ def _autocorrelator(X_, s):
 
     Returns:
         autocorrelation counts for a given microstructure function
+
+    Example
 
     >>> from pymks.datasets import make_microstructure
     >>> from pymks.bases import DiscreteIndicatorBasis
@@ -98,6 +102,8 @@ def crosscorrelate(X_, periodic_axes=[], probability_mask=None):
 
     Returns:
         Crosscorelations for microstructure function X_.
+
+    Examples
 
     Test for 2 states.
 
@@ -156,6 +162,8 @@ def _crosscorrelator(X_, s):
     Returns:
         cross-correlation counts for a given microstructure function
 
+    Example
+
     >>> from pymks.datasets import make_microstructure
     >>> from pymks.bases import DiscreteIndicatorBasis
     >>> X = make_microstructure(n_samples=2, n_phases=3,
@@ -202,6 +210,8 @@ def correlate(X_, periodic_axes=[], probability_mask=None):
     Returns:
         Autocorrelations and crosscorrelations for microstructure funciton X_.
 
+    Example
+
     >>> from pymks import DiscreteIndicatorBasis
     >>> dbasis = DiscreteIndicatorBasis(2, [0, 1])
     >>>
@@ -240,6 +250,8 @@ def _normalize(X_, s, probability_mask):
     Returns:
         Normalization
 
+    Example
+
     >>> Nx = Ny = 5
     >>> X_ = np.zeros((1, Nx, Ny, 1))
     >>> _Fkernel_shape  = np.array((2 * Nx, Ny))
@@ -272,6 +284,8 @@ def _Fkernel_shape(X_, periodic_axes):
     Returns:
         shape of the new Fkernel array
 
+    Example
+
     >>> Nx = Ny = 5
     >>> X_ = np.zeros((1, Nx, Ny, 1))
     >>> periodic_axes = [1]
@@ -295,6 +309,8 @@ def _truncate(a, shape):
 
     Returns:
         truncated array
+
+    Example
 
     >>> print _truncate(np.arange(10).reshape(1, 10, 1), (1, 5))[0, ..., 0]
     [3 4 5 6 7]

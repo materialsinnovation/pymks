@@ -1,5 +1,14 @@
 Spatial Statistics
 ==================
 
-.. automodule:: pymks.stats
-   :members:
+autocorrelate
+-------------
+.. autofunction:: pymks.stats.autocorrelate
+
+crosscorrelate
+--------------
+.. autofunction:: pymks.stats.crosscorrelate
+
+correlate
+---------
+.. autofunction:: pymks.stats.correlate

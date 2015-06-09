@@ -86,8 +86,6 @@ class MKSHomogenizationModel(BaseEstimator):
 
     @property
     def n_components(self):
-        """Number of components using by the dimension_reducer
-        """
         return self._n_components
 
     @n_components.setter
@@ -99,8 +97,6 @@ class MKSHomogenizationModel(BaseEstimator):
 
     @property
     def degree(self):
-        """Degree of polynomial used by property_linker.
-        """
         return self._degree
 
     @degree.setter
@@ -148,6 +144,8 @@ class MKSHomogenizationModel(BaseEstimator):
             probability_mask: array with same shape as X used to assign a
                 confidence value for each data point.
 
+        Example
+
         >>> from sklearn.decomposition import PCA
         >>> from sklearn.linear_model import LinearRegression
         >>> from pymks.bases import DiscreteIndicatorBasis
@@ -193,6 +191,8 @@ class MKSHomogenizationModel(BaseEstimator):
         Returns:
             The predicted macroscopic property for `X`.
 
+        Example
+
         >>> from sklearn.manifold import LocallyLinearEmbedding
         >>> from sklearn.linear_model import BayesianRidge
         >>> from pymks.bases import DiscreteIndicatorBasis
@@ -230,6 +230,8 @@ class MKSHomogenizationModel(BaseEstimator):
         Returns:
             Spatial correlations for each sample formated with dimensions
             (n_samples, n_features).
+
+        Example
 
         >>> from sklearn.manifold import Isomap
         >>> from sklearn.linear_model import ARDRegression

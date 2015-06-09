@@ -2,9 +2,10 @@ Examples
 ========
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   localization.rst
-   homogenization.rst
    spatial_stats.rst
+   homogenization.rst
+   localization.rst
+
 
