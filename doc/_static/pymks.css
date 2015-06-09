@@ -87,3 +87,9 @@ pre {
 p {
     margin: 10.5px 10.5px 10.5px;
 }
+
+/* Background color for Parameters and Returns in API*/
+th {
+    background: #E4E4E4;
+}
+
