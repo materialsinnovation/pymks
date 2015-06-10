@@ -10,18 +10,15 @@ class LegendreBasis(_Polynomial):
 
     .. math::
 
-       m_h \left[i\right] = \frac{2h +1}{2} P_h \left(
-       2 \left( \frac{\phi\left[i\right] - \chi_{\text{min}}}{\chi_{\text{max}}
-        - \chi_{\text{min}}} \right) - 1
-       \right)
+       \frac{1}{\Delta x \Delta t} \int_s \int_n m(h, x, t) dx dt =
+       \sum_0^{L-1} m[l, s, n] P_l(h)
 
-    where the :math:`P_h` are Legendre polynomials and
+    where the :math:`P_l` are Legendre polynomials and the local state space
+    :math:`H` is mapped into the orthogonal domain of the Legendre polynomials
 
     .. math::
 
-       \chi_{\text{min}} \le \phi \le \chi_{\text{max}}
-
-    and :math:`0 \le h \le n-1`.
+       -1 \le  H \le 1
 
     >>> n_states = 3
     >>> X = np.array([[0.25, 0.1],
@@ -41,9 +38,9 @@ class LegendreBasis(_Polynomial):
         Discretize `X`.
 
         Args:
-            X: The microstructure, an `(n_samples, n_x, ...)` shaped array
-                where `n_samples` is the number of samples and `n_x` is thes
-                patial discretization.
+            X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+                shaped array where `n_samples` is the number of samples and
+                `n_x` is the spatial discretization.
         Returns:
             Float valued field of of Legendre polynomial coefficients.
 

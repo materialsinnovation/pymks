@@ -10,33 +10,23 @@ class ContinuousIndicatorBasis(_Indicator):
 
     .. math::
 
-       m_h \left[i\right] = R\left(1 - \frac{\left| \phi\left[i\right] -
-       \chi_h \right|}{\Delta h}\right)
+       \frac{1}{\Delta x \Delta t} \int_{H} \int_{s} \int_{n} \Lambda(h - l)
+       m(h, x, t) dx dt dh = m[l, s, n]
 
-    where :math:`R` is the ramp function and
-
-    .. math::
-
-       \chi_h = \chi_0 + h \Delta h
-
-    and
+    where :math:`\Lambda` is the primitive basis (also called hat function)
 
     .. math::
 
-       \Delta h = \left( \chi_{n-1} - \chi_0 \right) / \left(n-1\right)
+       \Lambda (h - l) = max \Bigg (1-\Bigg |\frac{h(L - 1)}{H} -
+       \frac{Hl}{L-1} \Bigg|, 0\Bigg)
 
-    with the continuous variable, :math:`\phi`, bounded such that
-
-    .. math::
-
-       \chi_0 \le \phi \le \chi_{n-1}
-
-    and :math:`0 \le h \le n-1`.
 
     The field must be between the specified domain values. For
     example, if a cell has a value of 0.4, n_states=2 and the
     domain=[0, 1] then the local state is (0.6, 0.4) (the local state
     must sum to 1).
+
+    Example
 
     >>> n_states = 10
     >>> np.random.seed(4)
@@ -61,9 +51,9 @@ class ContinuousIndicatorBasis(_Indicator):
         Discretize `X`.
 
         Args:
-            X: The microstructure, an `(n_samples, n_x, ...)` shaped array
-                where `n_samples` is the number of samples and `n_x` is thes
-                patial discretization.
+            X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+                shaped array where `n_samples` is the number of samples and
+                `n_x` is thes patial discretization.
         Returns:
             Float valued field of local states between 0 and 1.
         """
