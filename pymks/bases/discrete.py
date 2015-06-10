@@ -58,8 +58,8 @@ class DiscreteIndicatorBasis(_Indicator):
         """Instantiate a Basis
 
         Args:
-            n_states: The number of local states
-            domain: indicate the range of expected values for the
+            n_states (int): The number of local states
+            domain (list): indicate the range of expected values for the
                 microstructure.
         """
         super(DiscreteIndicatorBasis, self).__init__(n_states,
@@ -70,9 +70,9 @@ class DiscreteIndicatorBasis(_Indicator):
         Discretize `X`.
 
         Args:
-            X: The microstructure, an `(n_samples, n_x, ...)` shaped array
-                where `n_samples` is the number of samples and `n_x` is thes
-                patial discretization.
+            X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+                shaped array where `n_samples` is the number of samples and
+                `n_x` is the spatial discretization.
         Returns:
             Integer valued field, either 0 or 1
         """

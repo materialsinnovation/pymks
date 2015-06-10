@@ -22,16 +22,16 @@ def make_elastic_FE_strain_delta(elastic_modulus=(100, 150),
     microstructure with dimensions of `(5, 5)`.
 
     Args:
-      elastic_modulus: list of elastic moduli for the phases
-      poissons_ratio: list of Poisson's ratios for the phases
-      size: size of the microstructure
-      macro_strain: Scalar for macroscopic strain applied
-      strain_index: interger value to return a particular strain
-        field.  0 returns exx, 1 returns eyy, etc. To return all
-        strain fields set strain_index equal to slice(None).
+        elastic_modulus (list, optional): elastic moduli for the phases
+        poissons_ratio (list, optional): Poisson's ratios for the phases
+        size (tuple, optional): size of the microstructure
+        macro_strain (float, optional): Scalar for macroscopic strain applied
+        strain_index (int, optional): interger value to return a particular
+            strain field. 0 returns exx, 1 returns eyy, etc. To return all
+            strain fields set strain_index equal to slice(None).
 
     Returns:
-      tuple containing delta microstructures and their strain fields
+        tuple containing delta microstructures and their strain fields
 
     Example
 
@@ -63,12 +63,12 @@ def make_delta_microstructures(n_phases=2, size=(21, 21)):
     given the size of the domain.
 
     Args:
-        n_phases: number of phases
-        size: dimension of microstructure
+        n_phases (int, optional): number of phases
+        size (tuple, optional): dimension of microstructure
 
     Returns:
         delta microstructures for the system of shape
-        (Nsamples, Nx, Ny, ...)
+        (n_samples, n_x, ...)
 
     Example
 
@@ -114,17 +114,16 @@ def make_elastic_FE_strain_random(n_samples=1, elastic_modulus=(100, 150),
     microstructure with dimensions of `(5, 5)`.
 
     Args:
-      elastic_modulus: list of elastic moduli for the phases
-      poissons_ratio: list of Poisson's ratios for the phases
-      n_samples: number of microstructure samples
-      size: size of the microstructure
-      macro_strain: Scalar for macroscopic strain applied
-      strain_index: interger value to return a particular strain
-        field.  0 returns exx, 1 returns eyy, etc. To return all
-        strain fields set strain_index equal to slice(None).
+        elastic_modulus (list, optional): elastic moduli for the phases
+        poissons_ratio (list, optional): Poisson's ratios for the phases
+        size (tuple, optional): size of the microstructure
+        macro_strain (float, optional): Scalar for macroscopic strain applied
+        strain_index (int, optional): interger value to return a particular
+            strain field. 0 returns exx, 1 returns eyy, etc. To return all
+            strain fields set strain_index equal to slice(None).
 
     Returns:
-      tuple containing delta microstructures and their strain fields
+         tuple containing delta microstructures and their strain fields
 
     Example
 
@@ -159,15 +158,15 @@ def make_cahn_hilliard(n_samples=1, size=(21, 21), dx=0.25, width=1.,
     microstructure with dimensions of `(6, 6)`.
 
     Args:
-      n_samples: number of microstructure samples
-      size: size of the microstructure
-      dx: grid spacing
-      dt: timpe step size
-      width: interface width between phases.
-      n_steps: number of time steps used
+        n_samples (int, optional): number of microstructure samples
+        size (tuple, optional): size of the microstructure
+        dx (float, optional): grid spacing
+        dt (float, optional): timpe step size
+        width (float, optional): interface width between phases.
+        n_steps (int, optional): number of time steps used
 
     Returns:
-      Array representing the microstructures at n_steps ahead of 'X'
+        Array representing the microstructures at n_steps ahead of 'X'
 
     Example
 
@@ -194,14 +193,14 @@ def make_microstructure(n_samples=10, size=(101, 101), n_phases=2,
     given the size of the domain, and relative grain size.
 
     Args:
-        n_samples: number of samples
-        size: dimension of microstructure
-        n_phases: number of phases
-        grain_size: effective dimensions of grains
-        seed: seed for random number microstructureGenerator
+        n_samples (int, optional): number of samples
+        size (tuple, optional): dimension of microstructure
+        n_phases (int, optional): number of phases
+        grain_size (tuple, optional): effective dimensions of grains
+        seed (int, optional): seed for random number microstructureGenerator
 
     Returns:
-        microstructures for the system of shape (Nsamples, Nx, Ny, ...)
+        microstructures for the system of shape (n_samples, n_x, ...)
 
     Example
 
@@ -229,8 +228,9 @@ def make_checkerboard_microstructure(square_size, n_squares):
     `square_size` size squares and on a `n_squares` by `n_squares`
 
     Args:
-        square_size: length of the side of one square in the checkerboard.
-        n_squares: number of squares along on size of the checkerboard.
+        square_size (int): length of the side of one square in the
+            checkerboard.
+        n_squares (int): number of squares along on size of the checkerboard.
 
     Returns:
         checkerboard microstructure with shape of (1, square_size * n_squares,
@@ -263,16 +263,19 @@ def make_elastic_stress_random(n_samples=1, elastic_modulus=(100, 150),
     applied macroscopic strain.
 
     Args:
-        n_samples: number of samples
-        elastic_modulus: list of elastic moduli for the different phases.
-        poissons_ratio: list of poisson's ratio values for the phases.
-        size: size of the microstructures
-        macro_strain: macroscopic strain applied to the sample.
-        grain_size: effective dimensions of grains
-        seed: seed for random number generator
+        n_samples (int, optional): number of samples
+        elastic_modulus (tuple, optional): list of elastic moduli for the
+            different phases.
+        poissons_ratio (tuple, optional): list of poisson's ratio values for
+            the phases.
+        size (tuple, optional): size of the microstructures
+        macro_strain (tuple, optional): macroscopic strain applied to the
+            sample.
+        grain_size (tuple, optional): effective dimensions of grains
+        seed (int, optional): seed for random number generator
 
     Returns:
-        array of microstructures with dimensions (n_samples, Nx, Ny, Nz) and
+        array of microstructures with dimensions (n_samples, n_x, ...) and
         effective stress values
 
     Example

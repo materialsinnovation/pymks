@@ -3,13 +3,13 @@ import numpy as np
 
 class _AbstractMicrostructureBasis(object):
 
-    def __init__(self, n_states=1, domain=[0, 1]):
+    def __init__(self, n_states=2, domain=[0, 1]):
         """
         Instantiate a `Basis`
 
         Args:
-            n_states: The number of local states
-            domain: indicate the range of expected values for the
+            n_states (int): The number of local states
+            domain (list): indicate the range of expected values for the
                 microstructure.
         """
         self.n_states = n_states

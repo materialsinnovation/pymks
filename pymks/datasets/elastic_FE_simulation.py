@@ -31,7 +31,8 @@ class ElasticFESimulation(object):
     edge (plane). Periodic boundary conditions are applied to the
     other boundaries.
 
-    The microstructure is of shape (Nsample, Nx, Ny) or (Nsample, Nx, Ny, Nz).
+    The microstructure is of shape (n_samples, n_x, n_y) or (n_samples, n_x,
+    n_y, n_z).
 
     >>> X = np.zeros((1, 3, 3), dtype=int)
     >>> X[0, :, 1] = 1
@@ -62,7 +63,7 @@ class ElasticFESimulation(object):
     ...                [0, 1, 1, 1],
     ...                [0, 0, 1, 1],
     ...                [1, 0, 0, 1]]])
-    >>> Nsample, N, N = X.shape
+    >>> n_samples, N, N = X.shape
     >>> macro_strain = 0.1
     >>> sim = ElasticFESimulation((10.0,1.0), (0.3,0.3), macro_strain=0.1)
     >>> sim.run(X)
@@ -84,11 +85,12 @@ class ElasticFESimulation(object):
     """
 
     def __init__(self, elastic_modulus, poissons_ratio, macro_strain=1.,):
-        """
+        """Instantiate a ElasticFESimulation.
+
         Args:
-          elastic_modulus: array of elastic moduli for phases
-          poissons_ratio: array of possion ratios for phases
-          macro_strain: Scalar for macroscopic strain
+            elastic_modulus (1D array): array of elastic moduli for phases
+            poissons_ratio (1D array): array of Possion's ratios for phases
+            macro_strain (float, optional): Scalar for macroscopic strain
 
         """
         self.macro_strain = macro_strain
@@ -111,7 +113,7 @@ class ElasticFESimulation(object):
         >>> assert(np.allclose(result, answer))
 
         Args:
-           dim: Scalar value for the dimension of the microstructure.
+            dim (int): Scalar value for the dimension of the microstructure.
 
         Returns:
             array with the Lame parameter and the shear modulus for each phase.
@@ -178,8 +180,7 @@ class ElasticFESimulation(object):
         Run the simulation.
 
         Args:
-          X: microstructure with shape (n_samples, Nx, Ny) or
-             (n_samples, Nx, Ny, Nz)
+          X (ND array): microstructure with shape (n_samples, n_x, ...)
         """
         X_property = self._get_property_array(X)
         strain = []
@@ -204,7 +205,7 @@ class ElasticFESimulation(object):
         quadrature points.
 
         Args:
-          property_array: array of the properties with shape (Nx, Ny, Nz, 2)
+          property_array: array of the properties with shape (n_x, n_y, n_z, 2)
 
         Returns:
           an SfePy material
@@ -277,7 +278,7 @@ class ElasticFESimulation(object):
         Generate an Sfepy rectangular mesh
 
         Args:
-          shape: proposed shape of domain (vertex shape) (Nx, Ny)
+          shape: proposed shape of domain (vertex shape) (n_x, n_y)
 
         Returns:
           Sfepy mesh
@@ -475,12 +476,12 @@ class ElasticFESimulation(object):
         Solve the Sfepy problem for one sample.
 
         Args:
-          property_array: array of shape (Nx, Ny, 2) where the last
+          property_array: array of shape (n_x, n_y, 2) where the last
           index is for Lame's parameter and shear modulus,
           respectively.
 
         Returns:
-          the strain field of shape (Nx, Ny, 2) where the last
+          the strain field of shape (n_x, n_y, 2) where the last
           index represents the x and y displacements
 
         """

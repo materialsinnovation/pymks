@@ -18,9 +18,9 @@ class MKSLocalizationModel(LinearRegression):
 
     Attributes:
         basis: Basis function used to discretize the microstucture.
-        n_states: Interger value for number of local states, if a basis is
-            specified, n_states indicates the order of the polynomial.
-        coef: Array of values that are the influence coefficients
+        n_states: Interger value for number of local states, if a basis
+            is specified, n_states indicates the order of the polynomial.
+        coef: Array of values that are the influence coefficients.
 
     >>> n_states = 2
     >>> n_spaces = 81
@@ -69,7 +69,8 @@ class MKSLocalizationModel(LinearRegression):
         Instantiate a MKSLocalizationModel.
 
         Args:
-            basis: an instance of a bases class.
+            basis (class): an instance of a bases class.
+            n_states (int, optional): number of local states
 
         """
         self.basis = basis
@@ -83,13 +84,13 @@ class MKSLocalizationModel(LinearRegression):
         Fits the data by calculating a set of influence coefficients.
 
         Args:
-            X: The microstructure, an `(n_samples, n_x, ...)` shaped
-               array where `n_samples` is the number of samples and `n_x`
-               is the spatial discretization.
-            y: The response field, same shape as `X`.
-            size: Alters the shape of X and y during the calibration of the
-                influence coefficients. If None, the size of the influence
-                coefficients is the same shape as `X` and `y`.
+            X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+                shaped array where `n_samples` is the number of samples and
+                `n_x` is the spatial discretization.
+            y (ND array): The response field, same shape as `X`.
+            size (tuple, optional): Alters the shape of X and y during the
+                calibration of the influence coefficients. If None, the size
+                of the influence coefficients is the same shape as `X` and `y`.
 
         Example
 
@@ -136,9 +137,9 @@ class MKSLocalizationModel(LinearRegression):
         calibrated influence coefficients.
 
         Args:
-            X: The microstructure, an `(n_samples, n_x, ...)` shaped array
-                where `n_samples` is the number of samples and `n_x` is thes
-                patial discretization.
+            X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+                shaped array where `n_samples` is the number of samples and
+                `n_x` is the spatial discretization.
         Returns:
             The predicted response field the same shape as `X`.
 
@@ -173,7 +174,7 @@ class MKSLocalizationModel(LinearRegression):
         """Scale the size of the coefficients and pad with zeros.
 
         Args:
-            size: The new size of the influence coefficients.
+            size (tuple): The new size of the influence coefficients.
 
         Returns:
             The resized influence coefficients to size.

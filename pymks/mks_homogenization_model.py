@@ -59,13 +59,15 @@ class MKSHomogenizationModel(BaseEstimator):
         Create an instance of a `MKSHomogenizationModel`.
 
         Args:
-            basis: an instance of a bases class.
-            dimension_reducer: an instance of a dimensionality reduction
-                class with a fit_transform method.
-            property_linker: an instance for a machine learning class with fit
-                and predict methods.
-            n_components: number of components kept by the dimension_reducer
-            degree: degree of the polynomial used by property_linker.
+            basis (class): an instance of a bases class.
+            dimension_reducer (class, optional): an instance of a
+                dimensionality reduction class with a fit_transform method.
+            property_linker (class, optional): an instance for a machine
+                learning class with fit and predict methods.
+            n_components (int, optional): number of components kept by the
+                dimension_reducer
+            degree (int, optional): degree of the polynomial used by
+                property_linker.
         """
 
         self.basis = basis
@@ -133,16 +135,17 @@ class MKSHomogenizationModel(BaseEstimator):
         data with the property_linker.
 
         Args:
-            X: The microstructure, an `(n_samples, n_x, ...)` shaped array
-                where `n_samples` is the number of samples and `n_x` is thes
-                patial discretization.
-            y: The material property associated with `X`.
-            reducer_label: label for X used during the fit_transform method
-               for the `dimension_reducer`.
-            periodic_axes: axes that are periodic. (0, 2) would indicate
-                that axes x and z are periodic in a 3D microstrucure.
-            probability_mask: array with same shape as X used to assign a
-                confidence value for each data point.
+            X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+                shaped array where `n_samples` is the number of samples and
+                `n_x` is the spatial discretization.
+            y (1D array): The material property associated with `X`.
+            reducer_label (1D array, optional): label for X used during the
+                fit_transform method for the `dimension_reducer`.
+            periodic_axes (list, optional): axes that are periodic. (0, 2)
+                would indicate that axes x and z are periodic in a 3D
+                microstrucure.
+            probability_mask (ND array, optional): array with same shape as X
+                used to assign a confidence value for each data point.
 
         Example
 
@@ -181,13 +184,15 @@ class MKSHomogenizationModel(BaseEstimator):
         """Predicts macroscopic property for the microstructures `X`.
 
         Args:
-            X: The microstructure, an `(n_samples, n_x, ...)` shaped array
-                where `n_samples` is the number of samples and `n_x` is thes
-                patial discretization.
-            periodic_axes: axes that are periodic. (0, 2) would indicate
-                that axes x and z are periodic in a 3D microstrucure.
-            probability_mask: array with same shape as X used to assign a
-                confidence value for each data point.
+            X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+                shaped array where `n_samples` is the number of samples and
+                `n_x` is the spatial discretization.
+            periodic_axes (list, optional): axes that are periodic. (0, 2)
+                would indicate that axes x and z are periodic in a 3D
+                microstrucure.
+            probability_mask (ND array, optional): array with same shape as X
+                used to assign a confidence value for each data point.
+
         Returns:
             The predicted macroscopic property for `X`.
 
@@ -220,13 +225,15 @@ class MKSHomogenizationModel(BaseEstimator):
         reshape them appropriately for fit and predict methods.
 
         Args:
-            X: The microstructure, an `(n_samples, n_x, ...)` shaped array
-                where `n_samples` is the number of samples and `n_x` is thes
-                patial discretization..
-            periodic_axes: axes that are periodic. (0, 2) would indicate
-                that axes x and z are periodic in a 3D microstrucure.
-            probability_mask: array with same shape as X used to assign a
-                confidence value for each data point.
+            X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+                shaped array where `n_samples` is the number of samples and
+                `n_x` is the spatial discretization..
+            periodic_axes (list, optional): axes that are periodic. (0, 2)
+                would indicate that axes x and z are periodic in a 3D
+                microstrucure.
+            probability_mask (ND array, optional): array with same shape as X
+                used to assign a confidence value for each data point.
+
         Returns:
             Spatial correlations for each sample formated with dimensions
             (n_samples, n_features).
@@ -261,14 +268,15 @@ class MKSHomogenizationModel(BaseEstimator):
         data and uses the score method from the property_linker.
 
         Args:
-            X: The microstructure, an `(n_samples, n_x, ...)` shaped array
-                where `n_samples` is the number of samples and `n_x` is thes
-                patial discretization.
-            y: The material property associated with `X`.
-                periodic_axes: axes that are periodic. (0, 2) would indicate
-                    that axes x and z are periodic in a 3D microstrucure.
-                probability_mask: array with same shape as X used to assign a
-                    confidence value for each data point.
+            X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+                shaped array where `n_samples` is the number of samples and
+                `n_x` is the spatial discretization.
+            y (1D array): The material property associated with `X`.
+            periodic_axes (list, optional): axes that are periodic. (0, 2)
+                would indicate that axes x and z are periodic in a 3D
+                microstrucure.
+            probability_mask (ND array, optional): array with same shape as X
+                used to assign a confidence value for each data point.
 
         Returns:
              Score for MKSHomogenizationModel from the selected

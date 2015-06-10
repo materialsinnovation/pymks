@@ -12,14 +12,14 @@ def autocorrelate(X_, periodic_axes=[], probability_mask=None):
     Computes the autocorrelation from a microstructure function.
 
     Args:
-        `X_`: The discretized microstructure function, an
+        X_ (ND array): The discretized microstructure function, an
             `(n_samples, n_x, ..., n_states)` shaped array
             where `n_samples` is the number of samples, `n_x` is thes
             patial discretization, and n_states is the number of local states.
-        periodic_axes: axes that are periodic. (0, 2) would indicate
-            that axes x and z are periodic in a 3D microstrucure.
-        probability_mask: array with same shape as X used to assign a
-            confidence value for each data point.
+        periodic_axes (list, optional): axes that are periodic. (0, 2) would
+            indicate that axes x and z are periodic in a 3D microstrucure.
+        probability_mask (ND array, optional): array with same shape as X used
+            to assign a confidence value for each data point.
 
     Returns:
         Autocorrelations for microstructure function `X_`.
@@ -50,11 +50,11 @@ def _autocorrelator(X_, s):
     Helper function used to calculate the unnormalized autocorrelation counts.
 
     Args:
-        `X_`: The discretized microstructure function, an
+        X_ (ND array): The discretized microstructure function, an
             `(n_samples, n_x, ..., n_states)` shaped array
             where `n_samples` is the number of samples, `n_x` is thes
             patial discretization, and n_states is the number of local states.
-        s: shape of the Fkernel used for the convolution
+        s (tuple): shape of the Fkernel used for the convolution
 
     Returns:
         autocorrelation counts for a given microstructure function
@@ -88,14 +88,14 @@ def crosscorrelate(X_, periodic_axes=[], probability_mask=None):
     Computes the crosscorrelations from a microstructure function.
 
     Args:
-        `X_`: The discretized microstructure function, an
+        X_ (ND array): The discretized microstructure function, an
             `(n_samples, n_x, ..., n_states)` shaped array
             where `n_samples` is the number of samples, `n_x` is thes
             patial discretization, and n_states is the number of local states.
-        periodic_axes: axes that are periodic. (0, 2) would indicate
-            that axes x and z are periodic in a 3D microstrucure.
-        probability_mask: array with same shape as X used to assign a
-            confidence value for each data point.
+        periodic_axes (list, optional): axes that are periodic. (0, 2) would
+            indicate that axes x and z are periodic in a 3D microstrucure.
+        probability_mask (ND array, optional): array with same shape as X used
+            to assign a confidence value for each data point.
 
     Returns:
         Crosscorelations for microstructure function `X_`.
@@ -150,7 +150,7 @@ def _crosscorrelator(X_, s):
     counts.
 
     Args:
-        `X_`: The discretized microstructure function, an
+        X_: The discretized microstructure function, an
             `(n_samples, n_x, ..., n_states)` shaped array
             where `n_samples` is the number of samples, `n_x` is thes
             patial discretization, and n_states is the number of local states.
@@ -195,14 +195,14 @@ def correlate(X_, periodic_axes=[], probability_mask=None):
     function.
 
     Args:
-        `X_`: The discretized microstructure function, an
+        X_ (ND array): The discretized microstructure function, an
             `(n_samples, n_x, ..., n_states)` shaped array
             where `n_samples` is the number of samples, `n_x` is thes
             patial discretization, and n_states is the number of local states.
-        periodic_axes: axes that are periodic. (0, 2) would indicate
-            that axes x and z are periodic in a 3D microstrucure.
-        probability_mask: array with same shape as X used to assign a
-            confidence value for each data point.
+        periodic_axes (list, optional): axes that are periodic. (0, 2) would
+            indicate that axes x and z are periodic in a 3D microstrucure.
+        probability_mask (ND array, optional): array with same shape as X used
+            to assign a confidence value for each data point.nt.
 
     Returns:
         Autocorrelations and crosscorrelations for microstructure funciton
