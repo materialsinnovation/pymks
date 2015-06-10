@@ -10,8 +10,8 @@ class ContinuousIndicatorBasis(_Indicator):
 
     .. math::
 
-       \frac{1}{\Delta x \Delta t} \int_{H} \int_{s} \int_{n} \Lambda(h - l)
-       m(h, x, t) dx dt dh = m[l, s, n]
+       \frac{1}{\Delta x} \int_{H} \int_{s} \Lambda(h - l)
+       m(h, x) dx dh = m[l, s]
 
     where :math:`\Lambda` is the primitive basis (also called hat function)
 

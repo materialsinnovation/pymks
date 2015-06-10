@@ -10,8 +10,8 @@ class LegendreBasis(_Polynomial):
 
     .. math::
 
-       \frac{1}{\Delta x \Delta t} \int_s \int_n m(h, x, t) dx dt =
-       \sum_0^{L-1} m[l, s, n] P_l(h)
+       \frac{1}{\Delta} \int_s m(h, x) dx =
+       \sum_0^{L-1} m[l, s] P_l(h)
 
     where the :math:`P_l` are Legendre polynomials and the local state space
     :math:`H` is mapped into the orthogonal domain of the Legendre polynomials
@@ -19,6 +19,8 @@ class LegendreBasis(_Polynomial):
     .. math::
 
        -1 \le  H \le 1
+
+    The mapping of :math:`H` into the domain is done automatically in PyMKS.
 
     >>> n_states = 3
     >>> X = np.array([[0.25, 0.1],
