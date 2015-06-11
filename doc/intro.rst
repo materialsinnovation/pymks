@@ -2,10 +2,11 @@
 Meet PyMKS
 ==========
 
-In this short intro, we will demonstrate how to use 2-point statistics
-to objectively quantify microstructures, predict effective properties
-using homogenization and predict local properties using localization.
-More technical details can be found in the `theory
+In this short introduction, we will demonstrate the functionality of
+PyMKS to compute 2-point statistics in order to objectively quantify
+microstructures, predict effective properties using homogenization and
+predict local properties using localization. If you would like more
+technical details amount any of these methods please see the `theory
 section <THEORY.html>`__.
 
 .. code:: python
@@ -42,7 +43,7 @@ have made the two microstructures, lets take a look at them.
 .. image:: intro_files/intro_5_0.png
 
 
-We can compute their 2-point statistics for these two periodic
+We can compute the 2-point statistics for these two periodic
 microstructures using the ``correlate`` function from ``pymks.stats``.
 This function computes all of the autocorrelations and
 cross-correlation(s) for a microstructure. Before we compute the 2-point
@@ -81,8 +82,8 @@ for these two microstructures.
 2-Point statistics provide an object way to compare microstructures, and
 have been shown as an effective input to machine learning methods.
 
-Predict Homogenize Properties
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Predict Homogenized Properties
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In this section of the intro, we are going to predict the effective
 stiffness for two phase microstructures using the
@@ -90,8 +91,8 @@ stiffness for two phase microstructures using the
 material property.
 
 First we need to make some microstructures and their effective stress
-values to fit our model with. Let's create 200 examples of 3 different
-types of microstructures, totaling 600 microstructures.
+values to fit our model. Let's create 200 random instances 3 different
+types of microstructures, totaling to 600 microstructures.
 
 .. code:: python
 
@@ -117,7 +118,8 @@ microstructures.
 
 
 The ``MKSHomogenizationModel`` uses 2-point statistics, so we need
-provide a basis function to discretize the microstructure with.
+provide a discretization method for the microstructures by providing a
+basis function.
 
 .. code:: python
 
@@ -125,7 +127,7 @@ provide a basis function to discretize the microstructure with.
     
     dbasis = DiscreteIndicatorBasis(n_states=2, domain=[0, 1])
     homogenize_model = MKSHomogenizationModel(basis=dbasis)
-Let's fit our model.
+Let's fit our model with the data we created.
 
 .. code:: python
 
@@ -145,7 +147,7 @@ microstructures.
     y_pred = homogenize_model.predict(X_test, periodic_axes=[0, 1])
 The ``MKSHomogenizationModel`` generates low dimensional representations
 of microstructures and regression methods to predict effective
-properties. Let's take a look at the low dimensional representations.
+properties. Take a look at the low dimensional representations.
 
 .. code:: python
 
@@ -231,7 +233,7 @@ Let's look at the microstructure and its local strain field.
 
 
 Now let's pass that same microstructure to our ``MKSLocalizationModel``
-and compare the predicted and computed local strain fields.
+and compare the predicted and computed local strain field.
 
 .. code:: python
 
@@ -245,7 +247,8 @@ and compare the predicted and computed local strain fields.
 .. image:: intro_files/intro_42_0.png
 
 
-Not bad!
+Not bad.
 
 The ``MKSLocalizationModel`` can be used to predict local properties and
 local processing-structure evolutions.
+
