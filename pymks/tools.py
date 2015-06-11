@@ -9,6 +9,8 @@ import itertools
 import warnings
 
 warnings.filterwarnings("ignore")
+plt.style.library['ggplot']['text.color'] = '#555555'
+plt.style.use('ggplot')
 
 
 def _set_colors():
@@ -35,6 +37,20 @@ def _get_response_cmap():
     LowRGB = np.array([0, 0, 0]) / 255.
     cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
     return colors.LinearSegmentedColormap('coeff_cmap', cdict, 256)
+
+
+def _get_microstructure_cmap():
+    """
+    Helper function used to set the microstructure color map.
+
+    Returns:
+        dictionary with colors and microstructure on color bar.
+    """
+    HighRGB = np.array([229, 229, 229]) / 255.
+    MediumRGB = np.array([114.5, 114.5, 114.5]) / 255.
+    LowRGB = np.array([0, 0, 0]) / 255.
+    cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
+    return colors.LinearSegmentedColormap('micro_cmap', cdict, 256)
 
 
 def _get_diff_cmap():
@@ -215,7 +231,7 @@ def draw_microstructure_strain(microstructure, strain):
     cmap = _get_response_cmap()
     fig = plt.figure(figsize=(8, 4))
     ax0 = plt.subplot(1, 2, 1)
-    ax0.imshow(microstructure.swapaxes(0, 1), cmap=plt.cm.gray,
+    ax0.imshow(microstructure.swapaxes(0, 1), cmap=_get_microstructure_cmap(),
                interpolation='none')
     ax0.set_xticks(())
     ax0.set_yticks(())
@@ -239,7 +255,7 @@ def draw_microstructures(*microstructures):
     Args:
         microstructures - numpy array with dimensions (n_samples, x, y)
     """
-    cmap = plt.cm.gray
+    cmap = _get_microstructure_cmap()
     titles = [' ' for s in np.arange(microstructures[0].shape[0])]
     _draw_fields(microstructures[0], cmap, 10, titles)
 
@@ -435,6 +451,7 @@ def draw_gridscores_matrix(grid_scores, params, score_label='R-Squared',
         ax.set_yticks(np.arange(len(param_range_0)))
         ax.set_xlabel(x_label, fontsize=14)
         ax.set_ylabel(y_label, fontsize=14)
+        ax.grid(False)
         im = ax.imshow(np.swapaxes(matrix, 0, 1),
                        cmap=X_cmap, interpolation='none')
         ax.set_title(title, fontsize=22)
@@ -444,6 +461,16 @@ def draw_gridscores_matrix(grid_scores, params, score_label='R-Squared',
         cbar.ax.tick_params(labelsize=12)
         fig.subplots_adjust(right=1.2)
     plt.show()
+
+
+def _remove_figure_ticksline(axs):
+    """Removes lines from tick marks inside of a figure.
+
+    Args:
+        axs: matplotlib axis.
+    """
+
+    return axs
 
 
 def draw_component_variance(variance):
@@ -685,7 +712,7 @@ def draw_correlations(X_corr, correlations=None):
     X_auto_lists = _get_autocorrelation_list(X_corr[..., :n_states])
     X_cross_lists = _get_crosscorrelation_list(X_corr[..., n_states:])
     X_corr_lists = [X_auto_lists[0] + X_cross_lists[0],
-                    np.concatenate((X_auto_lists[1],X_cross_lists[1]),
+                    np.concatenate((X_auto_lists[1], X_cross_lists[1]),
                     axis=-1)]
     _draw_stats(X_corr_lists, correlations=correlations)
 
@@ -793,6 +820,7 @@ def _draw_stats(X_lists, correlations=None):
     if n_plots == 1:
         axs = list([axs])
     for ax, label, img in zip(axs, correlation_labels, X_):
+        ax.grid(False)
         ax.set_xticks(x_loc)
         ax.set_xticklabels(x_labels, fontsize=12)
         ax.set_yticks(y_loc)
