@@ -1,11 +1,11 @@
 
 Meet PyMKS
-----------
+==========
 
 In this short intro, we will demonstrate how to use 2-point statistics
 to objectively quantify microstructures, predict effective properties
 using homogenization and predict local properties using localization.
-More technical details can be found `in the theory
+More technical details can be found in the `theory
 section <THEORY.html>`__.
 
 .. code:: python
@@ -17,7 +17,7 @@ section <THEORY.html>`__.
     import numpy as np
     import matplotlib.pyplot as plt
 Quantify Microstructures using 2-Point Statistics
--------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Lets make two dual phase microstructures with different morphologies.
 
@@ -82,7 +82,7 @@ for these two microstructures.
 have been shown as an effective input to machine learning methods.
 
 Predict Homogenize Properties
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In this section of the intro, we are going to predict the effective
 stiffness for two phase microstructures using the
@@ -181,7 +181,7 @@ The ``MKSHomogenizationModel`` can be used to predict effective
 properties and processing-structure evolutions.
 
 Predict Local Properties
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 In this section of the intro, we are going to predict the local strain
 field in a microstructure using ``MKSLocalizationModel``, but we could
