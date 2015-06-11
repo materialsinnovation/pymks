@@ -63,11 +63,13 @@ a:focus {
     outline-offset: -2px;
 }
 
-/*START OF Change to code text*/
+/*START OF Change to code reference text in documentation */
 code {
     font-size: 90%;
     color: #762a83;
 }
+
+/* START OF Change for code blocks*/
 
 pre {
     display: block;
