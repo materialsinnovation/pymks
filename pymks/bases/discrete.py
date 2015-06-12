@@ -55,18 +55,27 @@ class DiscreteIndicatorBasis(_Indicator):
     """
 
     def __init__(self, n_states=2, domain=None):
+        """Instantiate a Basis
+
+        Args:
+            n_states (int): The number of local states
+            domain (list): indicate the range of expected values for the
+                microstructure.
+        """
         super(DiscreteIndicatorBasis, self).__init__(n_states,
                                                      [0, n_states - 1])
 
     def discretize(self, X):
-        '''
+        """
         Discretize `X`.
 
         Args:
-          X: Integer valued field
+            X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+                shaped array where `n_samples` is the number of samples and
+                `n_x` is the spatial discretization.
         Returns:
-          Integer valued field, either 0 or 1
-        '''
+            Integer valued field, either 0 or 1
+        """
         if not issubclass(X.dtype.type, np.integer):
             raise RuntimeError("X must be an integer array")
         self.check(X)

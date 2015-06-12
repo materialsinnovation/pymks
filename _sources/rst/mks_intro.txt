@@ -1,0 +1,537 @@
+
+MKS Introduction
+================
+
+The following notebook is an introductory tutorial describing the
+calculation of influence coefficients for the MKS in both real and
+Fourier space. In the MKS, the goal is to quickly calculate a response
+:math:`p_{a,s}` from a microstructure :math:`m_{a,s}` where :math:`a`
+represents different samples and :math:`s` represents the spatial
+position. The first step in the MKS is to bin (or discretize) the state
+space, :math:`m_{a, s}`, in terms of a new representation,
+:math:`m_{a, s}^h`, given by,
+
+.. math::  m_{a,s} = \sum\limits_{h=0}^{H-1} m^h_{a, s} \chi^h 
+
+and
+
+.. math::  \sum\limits_{h=0}^{H-1} m^h_{a, s} = 1 
+
+where :math:`\chi^h` is the basis representation of the state space
+(microstructure space). :math:`H` is the size of the state space
+discretization.
+
+Why do we discretize the microstructure?
+
+Can we represent
+
+When the state space is discretized, the relationship between the
+response and microstructure can be written as,
+
+.. math::  p_{a,s} = \sum\limits_{h=0}^{H - 1} \sum\limits_{t=0}^{S-1} \alpha_t^h m_{a,s + t}^h 
+
+where the :math:`p_{a,s}` are the responses, :math:`\alpha_t^h` are the
+influence coefficients and :math:`m_{a,s}^h` is the microstructure.
+:math:`S` is the size of the spatial discretization The :math:`s` and
+:math:`t` indices run over the spatial discretization, the :math:`a`
+index runs over the number of samples and the :math:`h` index runs over
+the microstructure discretization. The goal of the notebook is to
+introduce the method for calculating the :math:`\alpha_t^h` by
+
+-  creating a response function using the Cahn-Hilliard equation,
+
+-  demonstrate Cahn-Hilliard evolution,
+
+-  create some sample data,
+
+-  solve MKS regression in real space for demonstration purposes,
+
+-  solve MKS regression in Fourier space,
+
+-  test that MKS regression seems to work with a single test sample and
+
+-  show that the calculated coefficients are not quite right.
+
+Questions for Tony
+------------------
+
+Why do we discretize the microstructure?
+
+Which type of non-linearities does the first order MKS handle?
+
+Can we represent any PDE in one variable with a high enough order MKS
+relationship?
+
+Calculating the Response
+------------------------
+
+In the MKS a sample set of microstructures and responses are required.
+In this example we will use the Cahn-Hilliard equation to provide the
+example response. `FiPy <http://www.ctcms.nist.gov/fipy/>`__ is used to
+solve the governing equation, which is given by,
+
+.. math::  \frac{\partial \phi}{\partial t} = \nabla \cdot D \nabla \left( \frac{\partial f}{\partial \phi}   - \epsilon^2 \nabla^2 \phi \right).
+
+where the free energy is given by,
+
+.. math::  f = (a^2/2) \phi^2 (1 - \phi)^2 
+
+In this example :math:`D = 1`, :math:`a = \sqrt{200}` and
+:math:`\epsilon=0.1`. See `the FiPy CH
+example <http://www.ctcms.nist.gov/fipy/examples/cahnHilliard/generated/examples.cahnHilliard.mesh2DCoupled.html>`__
+for further details.
+
+The ``fipy_response`` function takes an initial field, :math:`\phi_0`
+(the microstructure), and yields
+:math:`\frac{\partial \phi}{\partial t}` (the response).
+
+.. code:: python
+
+    %matplotlib inline
+    %load_ext autoreload
+    %autoreload 2
+    
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import fipy as fp
+
+.. parsed-literal::
+
+    The autoreload extension is already loaded. To reload it, use:
+      %reload_ext autoreload
+
+
+.. code:: python
+
+    def fipy_response(phi0, dt, N):
+        from fipy.solvers.scipy.linearLUSolver import LinearLUSolver
+        dx = 0.005
+        a = np.sqrt(200.)
+        epsilon = 0.1
+        nx = ny = N
+        mesh = fp.PeriodicGrid2D(nx=nx, ny=ny, dx=dx, dy=dx)
+        phi = fp.CellVariable(name=r"$\phi$", mesh=mesh, value=phi0.copy())
+        PHI = phi.arithmeticFaceValue
+        D = 1.
+        eq = (fp.TransientTerm()
+          == fp.DiffusionTerm(coeff=D * a**2 * (1 - 6 * PHI * (1 - PHI)))
+          - fp.DiffusionTerm(coeff=(D, epsilon**2)))
+        
+        eq.solve(phi, dt=dt, solver=LinearLUSolver())
+        
+        return (np.array(phi) - phi0) / dt
+        
+
+Demonstrate Cahn-Hilliard Evolution
+-----------------------------------
+
+The following cell iterates the ``fipy_response`` function to
+demonstrate the evolution of the microstructure for an initially uniform
+random field. Using the ``fipy_response`` function is quite an
+inefficient method of using `FiPy <http://www.ctcms.nist.gov/fipy/>`__,
+but useful for demonstration purposes.
+
+.. code:: python
+
+    from IPython.display import clear_output
+    import time
+    
+    N = 21
+    np.random.seed(0)
+    phi0 = np.random.random(N * N)
+    dt = 1e-8
+    
+    fig = plt.figure()
+    
+    for i in range(30):
+        response = fipy_response(phi0, dt=dt, N=N)
+        #Euler backward in this case since implicit
+        phi0 = response * dt + phi0
+        #print phi0
+        plt.contourf(phi0.reshape((N,N)))
+        time.sleep(1)
+        clear_output()
+        display(fig)
+
+
+.. image:: mks_intro_files/mks_intro_8_0.png
+
+
+
+.. image:: mks_intro_files/mks_intro_8_1.png
+
+
+Create Samples
+--------------
+
+Using the ``fipy_response`` function, we can now create a sample set of
+microstructures and responses. We create ``Nsample`` microstrucures over
+a 2D space of :math:`N \times N`. We choose a very small system to first
+demonstrate the linear regression in real space.
+
+.. code:: python
+
+    N = 10
+    Nbin = 6
+    Nsample = 5
+    
+    np.random.seed(1)
+    microstructures = np.random.random((Nsample, N**2))
+    responses = np.array([fipy_response(M, dt=dt, N=N) for M in microstructures])
+    print microstructures.shape
+    print responses.shape
+
+.. parsed-literal::
+
+    (5, 100)
+    (5, 100)
+
+
+Bin the Microstructure
+----------------------
+
+The function ``bin``, discretizes the original microstructure,
+:math:`m_{a,s}`, into the binned microstructure, :math:`m_{a,s}^h`,
+given by
+
+.. math::  m_{a, s} = \sum\limits_{s=0}^{S-1} m_{a, s}^h \chi^h 
+
+The ``bin`` function takes :math:`m_{a,s}` and returns
+:math:`m_{a,s}^h`. Don't look at it's code yet, this is the next
+exercise.
+
+.. code:: python
+
+    from pymks import bin
+    ?bin
+We can examine three points to see a graphical representation of
+:math:`M_{a, s}` in terms of :math:`m_{a, s}^h`.
+
+.. code:: python
+
+    from pymks import draw_microstructure_discretization
+    for s in range(3):
+        plt.figure()
+        draw_microstructure_discretization(microstructures, a=0, s=s)
+
+
+.. image:: mks_intro_files/mks_intro_15_0.png
+
+
+
+.. image:: mks_intro_files/mks_intro_15_1.png
+
+
+
+.. image:: mks_intro_files/mks_intro_15_2.png
+
+
+Run ``bin`` for each microstructure and rebuild the array (maybe this
+operation could be vectorized).
+
+.. code:: python
+
+    binnedMicrostructures = np.array([bin(M, Nbin) for M in microstructures])
+    print binnedMicrostructures.shape
+
+.. parsed-literal::
+
+    (5, 100, 6)
+
+
+The new ``binnedMicrostructures``, :math:`m_{a,s}^h`, has a shape of
+``(Nsample, N*N, Nbin)``. To double check that the binning worked we can
+evaluate :math:`\sum\limits_{h=0}^{H-1} m_{a, s}^h \chi^h` and check
+against the original :math:`m_{a,s}`. The summation is over the last
+axis (the binning axis).
+
+.. code:: python
+
+    X = np.linspace(0, 1, Nbin)
+    reconstructedMicrostructure = np.sum(binnedMicrostructures * X[np.newaxis, np.newaxis, :], axis=-1)
+    print np.allclose(reconstructedMicrostructure, microstructures)
+
+.. parsed-literal::
+
+    True
+
+
+.. code:: python
+
+    print X
+
+.. parsed-literal::
+
+    [ 0.   0.2  0.4  0.6  0.8  1. ]
+
+
+Exercise 02-0
+-------------
+
+Try and create a binning function. Just use loops to do this and then we
+will discuss how to vectorize.
+
+Test it with ``np.array((0.2, 0.5, 0.7))`` and ``Nbin = 4``.
+
+If this is too difficult, look at the code, ``??bin``, and then
+reproduce this with loops.
+
+.. code:: python
+
+    ??bin
+Real space
+----------
+
+In order to understand how to compute the influence coefficients it is
+useful to see a demonstration in real space. Although we have a tensor
+representations of :math:`m_{a, s}^h`, we need to create an intermediate
+matrix to calculate the convolution,
+:math:`\sum\limits_{h=0}^{H - 1} \sum\limits_{t=0}^{S-1} \alpha_t^h m_{a,s + t}^h`.
+This matrix representation of :math:`m_{a, s}^h` is given by the
+``microstructureMatrix`` and has shape ``(N*N*Nsample, N*N*Nbin)``. The
+``microstructureMatrix`` is essentially a `circulant
+matrix <http://en.wikipedia.org/wiki/Circulant_matrix>`__ that isn't
+square.
+
+.. code:: python
+
+    def rollMatrix(m, N, Nbin):
+        matrix = np.zeros((N**2, N**2 * Nbin))
+        for i in range(N**2):
+            matrix[i] = np.roll(m, -i, axis=0).swapaxes(0,1).flatten()
+        return matrix
+    
+    microstructureMatrix = np.concatenate([rollMatrix(m, N, Nbin) for m in binnedMicrostructures])
+    
+    print microstructureMatrix.shape
+
+
+.. parsed-literal::
+
+    (500, 600)
+
+
+To calculate the influence coefficients, :math:`\alpha_s^h`, we use
+``numpy``'s ``lstsq`` function.
+
+.. code:: python
+
+    responses = responses.flatten()
+    coefficients = np.linalg.lstsq(microstructureMatrix, responses)[0]
+    print coefficients.shape
+
+
+.. parsed-literal::
+
+    (600,)
+
+
+If ``Nbin > Nsample`` then we can check that the influence coeffiencts
+exacly reproduce the ``responses``. The result below should be ``True``
+for an over-determined system.
+
+.. code:: python
+
+    print np.allclose(np.dot(microstructureMatrix, coefficients), responses)
+
+.. parsed-literal::
+
+    True
+
+
+Fourier Space
+-------------
+
+Having calculated the coefficients for a small system in real space, we
+will now calculate a much larger system in Fourier space and then
+confirm that a sensible response is reproduced. Calculating the
+regression in Frequency space drastically reduces the computational
+cost. The size of the regression is reduced from $ (N^2 N\_{} N^2 H )$
+to :math:`\left(N_{\text{sample}} \times H \right)` for each point in
+reciprocal space :math:`N^2`. The convolution,
+
+.. math::  \sum\limits_{h=0}^{H-1} \sum\limits_{t=0}^{S-1} \alpha_t^h m_{a,s + t}^h 
+
+can be deconvolved in Fourier space with,
+
+.. math::
+
+    \begin{split}
+   \mathcal{F}_k \left( \sum\limits_{h=0}^{H-1} \sum\limits_{t=0}^{S-1} \alpha_t^h m_{a,s + t}^h \right)
+   =&  \sum\limits_{s=0}^{S-1} \left[ \sum\limits_{h=0}^{H-1} \sum\limits_{t=0}^{S-1} \alpha_t^h m_{a,s + t}^h \right] e^{-2 \pi i k s / S} 
+    \;\;\; & \text{(definition)}
+    \\
+   =&  \sum\limits_{h=0}^{H-1} \left[ \sum\limits_{t=0}^{S-1} \alpha_t^h \left[ \sum\limits_{s=0}^{S-1} m_{a,s + t}^h e^{-2 \pi i k s / S} \right] \right]
+    \;\;\; & \text{(rearrange)}
+    \\
+   =&  \sum\limits_{h=0}^{H-1} \left[ \sum\limits_{t=0}^{S-1} \alpha_t^h \left[ \sum\limits_{v=t}^{S-1+t} m_{a,v}^h e^{-2 \pi i k \left(v - t\right) / S} \right] \right]
+    \;\;\; & \text{($v=s+t$)} 
+    \\
+    =&  \sum\limits_{h=0}^{H-1} \left[ \sum\limits_{t=0}^{S-1} \alpha_t^h e^{2 \pi i k t / S} \left[ \sum\limits_{v=t}^{S-1+t} m_{a,v}^h e^{-2 \pi i k v / S} \right] \right]
+    \;\;\; & \text{(rearrange)} 
+     \\
+    =&  \sum\limits_{h=0}^{H-1} \left[ \sum\limits_{t=0}^{S-1} \alpha_t^h e^{2 \pi i k t / S} \left[ \sum\limits_{v=0}^{S-1} m_{a,v}^h e^{-2 \pi i k v / S} \right] \right]
+    \;\;\; & \text{(periodicity of $m_v^h$)} 
+    \\
+    =&  \sum\limits_{h=0}^{H-1} \left[ \left[ \mathcal{F}_k \left( \alpha_t^h \right) \right]^* \mathcal{F}_k \left( m_{a,t}^h \right) \right]
+    \;\;\; & \text{} 
+   \end{split}
+
+The above is a proof of the `circular convolution
+theorem <http://en.wikipedia.org/wiki/Discrete_Fourier_transform#Circular_convolution_theorem_and_cross-correlation_theorem>`__.
+If we write :math:`P_{a,k} =  \mathcal{F}_k \left( p_{a, s} \right)`,
+:math:`M_{a, k}^h = \mathcal{F}_k  \left( m_{a,s}^h \right)` and
+:math:`\beta_k^h = \mathcal{F}_k \left(  \alpha_s^h \right)`, then we
+just need to solve
+
+.. math::  P_{a,k} = \sum\limits_{h=0}^{h-1} \beta_k^h M_{a, k}^h 
+
+with a linear regression at each discretization location in :math:`k` to
+calculate the :math:`\beta_k^h`.
+
+In the example below we will create a microstructure with 11 bins and
+160 samples. This is enough to give reasonable influence coefficients.
+
+.. code:: python
+
+    N = 20
+    Nbin = 11
+    Nsample = 160
+    
+    np.random.seed(101)
+    microstructures = np.array([np.random.random(N**2) for i in range(Nsample)])
+    responses = np.array([fipy_response(m, dt=dt, N=N) for m in microstructures])
+    binnedMicrostructures = np.array([bin(m, Nbin) for m in microstructures])
+    print microstructures.shape
+    print responses.shape
+
+.. parsed-literal::
+
+    (160, 400)
+    (160, 400)
+
+
+We use ``numpy``'s ``fft2`` to calculate the :math:`P_{a,k}` and
+:math:`M^h_{k,a}`.
+
+.. code:: python
+
+    microstructuresRS = binnedMicrostructures.reshape((Nsample, N, N, Nbin))
+    responsesRS = responses.reshape((Nsample, N, N))
+    Fmicrostructures = np.fft.fft2(microstructuresRS, axes=(1, 2))
+    Fresponses = np.fft.fft2(responsesRS, axes=(1, 2))
+.. code:: python
+
+    Fcoeff = np.zeros((N, N, Nbin), dtype=np.complex)
+We calculate :math:`\beta_k^h` at every point in :math:`k` space.
+
+.. code:: python
+
+    for ki in range(N):
+        for kj in range(N):
+            Fcoeff[ki,kj,:] = np.linalg.lstsq(Fmicrostructures[:,ki,kj,:], Fresponses[:,ki,kj] )[0]
+            
+.. code:: python
+
+    reconstructedResponses = np.sum(Fmicrostructures * Fcoeff[np.newaxis], axis=-1)
+For a loose check let's see how close the reconstructed responses are to
+the sample responses.
+
+.. code:: python
+
+    from sklearn import metrics
+    mse = metrics.mean_squared_error
+    responses = np.fft.ifft2(reconstructedResponses, axes=(1, 2)).real
+    MSE = mse(responsesRS, np.fft.ifft2(reconstructedResponses, axes=(1, 2)).real)
+    print 'Mean square error: {0:1.3e}'.format(MSE)
+    print 'Typical values'
+    print responsesRS[0,0,:10]
+    print responses[0,0,:10]
+
+.. parsed-literal::
+
+    Mean square error: 1.358e+10
+    Typical values
+    [  3134920.24329635 -14859922.85111164  24350855.96847351  16518931.7101288
+     -13399504.96081172 -20608868.32626785  21532496.27938246
+     -24030785.28692817 -11643521.47041003  27758619.45859079]
+    [  3013635.84       -14692726.82641511  24504455.19776576
+      16802677.09155771 -13414803.84246958 -20575614.08        21450135.01626968
+     -23919938.87934423 -11691192.67329024  27626894.75236416]
+
+
+Exercise 02-1
+-------------
+
+Test the influence coefficients using one sample.
+
+-  first create a test microstructure
+-  use ``fipy_response`` to create a test response
+-  bin the test microstructure
+-  take the FFT of the binned microstructure
+-  take the inner prodcuct of ``Fcoeff`` with the binned microstructure
+   along the ``bin`` axis
+-  send the result back to real space to get the calculated response
+-  compare the calculated response with the test response.
+
+.. code:: python
+
+    np.random.seed(103)
+    test_microstructure = np.random.random(N**2)
+    test_response = fipy_response(test_microstructure, dt=dt, N=N)
+    
+    binned_test_microstructure = bin(test_microstructure, Nbin).reshape((N, N, Nbin))
+    Fm = np.fft.fft2(binned_test_microstructure, axes=(0, 1))
+    Fr = np.sum(Fm * Fcoeff, axis=-1)
+                
+    calc_response = np.fft.ifft2(Fr, axes=(0, 1)).real.flatten()
+    
+    
+    print test_response[:20]
+    print calc_response[:20]
+
+.. parsed-literal::
+
+    [ 10321080.57374739  18170943.91955532  21953730.26038766
+     -27668437.71011165  -1222554.20968084   4850834.021033   -26983622.32046547
+     -28409259.90543952   5996828.80698766  10823111.24422134
+       6559197.50876078 -30826019.2029601   -8894200.91717253
+      -6046499.57272069 -12751789.16653129  33920217.9478319    7588871.20941563
+      10018364.24439061   2116472.25868405 -25814016.94703518]
+    [ 10136893.8         18057017.95942609  21878377.34953976
+     -27708096.82038447  -1299137.4447629    4855990.40000001
+     -26852174.36448368 -28324788.67386933   6094005.82172765
+      10782186.63208983   6469447.32       -30907790.79029018
+      -9013656.85033033  -6133981.44410236 -12830583.26266264
+      33932517.76000001   7771430.67336559  10094396.05258644
+       2064878.55760657 -25968923.07545603]
+
+
+Influence Coefficients in Real Space
+------------------------------------
+
+Let's view the influence coefficients in real space.
+
+.. code:: python
+
+    coeff = np.fft.ifft2(Fcoeff, axes=(0, 1)).real
+    
+    plt.figure()
+    plt.title(r'$\beta_s^0$', fontsize=18)
+    plt.contourf(coeff[:,:,0])
+    plt.colorbar()
+    plt.figure()
+    plt.title(r'$\beta_s^1$', fontsize=18)
+    plt.contourf(coeff[:,:,1])
+    c = plt.colorbar()
+
+
+.. image:: mks_intro_files/mks_intro_44_0.png
+
+
+
+.. image:: mks_intro_files/mks_intro_44_1.png
+
+
+Doesn't look good. The influence coefficients should die off away from
+the origin.

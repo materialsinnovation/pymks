@@ -118,10 +118,14 @@ class Correlation(Filter):
     ...                      [3., 0.  ]]]])
     >>> assert(np.allclose(X_auto, X_test))
 
-    Ags:
-      X: microstructure
+    Args:
+        X_: The discretized microstructure function, an
+            `(n_samples, n_x, ..., n_states)` shaped array
+            where `n_samples` is the number of samples, `n_x` is thes
+            patial discretization, and n_states is the number of local states.
+
     Returns:
-      Autocorrelations for microstructure X
+        Autocorrelations for microstructure X_
     """
 
     def __init__(self, kernel, Fkernel_shape=None):
@@ -134,10 +138,10 @@ class Correlation(Filter):
         Convolve X with a kernel in frequency space.
 
         Args:
-          X: array to be convolved
+            X: array to be convolved
 
         Returns:
-          convolution of X with the kernel
+            correlation of X with the kernel
         """
         Fkernel_shape = np.array(self.Fkernel.shape)[self.axes]
         FX = np.fft.fftn(X, axes=self.axes, s=Fkernel_shape)

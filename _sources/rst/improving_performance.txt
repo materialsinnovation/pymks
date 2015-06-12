@@ -1,0 +1,831 @@
+
+Improving Performance
+=====================
+
+This notebook will
+
+-  introduce parallel computing with IPython,
+-  cross-validate in parallel,
+-  introduce ``numexpr`` for improving the efficiency of ``numpy``,
+-  improve the efficiency of the FFT with ``PyFFTW``,
+-  implement this all in the ``FastMKSRegressionModel`` class and
+-  run a full Cahn-Hilliard probelm with the ``FastMKSRegressionModel``.
+
+.. code:: python
+
+    %matplotlib inline
+    %load_ext autoreload
+    %autoreload 2
+    
+    import numpy as np
+    import matplotlib.pyplot as plt
+    
+    
+    from pymks import MKSRegressionModel
+    from pymks import FastMKSRegressionModel
+    from pymks import FiPyCHModel
+    from sklearn import metrics
+    from sklearn.grid_search import GridSearchCV
+    from pymks import FastMKSRegressionModel
+    import numexpr
+    
+    mse = metrics.mean_squared_error
+
+.. parsed-literal::
+
+    The autoreload extension is already loaded. To reload it, use:
+      %reload_ext autoreload
+
+
+Parallel Data Generation
+------------------------
+
+Generate a large(r) amount of data.
+
+.. code:: python
+
+    np.random.seed(101)
+    X = np.random.random((1000, 21, 21))
+Create a "direct view" of the engines.
+
+.. code:: python
+
+    from IPython.parallel import Client
+    engines = Client()
+    dview = engines[:]
+    dview.block = True
+    dview.activate()
+    print "engines IDs",engines.ids
+
+.. parsed-literal::
+
+    engines IDs [0, 1, 2, 3, 4, 5, 6, 7]
+
+
+scatter the data.
+
+.. code:: python
+
+    dview.scatter('X', X)
+Perfom the calculation in parallel.
+
+.. code:: python
+
+    %px print X.shape
+
+.. parsed-literal::
+
+    [stdout:0] (125, 21, 21)
+    [stdout:1] (125, 21, 21)
+    [stdout:2] (125, 21, 21)
+    [stdout:3] (125, 21, 21)
+    [stdout:4] (125, 21, 21)
+    [stdout:5] (125, 21, 21)
+    [stdout:6] (125, 21, 21)
+    [stdout:7] (125, 21, 21)
+
+
+.. code:: python
+
+    %%px
+    
+    from pymks import FiPyCHMode
+    y = FiPyCHModel().predict(X)
+The ``map_sync`` function returns a list which needs to be concatenated
+into one array.
+
+.. code:: python
+
+    y = dview.gather('y')
+    print y.dtype
+    print y.shape
+
+.. parsed-literal::
+
+    float64
+    (1000, 21, 21)
+
+
+Parallel Cross-Validation
+-------------------------
+
+Partition the data into training and test arrays.
+
+.. code:: python
+
+    from sklearn.cross_validation import train_test_split
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=3)
+Create a dictionary of tuning parameters to search and define the
+optimization function.
+
+.. code:: python
+
+    Nbins = np.arange(2, 20)
+Setting ``n_jobs=-1`` uses all the available processors
+
+.. code:: python
+
+    from pymks import MKSRegressionModel
+    from sklearn import metrics
+    from sklearn.grid_search import GridSearchCV
+    tuning_parameters = [{'Nbin': Nbins}]
+        
+    def neg_mse(a, b):
+        from sklearn import metrics
+        mse = metrics.mean_squared_error
+        return -mse(a, b)
+    
+    gridSearch = GridSearchCV(MKSRegressionModel(), tuning_parameters, cv=5,
+                              score_func=neg_mse, n_jobs=-1)
+.. code:: python
+
+    out = gridSearch.fit(X_train, y_train)
+.. code:: python
+
+    print gridSearch.best_estimator_
+    gridSearch.score(X_test, y_test)
+
+.. parsed-literal::
+
+    MKSRegressionModel(Nbin=5)
+
+
+
+
+.. parsed-literal::
+
+    0.99998973068237618
+
+
+
+.. code:: python
+
+    for params, mean_score, scores in gridSearch.grid_scores_:
+        print("%1.3e (+/-%1.3e) for %r"% (mean_score, scores.std() / 2, params))
+.. code:: python
+
+    for Nbin in Nbins:
+        model = MKSRegressionModel(Nbin=Nbin)
+        model.fit(X_train, y_train)
+        y_true, y_pred = y_test, model.predict(X_test)
+        print 'Nbin: {0}, mse: {1:1.3e}'.format(Nbin, mse(y_true, y_pred))
+Exercise 06-0
+-------------
+
+Change the number of samples. How does the optimal ``Nbin`` change with
+number of samples?
+
+Evaluate time taken for ``gridSearch.fit`` for varying ``n_jobs``.
+
+Evaluate the mean square error while varying Nspace in parallel (todo)
+----------------------------------------------------------------------
+
+Numexpr
+-------
+
+The `Numexpr <http://code.google.com/p/numexpr/>`__ package speeds up
+``numpy`` calculations considerably. For example, take the following
+
+.. code:: python
+
+    np.random.seed(102)
+    a = np.random.random(1e7)
+    b = np.random.random(1e7)
+    c = np.random.random(1e7)
+    a.dtype
+
+
+
+.. parsed-literal::
+
+    dtype('float64')
+
+
+
+The ``%timeit`` magic implicitly handles a number of common pit falls
+when timing Python expression execution.
+
+.. code:: python
+
+    ?%timeit
+Use ``timeit`` to time a regular Numpy calculation.
+
+.. code:: python
+
+    d = a**2 + b**2 + 2*a*b
+    %timeit a**2 + b**2 + 2*a*b
+
+.. parsed-literal::
+
+    10 loops, best of 3: 194 ms per loop
+
+
+Numpy calculations are quite slow when compared with the same code in C.
+This is due to the overhead from memory allocation for the intermediate
+arrays.
+
+Use ``timeit`` to time a
+```numexpr`` <http://code.google.com/p/numexpr/>`__ calculation.
+
+.. code:: python
+
+    e = numexpr.evaluate('a**2 + b**2 + 2 * a * b')
+    %timeit e = numexpr.evaluate('a**2 + b**2 + 2 * a * b')
+
+.. parsed-literal::
+
+    10 loops, best of 3: 20.1 ms per loop
+
+
+.. code:: python
+
+    np.all(d == e)
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+There is no benefit for small expressions with no intermediate memory
+allocation.
+
+.. code:: python
+
+    %timeit a**2
+
+.. parsed-literal::
+
+    10 loops, best of 3: 29.6 ms per loop
+
+
+.. code:: python
+
+    numexpr.set_num_threads(8)
+    %timeit numexpr.evaluate("a**2")
+
+.. parsed-literal::
+
+    100 loops, best of 3: 15.4 ms per loop
+
+
+`Numexpr <http://code.google.com/p/numexpr/>`__ uses multithreading by
+default.
+
+.. code:: python
+
+    Nproc = 8
+    for Nthread in range(1, Nproc + 1):
+        print "number of threads:",Nthread
+        numexpr.set_num_threads(Nthread)
+        %timeit numexpr.evaluate('a**2 + b**2 + 2 * a * b')
+
+.. parsed-literal::
+
+    number of threads: 1
+    10 loops, best of 3: 65.3 ms per loop
+    number of threads: 2
+    10 loops, best of 3: 46.9 ms per loop
+    number of threads: 3
+    10 loops, best of 3: 32.6 ms per loop
+    number of threads: 4
+    10 loops, best of 3: 25.1 ms per loop
+    number of threads: 5
+    10 loops, best of 3: 27.7 ms per loop
+    number of threads: 6
+    10 loops, best of 3: 24.9 ms per loop
+    number of threads: 7
+    10 loops, best of 3: 24.4 ms per loop
+    number of threads: 8
+    10 loops, best of 3: 21.3 ms per loop
+
+
+Another example.
+
+.. code:: python
+
+    %timeit sin(a)**2 + cos(b)**2
+
+::
+
+
+    ---------------------------------------------------------------------------
+    ValueError                                Traceback (most recent call last)
+
+    <ipython-input-67-40e67b41ad0a> in <module>()
+    ----> 1 get_ipython().magic(u'timeit sin(a)**2 + cos(b)**2')
+    
+
+    /home/wd15/git/ipython/IPython/core/interactiveshell.pyc in magic(self, arg_s)
+       2181         magic_name, _, magic_arg_s = arg_s.partition(' ')
+       2182         magic_name = magic_name.lstrip(prefilter.ESC_MAGIC)
+    -> 2183         return self.run_line_magic(magic_name, magic_arg_s)
+       2184 
+       2185     #-------------------------------------------------------------------------
+
+
+    /home/wd15/git/ipython/IPython/core/interactiveshell.pyc in run_line_magic(self, magic_name, line)
+       2102                 kwargs['local_ns'] = sys._getframe(stack_depth).f_locals
+       2103             with self.builtin_trap:
+    -> 2104                 result = fn(*args,**kwargs)
+       2105             return result
+       2106 
+
+
+    /home/wd15/git/ipython/IPython/core/magics/execution.pyc in timeit(self, line, cell)
+
+
+    /home/wd15/git/ipython/IPython/core/magic.pyc in <lambda>(f, *a, **k)
+        189     # but it's overkill for just that one bit of state.
+        190     def magic_deco(arg):
+    --> 191         call = lambda f, *a, **k: f(*a, **k)
+        192 
+        193         if callable(arg):
+
+
+    /home/wd15/git/ipython/IPython/core/magics/execution.pyc in timeit(self, line, cell)
+        984             number = 1
+        985             for _ in range(1, 10):
+    --> 986                 if timer.timeit(number) >= 0.2:
+        987                     break
+        988                 number *= 10
+
+
+    /usr/lib/python2.7/timeit.pyc in timeit(self, number)
+        193         gc.disable()
+        194         try:
+    --> 195             timing = self.inner(it, self.timer)
+        196         finally:
+        197             if gcold:
+
+
+    <magic-timeit> in inner(_it, _timer)
+
+
+    ValueError: operands could not be broadcast together with shapes (1024,16384) (10000000) 
+
+
+.. code:: python
+
+    %timeit numexpr.evaluate('sin(a)**2 + cos(b)**2')
+PyFFTW
+------
+
+Using `PyFFTW <Whttp://hgomersall.github.io/pyFFTW/>`__ offers
+substantial speed ups over Numpy's FFT.
+
+.. code:: python
+
+    a = np.random.random((1024, 16384))
+    b_numpy = np.fft.fftn(a, axes=(0, 1))
+    %timeit b_numpy = np.fft.fftn(a, axes=(0, 1))
+
+.. parsed-literal::
+
+    1 loops, best of 3: 1.13 s per loop
+
+
+PyFFTW requires the creation of a "plan" in order to optimize the FFT.
+
+.. code:: python
+
+    import pyfftw
+    
+    input_array = pyfftw.n_byte_align_empty(a.shape, 16, 'complex128')
+    output_array = pyfftw.n_byte_align_empty(a.shape, 16, 'complex128')
+    fft_plan = pyfftw.FFTW(input_array, output_array, threads=Nproc, axes=(0, 1), direction='FFTW_FORWARD')
+Much faster!
+
+.. code:: python
+
+    input_array[:] = a;
+    b_fftw = fft_plan()
+    %timeit input_array[:] = a; b_fftw = fft_plan()
+
+.. parsed-literal::
+
+    10 loops, best of 3: 172 ms per loop
+
+
+The return types and values are the same.
+
+.. code:: python
+
+    print b_fftw.dtype
+    print b_numpy.dtype
+.. code:: python
+
+    np.allclose(b_numpy, b_fftw)
+As with Numexpr, threading does help for large arrays.
+
+.. code:: python
+
+    for Nthread in range(1, Nproc + 1):
+        fft_plan = pyfftw.FFTW(input_array, output_array, threads=Nthread, axes=(0, 1), direction='FFTW_FORWARD')
+        print 'Nthread:',Nthread
+        %timeit input_array[:] = a; b_fftw = fft_plan()
+
+.. parsed-literal::
+
+    Nthread: 1
+    1 loops, best of 3: 376 ms per loop
+    Nthread: 2
+    1 loops, best of 3: 224 ms per loop
+    Nthread: 3
+    10 loops, best of 3: 184 ms per loop
+    Nthread:
+
+::
+
+
+    ---------------------------------------------------------------------------
+    KeyboardInterrupt                         Traceback (most recent call last)
+
+    <ipython-input-68-13bbe607deac> in <module>()
+          2     fft_plan = pyfftw.FFTW(input_array, output_array, threads=Nthread, axes=(0, 1), direction='FFTW_FORWARD')
+          3     print 'Nthread:',Nthread
+    ----> 4     get_ipython().magic(u'timeit input_array[:] = a; b_fftw = fft_plan()')
+    
+
+    /home/wd15/git/ipython/IPython/core/interactiveshell.pyc in magic(self, arg_s)
+       2181         magic_name, _, magic_arg_s = arg_s.partition(' ')
+       2182         magic_name = magic_name.lstrip(prefilter.ESC_MAGIC)
+    -> 2183         return self.run_line_magic(magic_name, magic_arg_s)
+       2184 
+       2185     #-------------------------------------------------------------------------
+
+
+    /home/wd15/git/ipython/IPython/core/interactiveshell.pyc in run_line_magic(self, magic_name, line)
+       2102                 kwargs['local_ns'] = sys._getframe(stack_depth).f_locals
+       2103             with self.builtin_trap:
+    -> 2104                 result = fn(*args,**kwargs)
+       2105             return result
+       2106 
+
+
+    /home/wd15/git/ipython/IPython/core/magics/execution.pyc in timeit(self, line, cell)
+
+
+    /home/wd15/git/ipython/IPython/core/magic.pyc in <lambda>(f, *a, **k)
+        189     # but it's overkill for just that one bit of state.
+        190     def magic_deco(arg):
+    --> 191         call = lambda f, *a, **k: f(*a, **k)
+        192 
+        193         if callable(arg):
+
+
+    /home/wd15/git/ipython/IPython/core/magics/execution.pyc in timeit(self, line, cell)
+        984             number = 1
+        985             for _ in range(1, 10):
+    --> 986                 if timer.timeit(number) >= 0.2:
+        987                     break
+        988                 number *= 10
+
+
+    /usr/lib/python2.7/timeit.pyc in timeit(self, number)
+        193         gc.disable()
+        194         try:
+    --> 195             timing = self.inner(it, self.timer)
+        196         finally:
+        197             if gcold:
+
+
+    <magic-timeit> in inner(_it, _timer)
+
+
+    KeyboardInterrupt: 
+
+
+.. parsed-literal::
+
+     4
+
+
+Exercise 06-01
+--------------
+
+Identify the bottle necks in the ``MKSRegressionModel`` using the
+``line_profiler`` and improve things with Numexpr and PyFFTW. Plot the
+relative speed up versus ``Nbin``.
+
+-  start by subclassing ``MKSRegressionModel`` and then speed up the
+   ``predict`` method
+
+
+
+
+
+
+
+
+
+
+
+``FastMKSRegressionModel``
+--------------------------
+
+Using Numexpr and PyFFTW, we can make improvements to the
+``MKSRegressionModel``. The ``FastMKSRegressionModel`` overwrites a
+number of methods in ``MKSRegressionModel``. ``FastMKSRegressionModel``
+only improves the ``predict`` method, not the ``fit`` method.
+
+and it can be tested
+
+
+Let's compare the two classes.
+
+.. code:: python
+
+    np.random.seed(11)
+    X0 = np.random.random((1, 1024, 1024))
+    
+    fast_model = FastMKSRegressionModel(Nbin=5, threads=8)
+    slow_model = MKSRegressionModel(Nbin=5)
+    
+    fast_model.fit(X, y)
+    fast_model.resize_coeff(X0.shape[1:])
+    y_fast = fast_model.predict(X0.copy())
+    
+    slow_model.fit(X, y)
+    slow_model.resize_coeff(X0.shape[1:])
+    y_slow = fast_model.predict(X0.copy())
+    
+    print np.allclose(y_fast, y_slow)
+They give the same result, but what about efficiency gains.
+
+.. code:: python
+
+    %timeit slow_model.predict(X0.copy())
+.. code:: python
+
+    %timeit fast_model.predict(X0.copy())
+This is better for small ``Nbin`` at the moment. Plot of speed up versus
+``Nbin``.
+
+Comparing MKS and FiPy
+----------------------
+
+.. code:: python
+
+    from IPython.display import clear_output
+    import time
+    from pymks import FiPyCHModel
+    N = 41
+    np.random.seed(13)
+    phi0 = np.random.random((1, N, N))
+    
+    model = FastMKSRegressionModel(Nbin=5)
+    model.fit(X, y)
+    model.resize_coeff((N, N))
+    
+    fig = plt.figure()
+    
+    fipymodel = FiPyCHModel()
+    fipy_phi1 = phi0.copy()
+    mks_phi1 = phi0.copy()
+    steps = 30
+    dt=1e-8
+    for i in range(steps):
+        fipy_response = fipymodel.predict(fipy_phi1)
+        mks_response = model.predict(mks_phi1)
+        #Euler forward
+        fipy_phi1 = fipy_response * dt + fipy_phi1
+        mks_phi1 = mks_response * dt + mks_phi1
+        mks_phi1 = np.minimum(mks_phi1, 1)
+        mks_phi1 = np.maximum(mks_phi1, 0)
+        #print phi0
+        plt.subplot(1,2,1)
+        plt.title('FiPy')
+        a = plt.imshow(fipy_phi1.reshape((N, N)), vmin=0.0, vmax=1.0)
+        plt.subplot(1,2,2)
+        plt.title('MKS')
+        b = plt.imshow(mks_phi1.reshape((N, N)), vmin=0.0, vmax=1.0)
+        time.sleep(1)
+        clear_output()
+        display(fig)
+        print i
+
+
+.. image:: improving_performance_files/improving_performance_79_0.png
+
+
+::
+
+
+    ---------------------------------------------------------------------------
+    KeyboardInterrupt                         Traceback (most recent call last)
+
+    <ipython-input-70-a62898ae6a1c> in <module>()
+         18 dt=1e-8
+         19 for i in range(steps):
+    ---> 20     fipy_response = fipymodel.predict(fipy_phi1)
+         21     mks_response = model.predict(mks_phi1)
+         22     #Euler forward
+
+
+    /home/wd15/git/pymks/pymks/fipyCHModel.pyc in predict(self, X)
+         31             phi[:] = x.flatten()
+         32             phi.updateOld()
+    ---> 33             self._solve(eq, phi, LinearLUSolver(), self.dt)
+         34             #            eq.solve(phi, dt=self.dt, solver=LinearLUSolver())
+         35             phi_ij = np.array(phi).reshape((nx, ny))
+
+
+    /home/wd15/git/pymks/pymks/fipyCHModel.pyc in _solve(self, eq, phi, solver, dt)
+         42 
+         43         for sweep in range(5):
+    ---> 44             res = eq.sweep(phi, dt=dt, solver=LinearLUSolver())
+         45             #    print 'res',res
+         46 
+
+
+    /home/wd15/git/fipy/fipy/terms/term.pyc in sweep(self, var, solver, boundaryConditions, dt, underRelaxation, residualFn, cacheResidual, cacheError)
+        234 
+        235         """
+    --> 236         solver = self._prepareLinearSystem(var=var, solver=solver, boundaryConditions=boundaryConditions, dt=dt)
+        237         solver._applyUnderRelaxation(underRelaxation=underRelaxation)
+        238         residual = solver._calcResidual(residualFn=residualFn)
+
+
+    /home/wd15/git/fipy/fipy/terms/term.pyc in _prepareLinearSystem(self, var, solver, boundaryConditions, dt)
+        166                                                            boundaryConditions=boundaryConditions,
+        167                                                            dt=dt,
+    --> 168                                                            transientGeomCoeff=self._getTransientGeomCoeff(var),
+        169                                                            diffusionGeomCoeff=self._getDiffusionGeomCoeff(var),
+        170                                                            buildExplicitIfOther=self._buildExplcitIfOther)
+
+
+    /home/wd15/git/fipy/fipy/terms/binaryTerm.pyc in _getTransientGeomCoeff(self, var)
+         94 
+         95     def _getTransientGeomCoeff(self, var):
+    ---> 96         return self._addNone(self.term._getTransientGeomCoeff(var), self.other._getTransientGeomCoeff(var))
+         97 
+         98     def _getDiffusionGeomCoeff(self, var):
+
+
+    /home/wd15/git/fipy/fipy/terms/transientTerm.pyc in _getTransientGeomCoeff(self, var)
+        144         """
+        145         if var is self.var or self.var is None:
+    --> 146             return self._getGeomCoeff(var)
+        147         else:
+        148             return None
+
+
+    /home/wd15/git/fipy/fipy/terms/term.pyc in _getGeomCoeff(self, var)
+        463     def _getGeomCoeff(self, var):
+        464         if self.geomCoeff is None:
+    --> 465             self.geomCoeff = self._calcGeomCoeff(var)
+        466             if self.geomCoeff is not None:
+        467                 self.geomCoeff.dontCacheMe()
+
+
+    /home/wd15/git/fipy/fipy/terms/transientTerm.pyc in _calcGeomCoeff(self, var)
+        116             return self.coeff[...,numerix.newaxis] * numerix.resize(var.mesh.cellVolumes, var.shape)
+        117         else:
+    --> 118             return self.coeff * numerix.resize(var.mesh.cellVolumes, var.shape)
+        119 
+        120     def _getTransientGeomCoeff(self, var):
+
+
+    /home/wd15/git/fipy/fipy/variables/variable.pyc in __mul__(self, other)
+       1149             return other * self
+       1150         else:
+    -> 1151             return self._BinaryOperatorVariable(lambda a,b: a*b, other)
+       1152 
+       1153     __rmul__ = __mul__
+
+
+    /home/wd15/git/fipy/fipy/variables/variable.pyc in _BinaryOperatorVariable(self, op, other, operatorClass, opShape, canInline, unit)
+       1123 
+       1124         return binOp(op=op, var=[self, other], opShape=opShape, canInline=canInline, unit=unit, 
+    -> 1125                      inlineComment=inline._operatorVariableComment(canInline=canInline))
+       1126 
+       1127     def __add__(self, other):
+
+
+    /home/wd15/git/fipy/fipy/variables/operatorVariable.pyc in __init__(self, op, var, opShape, canInline, unit, inlineComment, *args, **kwargs)
+         52             self.name = ''
+         53             for var in self.var:    #C does not accept units
+    ---> 54                 if not var.unit.isDimensionless():
+         55                     self.canInline = False
+         56                     break
+
+
+    /home/wd15/git/fipy/fipy/variables/variable.pyc in _getUnit(self)
+        253             <PhysicalUnit m>
+        254         """
+    --> 255         return self._extractUnit(self.value)
+        256 
+        257     @getsetDeprecated
+
+
+    /home/wd15/git/fipy/fipy/variables/variable.pyc in _getValue(self)
+        545             value = self._value
+        546 
+    --> 547         if len(self.constraints) > 0:
+        548             value = value.copy()
+        549             for constraint in self.constraints:
+
+
+    /home/wd15/git/fipy/fipy/variables/variable.pyc in constraints(self)
+        570     value = property(_getValue, _setValueProperty)
+        571 
+    --> 572     @property
+        573     def constraints(self):
+        574         if not hasattr(self, "_constraints"):
+
+
+    KeyboardInterrupt: 
+
+
+.. parsed-literal::
+
+    1
+
+
+
+.. image:: improving_performance_files/improving_performance_79_3.png
+
+
+Simulation
+----------
+
+A full simulation. The MKS has to artificially maintain the solution
+between 0 and 1. This hasn't been fixed yet.
+
+.. code:: python
+
+    
+    np.random.seed(11)
+    X0 = np.random.random((1, 256, 256))
+    dt = 1e-8
+    model = FastMKSRegressionModel(Nbin=7, threads=8)
+    model.fit(X, y)
+    model.resize_coeff(X0.shape[1:])
+    data = []
+    X1 = X0.copy()
+    steps = 3000
+    for step in range(steps + 1):
+        y1 = model.predict(X1)
+        X1 = numexpr.evaluate('X1 + dt * y1')
+        X1 = np.minimum(X1, 1)
+        X1 = np.maximum(X1, 0)
+        if step % (steps / 200) == 0:
+            data.append(X1[0])
+            print step,
+
+.. parsed-literal::
+
+    0 15 30 45 60 75 90 105 120 135 150 165 180 195 210 225 240 255 270 285 300 315 330 345 360 375 390 405 420 435 450 465 480 495 510 525 540 555 570 585 600 615 630 645 660 675 690 705 720 735 750 765 780 795 810 825 840 855 870 885 900 915 930 945 960 975 990 1005 1020 1035 1050 1065 1080 1095 1110 1125 1140 1155 1170 1185 1200 1215 1230 1245 1260 1275 1290 1305 1320 1335 1350 1365 1380 1395 1410 1425 1440 1455 1470 1485 1500 1515 1530 1545 1560 1575 1590 1605 1620 1635 1650 1665 1680 1695 1710 1725 1740 1755 1770 1785 1800 1815 1830 1845 1860 1875 1890 1905 1920 1935 1950 1965 1980 1995 2010 2025 2040 2055 2070 2085 2100 2115 2130 2145 2160 2175 2190 2205 2220 2235 2250 2265 2280 2295 2310 2325 2340 2355 2370 2385 2400 2415 2430 2445 2460 2475 2490 2505 2520 2535 2550 2565 2580 2595 2610 2625 2640 2655 2670 2685 2700 2715 2730 2745 2760 2775 2790 2805 2820 2835 2850 2865 2880 2895 2910 2925 2940 2955 2970 2985 3000
+
+
+Rudimentary Animation of the Data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    from IPython.display import clear_output
+    import time
+    
+    fig = plt.figure()
+    ax = plt.axes()
+    a = plt.imshow(X0[0].copy(), vmin=0.0, vmax=1.0)
+    plt.colorbar()
+    for d in data:
+        a.set_array(d.copy())
+        plt.show()
+        time.sleep(1)
+        clear_output()
+        display(fig)
+Java Script Animation of the Data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    # JSAnimation import available at https://github.com/jakevdp/JSAnimation
+    from JSAnimation import IPython_display
+    from matplotlib import animation
+    
+    # create a simple animation
+    fig = plt.figure()
+    ax = plt.axes()
+    im = plt.imshow(X0[0], vmin=0.0, vmax=1.0)
+    plt.colorbar()
+    
+    def init():
+        im.set_array(X0[0])
+        return im
+    
+    def animate(i):
+        im.set_array(data[i])
+        return im
+    
+    anim = animation.FuncAnimation(fig, animate, init_func=init,
+                                   frames=len(data), interval=1, blit=True)
+    
+    from IPython.display import HTML
+    plt.close(anim._fig)
+    HTML(IPython_display.anim_to_html(anim))

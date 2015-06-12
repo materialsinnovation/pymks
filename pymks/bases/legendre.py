@@ -10,18 +10,17 @@ class LegendreBasis(_Polynomial):
 
     .. math::
 
-       m_h \left[i\right] = \frac{2h +1}{2} P_h \left(
-       2 \left( \frac{\phi\left[i\right] - \chi_{\text{min}}}{\chi_{\text{max}}
-        - \chi_{\text{min}}} \right) - 1
-       \right)
+       \frac{1}{\Delta} \int_s m(h, x) dx =
+       \sum_0^{L-1} m[l, s] P_l(h)
 
-    where the :math:`P_h` are Legendre polynomials and
+    where the :math:`P_l` are Legendre polynomials and the local state space
+    :math:`H` is mapped into the orthogonal domain of the Legendre polynomials
 
     .. math::
 
-       \chi_{\text{min}} \le \phi \le \chi_{\text{max}}
+       -1 \le  H \le 1
 
-    and :math:`0 \le h \le n-1`.
+    The mapping of :math:`H` into the domain is done automatically in PyMKS.
 
     >>> n_states = 3
     >>> X = np.array([[0.25, 0.1],
@@ -41,9 +40,11 @@ class LegendreBasis(_Polynomial):
         Discretize `X`.
 
         Args:
-          X: field representing the microstructure
+            X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+                shaped array where `n_samples` is the number of samples and
+                `n_x` is the spatial discretization.
         Returns:
-          field of local states
+            Float valued field of of Legendre polynomial coefficients.
 
         >>> X = np.array([[-1, 1],
         ...               [0, -1]])

@@ -9,11 +9,16 @@ import numpy as np
 
 class MKSHomogenizationModel(BaseEstimator):
 
-    '''
+    """
     The `MKSHomogenizationModel` takes in microstructures and a their
     associated macroscopic property, and created a low dimensional structure
     property linkage. The `MKSHomogenizationModel` model is designed to
     integrate with dimensionality reduction techniques and predictive models.
+
+    Attributes:
+        degree: Degree of the polynomial used by `property_linker`.
+        n_components: Number of components used by `dimension_reducer`.
+        dimension_reducer: Class with method used for dimensionality reduction.
 
     Below is an examlpe of using MKSHomogenizationModel to predict the type of
     microstructure using PCA and Logistic Regression.
@@ -46,23 +51,24 @@ class MKSHomogenizationModel(BaseEstimator):
     >>> y1_test = model.predict(X1_test)
     >>> assert np.allclose(y0_test, [0, 0, 0])
     >>> assert np.allclose(y1_test, [1, 1, 1])
-
-    '''
+    """
 
     def __init__(self, basis, n_components=None, degree=1,
                  dimension_reducer=None, property_linker=None):
-        '''
+        """
         Create an instance of a `MKSHomogenizationModel`.
 
         Args:
-            basis: an instance of a bases class.
-            dimension_reducer: an instance of a dimensionality reduction
-                class with a fit_transform method.
-            property_linker: an instance for a machine learning class with fit
-                and predict methods.
-            n_components: number of components kept by the dimension_reducer
-            degree: degree of the polynomial used by property_linker.
-        '''
+            basis (class): an instance of a bases class.
+            dimension_reducer (class, optional): an instance of a
+                dimensionality reduction class with a fit_transform method.
+            property_linker (class, optional): an instance for a machine
+                learning class with fit and predict methods.
+            n_components (int, optional): number of components kept by the
+                dimension_reducer
+            degree (int, optional): degree of the polynomial used by
+                property_linker.
+        """
 
         self.basis = basis
         self.dimension_reducer = dimension_reducer
@@ -75,7 +81,7 @@ class MKSHomogenizationModel(BaseEstimator):
         if property_linker is None:
             property_linker = LinearRegression()
         self.linker = Pipeline([('poly', PolynomialFeatures(degree=degree)),
-                                ('linker', property_linker)])
+                                ('connector', property_linker)])
         self._check_methods
         self.degree = degree
         self.n_components = n_components
@@ -86,6 +92,8 @@ class MKSHomogenizationModel(BaseEstimator):
 
     @n_components.setter
     def n_components(self, value):
+        """Setter for the number of components using by the dimension_reducer
+        """
         self._n_components = value
         self.dimension_reducer.n_components = value
 
@@ -95,14 +103,16 @@ class MKSHomogenizationModel(BaseEstimator):
 
     @degree.setter
     def degree(self, value):
+        """Setter for the polynomial degree for property_linker.
+        """
         self._degree = value
         self.linker.set_params(poly__degree=value)
 
     def _check_methods(self):
-        '''
+        """
         Helper function to make check that the dimensionality reduction and
         property linking methods have the appropriate methods.
-        '''
+        """
         if not callable(getattr(self.dimension_reducer,
                                 "fit_transform", None)):
             raise RuntimeError(
@@ -119,10 +129,25 @@ class MKSHomogenizationModel(BaseEstimator):
 
     def fit(self, X, y, X_reduce_label=None,
             periodic_axes=[], probability_mask=None, size=None):
-        '''
+        """
         Fits data by calculating 2-point statistics from X, preforming
         dimension reduction using dimension_reducer, and fitting the reduced
         data with the property_linker.
+
+        Args:
+            X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+                shaped array where `n_samples` is the number of samples and
+                `n_x` is the spatial discretization.
+            y (1D array): The material property associated with `X`.
+            reducer_label (1D array, optional): label for X used during the
+                fit_transform method for the `dimension_reducer`.
+            periodic_axes (list, optional): axes that are periodic. (0, 2)
+                would indicate that axes x and z are periodic in a 3D
+                microstrucure.
+            probability_mask (ND array, optional): array with same shape as X
+                used to assign a confidence value for each data point.
+
+        Example
 
         >>> from sklearn.decomposition import PCA
         >>> from sklearn.linear_model import LinearRegression
@@ -145,19 +170,7 @@ class MKSHomogenizationModel(BaseEstimator):
         >>> X_pca = reducer.fit_transform(X_reshaped - np.mean(X_reshaped,
         ...                               axis=1)[:, None])
         >>> assert np.allclose(model.fit_data, X_pca)
-
-        Args:
-          X: The microstructure, an `(S, N, ...)` shaped
-             array where `S` is the number of samples and `N` is the
-             spatial discretization.
-          y: The material property associated with `X`.
-          reducer_label: label for X used during the fit_transform method
-             for the `dimension_reducer`.
-          periodic_axes: axes that are periodic. (0, 2) would indicate
-              that axes x and z are periodic in a 3D microstrucure.
-          probability_mask: array with same shape as X used to assign a
-              confidence value for each data point.
-        '''
+        """
         if size is not None:
             new_shape = (X.shape[0],) + size
             X = X.reshape(new_shape)
@@ -168,7 +181,22 @@ class MKSHomogenizationModel(BaseEstimator):
         self.fit_data = X_reduced
 
     def predict(self, X, periodic_axes=[], probability_mask=None):
-        '''Predicts macroscopic property for the microstructures `X`.
+        """Predicts macroscopic property for the microstructures `X`.
+
+        Args:
+            X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+                shaped array where `n_samples` is the number of samples and
+                `n_x` is the spatial discretization.
+            periodic_axes (list, optional): axes that are periodic. (0, 2)
+                would indicate that axes x and z are periodic in a 3D
+                microstrucure.
+            probability_mask (ND array, optional): array with same shape as X
+                used to assign a confidence value for each data point.
+
+        Returns:
+            The predicted macroscopic property for `X`.
+
+        Example
 
         >>> from sklearn.manifold import LocallyLinearEmbedding
         >>> from sklearn.linear_model import BayesianRidge
@@ -185,26 +213,32 @@ class MKSHomogenizationModel(BaseEstimator):
         >>> model.fit(X, y)
         >>> X_test = np.random.randint(2, size=(1, 100))
         >>> assert np.allclose(model.predict(X_test), 0.53031958)
-
-        Args:
-            X: The microstructre, an `(S, N, ...)` shaped array where `S` is
-               the number of samples and `N` is the spatial discretization.
-            periodic_axes: axes that are periodic. (0, 2) would indicate
-                that axes x and z are periodic in a 3D microstrucure.
-            probability_mask: array with same shape as X used to assign a
-                confidence value for each data point.
-        Returns:
-            The predicted macroscopic property for `X`.
-        '''
+        """
         X_preped = self._X_prep(X, periodic_axes, probability_mask)
         X_reduced = self.dimension_reducer.transform(X_preped)
         self.predict_data = X_reduced
         return self.linker.predict(X_reduced)
 
     def _X_prep(self, X, periodic_axes=[], probability_mask=None):
-        '''
+        """
         Helper function used to calculated 2-point statistics from `X` and
         reshape them appropriately for fit and predict methods.
+
+        Args:
+            X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+                shaped array where `n_samples` is the number of samples and
+                `n_x` is the spatial discretization..
+            periodic_axes (list, optional): axes that are periodic. (0, 2)
+                would indicate that axes x and z are periodic in a 3D
+                microstrucure.
+            probability_mask (ND array, optional): array with same shape as X
+                used to assign a confidence value for each data point.
+
+        Returns:
+            Spatial correlations for each sample formated with dimensions
+            (n_samples, n_features).
+
+        Example
 
         >>> from sklearn.manifold import Isomap
         >>> from sklearn.linear_model import ARDRegression
@@ -221,19 +255,7 @@ class MKSHomogenizationModel(BaseEstimator):
         ...                    [-1 / 3., -1 / 3., 2 / 3.,
         ...                      1 / 6., 1 / 6., -1 / 3.]])
         >>> assert np.allclose(X_test, X_prep)
-
-
-        Args:
-            X: The microstructre, an `(S, N, ...)` shaped array where `S` is
-               the number of samples and `N` is the spatial discretization.
-            periodic_axes: axes that are periodic. (0, 2) would indicate
-                that axes x and z are periodic in a 3D microstrucure.
-            probability_mask: array with same shape as X used to assign a
-                confidence value for each data point.
-        Returns:
-           Spatial correlations for each sample formated with dimensions
-           (n_samples, n_features).
-        '''
+        """
         X_ = self.basis.discretize(X)
         X_corr = correlate(X_, periodic_axes=periodic_axes,
                            probability_mask=probability_mask)
@@ -241,10 +263,25 @@ class MKSHomogenizationModel(BaseEstimator):
         return X_reshaped - np.mean(X_reshaped, axis=1)[:, None]
 
     def score(self, X, y, periodic_axes=[], probability_mask=None):
-        '''
+        """
         The score function for the MKSHomogenizationModel. It formats the
         data and uses the score method from the property_linker.
-        '''
+
+        Args:
+            X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+                shaped array where `n_samples` is the number of samples and
+                `n_x` is the spatial discretization.
+            y (1D array): The material property associated with `X`.
+            periodic_axes (list, optional): axes that are periodic. (0, 2)
+                would indicate that axes x and z are periodic in a 3D
+                microstrucure.
+            probability_mask (ND array, optional): array with same shape as X
+                used to assign a confidence value for each data point.
+
+        Returns:
+             Score for MKSHomogenizationModel from the selected
+             property_linker.
+        """
         if not callable(getattr(self.linker, "score", None)):
             raise RuntimeError(
                 "property_linker does not have score() method.")

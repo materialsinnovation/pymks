@@ -1,0 +1,273 @@
+
+A Simple Filter
+===============
+
+This example will demonstrate the importance of removing the
+redundancies from the regression. This notebook will
+
+-  define a simple 1D filter,
+-  generate influence coefficients using the filter,
+-  use these coefficients to calculate a response from a microstructure,
+-  back calculate the influence coefficients,
+-  compare the back calculated influence coefficients with the original,
+-  introduce the ``MKSRegressionModel`` class and
+-  show how the this class deals with redundancies.
+
+.. code:: python
+
+    %matplotlib inline
+    %load_ext autoreload
+    %autoreload 2
+    
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+.. parsed-literal::
+
+    The autoreload extension is already loaded. To reload it, use:
+      %reload_ext autoreload
+
+
+The filter
+----------
+
+Create a filter.
+
+.. code:: python
+
+    def filter(x):
+        return np.where(x < 10,
+                        np.exp(-abs(x)) * np.cos(x * np.pi),
+                        np.exp(-abs(x - 20)) * np.cos((x - 20) * np.pi))
+    
+    x = np.linspace(0, 20, 100)
+    a = plt.plot(x, filter(x))
+
+
+.. image:: filter_files/filter_4_0.png
+
+
+.. code:: python
+
+    ?np.linspace
+Construct the coefficients, ``coeff``
+
+.. code:: python
+
+    Nbin = 2
+    Nspace = 81
+    
+    coeff = np.linspace(0, 1, Nbin)[None,:] * filter(np.linspace(0, 20, Nspace))[:,None]
+    print coeff.shape
+
+.. parsed-literal::
+
+    (81, 2)
+
+
+Take the Fourier transform.
+
+.. code:: python
+
+    Fcoeff = np.fft.fft(coeff, axis=0)
+Make some sample microstructures, ``X``
+
+.. code:: python
+
+    Nsample = 400
+    
+    np.random.seed(2)
+    X = np.random.random((Nsample, Nspace))
+    print X.shape
+
+.. parsed-literal::
+
+    (400, 81)
+
+
+Discretize the microstructure
+
+.. code:: python
+
+    H = np.linspace(0, 1, Nbin)
+    X_ = np.maximum(1 - abs(X[:,:,None] - H) / (H[1] - H[0]), 0)
+.. code:: python
+
+    print X_[0, 0]
+    print X[0, 0]
+
+.. parsed-literal::
+
+    [ 0.5640051  0.4359949]
+    0.435994902142
+
+
+Calculate the responses
+
+.. code:: python
+
+    FX = np.fft.fft(X_, axis=1)
+    Fy = np.sum(Fcoeff[None] * FX, axis=-1)
+    y = np.fft.ifft(Fy, axis=1).real
+What is a Filter?
+-----------------
+
+A convolution
+
+.. math::  y_k = \sum_{i=0}^{N - 1} x_{k-i} h_i 
+
+where :math:`h` is filter and :math:`x` is periodic in this case.
+
+Exercise 03-0
+-------------
+
+Use the ``scipy.ndimage.convolve`` function to construct the ``y``.
+
+-  look at ``scipy.ndimage.convove`` documentation
+-  just do the first sample
+-  the ``convolve`` function must be in ``wrap`` mode to be periodic
+-  use a small ``Nspace`` to test
+-  use ``np.roll`` to align the results
+-  check the answer with ``np.allclose``
+
+.. code:: python
+
+    import scipy.signal
+    import scipy.ndimage
+    ?scipy.signal.fftconvolve
+    
+    y_alt = scipy.ndimage.convolve(X[0], filter(np.linspace(0, 20, Nspace)), mode='wrap')
+    print np.allclose(np.roll(y_alt, 40), y[0])
+
+.. parsed-literal::
+
+    True
+
+
+Calculate the influence coefficients using the regression
+---------------------------------------------------------
+
+Use the binned microstructure, ``X_``, and the repsonses, ``y`` to
+recalculate the coefficients.
+
+.. code:: python
+
+    model_Fcoeff = np.zeros((Nspace, Nbin), dtype=np.complex)
+    for i in range(Nspace):
+        model_Fcoeff[i] = np.linalg.lstsq(X_[:,i], y[:,i] )[0]
+        
+    model_coeff = np.fft.ifft(model_Fcoeff, axis=0)
+    for b in range(Nbin):
+        plt.figure()
+        plt.plot(coeff[:,b], label='orignal')
+        plt.plot(model_coeff[:,b], label='MKS')
+        plt.legend()
+
+
+.. image:: filter_files/filter_20_0.png
+
+
+
+.. image:: filter_files/filter_20_1.png
+
+
+The calculated influence coefficients are not even close to the
+originals. What's going on? The equation,
+
+.. math::  \sum\limits_{h=0}^{H-1} m^h_{a, s} = 1 
+
+is not being taken into account. Using this, we can rewrite the
+convolution as
+
+.. math::
+
+    \begin{split}
+   p_{a,s} &= \sum\limits_{h=0}^{H - 1} \sum\limits_{t=0}^{S-1} \alpha_t^h m_{a,s + t}^h \\
+           &= \sum\limits_{t=0}^{S-1} \left[ \sum\limits_{h=0}^{H - 2} \alpha_t^h m_{a,s + t}^h + 
+              \alpha_t^{H-1} \left( 1 - \sum\limits_{h=0}^{H - 2} m_{a,s+t}^h \right) \right] \\
+           &= \sum\limits_{t=0}^{S-1} \alpha_t^{H - 1} +
+              \sum\limits_{h=0}^{H - 2} \sum\limits_{t=0}^{S-1} \left(\alpha_t^h - \alpha_t^{H-1} \right) m_{a,s + t}^h \\
+           &= b_0 + \sum\limits_{h=0}^{H - 2} \sum\limits_{t=0}^{S-1} b_t^h m_{a,s + t}^h
+   \end{split}
+
+This removes the redundancies from the regression. Coding this in 1D is
+easy, we simply replace
+
+.. code:: python
+
+    for k in range(Nspace):
+        model_Fcoeff[k] = np.linalg.lstsq(X_[:,k], y[:,k] )[0]
+
+with
+
+.. code:: python
+
+    for k in range(Nspace):
+        if k == 0:
+            model_Fcoeff[k] = np.linalg.lstsq(X_[:,k], y[:,k] )[0]
+        else:
+            model_Fcoeff[k,:-1] = np.linalg.lstsq(X_[:,k,:-1], y[:,k] )[0]
+
+
+Introducing the ``MKSRegressionModel``
+--------------------------------------
+
+The ``MKSRegressionModel`` takes a test microstructure ``X`` and a test
+response ``y`` in any dimension and does a linear regression to
+determine the influence coefficients. So,
+
+.. code:: python
+
+    model = MKSRegressionModel(Nbin=10)
+    model.fit(X, y)
+
+After the fit, the ``predict`` method can be used to fit new data.
+
+.. code:: python
+
+    y_predict = model.predict(X_predict)
+
+The ``MKSRegressionModel`` inherits from Scikit-learn's
+``LinearRegression`` class so that we can start doing cross validation
+in the next tutorial.
+
+.. code:: python
+
+    from pymks import MKSRegressionModel
+    
+    ??MKSRegressionModel
+.. code:: python
+
+    model = MKSRegressionModel(Nbin=2)
+    model.fit(X, y)
+.. code:: python
+
+    model.coeff = np.fft.ifft(model.Fcoeff, axis=0)
+    model.coeff = -(model.coeff - model.coeff[0, 1])[:,::-1]
+    for b in range(Nbin):
+        plt.figure()
+        plt.plot(model.coeff[:,b], label='MKSRegressionModel')
+        plt.plot(coeff[:,b], label='original')
+        plt.legend()
+
+
+.. image:: filter_files/filter_26_0.png
+
+
+
+.. image:: filter_files/filter_26_1.png
+
+
+The ``model.coeff`` needed rearranging as the ``MKSRegressionModel``
+coefficients are using the coefficients that have the redundancies
+removed.
+
+Exercise 03-1
+-------------
+
+Create a random sample and check that using ``scipy.ndimage.convolve``
+to create the responses gives the same result as the
+``MKSRegressionModel``.
+
+-  Use ``np.roll`` to align the result from ``scipy.ndimage.convolve``
+-  Use ``np.allclose`` to compare.

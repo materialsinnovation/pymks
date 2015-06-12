@@ -11,7 +11,7 @@ and then run the tests.
 ## Scipy Stack
 
 The packages [Nosetests](https://nose.readthedocs.org/en/latest/),
-[Scipy](http://www.scipy.org/), [Numpy](http://www.scipy.org/),
+[Scipy](http://www.scipy.org/), [Numpy][numpy], and
 [Scikit-learn](http://scikit-learn.org) are all required.
 
 ## Examples
@@ -38,14 +38,52 @@ See the
 [SfePy installation instructions](http://sfepy.org/doc-devel/installation.html)
 for more details.
 
+## [PyFFTW][pyfftw]
+
+If installed, PyMKS will use [PyFFTW][pyfftw] to
+computed FFTs instead of [Numpy][numpy]. As long as [Numpy][numpy] is
+not using [Intel MKL][MKL], [PyFFTW][pyfftw] should improvement the
+performance of PyMKS.
+
+To install [PyFFTW][pyfftw] use pip
+
+    $ pip install pyfftw
+
+See the [PyFFTW installation instructions](https://github.com/hgomersall/pyFFTW#installation)
+ for more details.
+
+## Installation on Windows
+
+It is recommended to follow the installation instructions below using
+[Anaconda](https://store.continuum.io/cshop/anaconda/).
+
+Alternatively, if you already have a Python environment installed, all
+of the required packages and their dependencies can be downloaded from
+[Christoph Gohlke Unofficial Windows installers][chris].
+
+## Installation with Anaconda
+
+The [Anaconda Python Distributionn](https://store.continuum.io/cshop/anaconda/)
+contains all of the required packages outside of [SfePy][sfepy] and
+works on multiple platforms. [Download][conda] and
+[install](http://docs.continuum.io/anaconda/install.html) Anaconda, and
+use the Anaconda Command Prompt to install PyMKS using pip.
+
 ## Requirements
 
-The [REQUIREMENTS.md](REQUIREMENTS.html) file has a complete list of
-packages in the Python environment during development. However, most
-of these are certainly not required for running PyMKS.
+The [REQUIREMENTS.md](REQUIREMENTS.html) file has a list of required
+packages in a Python environment used to run tests and examples
+for the current release of PyMKS.
 
-[sfepy]: http://sfepy.org 
+#Installation Issues
 
+Please send questions and issues about installation of PyMKS to the
+[pymks-general@googlegroups.com](mailto:pymks-general@googlegroups.com)
+list.
 
-
-
+[sfepy]: http://sfepy.org
+[numpy]: http://www.scipy.org/
+[MKL]: https://software.intel.com/en-us/articles/numpyscipy-with-intel-mkl
+[pyfftw]: http://hgomersall.github.io/pyFFTW/
+[chris]: http://www.lfd.uci.edu/~gohlke/pythonlibs/#scikit-learn
+[conda]: http://continuum.io/downloads

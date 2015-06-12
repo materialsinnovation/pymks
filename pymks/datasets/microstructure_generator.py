@@ -49,14 +49,14 @@ class MicrostructureGenerator(BaseMicrostructureGenerator):
         return self._assign_phases(X_blur).astype(int)
 
     def _assign_phases(self, X_blur):
-        '''
+        """
         Takes in blurred array and assigns phase values.
 
         Args:
           X_blur: random field that has be blurred by a convolution.
         Returns:
           microstructure with assigned phases
-        '''
+        """
         epsilon = 1e-5
         X0, X1 = np.min(X_blur), np.max(X_blur)
         Xphases = float(self.n_phases) * (X_blur - X0) / (X1 - X0) * \
