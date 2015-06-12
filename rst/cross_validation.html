@@ -1,0 +1,478 @@
+
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Cross Validation and Hyperparameter Optimization &mdash; PyMKS</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootswatch-3.1.0/cosmo/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pymks.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1-dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.1.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="../_static/pymks_logo.ico"/>
+    <link rel="top" title="PyMKS" href="../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+                <li><a href="INSTALLATION.html">Installation</a></li>
+                <li><a href="../EXAMPLES.html">Examples</a></li>
+                <li><a href="../API.html">API</a></li>
+                <li><a href="https://github.com/wd15/pymks/">Github</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">More <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../THEORY.html">Theory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="derivation.html">Derivation of Materials Knowledge Systems Equation using Linear Elasticity</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="CREDITS.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CITATION.html">Citing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="REQUIREMENTS.html">Requirements</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="section" id="cross-validation-and-hyperparameter-optimization">
+<h1>Cross Validation and Hyperparameter Optimization<a class="headerlink" href="#cross-validation-and-hyperparameter-optimization" title="Permalink to this headline">¶</a></h1>
+<p>In this notebook, we will</p>
+<ul class="simple">
+<li>split the sample data into test and training sets,</li>
+<li>optimize the <tt class="docutils literal"><span class="pre">Nbin</span></tt> hyperparameter,</li>
+<li>learn to use <a class="reference external" href="http://scikit-learn.org">Sklearn</a> to cross validate
+the model,</li>
+<li>plot learning curves as a function of training sets.</li>
+</ul>
+<div class="code python highlight-python"><pre>%matplotlib inline
+%load_ext autoreload
+%autoreload 2
+
+import numpy as np
+import matplotlib.pyplot as plt
+from pymks import MKSRegressionModel
+from pymks import FiPyCHModel</pre>
+</div>
+<p>Make some actual data (400 samples) with a random seed of 101.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">101</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">400</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">21</span><span class="p">))</span>
+<span class="n">fipymodel</span> <span class="o">=</span> <span class="n">FiPyCHModel</span><span class="p">()</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">fipymodel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The FiPy Cahn-Hilliard model has been packaged into the <tt class="docutils literal"><span class="pre">FiPyCHModel</span></tt>
+class within the <tt class="docutils literal"><span class="pre">fit</span></tt>, <tt class="docutils literal"><span class="pre">predict</span></tt> paradigm.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">fipymodel</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>---------------------------------------------------------------------------
+NotImplementedError                       Traceback (most recent call last)
+
+&lt;ipython-input-3-2db047ef34e7&gt; in &lt;module&gt;()
+----&gt; 1 fipymodel.fit(None, None)
+
+
+/home/dbb1/git/pymks/pymks/fipyCHModel.py in fit(self, X, y)
+     16
+     17     def fit(self, X, y):
+---&gt; 18         raise NotImplementedError
+     19
+     20     def predict(self, X):
+
+
+NotImplementedError:</pre>
+</div>
+<div class="section" id="a-sanity-check">
+<h2>A sanity check<a class="headerlink" href="#a-sanity-check" title="Permalink to this headline">¶</a></h2>
+<p>Let&#8217;s fit the data.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nbin</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">model</span></tt> now knows its coefficients</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">model</span><span class="o">.</span><span class="n">Fcoeff</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Let&#8217;s check that the fit sort of &#8220;looks right&#8221; with one test sample</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">102</span><span class="p">)</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">1</span><span class="p">,)</span> <span class="o">+</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+<span class="n">y_test</span> <span class="o">=</span> <span class="n">fipymodel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_test</span><span class="o">.</span><span class="n">flatten</span><span class="p">()),</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">y_test</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="n">index</span><span class="p">]</span>
+<span class="k">print</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="n">index</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>[ 23950253.78282329  13425583.87216847  10370446.72304485
+  -5082255.45966466 -37232615.8747914   26787885.25872415
+  24692312.47186201  27598782.37350243   2548349.44343851   9095170.7858277 ]
+[ 23924081.38330388  13398981.55267725  10372689.12723125
+  -5103357.55708056 -37274867.56519654  26809449.81666647
+  24722045.53760799  27628866.17868118   2557932.70513816
+   9110175.33127278]</pre>
+</div>
+<p>and check the &#8220;mean square error&#8221; using Sklearn&#8217;s <tt class="docutils literal"><span class="pre">mean_squared_error</span></tt>
+function.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">metrics</span>
+<span class="n">mse</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">mean_squared_error</span>
+<span class="s">&#39;</span><span class="si">%1.3e</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mse</span><span class="p">(</span><span class="n">y_test</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&#39;5.984e+04&#39;</span>
+</pre></div>
+</div>
+<p>Seems okay. How do the coefficients look?</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Fcoeff</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">real</span>
+<span class="n">Nroll</span> <span class="o">=</span> <span class="n">coeff</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">coeff_rolled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">coeff</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">Nroll</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">Nroll</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">coeff_rolled</span><span class="p">,</span> <span class="mi">249</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>&lt;matplotlib.colorbar.Colorbar instance at 0x5806680&gt;</pre>
+</div>
+<img alt="../_images/cross_validation_15_1.png" src="../_images/cross_validation_15_1.png" />
+<p>The coefficients look like one would expect with the nearest neighbor
+cells having the highest influence on a cell.</p>
+</div>
+<div class="section" id="training-and-testing">
+<h2>Training and testing<a class="headerlink" href="#training-and-testing" title="Permalink to this headline">¶</a></h2>
+<p>Now, let&#8217;s use the Sklearn function <tt class="docutils literal"><span class="pre">train_test_split</span></tt> to split the
+data into training and test data sets. If we use the entire set of data
+for the fitting and leave nothing for testing, we have no idea if we are
+simply &#8220;overfitting&#8221; the data. Think of the analogy of using a high
+order polynomial to fit data points on a graph, while it may fit the
+data perfectly, we learn nothing as it is a useless model for fitting
+subsequently generated data.</p>
+<p>The argument <tt class="docutils literal"><span class="pre">test_size=0.5</span></tt> splits the data into equal sized chunks
+for training and testing.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sklearn.cross_validation</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">21</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Let&#8217;s refit with the training data set only.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nbin</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>How well does it predict?</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="s">&#39;</span><span class="si">%1.3e</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">mse</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">),</span> <span class="n">y_test</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&#39;4.018e+09&#39;</span>
+</pre></div>
+</div>
+<p>The above is just one way to split the data. We may want to check with
+alternative splits of the data. This is easy using Sklearn&#8217;s
+<tt class="docutils literal"><span class="pre">cross_validation</span></tt> module. Here we do <tt class="docutils literal"><span class="pre">10</span></tt> different splits of the
+entire dataset and check the mean and standard deviation of the mean
+square error. To do this we first need to define a &#8220;scoring&#8221; function.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">neg_mse</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">mse</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+<span class="n">scoring</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">make_scorer</span><span class="p">(</span><span class="n">neg_mse</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now pass the &#8216;scoring&#8217; function as an arguement to do cross validation.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">cross_validation</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nbin</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">scores</span> <span class="o">=</span> <span class="n">cross_validation</span><span class="o">.</span><span class="n">cross_val_score</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="n">scoring</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;MSE: </span><span class="si">%1.3e</span><span class="s"> (+/- </span><span class="si">%1.3e</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">scores</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">scores</span><span class="o">.</span><span class="n">std</span><span class="p">()))</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>MSE: -3.946e+09 (+/- 2.568e+08)</pre>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">MKSRegressionModel</span></tt> has methods inherited from the Sklearn&#8217;s
+<tt class="docutils literal"><span class="pre">LinearRegressionModel</span></tt> that allows the use of <tt class="docutils literal"><span class="pre">cross_validation</span></tt>.</p>
+<p>The <tt class="docutils literal"><span class="pre">LinearRegressionModel</span></tt> may not be the best class to inherit from.
+Fitting MKS into Sklearn needs careful consideration.</p>
+</div>
+<div class="section" id="optimize-the-nbin-hyperparameter">
+<h2>Optimize the <tt class="docutils literal"><span class="pre">Nbin</span></tt> hyperparameter<a class="headerlink" href="#optimize-the-nbin-hyperparameter" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Nbin</span></tt> is known as a hyperparameter. Hyperparameters are parameters
+that influence the fitting, but are separate from the data and the
+parameters used to generate the data. To demonstrate the need to
+optimize hyperparameters, let look at when we use all the data (<tt class="docutils literal"><span class="pre">X</span></tt>
+and <tt class="docutils literal"><span class="pre">y</span></tt>) to call <tt class="docutils literal"><span class="pre">fit</span></tt> for various values of <tt class="docutils literal"><span class="pre">Nbin</span></tt>, and calculate
+the mean square error by comparing the predicted data against the
+original data, <tt class="docutils literal"><span class="pre">y</span></tt>.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="n">mse</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">mean_squared_error</span>
+
+<span class="n">Nbins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+<span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">Nbin</span> <span class="ow">in</span> <span class="n">Nbins</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">Nbin</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nbin</span><span class="o">=</span><span class="n">Nbin</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mse</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">y</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Nbins</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;Nbin&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;MSE&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mi">2</span>
+<span class="mi">12</span>
+<span class="mi">22</span>
+<span class="mi">32</span>
+<span class="mi">42</span>
+<span class="mi">52</span>
+<span class="mi">62</span>
+<span class="mi">72</span>
+<span class="mi">82</span>
+<span class="mi">92</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>&lt;matplotlib.text.Text at 0x4eee350&gt;</pre>
+</div>
+<img alt="../_images/cross_validation_31_2.png" src="../_images/cross_validation_31_2.png" />
+<p>In contrast, using only the training data (<tt class="docutils literal"><span class="pre">X_train</span></tt>, <tt class="docutils literal"><span class="pre">y_train</span></tt>) to
+fit the MKS model the mean square error has a minimum value for a given
+number of <tt class="docutils literal"><span class="pre">Nbin</span></tt>.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">Nbins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">Nbin</span> <span class="ow">in</span> <span class="n">Nbins</span><span class="p">:</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nbin</span><span class="o">=</span><span class="n">Nbin</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mse</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">),</span> <span class="n">y_test</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Nbins</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;Nbin&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;MSE&#39;</span><span class="p">)</span>
+
+<span class="n">argmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&quot;optimal Nbin: {0}, mse: {1:1.3e}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Nbins</span><span class="p">[</span><span class="n">argmin</span><span class="p">],</span> <span class="n">errors</span><span class="p">[</span><span class="n">argmin</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>optimal Nbin: 6, mse: 3.976e+09</pre>
+</div>
+<img alt="../_images/cross_validation_33_1.png" src="../_images/cross_validation_33_1.png" />
+<p>By seperating the data into test and predict, we are able to objectivly
+optimize the hyperparameter <tt class="docutils literal"><span class="pre">Nbin</span></tt>.</p>
+</div>
+<div class="section" id="training-validation-and-test-data-for-hyperparameter-optimization">
+<h2>Training, validation and test data for hyperparameter optimization<a class="headerlink" href="#training-validation-and-test-data-for-hyperparameter-optimization" title="Permalink to this headline">¶</a></h2>
+<p>Using the test data to optimize hyperparameters leads to test data
+knowledge leaking into the model. A way to avoid this is to optimize the
+hyperparamters with a validation data set separate from the test data
+set. Sklearn provides <tt class="docutils literal"><span class="pre">GridSearchCV</span></tt> to automate the optimization of
+hyperparamters using only the training data without using the test data.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sklearn.grid_search</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
+
+<span class="n">parameters_to_tune</span> <span class="o">=</span> <span class="p">[{</span><span class="s">&#39;Nbin&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">)}]</span>
+</pre></div>
+</div>
+<p>Using the scoring function created earlier, generate a <tt class="docutils literal"><span class="pre">GridSearchCV</span></tt>
+instance.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">gridSearch</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nbin</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span> <span class="n">parameters_to_tune</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="n">scoring</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Optimize with only the training data.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">gridSearch</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">GridSearchCV</span><span class="p">(</span><span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">estimator</span><span class="o">=</span><span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nbin</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span> <span class="n">fit_params</span><span class="o">=</span><span class="p">{},</span>
+       <span class="n">iid</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">loss_func</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+       <span class="n">param_grid</span><span class="o">=</span><span class="p">[{</span><span class="s">&#39;Nbin&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span> <span class="mi">2</span><span class="p">,</span>  <span class="mi">3</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">5</span><span class="p">,</span>  <span class="mi">6</span><span class="p">,</span>  <span class="mi">7</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span>  <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span>
+       <span class="mi">19</span><span class="p">])}],</span>
+       <span class="n">pre_dispatch</span><span class="o">=</span><span class="s">&#39;2*n_jobs&#39;</span><span class="p">,</span> <span class="n">refit</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">score_func</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+       <span class="n">scoring</span><span class="o">=</span><span class="n">make_scorer</span><span class="p">(</span><span class="n">neg_mse</span><span class="p">),</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Find the best estimator.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">print</span><span class="p">(</span><span class="n">gridSearch</span><span class="o">.</span><span class="n">best_estimator_</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">gridSearch</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nbin</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="mf">0.999989352422</span>
+</pre></div>
+</div>
+<p>What were the MSEs for each value of <tt class="docutils literal"><span class="pre">Nbin</span></tt>.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">params</span><span class="p">,</span> <span class="n">mean_score</span><span class="p">,</span> <span class="n">scores</span> <span class="ow">in</span> <span class="n">gridSearch</span><span class="o">.</span><span class="n">grid_scores_</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%1.3e</span><span class="s"> (+/-</span><span class="si">%1.3e</span><span class="s">) for </span><span class="si">%r</span><span class="s">&quot;</span><span class="o">%</span> <span class="p">(</span><span class="n">mean_score</span><span class="p">,</span> <span class="n">scores</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">params</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>-4.119e+09 (+/-4.555e+07) for {'Nbin': 2}
+-4.136e+09 (+/-4.557e+07) for {'Nbin': 3}
+-3.932e+09 (+/-4.326e+07) for {'Nbin': 4}
+-3.916e+09 (+/-4.207e+07) for {'Nbin': 5}
+-3.921e+09 (+/-4.219e+07) for {'Nbin': 6}
+-3.932e+09 (+/-4.355e+07) for {'Nbin': 7}
+-3.946e+09 (+/-4.307e+07) for {'Nbin': 8}
+-3.964e+09 (+/-4.413e+07) for {'Nbin': 9}
+-3.974e+09 (+/-4.380e+07) for {'Nbin': 10}
+-3.994e+09 (+/-4.576e+07) for {'Nbin': 11}
+-4.012e+09 (+/-4.730e+07) for {'Nbin': 12}
+-4.024e+09 (+/-4.554e+07) for {'Nbin': 13}
+-4.042e+09 (+/-4.863e+07) for {'Nbin': 14}
+-4.059e+09 (+/-4.539e+07) for {'Nbin': 15}
+-4.070e+09 (+/-4.556e+07) for {'Nbin': 16}
+-4.091e+09 (+/-4.561e+07) for {'Nbin': 17}
+-4.112e+09 (+/-4.638e+07) for {'Nbin': 18}
+-4.128e+09 (+/-4.684e+07) for {'Nbin': 19}</pre>
+</div>
+<p>How does that match the test data?</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span> <span class="o">=</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">gridSearch</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="s">&#39;</span><span class="si">%1.3e</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">mse</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&#39;3.980e+09&#39;</span>
+</pre></div>
+</div>
+<p>What about for other values of <tt class="docutils literal"><span class="pre">Nbin</span></tt>.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">Nbin</span> <span class="ow">in</span> <span class="n">parameters_to_tune</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;Nbin&#39;</span><span class="p">]:</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">Nbin</span><span class="o">=</span><span class="n">Nbin</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+    <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span> <span class="o">=</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&#39;Nbin: {0}, mse: {1:1.3e}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Nbin</span><span class="p">,</span> <span class="n">mse</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>Nbin: 2, mse: 4.184e+09
+Nbin: 3, mse: 4.199e+09
+Nbin: 4, mse: 3.997e+09
+Nbin: 5, mse: 3.980e+09
+Nbin: 6, mse: 3.976e+09
+Nbin: 7, mse: 3.990e+09
+Nbin: 8, mse: 4.001e+09
+Nbin: 9, mse: 4.017e+09
+Nbin: 10, mse: 4.025e+09
+Nbin: 11, mse: 4.044e+09
+Nbin: 12, mse: 4.044e+09
+Nbin: 13, mse: 4.067e+09
+Nbin: 14, mse: 4.082e+09
+Nbin: 15, mse: 4.089e+09
+Nbin: 16, mse: 4.104e+09
+Nbin: 17, mse: 4.114e+09
+Nbin: 18, mse: 4.120e+09
+Nbin: 19, mse: 4.141e+09</pre>
+</div>
+</div>
+</div>
+<div class="section" id="learning-curves">
+<h1>Learning Curves<a class="headerlink" href="#learning-curves" title="Permalink to this headline">¶</a></h1>
+<p>Learning curves provide some insight as to whether the number of samples
+you have can represent the distribution you predicting from by plotting
+a <tt class="docutils literal"><span class="pre">Training</span> <span class="pre">score</span></tt> curve and a <tt class="docutils literal"><span class="pre">Cross-validation</span> <span class="pre">score</span></tt> curve. The
+<tt class="docutils literal"><span class="pre">Training</span> <span class="pre">score</span></tt> curve plots the score of mksRegressionModel using the
+entire dataset, and the <tt class="docutils literal"><span class="pre">Cross-validation</span> <span class="pre">score</span></tt> curve preforms the
+score with a cross-validation as a function of number of samples. Let&#8217;s
+plot the learning curves for the for the mksRegressionModel using random
+microstructures.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">plot_learning_curve</span>
+<span class="n">title</span> <span class="o">=</span> <span class="s">&#39;Cahn-Hillard with MKS&#39;</span>
+<span class="n">plot_learning_curve</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span>\
+                    <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">),</span> <span class="n">cv</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> \
+                    <span class="n">train_sizes</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/cross_validation_50_0.png" src="../_images/cross_validation_50_0.png" />
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

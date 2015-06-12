@@ -1,0 +1,663 @@
+
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>MKS Introduction &mdash; PyMKS</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.1.0/cosmo/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pymks.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.1.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="_static/pymks_logo.ico"/>
+    <link rel="top" title="PyMKS" href="index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><img src="_static/pymks_logo.png">
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+                <li><a href="rst/INSTALLATION.html">Installation</a></li>
+                <li><a href="EXAMPLES.html">Examples</a></li>
+                <li><a href="API.html">API</a></li>
+                <li><a href="https://github.com/wd15/pymks/">Github</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="rst/INSTALLATION.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rst/INSTALLATION.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/INSTALLATION.html#anaconda-python">Anaconda Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/INSTALLATION.html#regular-python">Regular Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/INSTALLATION.html#fftw">FFTW</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/INSTALLATION.html#line-profiler"><tt class="docutils literal"><span class="pre">line_profiler</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/INSTALLATION.html#java-script-animator">Java Script Animator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/INSTALLATION.html#git">Git</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/INSTALLATION.html#install-the-pymks-module">Install the <tt class="docutils literal"><span class="pre">pymks</span></tt> module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/INSTALLATION.html#ipython-notebooks">IPython Notebooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/INSTALLATION.html#issues">Issues</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="EXAMPLES.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rst/elasticity.html">Linear Elasticity Simulations and the Materials Knowledge System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/derivation.html">Derivation of Materials Knowledge Systems Equation using Linear Elasticity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/filter.html">A Simple Filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/cross_validation.html">Cross Validation and Hyperparameter Optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/cross_validation.html#learning-curves">Learning Curves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/scaling_coefficients.html">Scaling the Coefficients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/improving_performance.html">Improving Performance</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="API.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rst/CREDITS.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rst/LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rst/CITATION.html">Citation</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="section" id="mks-introduction">
+<h1>MKS Introduction<a class="headerlink" href="#mks-introduction" title="Permalink to this headline">¶</a></h1>
+<p>The following notebook is an introductory tutorial describing the
+calculation of influence coefficients for the MKS in both real and
+Fourier space. In the MKS, the goal is to quickly calculate a response
+<img class="math" src="_images/math/0c2f28c859cec2d514c56eee0f6506c28b91eb5f.png" alt="p_{a,s}"/> from a microstructure <img class="math" src="_images/math/a975d833b5c01ceec66c571a3a4b8bf7bda649bd.png" alt="m_{a,s}"/> where <img class="math" src="_images/math/c7d457e388298246adb06c587bccd419ea67f7e8.png" alt="a"/>
+represents different samples and <img class="math" src="_images/math/f37bba504894945c07a32f5496d74299a37aa51c.png" alt="s"/> represents the spatial
+position. The first step in the MKS is to bin (or discretize) the state
+space, <img class="math" src="_images/math/e8e0cb579482292f6b7a04f2a410afcb6f67ea34.png" alt="m_{a, s}"/>, in terms of a new representation,
+<img class="math" src="_images/math/1d4cde23f91651ddc82a884a1b687addbfbba0eb.png" alt="m_{a, s}^h"/>, given by,</p>
+<div class="math">
+<p><img src="_images/math/18c50a394eede61ff57681fa8382cc06b1924bdf.png" alt="m_{a,s} = \sum\limits_{h=0}^{H-1} m^h_{a, s} \chi^h"/></p>
+</div><p>and</p>
+<div class="math">
+<p><img src="_images/math/1adf7ab6d6c850ac6e1a8100514f52939f652bfe.png" alt="\sum\limits_{h=0}^{H-1} m^h_{a, s} = 1"/></p>
+</div><p>where <img class="math" src="_images/math/8bc239c0b85b91692186af06e548a695445c6c60.png" alt="\chi^h"/> is the basis representation of the state space
+(microstructure space). <img class="math" src="_images/math/b1902d279ba37d60bdce4e0e987b7cd19d48974e.png" alt="H"/> is the size of the state space
+discretization.</p>
+<p>Why do we discretize the microstructure?</p>
+<p>Can we represent</p>
+<p>When the state space is discretized, the relationship between the
+response and microstructure can be written as,</p>
+<div class="math">
+<p><img src="_images/math/5677a405621647c3b446c2e5d573e2666676a4b4.png" alt="p_{a,s} = \sum\limits_{h=0}^{H - 1} \sum\limits_{t=0}^{S-1} \alpha_t^h m_{a,s + t}^h"/></p>
+</div><p>where the <img class="math" src="_images/math/0c2f28c859cec2d514c56eee0f6506c28b91eb5f.png" alt="p_{a,s}"/> are the responses, <img class="math" src="_images/math/b8fb7cdb4a8404de8717191a2f003fe90960e99b.png" alt="\alpha_t^h"/> are the
+influence coefficients and <img class="math" src="_images/math/b76de678712c5a989eb7604620958c2ecc4a8ba6.png" alt="m_{a,s}^h"/> is the microstructure.
+<img class="math" src="_images/math/ad28c83c99a8fd0dd2e2e594c9d02ee532765a0a.png" alt="S"/> is the size of the spatial discretization The <img class="math" src="_images/math/f37bba504894945c07a32f5496d74299a37aa51c.png" alt="s"/> and
+<img class="math" src="_images/math/e0d2bf360290fd61d1c1557e763f2622363b3d35.png" alt="t"/> indices run over the spatial discretization, the <img class="math" src="_images/math/c7d457e388298246adb06c587bccd419ea67f7e8.png" alt="a"/>
+index runs over the number of samples and the <img class="math" src="_images/math/8189a5b5a0917b8c93350827be4038af1839139d.png" alt="h"/> index runs over
+the microstructure discretization. The goal of the notebook is to
+introduce the method for calculating the <img class="math" src="_images/math/b8fb7cdb4a8404de8717191a2f003fe90960e99b.png" alt="\alpha_t^h"/> by</p>
+<ul class="simple">
+<li>creating a response function using the Cahn-Hilliard equation,</li>
+<li>demonstrate Cahn-Hilliard evolution,</li>
+<li>create some sample data,</li>
+<li>solve MKS regression in real space for demonstration purposes,</li>
+<li>solve MKS regression in Fourier space,</li>
+<li>test that MKS regression seems to work with a single test sample and</li>
+<li>show that the calculated coefficients are not quite right.</li>
+</ul>
+<div class="section" id="questions-for-tony">
+<h2>Questions for Tony<a class="headerlink" href="#questions-for-tony" title="Permalink to this headline">¶</a></h2>
+<p>Why do we discretize the microstructure?</p>
+<p>Which type of non-linearities does the first order MKS handle?</p>
+<p>Can we represent any PDE in one variable with a high enough order MKS
+relationship?</p>
+</div>
+<div class="section" id="calculating-the-response">
+<h2>Calculating the Response<a class="headerlink" href="#calculating-the-response" title="Permalink to this headline">¶</a></h2>
+<p>In the MKS a sample set of microstructures and responses are required.
+In this example we will use the Cahn-Hilliard equation to provide the
+example response. <a class="reference external" href="http://www.ctcms.nist.gov/fipy/">FiPy</a> is used to
+solve the governing equation, which is given by,</p>
+<div class="math">
+<p><img src="_images/math/e1c23bd98e6c42a92f3d558a98e0764cdc127a1c.png" alt="\frac{\partial \phi}{\partial t} = \nabla \cdot D \nabla \left( \frac{\partial f}{\partial \phi}   - \epsilon^2 \nabla^2 \phi \right)."/></p>
+</div><p>where the free energy is given by,</p>
+<div class="math">
+<p><img src="_images/math/73c2928efa9a1e0acba5ea8a16552b1a3d799ede.png" alt="f = (a^2/2) \phi^2 (1 - \phi)^2"/></p>
+</div><p>In this example <img class="math" src="_images/math/b4ef8f3aaa06cf13d91f68dc8e6c246b69efb42a.png" alt="D = 1"/>, <img class="math" src="_images/math/4690c144a08f4c6260934b378aa6c410002e36e1.png" alt="a = \sqrt{200}"/> and
+<img class="math" src="_images/math/a574d13e831742d540590031c9642b2b27b07837.png" alt="\epsilon=0.1"/>. See <a class="reference external" href="http://www.ctcms.nist.gov/fipy/examples/cahnHilliard/generated/examples.cahnHilliard.mesh2DCoupled.html">the FiPy CH
+example</a>
+for further details.</p>
+<p>The <tt class="docutils literal"><span class="pre">fipy_response</span></tt> function takes an initial field, <img class="math" src="_images/math/96abea1a5184eceee29b38cf3db551f3bb863ad9.png" alt="\phi_0"/>
+(the microstructure), and yields
+<img class="math" src="_images/math/20c2853efecb2fff075056f8c3008a96df92a660.png" alt="\frac{\partial \phi}{\partial t}"/> (the response).</p>
+<div class="code python highlight-python"><pre>%matplotlib inline
+%load_ext autoreload
+%autoreload 2
+
+import numpy as np
+import matplotlib.pyplot as plt
+import fipy as fp</pre>
+</div>
+<div class="highlight-python"><pre>The autoreload extension is already loaded. To reload it, use:
+  %reload_ext autoreload</pre>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">fipy_response</span><span class="p">(</span><span class="n">phi0</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">fipy.solvers.scipy.linearLUSolver</span> <span class="kn">import</span> <span class="n">LinearLUSolver</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="mf">0.005</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">200.</span><span class="p">)</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">nx</span> <span class="o">=</span> <span class="n">ny</span> <span class="o">=</span> <span class="n">N</span>
+    <span class="n">mesh</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">PeriodicGrid2D</span><span class="p">(</span><span class="n">nx</span><span class="o">=</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="o">=</span><span class="n">ny</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="n">dx</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">CellVariable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">r&quot;$\phi$&quot;</span><span class="p">,</span> <span class="n">mesh</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">phi0</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+    <span class="n">PHI</span> <span class="o">=</span> <span class="n">phi</span><span class="o">.</span><span class="n">arithmeticFaceValue</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="mf">1.</span>
+    <span class="n">eq</span> <span class="o">=</span> <span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">TransientTerm</span><span class="p">()</span>
+      <span class="o">==</span> <span class="n">fp</span><span class="o">.</span><span class="n">DiffusionTerm</span><span class="p">(</span><span class="n">coeff</span><span class="o">=</span><span class="n">D</span> <span class="o">*</span> <span class="n">a</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">PHI</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">PHI</span><span class="p">)))</span>
+      <span class="o">-</span> <span class="n">fp</span><span class="o">.</span><span class="n">DiffusionTerm</span><span class="p">(</span><span class="n">coeff</span><span class="o">=</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span>
+
+    <span class="n">eq</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="n">LinearLUSolver</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="o">-</span> <span class="n">phi0</span><span class="p">)</span> <span class="o">/</span> <span class="n">dt</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="demonstrate-cahn-hilliard-evolution">
+<h2>Demonstrate Cahn-Hilliard Evolution<a class="headerlink" href="#demonstrate-cahn-hilliard-evolution" title="Permalink to this headline">¶</a></h2>
+<p>The following cell iterates the <tt class="docutils literal"><span class="pre">fipy_response</span></tt> function to
+demonstrate the evolution of the microstructure for an initially uniform
+random field. Using the <tt class="docutils literal"><span class="pre">fipy_response</span></tt> function is quite an
+inefficient method of using <a class="reference external" href="http://www.ctcms.nist.gov/fipy/">FiPy</a>,
+but useful for demonstration purposes.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">clear_output</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="mi">21</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">phi0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">N</span><span class="p">)</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">1e-8</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">30</span><span class="p">):</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">fipy_response</span><span class="p">(</span><span class="n">phi0</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+    <span class="c">#Euler backward in this case since implicit</span>
+    <span class="n">phi0</span> <span class="o">=</span> <span class="n">response</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">+</span> <span class="n">phi0</span>
+    <span class="c">#print phi0</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">phi0</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">N</span><span class="p">,</span><span class="n">N</span><span class="p">)))</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">clear_output</span><span class="p">()</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/mks_intro_8_0.png" src="_images/mks_intro_8_0.png" />
+<img alt="_images/mks_intro_8_1.png" src="_images/mks_intro_8_1.png" />
+</div>
+<div class="section" id="create-samples">
+<h2>Create Samples<a class="headerlink" href="#create-samples" title="Permalink to this headline">¶</a></h2>
+<p>Using the <tt class="docutils literal"><span class="pre">fipy_response</span></tt> function, we can now create a sample set of
+microstructures and responses. We create <tt class="docutils literal"><span class="pre">Nsample</span></tt> microstrucures over
+a 2D space of <img class="math" src="_images/math/cb21db0177b65427c9c7fb7bd9183d242bdbcb1f.png" alt="N \times N"/>. We choose a very small system to first
+demonstrate the linear regression in real space.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">N</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">Nbin</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">Nsample</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">microstructures</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">Nsample</span><span class="p">,</span> <span class="n">N</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">responses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">fipy_response</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">)</span> <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="n">microstructures</span><span class="p">])</span>
+<span class="k">print</span> <span class="n">microstructures</span><span class="o">.</span><span class="n">shape</span>
+<span class="k">print</span> <span class="n">responses</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="bin-the-microstructure">
+<h2>Bin the Microstructure<a class="headerlink" href="#bin-the-microstructure" title="Permalink to this headline">¶</a></h2>
+<p>The function <tt class="docutils literal"><span class="pre">bin</span></tt>, discretizes the original microstructure,
+<img class="math" src="_images/math/a975d833b5c01ceec66c571a3a4b8bf7bda649bd.png" alt="m_{a,s}"/>, into the binned microstructure, <img class="math" src="_images/math/b76de678712c5a989eb7604620958c2ecc4a8ba6.png" alt="m_{a,s}^h"/>,
+given by</p>
+<div class="math">
+<p><img src="_images/math/974c3e58eeaae3491f63d220666b33cda14a72eb.png" alt="m_{a, s} = \sum\limits_{s=0}^{S-1} m_{a, s}^h \chi^h"/></p>
+</div><p>The <tt class="docutils literal"><span class="pre">bin</span></tt> function takes <img class="math" src="_images/math/a975d833b5c01ceec66c571a3a4b8bf7bda649bd.png" alt="m_{a,s}"/> and returns
+<img class="math" src="_images/math/b76de678712c5a989eb7604620958c2ecc4a8ba6.png" alt="m_{a,s}^h"/>. Don&#8217;t look at it&#8217;s code yet, this is the next
+exercise.</p>
+<div class="code python highlight-python"><pre>from pymks import bin
+?bin</pre>
+</div>
+<p>We can examine three points to see a graphical representation of
+<img class="math" src="_images/math/83b9e0c5e21f620425509be29b4ca54201320ab3.png" alt="M_{a, s}"/> in terms of <img class="math" src="_images/math/1d4cde23f91651ddc82a884a1b687addbfbba0eb.png" alt="m_{a, s}^h"/>.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks</span> <span class="kn">import</span> <span class="n">draw_microstructure_discretization</span>
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">draw_microstructure_discretization</span><span class="p">(</span><span class="n">microstructures</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/mks_intro_15_0.png" src="_images/mks_intro_15_0.png" />
+<img alt="_images/mks_intro_15_1.png" src="_images/mks_intro_15_1.png" />
+<img alt="_images/mks_intro_15_2.png" src="_images/mks_intro_15_2.png" />
+<p>Run <tt class="docutils literal"><span class="pre">bin</span></tt> for each microstructure and rebuild the array (maybe this
+operation could be vectorized).</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">binnedMicrostructures</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">bin</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">Nbin</span><span class="p">)</span> <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="n">microstructures</span><span class="p">])</span>
+<span class="k">print</span> <span class="n">binnedMicrostructures</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The new <tt class="docutils literal"><span class="pre">binnedMicrostructures</span></tt>, <img class="math" src="_images/math/b76de678712c5a989eb7604620958c2ecc4a8ba6.png" alt="m_{a,s}^h"/>, has a shape of
+<tt class="docutils literal"><span class="pre">(Nsample,</span> <span class="pre">N*N,</span> <span class="pre">Nbin)</span></tt>. To double check that the binning worked we can
+evaluate <img class="math" src="_images/math/fe8162afd14e12a9af918f6d07a3ebb9771112f1.png" alt="\sum\limits_{h=0}^{H-1} m_{a, s}^h \chi^h"/> and check
+against the original <img class="math" src="_images/math/a975d833b5c01ceec66c571a3a4b8bf7bda649bd.png" alt="m_{a,s}"/>. The summation is over the last
+axis (the binning axis).</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Nbin</span><span class="p">)</span>
+<span class="n">reconstructedMicrostructure</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">binnedMicrostructures</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">reconstructedMicrostructure</span><span class="p">,</span> <span class="n">microstructures</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="bp">True</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">X</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>[ 0.   0.2  0.4  0.6  0.8  1. ]</pre>
+</div>
+</div>
+<div class="section" id="exercise-02-0">
+<h2>Exercise 02-0<a class="headerlink" href="#exercise-02-0" title="Permalink to this headline">¶</a></h2>
+<p>Try and create a binning function. Just use loops to do this and then we
+will discuss how to vectorize.</p>
+<p>Test it with <tt class="docutils literal"><span class="pre">np.array((0.2,</span> <span class="pre">0.5,</span> <span class="pre">0.7))</span></tt> and <tt class="docutils literal"><span class="pre">Nbin</span> <span class="pre">=</span> <span class="pre">4</span></tt>.</p>
+<p>If this is too difficult, look at the code, <tt class="docutils literal"><span class="pre">??bin</span></tt>, and then
+reproduce this with loops.</p>
+<div class="code python highlight-python"><pre>??bin</pre>
+</div>
+</div>
+<div class="section" id="real-space">
+<h2>Real space<a class="headerlink" href="#real-space" title="Permalink to this headline">¶</a></h2>
+<p>In order to understand how to compute the influence coefficients it is
+useful to see a demonstration in real space. Although we have a tensor
+representations of <img class="math" src="_images/math/1d4cde23f91651ddc82a884a1b687addbfbba0eb.png" alt="m_{a, s}^h"/>, we need to create an intermediate
+matrix to calculate the convolution,
+<img class="math" src="_images/math/a8cbe2976150862fda56afe02f88281ffb34092a.png" alt="\sum\limits_{h=0}^{H - 1} \sum\limits_{t=0}^{S-1} \alpha_t^h m_{a,s + t}^h"/>.
+This matrix representation of <img class="math" src="_images/math/1d4cde23f91651ddc82a884a1b687addbfbba0eb.png" alt="m_{a, s}^h"/> is given by the
+<tt class="docutils literal"><span class="pre">microstructureMatrix</span></tt> and has shape <tt class="docutils literal"><span class="pre">(N*N*Nsample,</span> <span class="pre">N*N*Nbin)</span></tt>. The
+<tt class="docutils literal"><span class="pre">microstructureMatrix</span></tt> is essentially a <a class="reference external" href="http://en.wikipedia.org/wiki/Circulant_matrix">circulant
+matrix</a> that isn&#8217;t
+square.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">rollMatrix</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">Nbin</span><span class="p">):</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">Nbin</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="o">**</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="o">-</span><span class="n">i</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">matrix</span>
+
+<span class="n">microstructureMatrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">rollMatrix</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">Nbin</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">binnedMicrostructures</span><span class="p">])</span>
+
+<span class="k">print</span> <span class="n">microstructureMatrix</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">600</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To calculate the influence coefficients, <img class="math" src="_images/math/a715b4a42efd5ea9df260e937cc098a2601d1a28.png" alt="\alpha_s^h"/>, we use
+<tt class="docutils literal"><span class="pre">numpy</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">lstsq</span></tt> function.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">responses</span> <span class="o">=</span> <span class="n">responses</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">coefficients</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">microstructureMatrix</span><span class="p">,</span> <span class="n">responses</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">print</span> <span class="n">coefficients</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">600</span><span class="p">,)</span>
+</pre></div>
+</div>
+<p>If <tt class="docutils literal"><span class="pre">Nbin</span> <span class="pre">&gt;</span> <span class="pre">Nsample</span></tt> then we can check that the influence coeffiencts
+exacly reproduce the <tt class="docutils literal"><span class="pre">responses</span></tt>. The result below should be <tt class="docutils literal"><span class="pre">True</span></tt>
+for an over-determined system.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">microstructureMatrix</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">),</span> <span class="n">responses</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="bp">True</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="fourier-space">
+<h2>Fourier Space<a class="headerlink" href="#fourier-space" title="Permalink to this headline">¶</a></h2>
+<p>Having calculated the coefficients for a small system in real space, we
+will now calculate a much larger system in Fourier space and then
+confirm that a sensible response is reproduced. Calculating the
+regression in Frequency space drastically reduces the computational
+cost. The size of the regression is reduced from $ (N^2 N_{} N^2 H )$
+to <img class="math" src="_images/math/46dc0e4861bd3b450e47e57e8cb41639237bb1ee.png" alt="\left(N_{\text{sample}} \times H \right)"/> for each point in
+reciprocal space <img class="math" src="_images/math/46aa1fb4a215adc468fe8cb9d2ec17bdb72bf1e6.png" alt="N^2"/>. The convolution,</p>
+<div class="math">
+<p><img src="_images/math/eb4695f958e12c407ca266f6432a32b97d47dd47.png" alt="\sum\limits_{h=0}^{H-1} \sum\limits_{t=0}^{S-1} \alpha_t^h m_{a,s + t}^h"/></p>
+</div><p>can be deconvolved in Fourier space with,</p>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils"> \begin{split}
+\mathcal{F}_k \left( \sum\limits_{h=0}^{H-1} \sum\limits_{t=0}^{S-1} \alpha_t^h m_{a,s + t}^h \right)
+=&amp;  \sum\limits_{s=0}^{S-1} \left[ \sum\limits_{h=0}^{H-1} \sum\limits_{t=0}^{S-1} \alpha_t^h m_{a,s + t}^h \right] e^{-2 \pi i k s / S}
+ \;\;\; &amp; \text{(definition)}
+ \\
+=&amp;  \sum\limits_{h=0}^{H-1} \left[ \sum\limits_{t=0}^{S-1} \alpha_t^h \left[ \sum\limits_{s=0}^{S-1} m_{a,s + t}^h e^{-2 \pi i k s / S} \right] \right]
+ \;\;\; &amp; \text{(rearrange)}
+ \\
+=&amp;  \sum\limits_{h=0}^{H-1} \left[ \sum\limits_{t=0}^{S-1} \alpha_t^h \left[ \sum\limits_{v=t}^{S-1+t} m_{a,v}^h e^{-2 \pi i k \left(v - t\right) / S} \right] \right]
+ \;\;\; &amp; \text{($v=s+t$)}
+ \\
+ =&amp;  \sum\limits_{h=0}^{H-1} \left[ \sum\limits_{t=0}^{S-1} \alpha_t^h e^{2 \pi i k t / S} \left[ \sum\limits_{v=t}^{S-1+t} m_{a,v}^h e^{-2 \pi i k v / S} \right] \right]
+ \;\;\; &amp; \text{(rearrange)}
+  \\
+ =&amp;  \sum\limits_{h=0}^{H-1} \left[ \sum\limits_{t=0}^{S-1} \alpha_t^h e^{2 \pi i k t / S} \left[ \sum\limits_{v=0}^{S-1} m_{a,v}^h e^{-2 \pi i k v / S} \right] \right]
+ \;\;\; &amp; \text{(periodicity of $m_v^h$)}
+ \\
+ =&amp;  \sum\limits_{h=0}^{H-1} \left[ \left[ \mathcal{F}_k \left( \alpha_t^h \right) \right]^* \mathcal{F}_k \left( m_{a,t}^h \right) \right]
+ \;\;\; &amp; \text{}
+\end{split}</tt>)</p>
+latex exited with error:
+[stderr]
+
+[stdout]
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian)
+ restricted \write18 enabled.
+entering extended mode
+(./math.tex
+LaTeX2e &lt;2011/06/27&gt;
+Babel &lt;3.9h&gt; and hyphenation patterns for 2 languages loaded.
+(/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2007/10/19 v1.4h Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/size12.clo))
+(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty
+(/usr/share/texlive/texmf-dist/tex/latex/ucs/utf8x.def))
+(/usr/share/texlive/texmf-dist/tex/latex/ucs/ucs.sty
+(/usr/share/texlive/texmf-dist/tex/latex/ucs/data/uni-global.def))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?&#8217; option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amscls/amsthm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty) (./math.aux)
+(/usr/share/texlive/texmf-dist/tex/latex/ucs/ucsencs.def)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
+! Extra alignment tab has been changed to \cr.
+&lt;template&gt; }$\hfill \endtemplate 
+                                 
+l.33 \end{gather}
+                 
+! Extra alignment tab has been changed to \cr.
+&lt;template&gt; }$\hfill \endtemplate 
+                                 
+l.33 \end{gather}
+                 
+! Extra alignment tab has been changed to \cr.
+&lt;template&gt; }$\hfill \endtemplate 
+                                 
+l.33 \end{gather}
+                 
+! Extra alignment tab has been changed to \cr.
+&lt;template&gt; }$\hfill \endtemplate 
+                                 
+l.33 \end{gather}
+                 
+! Extra alignment tab has been changed to \cr.
+&lt;template&gt; }$\hfill \endtemplate 
+                                 
+l.33 \end{gather}
+                 
+! Extra alignment tab has been changed to \cr.
+&lt;template&gt; }$\hfill \endtemplate 
+                                 
+l.33 \end{gather}
+                 
+! Extra alignment tab has been changed to \cr.
+&lt;template&gt; }$\hfill \endtemplate 
+                                 
+l.33 \end{gather}
+                 
+! Extra alignment tab has been changed to \cr.
+&lt;template&gt; }$\hfill \endtemplate 
+                                 
+l.33 \end{gather}
+                 
+! Extra alignment tab has been changed to \cr.
+&lt;template&gt; }$\hfill \endtemplate 
+                                 
+l.33 \end{gather}
+                 
+! Extra alignment tab has been changed to \cr.
+&lt;template&gt; }$\hfill \endtemplate 
+                                 
+l.33 \end{gather}
+                 
+! Extra alignment tab has been changed to \cr.
+&lt;template&gt; }$\hfill \endtemplate 
+                                 
+l.33 \end{gather}
+                 
+! Extra alignment tab has been changed to \cr.
+&lt;template&gt; }$\hfill \endtemplate 
+                                 
+l.33 \end{gather}
+                 
+[1] (./math.aux) )
+(see the transcript file for additional information)
+Output written on math.dvi (1 page, 2840 bytes).
+Transcript written on math.log.
+</div>
+<p>The above is a proof of the <a class="reference external" href="http://en.wikipedia.org/wiki/Discrete_Fourier_transform#Circular_convolution_theorem_and_cross-correlation_theorem">circular convolution
+theorem</a>.
+If we write <img class="math" src="_images/math/72e4df31ee2f47e4e3571cb1a8382a1920ad1439.png" alt="P_{a,k} =  \mathcal{F}_k \left( p_{a, s} \right)"/>,
+<img class="math" src="_images/math/5030112dacdfd336ec4589f5f2aab7fc5422c351.png" alt="M_{a, k}^h = \mathcal{F}_k  \left( m_{a,s}^h \right)"/> and
+<img class="math" src="_images/math/0a88d9aea508521d755dfe348d73b038ad8034f8.png" alt="\beta_k^h = \mathcal{F}_k \left(  \alpha_s^h \right)"/>, then we
+just need to solve</p>
+<div class="math">
+<p><img src="_images/math/8e5d166c4911179452ea4ccc6d797151e6a5a3d3.png" alt="P_{a,k} = \sum\limits_{h=0}^{h-1} \beta_k^h M_{a, k}^h"/></p>
+</div><p>with a linear regression at each discretization location in <img class="math" src="_images/math/8c325612684d41304b9751c175df7bcc0f61f64f.png" alt="k"/> to
+calculate the <img class="math" src="_images/math/0030790462c62d3a5e053ef944f18480c1d37166.png" alt="\beta_k^h"/>.</p>
+<p>In the example below we will create a microstructure with 11 bins and
+160 samples. This is enough to give reasonable influence coefficients.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">N</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">Nbin</span> <span class="o">=</span> <span class="mi">11</span>
+<span class="n">Nsample</span> <span class="o">=</span> <span class="mi">160</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">101</span><span class="p">)</span>
+<span class="n">microstructures</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">N</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nsample</span><span class="p">)])</span>
+<span class="n">responses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">fipy_response</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">microstructures</span><span class="p">])</span>
+<span class="n">binnedMicrostructures</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">bin</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">Nbin</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">microstructures</span><span class="p">])</span>
+<span class="k">print</span> <span class="n">microstructures</span><span class="o">.</span><span class="n">shape</span>
+<span class="k">print</span> <span class="n">responses</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">160</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+<span class="p">(</span><span class="mi">160</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We use <tt class="docutils literal"><span class="pre">numpy</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">fft2</span></tt> to calculate the <img class="math" src="_images/math/d5a832dbe273daac7e64e96e7e201a001ed65cb2.png" alt="P_{a,k}"/> and
+<img class="math" src="_images/math/99e225d5084a6f71d1704216b0725366ed05e3b1.png" alt="M^h_{k,a}"/>.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">microstructuresRS</span> <span class="o">=</span> <span class="n">binnedMicrostructures</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">Nsample</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">Nbin</span><span class="p">))</span>
+<span class="n">responsesRS</span> <span class="o">=</span> <span class="n">responses</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">Nsample</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
+<span class="n">Fmicrostructures</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft2</span><span class="p">(</span><span class="n">microstructuresRS</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">Fresponses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft2</span><span class="p">(</span><span class="n">responsesRS</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">Fcoeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">Nbin</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We calculate <img class="math" src="_images/math/0030790462c62d3a5e053ef944f18480c1d37166.png" alt="\beta_k^h"/> at every point in <img class="math" src="_images/math/8c325612684d41304b9751c175df7bcc0f61f64f.png" alt="k"/> space.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">ki</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">kj</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">Fcoeff</span><span class="p">[</span><span class="n">ki</span><span class="p">,</span><span class="n">kj</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">Fmicrostructures</span><span class="p">[:,</span><span class="n">ki</span><span class="p">,</span><span class="n">kj</span><span class="p">,:],</span> <span class="n">Fresponses</span><span class="p">[:,</span><span class="n">ki</span><span class="p">,</span><span class="n">kj</span><span class="p">]</span> <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">reconstructedResponses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Fmicrostructures</span> <span class="o">*</span> <span class="n">Fcoeff</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For a loose check let&#8217;s see how close the reconstructed responses are to
+the sample responses.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">metrics</span>
+<span class="n">mse</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">mean_squared_error</span>
+<span class="n">responses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft2</span><span class="p">(</span><span class="n">reconstructedResponses</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">real</span>
+<span class="n">MSE</span> <span class="o">=</span> <span class="n">mse</span><span class="p">(</span><span class="n">responsesRS</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft2</span><span class="p">(</span><span class="n">reconstructedResponses</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Mean square error: {0:1.3e}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">MSE</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Typical values&#39;</span>
+<span class="k">print</span> <span class="n">responsesRS</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:</span><span class="mi">10</span><span class="p">]</span>
+<span class="k">print</span> <span class="n">responses</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>Mean square error: 1.358e+10
+Typical values
+[  3134920.24329635 -14859922.85111164  24350855.96847351  16518931.7101288
+ -13399504.96081172 -20608868.32626785  21532496.27938246
+ -24030785.28692817 -11643521.47041003  27758619.45859079]
+[  3013635.84       -14692726.82641511  24504455.19776576
+  16802677.09155771 -13414803.84246958 -20575614.08        21450135.01626968
+ -23919938.87934423 -11691192.67329024  27626894.75236416]</pre>
+</div>
+</div>
+<div class="section" id="exercise-02-1">
+<h2>Exercise 02-1<a class="headerlink" href="#exercise-02-1" title="Permalink to this headline">¶</a></h2>
+<p>Test the influence coefficients using one sample.</p>
+<ul class="simple">
+<li>first create a test microstructure</li>
+<li>use <tt class="docutils literal"><span class="pre">fipy_response</span></tt> to create a test response</li>
+<li>bin the test microstructure</li>
+<li>take the FFT of the binned microstructure</li>
+<li>take the inner prodcuct of <tt class="docutils literal"><span class="pre">Fcoeff</span></tt> with the binned microstructure
+along the <tt class="docutils literal"><span class="pre">bin</span></tt> axis</li>
+<li>send the result back to real space to get the calculated response</li>
+<li>compare the calculated response with the test response.</li>
+</ul>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">103</span><span class="p">)</span>
+<span class="n">test_microstructure</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">N</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">test_response</span> <span class="o">=</span> <span class="n">fipy_response</span><span class="p">(</span><span class="n">test_microstructure</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+
+<span class="n">binned_test_microstructure</span> <span class="o">=</span> <span class="nb">bin</span><span class="p">(</span><span class="n">test_microstructure</span><span class="p">,</span> <span class="n">Nbin</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">Nbin</span><span class="p">))</span>
+<span class="n">Fm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft2</span><span class="p">(</span><span class="n">binned_test_microstructure</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">Fr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Fm</span> <span class="o">*</span> <span class="n">Fcoeff</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">calc_response</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft2</span><span class="p">(</span><span class="n">Fr</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+
+<span class="k">print</span> <span class="n">test_response</span><span class="p">[:</span><span class="mi">20</span><span class="p">]</span>
+<span class="k">print</span> <span class="n">calc_response</span><span class="p">[:</span><span class="mi">20</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>[ 10321080.57374739  18170943.91955532  21953730.26038766
+ -27668437.71011165  -1222554.20968084   4850834.021033   -26983622.32046547
+ -28409259.90543952   5996828.80698766  10823111.24422134
+   6559197.50876078 -30826019.2029601   -8894200.91717253
+  -6046499.57272069 -12751789.16653129  33920217.9478319    7588871.20941563
+  10018364.24439061   2116472.25868405 -25814016.94703518]
+[ 10136893.8         18057017.95942609  21878377.34953976
+ -27708096.82038447  -1299137.4447629    4855990.40000001
+ -26852174.36448368 -28324788.67386933   6094005.82172765
+  10782186.63208983   6469447.32       -30907790.79029018
+  -9013656.85033033  -6133981.44410236 -12830583.26266264
+  33932517.76000001   7771430.67336559  10094396.05258644
+   2064878.55760657 -25968923.07545603]</pre>
+</div>
+</div>
+<div class="section" id="influence-coefficients-in-real-space">
+<h2>Influence Coefficients in Real Space<a class="headerlink" href="#influence-coefficients-in-real-space" title="Permalink to this headline">¶</a></h2>
+<p>Let&#8217;s view the influence coefficients in real space.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft2</span><span class="p">(</span><span class="n">Fcoeff</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">real</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">r&#39;$\beta_s^0$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">coeff</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">r&#39;$\beta_s^1$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">coeff</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/mks_intro_44_0.png" src="_images/mks_intro_44_0.png" />
+<img alt="_images/mks_intro_44_1.png" src="_images/mks_intro_44_1.png" />
+<p>Doesn&#8217;t look good. The influence coefficients should die off away from
+the origin.</p>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

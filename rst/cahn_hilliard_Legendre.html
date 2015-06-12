@@ -1,0 +1,443 @@
+
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Cahn-Hilliard with Legendre Basis &mdash; PyMKS</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootswatch-3.1.0/cosmo/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pymks.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1-dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.1.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="../_static/pymks_logo.ico"/>
+    <link rel="top" title="PyMKS" href="../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1-dev</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+                <li><a href="INSTALLATION.html">Installation</a></li>
+                <li><a href="../EXAMPLES.html">Examples</a></li>
+                <li><a href="../API.html">API</a></li>
+                <li><a href="https://github.com/wd15/pymks/">Github</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">More <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../THEORY.html">Theory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="derivation.html">Derivation of Materials Knowledge Systems Equation using Linear Elasticity</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="CREDITS.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CITATION.html">Citing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="REQUIREMENTS.html">Requirements</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="section" id="cahn-hilliard-with-legendre-basis">
+<h1>Cahn-Hilliard with Legendre Basis<a class="headerlink" href="#cahn-hilliard-with-legendre-basis" title="Permalink to this headline">¶</a></h1>
+<p>This example uses phase field results from a Cahn-Hilliard simulation to
+compares two MKS models with different bases for the microstructure
+function.The first MKS model uses the primitive (binned) basis and the
+second uses the Legendre polynomials as a basis. The first section
+provides some background information about the Cahn-Hilliard simulation
+used to calibration and validate the MKS models. Next the mathematics
+behind using the Legendre polynomials as a basis is discussed. The
+example then goes on to demonstrate how to generate calibration data and
+how to use it to determine a basis and the number of local states that
+can be used. The Cahn-Hilliard simulation and the MKS models with
+calibrated influence coefficients are then used to predict the
+microstructure evolution from a given initial concentration and
+compared. Finally, the influence coefficients are scaled up and used to
+predict the evolution for a much larger system.</p>
+<div class="section" id="cahn-hilliard-equation">
+<h2>Cahn-Hilliard Equation<a class="headerlink" href="#cahn-hilliard-equation" title="Permalink to this headline">¶</a></h2>
+<p>The Cahn-Hilliard equation is used to simulation microstructure
+evolution during spinodial decomposition.</p>
+<div class="math">
+\[\frac{\partial \phi}{\partial t} = \nabla \cdot D \nabla \Bigg ( \frac{\partial f}{\partial \phi} + \epsilon^2 \nabla^2 \phi \Bigg )\]</div>
+<p>For more details on the physics behind the Cahn-Hilliard equation see
+the Cahn-Hilliard Example.</p>
+<p>In this example, 2D concentration fields <span class="math">\(\phi\)</span> are simulated by
+solving the Cahn-Hilliard equation using the spectral method with
+periodic boundary conditions [1]. The simulated concentration fields are
+used to both calibrate the influence coefficients and validate the
+accuracy of the MKS model.</p>
+</div>
+<div class="section" id="legendre-polynomial-basis-for-the-microstructure-function">
+<h2>Legendre Polynomial Basis for the Microstructure Function<a class="headerlink" href="#legendre-polynomial-basis-for-the-microstructure-function" title="Permalink to this headline">¶</a></h2>
+<p>The microstructure function can be represented using Legendre
+polynomials as basis functions.</p>
+<div class="math">
+\[m_s(h) = \sum_{l = 0}^\infty c_{ls} P_l (h)\]</div>
+<p>In the equation above <span class="math">\(s\)</span> represents a spacial bin, <span class="math">\(l\)</span>
+represents the order of the Legendre polynomial and <span class="math">\(m_s(h)\)</span> is a
+continuous distribution of the local states located at the spacial
+location <span class="math">\(s\)</span>. Using the orthogonal properties of Legendre
+polynomials, the coefficients of this series can be found.</p>
+<div class="math">
+\[c_{ls} = \frac{(2l +1)}{2} \int_{-1}^1 P_l (h) m_s(h) dh\]</div>
+<p>In the special case that the distribution is a delta function (meaning
+there is only one local state at location <span class="math">\(s\)</span>), the coefficients
+can be defined in terms of the value of the local states for equation of
+the Legendre polynomials.</p>
+<div class="math">
+\[m_s(h) = \delta(h - h_s)\]</div>
+<div class="math">
+\[c_{ls} = \frac{(2l +1)}{2} \int_{-1}^1 P_l (h) \delta(h - h_s) dh\]</div>
+<div class="math">
+\[c_{ls} = \frac{(2l +1)}{2}  P_l (h_s)\]</div>
+<p>In this example, we will explore the differences when using the Legendre
+polynomials as the basis function compared to the primitive (binned)
+basis for the microstructure function.</p>
+<div class="code python highlight-python"><pre>%matplotlib inline
+%load_ext autoreload
+%autoreload 2
+
+import numpy as np
+import matplotlib.pyplot as plt</pre>
+</div>
+<div class="section" id="modeling-with-mks">
+<h3>Modeling with MKS<a class="headerlink" href="#modeling-with-mks" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="generating-calibration-datasets">
+<h2>Generating Calibration Datasets<a class="headerlink" href="#generating-calibration-datasets" title="Permalink to this headline">¶</a></h2>
+<p>Because the microstructure is a continuous field that can have a range
+of values and changes over time, the first order influence coefficients
+cannot be calibrated with delta microstructures. Instead a large number
+of simulations with random initial conditions will be used to calibrate
+the first order influence coefficients using linear regression. Let&#8217;s
+show how this is done.</p>
+<p>The function <tt class="docutils literal"><span class="pre">make_cahnHilliard</span></tt> from <tt class="docutils literal"><span class="pre">pymks.datasets</span></tt> provides a
+nice interface to generate calibration datasets for the influence
+coefficient. To use <tt class="docutils literal"><span class="pre">make_cahnHilliard</span></tt>, we need to set the number of
+samples we want to use to calibrate the influence coefficients using
+<tt class="docutils literal"><span class="pre">n_samples</span></tt> as well as the size of the simulation using <tt class="docutils literal"><span class="pre">size</span></tt>.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pymks</span>
+<span class="kn">from</span> <span class="nn">pymks.datasets</span> <span class="kn">import</span> <span class="n">make_cahnHilliard</span>
+
+<span class="n">L</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">n_samples</span> <span class="o">=</span> <span class="mi">400</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">1e-2</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">101</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_cahnHilliard</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">),</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The function <tt class="docutils literal"><span class="pre">make_cahnHilliard</span></tt> has generated <tt class="docutils literal"><span class="pre">n_samples</span></tt> number of
+random microstructures <tt class="docutils literal"><span class="pre">X</span></tt> and returned the same microstructures after
+they have evolved one time step <tt class="docutils literal"><span class="pre">y</span></tt>. Let&#8217;s take a look at one of them.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_concentrations</span>
+
+<span class="n">draw_concentrations</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title0</span><span class="o">=</span><span class="s">&#39;time=0&#39;</span><span class="p">,</span> <span class="n">title1</span><span class="o">=</span><span class="s">&#39;time = 1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>/home/wd15/anaconda/lib/python2.7/site-packages/matplotlib/figure.py:1595: UserWarning: This figure includes Axes that are not compatible with tight_layout, so its results might be incorrect.
+  warnings.warn("This figure includes Axes that are not "</pre>
+</div>
+<img alt="../_images/cahn_hilliard_Legendre_7_1.png" src="../_images/cahn_hilliard_Legendre_7_1.png" />
+</div>
+<div class="section" id="calibrate-influence-coefficients">
+<h2>Calibrate Influence Coefficients<a class="headerlink" href="#calibrate-influence-coefficients" title="Permalink to this headline">¶</a></h2>
+<p>In this example, let&#8217;s compare the difference between using the
+&#8220;primitive basis&#8221; (which is just binning the microstructure) and a
+polynomial basis to represent the microstructure function. As mentioned
+above, the microstructures (concentration fields) are note discrete
+phases. This leaves the number of local states in local state space
+<tt class="docutils literal"><span class="pre">n_states</span></tt> as a free hyper parameter. In the next section we look to
+see what a practical number of bins and Legendre polynomials would be.</p>
+<p>The process of finding a practical number of local states can also be
+done using the <tt class="docutils literal"><span class="pre">optimize_n_states</span></tt> function from <tt class="docutils literal"><span class="pre">pymks.tools</span></tt>.
+Let&#8217;s compare the difference in performance as we vary the local state
+when we choose the binned basis and the Legendre polynomial basis. The
+function will assume the binned basis if one isn&#8217;t specified. If
+<tt class="docutils literal"><span class="pre">Legendre</span></tt> basis is specified, the <tt class="docutils literal"><span class="pre">domain</span></tt> (the expect interval of
+values for X) also needs to be specified.</p>
+<p>Let&#8217;s compare the two bases.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.bases</span> <span class="kn">import</span> <span class="n">ContinuousIndicatorBasis</span>
+<span class="kn">from</span> <span class="nn">sklearn.grid_search</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">metrics</span>
+<span class="n">mse</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">mean_squared_error</span>
+<span class="kn">from</span> <span class="nn">pymks.bases</span> <span class="kn">import</span> <span class="n">LegendreBasis</span>
+<span class="kn">from</span> <span class="nn">pymks</span> <span class="kn">import</span> <span class="n">MKSRegressionModel</span>
+<span class="kn">from</span> <span class="nn">sklearn.cross_validation</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">continuousBasis</span> <span class="o">=</span> <span class="n">ContinuousIndicatorBasis</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">legendreBasis</span> <span class="o">=</span> <span class="n">LegendreBasis</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+<span class="n">parameters_to_tune</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;n_states&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">11</span><span class="p">),</span>
+                      <span class="s">&#39;basis&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">continuousBasis</span><span class="p">,</span> <span class="n">legendreBasis</span><span class="p">]}</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">continuousBasis</span><span class="p">)</span>
+<span class="n">scoring</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">make_scorer</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="o">-</span><span class="n">mse</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+<span class="n">gs</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">parameters_to_tune</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="n">scoring</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="o">.</span><span class="n">best_estimator_</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>MKSRegressionModel(basis=&lt;pymks.bases.legendre.LegendreBasis object at 0x7f5eaf19a150&gt;,
+          n_states=4)
+1.0</pre>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_gridscores</span>
+
+<span class="n">lgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">gs</span><span class="o">.</span><span class="n">grid_scores_</span> \
+       <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s">&#39;basis&#39;</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">type</span><span class="p">(</span><span class="n">legendreBasis</span><span class="p">)]</span>
+<span class="n">cgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">gs</span><span class="o">.</span><span class="n">grid_scores_</span> \
+       <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s">&#39;basis&#39;</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">type</span><span class="p">(</span><span class="n">continuousBasis</span><span class="p">)]</span>
+
+<span class="n">draw_gridscores</span><span class="p">(</span><span class="n">lgs</span><span class="p">,</span> <span class="s">&#39;Legendre&#39;</span><span class="p">,</span> <span class="s">&#39;#f46d43&#39;</span><span class="p">)</span>
+<span class="n">draw_gridscores</span><span class="p">(</span><span class="n">cgs</span><span class="p">,</span> <span class="s">&#39;Continuous&#39;</span><span class="p">,</span> <span class="s">&#39;#1a9641&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>&lt;matplotlib.legend.Legend at 0x7f5eaed3d950&gt;</pre>
+</div>
+<img alt="../_images/cahn_hilliard_Legendre_11_1.png" src="../_images/cahn_hilliard_Legendre_11_1.png" />
+<p>As you can see the <tt class="docutils literal"><span class="pre">Legendre</span></tt> basis converges faster than the binned
+basis. In order to further compare performance between the two models,
+lets select 4 local states for both bases.</p>
+</div>
+<div class="section" id="comparing-the-bases-for-n-states-4">
+<h2>Comparing the Bases for <tt class="docutils literal"><span class="pre">n_states=4</span></tt><a class="headerlink" href="#comparing-the-bases-for-n-states-4" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks</span> <span class="kn">import</span> <span class="n">MKSRegressionModel</span>
+
+<span class="n">BinBasis</span> <span class="o">=</span> <span class="n">ContinuousIndicatorBasis</span><span class="p">(</span><span class="n">n_states</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">BinModel</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">basis</span><span class="o">=</span><span class="n">BinBasis</span><span class="p">)</span>
+<span class="n">BinModel</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="n">LegendreBasis</span> <span class="o">=</span> <span class="n">LegendreBasis</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">LegendreModel</span> <span class="o">=</span> <span class="n">MKSRegressionModel</span><span class="p">(</span><span class="n">basis</span><span class="o">=</span><span class="n">LegendreBasis</span><span class="p">)</span>
+<span class="n">LegendreModel</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now let&#8217;s look at the influence coefficients for both bases.</p>
+<p>First the binned basis influence coefficients</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_coeff</span>
+
+<span class="n">draw_coeff</span><span class="p">(</span><span class="n">BinModel</span><span class="o">.</span><span class="n">coeff</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/cahn_hilliard_Legendre_16_0.png" src="../_images/cahn_hilliard_Legendre_16_0.png" />
+<p>Now for the Legendre polynomial basis influence coefficients.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">draw_coeff</span><span class="p">(</span><span class="n">LegendreModel</span><span class="o">.</span><span class="n">coeff</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/cahn_hilliard_Legendre_18_0.png" src="../_images/cahn_hilliard_Legendre_18_0.png" />
+<p>Now let&#8217;s do some simulations with both sets of coefficients and compare
+the results.</p>
+</div>
+<div class="section" id="predict-microstructure-evolution">
+<h2>Predict Microstructure Evolution<a class="headerlink" href="#predict-microstructure-evolution" title="Permalink to this headline">¶</a></h2>
+<p>In order to compare the difference between the two bases, we need to
+have the Cahn-Hilliard simulation and two the MKS models start with the
+same initial concentration <tt class="docutils literal"><span class="pre">phi0</span></tt> and evolve in time. In order to do
+the Cahn-Hilliard simulation we need an instance of the class
+<tt class="docutils literal"><span class="pre">CahnHilliardSimulation</span></tt>.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.datasets.cahnHilliardSimulation</span> <span class="kn">import</span> <span class="n">CahnHilliardSimulation</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">66</span><span class="p">)</span>
+
+<span class="n">phi0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="n">CHSim</span> <span class="o">=</span> <span class="n">CahnHilliardSimulation</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+<span class="n">phi</span> <span class="o">=</span> <span class="n">phi0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">phi_bin_pred</span> <span class="o">=</span> <span class="n">phi0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">phi_legendre_pred</span> <span class="o">=</span> <span class="n">phi0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>In order to move forward in time, we need to feed the concentration back
+in to the Cahn-Hilliard simulation and the MKS models.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">time_steps</span> <span class="o">=</span> <span class="mi">55</span>
+
+<span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">time_steps</span><span class="p">):</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">CHSim</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">phi_bin_pred</span> <span class="o">=</span> <span class="n">BinModel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">phi_bin_pred</span><span class="p">)</span>
+    <span class="n">phi_legendre_pred</span> <span class="o">=</span> <span class="n">LegendreModel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">phi_legendre_pred</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Let&#8217;s take a look at the concentration fields.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">draw_concentrations</span><span class="p">(</span><span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">phi_bin_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">phi_legendre_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title0</span><span class="o">=</span><span class="s">&#39;Simulation&#39;</span><span class="p">,</span> <span class="n">title1</span><span class="o">=</span><span class="s">&#39;Bin&#39;</span><span class="p">,</span> <span class="n">title2</span><span class="o">=</span><span class="s">&#39;Legendre&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/cahn_hilliard_Legendre_25_0.png" src="../_images/cahn_hilliard_Legendre_25_0.png" />
+<p>By just looking at the three microstructures is it difficult to see a
+difference between the microstructures, so let&#8217;s look at the difference
+between the two MKS models and the simulation.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">metrics</span>
+<span class="n">mse</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">mean_squared_error</span>
+<span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_diff</span>
+
+<span class="n">draw_diff</span><span class="p">((</span><span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">phi_bin_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="p">(</span><span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">phi_legendre_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">title0</span><span class="o">=</span><span class="s">&#39;Simulaiton - Bin&#39;</span><span class="p">,</span> <span class="n">title1</span><span class="o">=</span><span class="s">&#39;Simulation - Legendre&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Bin mse =&#39;</span><span class="p">,</span><span class="n">mse</span><span class="p">(</span><span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">phi_bin_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">print</span> <span class="s">&#39;Legendre mse =&#39;</span><span class="p">,</span><span class="n">mse</span><span class="p">(</span><span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">phi_legendre_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>Bin mse = 2.3883216066e-05
+Legendre mse = 2.56654150508e-26</pre>
+</div>
+<img alt="../_images/cahn_hilliard_Legendre_27_1.png" src="../_images/cahn_hilliard_Legendre_27_1.png" />
+<p>The Legendre polynomial basis clearly out performs the binned basis.</p>
+<div class="section" id="resizing-the-coefficients-to-use-on-larger-systems">
+<h3>Resizing the Coefficients to use on Larger Systems<a class="headerlink" href="#resizing-the-coefficients-to-use-on-larger-systems" title="Permalink to this headline">¶</a></h3>
+<p>Now let&#8217;s compare the bases after resizing the coefficients. Do do this
+we need to use the <tt class="docutils literal"><span class="pre">resize_coeff</span></tt> method and provide a larger initial
+concentration.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">N</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">L</span>
+<span class="n">BinModel</span><span class="o">.</span><span class="n">resize_coeff</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
+<span class="n">LegendreModel</span><span class="o">.</span><span class="n">resize_coeff</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
+
+<span class="n">phi0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="n">phi</span> <span class="o">=</span> <span class="n">phi0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">phi_bin_pred</span> <span class="o">=</span> <span class="n">phi0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">phi_legendre_pred</span> <span class="o">=</span> <span class="n">phi0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Let&#8217;s look at the resized coefficients.</p>
+<p>First the influence coefficients from the binned bases.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">draw_coeff</span><span class="p">(</span><span class="n">BinModel</span><span class="o">.</span><span class="n">coeff</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/cahn_hilliard_Legendre_32_0.png" src="../_images/cahn_hilliard_Legendre_32_0.png" />
+<p>Now the influence coefficients from the Legendre polynomial bases.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">draw_coeff</span><span class="p">(</span><span class="n">LegendreModel</span><span class="o">.</span><span class="n">coeff</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/cahn_hilliard_Legendre_34_0.png" src="../_images/cahn_hilliard_Legendre_34_0.png" />
+<p>Once again we are going to march forward in time by feeding the
+concentration fields back into the Cahn-Hilliard simulation and the MKS
+models.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">CHSim</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">phi_bin_pred</span> <span class="o">=</span> <span class="n">BinModel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">phi_bin_pred</span><span class="p">)</span>
+    <span class="n">phi_legendre_pred</span> <span class="o">=</span> <span class="n">LegendreModel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">phi_legendre_pred</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Let&#8217;s take a look at the results.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">draw_concentrations</span><span class="p">(</span><span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">phi_bin_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">phi_legendre_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title0</span><span class="o">=</span><span class="s">&#39;Simulation&#39;</span><span class="p">,</span> <span class="n">title1</span><span class="o">=</span><span class="s">&#39;Bin&#39;</span><span class="p">,</span> <span class="n">title2</span><span class="o">=</span><span class="s">&#39;Legendre&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/cahn_hilliard_Legendre_38_0.png" src="../_images/cahn_hilliard_Legendre_38_0.png" />
+<p>The MKS model with resized influence coefficients was able to accurately
+predict the structure evolution for a larger concentration field. Again
+let&#8217;s look at the difference between the simulation and the MKS models.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.tools</span> <span class="kn">import</span> <span class="n">draw_diff</span>
+
+<span class="n">draw_diff</span><span class="p">((</span><span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">phi_bin_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="p">(</span><span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">phi_legendre_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+           <span class="n">title0</span><span class="o">=</span><span class="s">&#39;Simulaiton - Bin&#39;</span><span class="p">,</span> <span class="n">title1</span><span class="o">=</span><span class="s">&#39;Simulation - Legendre&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Bin mse =&#39;</span><span class="p">,</span><span class="n">mse</span><span class="p">(</span><span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">phi_bin_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">print</span> <span class="s">&#39;Legendre mse =&#39;</span><span class="p">,</span><span class="n">mse</span><span class="p">(</span><span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">phi_legendre_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>Bin mse = 0.0192607235162
+Legendre mse = 7.11131823004e-05</pre>
+</div>
+<img alt="../_images/cahn_hilliard_Legendre_40_1.png" src="../_images/cahn_hilliard_Legendre_40_1.png" />
+<p>With the resize influence coefficients, the Legendre polynomial
+nominally out performs the binned basis, but these isn&#8217;t an strong of a
+contrast between the performance of the two bases.</p>
+</div>
+<div class="section" id="references">
+<h3>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h3>
+<p>[1] Ye X., Cheng X., The Fourier spectral method for the Cahn-Hilliard
+equation. Applied Mathematics and Computation, 171, 1, 345-357, 2005.
+<a class="reference external" href="http://dx.doi.org/10.1016/j.amc.2005.01.050">doi:10.1016/j.amc.2005.01.050</a></p>
+<p>[2] Fast T., Niezgoda S., Kalidindi S.R., A new framework for
+computationally efficient structure–structure evolution linkages to
+facilitate high-fidelity scale bridging in multi-scale materials models
+59, 2, 699-707, 2011.
+<a class="reference external" href="http://dx.doi.org/10.1016/j.actamat.2010.10.008">doi:10.1016/j.actamat.2010.10.008</a></p>
+</div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
