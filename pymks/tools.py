@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from sklearn.learning_curve import learning_curve
+from .stats import _auto_correlations
+from .stats import _cross_correlations
 import numpy as np
 import itertools
 import warnings
@@ -626,78 +628,78 @@ def draw_goodness_of_fit(fit_data, pred_data, labels):
     plt.show()
 
 
-def _get_correlation_titles(correlation_labels, selected_labels):
-    """
-    Helper function to get the correct spatial correlation keys.
+# def _get_correlation_titles(correlation_labels, selected_labels):
+#     """
+#     Helper function to get the correct spatial correlation keys.
 
-    >>> corr_dict = {'(1, 1)': np.ones((3, 3)), '(2, 1)':np.zeros((3, 3))}
-    >>> corr_plots = [(1, 1), (1, 2)]
-    >>> result = ['(1, 1)', '(2, 1)']
-    >>> assert result == _get_correlation_titles(corr_dict, corr_plots)
+#     >>> corr_dict = {'(1, 1)': np.ones((3, 3)), '(2, 1)':np.zeros((3, 3))}
+#     >>> corr_plots = [(1, 1), (1, 2)]
+#     >>> result = ['(1, 1)', '(2, 1)']
+#     >>> assert result == _get_correlation_titles(corr_dict, corr_plots)
 
-    Args:
-        correlation_dict: dictionary that has spatial correlation lab as
-            keys and spatial correlations as values
-        selected_correlation_plots: list of correlations that will be drawn.
+#     Args:
+#         correlation_dict: dictionary that has spatial correlation lab as
+#             keys and spatial correlations as values
+#         selected_correlation_plots: list of correlations that will be drawn.
 
-    Returns:
-        list of correlation computed with local state labels in the correct
-            order.
-    """
-    if selected_labels is None:
-        return None
-    selected_labels = map(str, selected_labels)
-    new_names = selected_labels
-    for plot_name in selected_labels:
-        if plot_name not in correlation_labels:
-            name = list(plot_name)
-            name[1], name[4] = name[4], name[1]
-            new_name = ''.join(str(e) for e in name)
-            new_names[new_names.index(plot_name)] = new_name
-            if new_name not in correlation_labels:
-                raise RuntimeError(str(plot_name) + " correlation not found", )
-    return new_names
-
-
-def _get_autocorrelation_titles(n_states):
-    """
-    Helper function to get the autocorrelations computed and returns them in
-    a list.
-
-    >>> result = [(1, 1), (2, 2), (3, 3), (4, 4)]
-    >>> assert result == _get_autocorrelation_titles(4)
-
-    Args:
-        n_states: number of local states
-
-    Returns:
-        list of computed autocorrelations
-    """
-    states = np.arange(n_states) + 1
-    return list(zip(states, states))
+#     Returns:
+#         list of correlation computed with local state labels in the correct
+#             order.
+#     """
+#     if selected_labels is None:
+#         return None
+#     selected_labels = map(str, selected_labels)
+#     new_names = selected_labels
+#     for plot_name in selected_labels:
+#         if plot_name not in correlation_labels:
+#             name = list(plot_name)
+#             name[1], name[4] = name[4], name[1]
+#             new_name = ''.join(str(e) for e in name)
+#             new_names[new_names.index(plot_name)] = new_name
+#             if new_name not in correlation_labels:
+#                 raise RuntimeError(str(plot_name) + " correlation not found", )
+#     return new_names
 
 
-def _get_crosscorrelation_titles(n_states):
-    """
-    Helper function to get the crosscorrelations computed and returns them in
-    a list.
+# def _get_autocorrelation_titles(n_states):
+#     """
+#     Helper function to get the autocorrelations computed and returns them in
+#     a list.
 
-    >>> result = [(1, 4), (2, 1), (3, 2), (4, 3), (1, 3), (2, 4)]
-    >>> assert result == _get_crosscorrelation_titles(4)
+#     >>> result = [(1, 1), (2, 2), (3, 3), (4, 4)]
+#     >>> assert result == _get_autocorrelation_titles(4)
 
-    Args:
-        n_states: number of local states
+#     Args:
+#         n_states: number of local states
 
-    Returns:
-        list of computed crosscorrelations
-    """
+#     Returns:
+#         list of computed autocorrelations
+#     """
+#     states = np.arange(n_states) + 1
+#     return list(zip(states, states))
 
-    states = np.arange(n_states) + 1
-    Niter = n_states / 2
-    Nslice = n_states * (n_states - 1) / 2
-    tmp = [zip(states, np.roll(states, i)) for i in range(1, Niter + 1)]
-    titles = list(itertools.chain.from_iterable(tmp))
-    return titles[:Nslice]
+
+# def _get_crosscorrelation_titles(n_states):
+#     """
+#     Helper function to get the crosscorrelations computed and returns them in
+#     a list.
+
+#     >>> result = [(1, 4), (2, 1), (3, 2), (4, 3), (1, 3), (2, 4)]
+#     >>> assert result == _get_crosscorrelation_titles(4)
+
+#     Args:
+#         n_states: number of local states
+
+#     Returns:
+#         list of computed crosscorrelations
+#     """
+
+#     states = np.arange(n_states) + 1
+#     Niter = n_states / 2
+#     Nslice = n_states * (n_states - 1) / 2
+#     tmp = [zip(states, np.roll(states, i)) for i in range(1, Niter + 1)]
+#     titles = list(itertools.chain.from_iterable(tmp))
+#     return titles[:Nslice]
 
 
 def draw_correlations(X_corr, correlations=None):
@@ -705,95 +707,97 @@ def draw_correlations(X_corr, correlations=None):
     Visualize spatial correlations.
 
     Args:
-        X_corr: correlations
-        correlations: correlations that will be displayed.
+        X_corr (ND array): correlations
+        correlations (list, optional): correlation labels
     """
-    n_states = ((np.sqrt(8 * X_corr.shape[-1] + 1) - 1) / 2).astype(int)
-    X_auto_lists = _get_autocorrelation_list(X_corr[..., :n_states])
-    X_cross_lists = _get_crosscorrelation_list(X_corr[..., n_states:])
-    X_corr_lists = [X_auto_lists[0] + X_cross_lists[0],
-                    np.concatenate((X_auto_lists[1], X_cross_lists[1]),
-                    axis=-1)]
-    _draw_stats(X_corr_lists, correlations=correlations)
+    L = X_corr.shape[-1]
+    if correlations is None:
+        correlations = _auto_correlations(L) + _cross_correlations(L)
+    _draw_stats(X_corr, correlations=correlations)
 
 
-def draw_autocorrelations(X_auto, correlations=None):
+def draw_autocorrelations(X_auto, autocorrelations=None):
     """
     Visualize spatial autocorrelations.
 
     Args:
-        X_auto: autocorrelations
-        correlations: correlations that will be displayed.
+        X_auto (ND array): autocorrelations
+        autocorrelations (list, optional): autocorrelation labels.
     """
-    X_auto_lists = _get_autocorrelation_list(X_auto)
-    _draw_stats(X_auto_lists, correlations=correlations)
+    if autocorrelations is None:
+        n_states = X_auto.shape[-1]
+        autocorrelations = _auto_correlations(n_states)
+    _draw_stats(X_auto, correlations=autocorrelations)
 
 
-def draw_crosscorrelations(X_cross, correlations=None):
+def draw_crosscorrelations(X_cross, crosscorrelations=None):
     """
     Visualize spatial crosscorrelations.
 
     Args:
-        X_cross: crosscorrelations
-        correlations: correlations that will be displayed.
+        X_cross (ND array): crosscorrelations
+        correlations (list, optional: crosscorrelation labels.
     """
-    X_cross_lists = _get_crosscorrelation_list(X_cross)
-    _draw_stats(X_cross_lists, correlations=correlations)
+    if crosscorrelations is None:
+        n_cross = X_cross.shape[-1]
+        n_states = (np.sqrt(1 + 8 * n_cross) + 1).astype(int) / 2
+        crosscorrelations = _cross_correlations(n_states)
+    _draw_stats(X_cross, correlations=crosscorrelations)
 
 
-def _get_autocorrelation_list(X_auto):
-    """
-    Helper function to label autocorrelations.
+# def _get_autocorrelation_list(X_auto):
+#     """
+#     Helper function to label autocorrelations.
 
-    >>> X_auto = np.ones((3, 3, 2))
-    >>> X_auto[..., 1] = 2.
-    >>> X_auto_list = _get_autocorrelation_list(X_auto)
-    >>> X_result = [['(1, 1)', '(2, 2)'],
-    ...             np.concatenate([X_auto[..., 0][..., None],
-    ...                             X_auto[..., 1][..., None]], axis=-1)]
-    >>> assert X_result[0] == X_auto_list[0]
-    >>> assert np.allclose(X_result[1], X_auto_list[1])
+#     >>> X_auto = np.ones((3, 3, 2))
+#     >>> X_auto[..., 1] = 2.
+#     >>> X_auto_list = _get_autocorrelation_list(X_auto)
+#     >>> X_result = [['(1, 1)', '(2, 2)'],
+#     ...             np.concatenate([X_auto[..., 0][..., None],
+#     ...                             X_auto[..., 1][..., None]], axis=-1)]
+#     >>> assert X_result[0] == X_auto_list[0]
+#     >>> assert np.allclose(X_result[1], X_auto_list[1])
 
-    Args:
-        X_auto: autocorrelations
+#     Args:
+#         X_auto: autocorrelations
 
-    Returns:
-        nested list with the local states labels and the spatial
-        correlations
-    """
-    auto_labels = map(str, _get_autocorrelation_titles(X_auto.shape[-1]))
-    return [auto_labels, X_auto]
-
-
-def _get_crosscorrelation_list(X_cross):
-    """
-    Helper function to label autocorrelations.
-
-    >>> X_cross = np.zeros((3, 3, 3))
-    >>> X_cross[..., 1] = 1
-    >>> X_cross[..., 2] = 2
-    >>> X_cross_list = _get_crosscorrelation_list(X_cross)
-    >>> X_result = [['(1, 3)', '(2, 1)', '(3, 2)'],
-    ...             np.concatenate([X_cross[..., 0][..., None],
-    ...                             X_cross[..., 1][..., None],
-    ...                             X_cross[..., 2][..., None]], axis=-1)]
-    >>> assert X_result[0] == X_cross_list[0]
-    >>> assert np.allclose(np.concatenate(X_result[1]),
-    ...                    np.concatenate(X_cross_list[1]))
-
-    Args:
-        X_cross: crosscorrelations
-
-    Returns:
-        nested list with the local states labels and the spatial
-        correlations
-    """
-    n_states = 0.5 + np.sqrt(1 + 8 * X_cross.shape[-1]) / 2.
-    cross_labels = map(str, _get_crosscorrelation_titles(int(n_states)))
-    return [cross_labels, X_cross]
+#     Returns:
+#         nested list with the local states labels and the spatial
+#         correlations
+#     """
+#     auto_labels = map(str, _get_autocorrelation_titles(X_auto.shape[-1]))
+#     return [auto_labels, X_auto]
 
 
-def _draw_stats(X_lists, correlations=None):
+# def _get_crosscorrelation_list(X_cross):
+#     """
+#     Helper function to label autocorrelations.
+
+#     >>> X_cross = np.zeros((3, 3, 3))
+#     >>> X_cross[..., 1] = 1
+#     >>> X_cross[..., 2] = 2
+#     >>> X_cross_list = _get_crosscorrelation_list(X_cross)
+#     >>> X_result = [['(1, 3)', '(2, 1)', '(3, 2)'],
+#     ...             np.concatenate([X_cross[..., 0][..., None],
+#     ...                             X_cross[..., 1][..., None],
+#     ...                             X_cross[..., 2][..., None]], axis=-1)]
+#     >>> assert X_result[0] == X_cross_list[0]
+#     >>> assert np.allclose(np.concatenate(X_result[1]),
+#     ...                    np.concatenate(X_cross_list[1]))
+
+#     Args:
+#         X_cross: crosscorrelations
+
+#     Returns:
+#         nested list with the local states labels and the spatial
+#         correlations
+#     """
+#     n_states = 0.5 + np.sqrt(1 + 8 * X_cross.shape[-1]) / 2.
+#     cross_labels = map(str, _get_crosscorrelation_titles(int(n_states)))
+#     return [cross_labels, X_cross]
+
+
+def _draw_stats(X_, correlations=None):
     """
     Helper function used by visualize the spatial correlations.
 
@@ -805,21 +809,15 @@ def _draw_stats(X_lists, correlations=None):
     """
     plt.close('all')
     X_cmap = _get_coeff_cmap()
-    correlation_labels = _get_correlation_titles(X_lists[0], correlations)
-    if correlation_labels is None:
-        correlation_labels = X_lists[0]
-    n_plots = len(correlation_labels)
-    X_corr_index = [X_lists[0].index(s) for s in correlation_labels]
-    X_list = [X_lists[1][..., s][None] for s in X_corr_index]
-    X_ = np.concatenate(tuple(X_list))
+    n_plots = len(correlations)
     vmin = np.min(X_)
     vmax = np.max(X_)
-    x_loc, x_labels = _get_ticks_params(X_.shape[1])
-    y_loc, y_labels = _get_ticks_params(X_.shape[2])
+    x_loc, x_labels = _get_ticks_params(X_.shape[0])
+    y_loc, y_labels = _get_ticks_params(X_.shape[1])
     fig, axs = plt.subplots(1, n_plots, figsize=(n_plots * 5, 5))
     if n_plots == 1:
         axs = list([axs])
-    for ax, label, img in zip(axs, correlation_labels, X_):
+    for ax, label, img in zip(axs, correlations, np.rollaxis(X_, -1)):
         ax.grid(False)
         ax.set_xticks(x_loc)
         ax.set_xticklabels(x_labels, fontsize=12)
@@ -827,8 +825,8 @@ def _draw_stats(X_lists, correlations=None):
         ax.set_yticklabels(y_labels, fontsize=12)
         im = ax.imshow(np.swapaxes(img, 0, 1), cmap=X_cmap,
                        interpolation='none', vmin=vmin, vmax=vmax)
-        ax.set_title(r"Correlation $l = {0}$, $l' = {1}$".format(label[1],
-                                                                 label[-2]),
+        ax.set_title(r"Correlation $l = {0}$, $l' = {1}$".format(label[0],
+                                                                 label[1]),
                      fontsize=15)
         fig.subplots_adjust(right=0.8)
         divider = make_axes_locatable(ax)

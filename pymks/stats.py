@@ -7,7 +7,8 @@ point statistics.
 """
 
 
-def autocorrelate(X_, periodic_axes=[], probability_mask=None):
+def autocorrelate(X_, periodic_axes=[], probability_mask=None,
+                  autocorrelations=[]):
     """
     Computes the autocorrelation from a microstructure function.
 
@@ -20,6 +21,10 @@ def autocorrelate(X_, periodic_axes=[], probability_mask=None):
             indicate that axes x and z are periodic in a 3D microstrucure.
         probability_mask (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
+        autocorrelations (list, optional): list of spatial autocorrelatiions to
+            be computed. For example [(0, 0), (1, 1)] computes the
+            autocorrelations with local states 0 and 1. If no list is passed,
+            all autocorrelations are computed.
 
     Returns:
         Autocorrelations for microstructure function `X_`.
@@ -39,15 +44,18 @@ def autocorrelate(X_, periodic_axes=[], probability_mask=None):
     ...                   [0., 0., 0.]]])
     >>> assert(np.allclose(np.real_if_close(X_auto[0, ..., 1]), X_test[0]))
     """
-    X_ = _set_X(X_, probability_mask)
+
+    if len(autocorrelations) is 0:
+        correlations = _auto_correlations(X_.shape[-1])
+    X_ = _mask_X_(X_, probability_mask)
     s = _Fkernel_shape(X_, periodic_axes)
-    auto = _autocorrelator(X_, s)
+    auto = _correlate(X_, s, correlations)
     return auto / _normalize(X_, s, probability_mask)
 
 
-def _autocorrelator(X_, s):
+def _correlate(X_, s, correlations=[]):
     """
-    Helper function used to calculate the unnormalized autocorrelation counts.
+    Helper function used to calculate the unnormalized correlation counts.
 
     Args:
         X_ (ND array): The discretized microstructure function, an
@@ -57,7 +65,7 @@ def _autocorrelator(X_, s):
         s (tuple): shape of the Fkernel used for the convolution
 
     Returns:
-        autocorrelation counts for a given microstructure function
+        correlation counts for a given microstructure function
 
     Example
 
@@ -67,7 +75,8 @@ def _autocorrelator(X_, s):
     ...                         size=(2, 2), grain_size=(2, 2), seed=99)
     >>> basis = DiscreteIndicatorBasis(n_states=3, domain=[0, 2])
     >>> X_ = basis.discretize(X)
-    >>> X_auto = _autocorrelator(X_, X_.shape[1:-1])
+    >>> correlations = [(l, l) for l in range(3)]
+    >>> X_corr = _correlate(X_, X_.shape[1:-1], correlations=correlations)
     >>> X_result = np.array([[[[0, 0, 0],
     ...                        [0, 0, 2]],
     ...                       [[0, 0, 0],
@@ -76,14 +85,16 @@ def _autocorrelator(X_, s):
     ...                        [0, 0, 0]],
     ...                       [[2, 0, 2],
     ...                        [2, 0, 2]]]])
-    >>> assert np.allclose(X_result, X_auto)
+    >>> assert np.allclose(X_result, X_corr)
     """
 
-    auto = Correlation(X_, Fkernel_shape=s).convolve(X_)
-    return _truncate(auto, X_.shape[:-1])
+    l_0, l_1 = [l[0] for l in correlations], [l[1] for l in correlations]
+    corr = Correlation(X_[..., l_0], Fkernel_shape=s).convolve(X_[..., l_1])
+    return _truncate(corr, X_.shape[:-1])
 
 
-def crosscorrelate(X_, periodic_axes=[], probability_mask=None):
+def crosscorrelate(X_, periodic_axes=[], probability_mask=None,
+                   crosscorrelations=[]):
     """
     Computes the crosscorrelations from a microstructure function.
 
@@ -96,6 +107,10 @@ def crosscorrelate(X_, periodic_axes=[], probability_mask=None):
             indicate that axes x and z are periodic in a 3D microstrucure.
         probability_mask (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
+        crosscorrelations (list, optional): list of cross-correlatiions to
+            be computed. For example [(0, 1), (0, 2)] computes the
+            cross-correlations with local states 0 and 1 as well as 0 and 2.
+            If no list is passed, all cross-correlations are computed.
 
     Returns:
         Crosscorelations for microstructure function `X_`.
@@ -138,58 +153,15 @@ def crosscorrelate(X_, periodic_axes=[], probability_mask=None):
     >>> X_ = basis.discretize(X)
     >>> assert(crosscorrelate(X_, periodic_axes=[0, 1]).shape == (1, 3, 3, 10))
     """
-    X_ = _set_X(X_, probability_mask)
+    if len(crosscorrelations) is 0:
+        correlations = _cross_correlations(X_.shape[-1])
+    X_ = _mask_X_(X_, probability_mask)
     s = _Fkernel_shape(X_, periodic_axes)
-    cross = _crosscorrelator(X_, s)
+    cross = _correlate(X_, s, correlations)
     return cross / _normalize(X_, s, probability_mask)
 
 
-def _crosscorrelator(X_, s):
-    """
-    Helper function used to calculate the unnormalized croos-correlation
-    counts.
-
-    Args:
-        X_: The discretized microstructure function, an
-            `(n_samples, n_x, ..., n_states)` shaped array
-            where `n_samples` is the number of samples, `n_x` is thes
-            patial discretization, and n_states is the number of local states.
-        s: shape of the Fkernel used for the convolution
-
-    Returns:
-        cross-correlation counts for a given microstructure function
-
-    Example
-
-    >>> from pymks.datasets import make_microstructure
-    >>> from pymks.bases import DiscreteIndicatorBasis
-    >>> X = make_microstructure(n_samples=2, n_phases=3,
-    ...                         size=(2, 2), grain_size=(2, 2), seed=90)
-    >>> basis = DiscreteIndicatorBasis(n_states=3, domain=[0, 2])
-    >>> X_ = basis.discretize(X)
-    >>> X_cross = _crosscorrelator(X_, X_.shape[1:-1])
-    >>> X_result = np.array([[[[2, 0, 0],
-    ...                        [2, 0, 0]],
-    ...                       [[0, 0, 0],
-    ...                        [0, 0, 0]]],
-    ...                      [[[0, 1, 0],
-    ...                        [0, 1, 0]],
-    ...                       [[0, 1, 0],
-    ...                        [0, 0, 0]]]])
-    >>> assert np.allclose(X_result, X_cross)
-    """
-    n_states = X_.shape[-1]
-    Niter = n_states // 2
-    Nslice = n_states * (n_states - 1) / 2
-    tmp = [Correlation(X_,
-                       Fkernel_shape=s).convolve(np.roll(X_, i,
-                                                         axis=-1)) for i
-           in range(1, Niter + 1)]
-    cross = np.concatenate(tmp, axis=-1)[..., :Nslice]
-    return _truncate(cross, X_.shape[:-1])
-
-
-def correlate(X_, periodic_axes=[], probability_mask=None):
+def correlate(X_, periodic_axes=[], probability_mask=None, correlations=[]):
     """
     Computes the autocorrelations and crosscorrelations from a microstructure
     function.
@@ -202,7 +174,12 @@ def correlate(X_, periodic_axes=[], probability_mask=None):
         periodic_axes (list, optional): axes that are periodic. (0, 2) would
             indicate that axes x and z are periodic in a 3D microstrucure.
         probability_mask (ND array, optional): array with same shape as X used
-            to assign a confidence value for each data point.nt.
+            to assign a confidence value for each data point.
+        correlations (list, optional): list of  spatial correlatiions to
+            be computed. For example [(0, 0), (1, 1), (0, 2)] computes the
+            autocorrelations with local states 0 and 1 as well as the
+            cross-correlation between 0 and 2. If no list is passed, all
+            spatial correlations are computed.
 
     Returns:
         Autocorrelations and crosscorrelations for microstructure funciton
@@ -222,12 +199,46 @@ def correlate(X_, periodic_axes=[], probability_mask=None):
     ...                      [0, 0.5, 0.5]])
     >>> assert np.allclose(X_corr, X_result)
     """
-    X_ = _set_X(X_, probability_mask)
+    if len(correlations) is 0:
+        L = X_.shape[-1]
+        correlations = _auto_correlations(L) + _cross_correlations(L)
+    X_ = _mask_X_(X_, probability_mask)
     s = _Fkernel_shape(X_, periodic_axes)
-    auto = _autocorrelator(X_, s)
-    cross = _crosscorrelator(X_, s)
-    norm = _normalize(X_, s, probability_mask)
-    return np.concatenate((auto / norm, cross / norm), axis=-1)
+    corr = _correlate(X_, s, correlations)
+    return corr / _normalize(X_, s, probability_mask)
+
+
+def _auto_correlations(n_states):
+    """Returns list of autocorrelations
+
+    Args:
+        n_states: number of local states
+
+    Returns:
+        list of tuples for autocorrelations
+
+    >>> l = _auto_correlations(3)
+    >>> assert l == [(0, 0), (1, 1), (2, 2)]
+    """
+    local_states = range(n_states)
+    return [(l, l) for l in local_states]
+
+
+def _cross_correlations(n_states):
+    """Returns list of crosscorrelations
+
+    Args:
+        n_states: number of local states
+
+    Returns:
+        list of tuples for crosscorrelations
+
+    >>> l = _cross_correlations(3)
+    >>> assert l == [(0, 1), (0, 2), (1, 2)]
+    """
+    l = range(n_states)
+    cross_corr = [[(l[i], l[j]) for j in l[1:][i:]] for i in l[:-1]]
+    return [item for sublist in cross_corr for item in sublist]
 
 
 def _normalize(X_, s, probability_mask):
@@ -341,7 +352,7 @@ def _truncate(a, shape):
     return a[multi_slice]
 
 
-def _set_X(X_, probability_mask):
+def _mask_X_(X_, probability_mask):
     """
     Helper function to verify that the probability_mask is the correct
     shape.
