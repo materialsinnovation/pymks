@@ -2,7 +2,7 @@ import numpy as np
 from .filter import Correlation
 
 """
-The stats functions take in a microstructure and returns its two
+The stats functions take in a microstructure function and returns its two
 point statistics.
 """
 
@@ -35,9 +35,9 @@ def autocorrelate(X_, periodic_axes=[], probability_mask=None,
     >>> X = np.array([[[0, 0, 0],
     ...                [0, 1, 0],
     ...                [0, 0, 0]]])
-    >>> from pymks.bases import DiscreteIndicatorBasis
-    >>> basis = DiscreteIndicatorBasis(n_states=n_states)
-    >>> X_ = basis.discretize(X)
+    >>> from pymks.bases import PrimitiveBasis
+    >>> prim_basis = PrimitiveBasis(n_states=n_states)
+    >>> X_ = prim_basis.discretize(X)
     >>> X_auto = autocorrelate(X_, periodic_axes=(0, 1))
     >>> X_test = np.array([[[0., 0., 0.],
     ...                   [0., 1./9, 0.],
@@ -70,11 +70,11 @@ def _correlate(X_, s, correlations=[]):
     Example
 
     >>> from pymks.datasets import make_microstructure
-    >>> from pymks.bases import DiscreteIndicatorBasis
+    >>> from pymks.bases import PrimitiveBasis
     >>> X = make_microstructure(n_samples=2, n_phases=3,
     ...                         size=(2, 2), grain_size=(2, 2), seed=99)
-    >>> basis = DiscreteIndicatorBasis(n_states=3, domain=[0, 2])
-    >>> X_ = basis.discretize(X)
+    >>> prim_basis = PrimitiveBasis(n_states=3, domain=[0, 2])
+    >>> X_ = prim_basis.discretize(X)
     >>> correlations = [(l, l) for l in range(3)]
     >>> X_corr = _correlate(X_, X_.shape[1:-1], correlations=correlations)
     >>> X_result = np.array([[[[0, 0, 0],
@@ -123,9 +123,9 @@ def crosscorrelate(X_, periodic_axes=[], probability_mask=None,
     >>> X = np.array([[[0, 1, 0],
     ...                [0, 1, 0],
     ...                [0, 1, 0]]])
-    >>> from pymks.bases import DiscreteIndicatorBasis
-    >>> basis = DiscreteIndicatorBasis(n_states=n_states)
-    >>> X_ = basis.discretize(X)
+    >>> from pymks.bases import PrimitiveBasis
+    >>> prim_basis = PrimitiveBasis(n_states=n_states)
+    >>> X_ = prim_basis.discretize(X)
     >>> X_cross = crosscorrelate(X_, periodic_axes=[0, 1])
     >>> X_test = np.array([[[[1/3.], [0.], [1/3.]],
     ...                     [[1/3.], [0.], [1/3.]],
@@ -135,22 +135,22 @@ def crosscorrelate(X_, periodic_axes=[], probability_mask=None,
     Test for 3 states
 
     >>> n_states = 3
-    >>> basis = DiscreteIndicatorBasis(n_states=n_states)
-    >>> X_ = basis.discretize(X)
+    >>> prim_basis = PrimitiveBasis(n_states=n_states)
+    >>> X_ = prim_basis.discretize(X)
     >>> assert(crosscorrelate(X_, periodic_axes=[0, 1]).shape == (1, 3, 3, 3))
 
     Test for 4 states
 
     >>> n_states = 4
-    >>> basis = DiscreteIndicatorBasis(n_states=n_states)
-    >>> X_ = basis.discretize(X)
+    >>> prim_basis = PrimitiveBasis(n_states=n_states)
+    >>> X_ = prim_basis.discretize(X)
     >>> assert(crosscorrelate(X_, periodic_axes=[0, 1]).shape == (1, 3, 3, 6))
 
     Test for 5 states
 
     >>> n_states = 5
-    >>> basis = DiscreteIndicatorBasis(n_states=n_states)
-    >>> X_ = basis.discretize(X)
+    >>> prim_basis = PrimitiveBasis(n_states=n_states)
+    >>> X_ = prim_basis.discretize(X)
     >>> assert(crosscorrelate(X_, periodic_axes=[0, 1]).shape == (1, 3, 3, 10))
     """
     if len(crosscorrelations) is 0:
@@ -187,12 +187,12 @@ def correlate(X_, periodic_axes=[], probability_mask=None, correlations=[]):
 
     Example
 
-    >>> from pymks import DiscreteIndicatorBasis
-    >>> dbasis = DiscreteIndicatorBasis(2, [0, 1])
+    >>> from pymks import PrimitiveBasis
+    >>> prim_basis = PrimitiveBasis(2, [0, 1])
     >>>
     >>> np.random.seed(0)
     >>> X = np.random.randint(2, size=(1, 3))
-    >>> X_ = dbasis.discretize(X)
+    >>> X_ = prim_basis.discretize(X)
     >>> X_corr = correlate(X_)
     >>> X_result = np.array([[0, 0.5, 0],
     ...                      [1 / 3., 2 / 3., 0],

@@ -20,24 +20,23 @@ class MKSHomogenizationModel(BaseEstimator):
         n_components: Number of components used by `dimension_reducer`.
         dimension_reducer: Class with method used for dimensionality reduction.
 
-    Below is an examlpe of using MKSHomogenizationModel to predict the type of
-    microstructure using PCA and Logistic Regression.
+    Below is an examlpe of using MKSHomogenizationModel to predict (or
+    classify) the type of microstructure using PCA and Logistic Regression.
 
     >>> n_states = 3
     >>> domain = [-1, 1]
 
 
     >>> from .bases import LegendreBasis
-    >>> basis = LegendreBasis(n_states=n_states, domain=domain)
+    >>> leg_basis = LegendreBasis(n_states=n_states, domain=domain)
     >>> from sklearn.decomposition import PCA
     >>> from sklearn.linear_model import LogisticRegression
     >>> reducer = PCA(n_components=3)
     >>> linker = LogisticRegression()
-    >>> model = MKSHomogenizationModel(basis=basis, dimension_reducer=reducer,
-    ...                                property_linker=linker)
-
+    >>> model = MKSHomogenizationModel(
+    ...     basis=leg_basis, dimension_reducer=reducer, property_linker=linker)
     >>> from .datasets import make_cahn_hilliard
-    >>> X0, X1 = make_cahn_hilliard(n_samples=25)
+    >>> X0, X1 = make_cahn_hilliard(n_samples=50)
     >>> y0 = np.zeros(X0.shape[0])
     >>> y1 = np.ones(X1.shape[0])
 
@@ -151,20 +150,20 @@ class MKSHomogenizationModel(BaseEstimator):
 
         >>> from sklearn.decomposition import PCA
         >>> from sklearn.linear_model import LinearRegression
-        >>> from pymks.bases import DiscreteIndicatorBasis
+        >>> from pymks.bases import PrimitiveBasis
         >>> from pymks.stats import correlate
 
         >>> reducer = PCA(n_components=2)
         >>> linker = LinearRegression()
-        >>> dbasis = DiscreteIndicatorBasis(n_states=2, domain=[0, 1])
-        >>> model = MKSHomogenizationModel(dbasis,
+        >>> prim_basis = PrimitiveBasis(n_states=2, domain=[0, 1])
+        >>> model = MKSHomogenizationModel(prim_basis,
         ...                                dimension_reducer=reducer,
         ...                                property_linker=linker)
         >>> np.random.seed(99)
         >>> X = np.random.randint(2, size=(3, 15))
         >>> y = np.array([1, 2, 3])
         >>> model.fit(X, y)
-        >>> X_ = dbasis.discretize(X)
+        >>> X_ = prim_basis.discretize(X)
         >>> X_corr = correlate(X_)
         >>> X_reshaped = X_corr.reshape((X_corr.shape[0], X_corr[0].size))
         >>> X_pca = reducer.fit_transform(X_reshaped - np.mean(X_reshaped,
@@ -200,14 +199,14 @@ class MKSHomogenizationModel(BaseEstimator):
 
         >>> from sklearn.manifold import LocallyLinearEmbedding
         >>> from sklearn.linear_model import BayesianRidge
-        >>> from pymks.bases import DiscreteIndicatorBasis
+        >>> from pymks.bases import PrimitiveBasis
         >>> np.random.seed(99)
         >>> X = np.random.randint(2, size=(50, 100))
         >>> y = np.random.random(50)
         >>> reducer = LocallyLinearEmbedding()
         >>> linker = BayesianRidge()
-        >>> basis = DiscreteIndicatorBasis(2, domain=[0, 1])
-        >>> model = MKSHomogenizationModel(basis, n_components=2,
+        >>> prim_basis = PrimitiveBasis(2, domain=[0, 1])
+        >>> model = MKSHomogenizationModel(prim_basis, n_components=2,
         ...                                dimension_reducer=reducer,
         ...                                property_linker=linker)
         >>> model.fit(X, y)
@@ -242,11 +241,11 @@ class MKSHomogenizationModel(BaseEstimator):
 
         >>> from sklearn.manifold import Isomap
         >>> from sklearn.linear_model import ARDRegression
-        >>> from pymks.bases import DiscreteIndicatorBasis
+        >>> from pymks.bases import PrimitiveBasis
         >>> reducer = Isomap()
         >>> linker = ARDRegression()
-        >>> basis = DiscreteIndicatorBasis(2, [0, 1])
-        >>> model = MKSHomogenizationModel(basis, reducer, linker)
+        >>> prim_basis = PrimitiveBasis(2, [0, 1])
+        >>> model = MKSHomogenizationModel(prim_basis, reducer, linker)
         >>> X = np.array([[0, 1],
         ...               [1, 0]])
         >>> X_prep = model._X_prep(X, [], None)

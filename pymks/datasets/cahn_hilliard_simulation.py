@@ -1,10 +1,6 @@
 import numpy as np
-try:
-    import pyfftw
-    np.fft = pyfftw.interfaces.numpy_fft
-    pyfftw.interfaces.cache.enable()
-except:
-    pass
+from ..filter import _import_pyfftw
+_import_pyfftw()
 
 
 class CahnHilliardSimulation(object):
