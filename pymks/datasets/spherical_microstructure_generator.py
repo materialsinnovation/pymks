@@ -46,7 +46,7 @@ class SphericalMicrostructureGenerator(BaseMicrostructureGenerator):
     ...     n_particles=2,
     ...     grain_size=2.,
     ...     seed=10)
-    ... X = [[[[0, 0, 0], [1, 1, 1], [0, 0, 0]],
+    >>> X = [[[[0, 0, 0], [1, 1, 1], [0, 0, 0]],
     ...       [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
     ...       [[0, 0, 0], [1, 1, 1], [0, 0, 0]]]]
     >>> assert np.allclose(generator.generate(), X)
