@@ -166,7 +166,7 @@ def test_periodic_mask():
     mask = np.ones((X.shape))
     mask[0, 0, 0] = 0
     X_auto_periodic_mask = autocorrelate(X_, periodic_axes=[0, 1],
-                                         probability_mask=mask)
+                                         confidence_index=mask)
     X_result_0 = np.array([[[1 / 7., 1 / 7., 3 / 7.],
                           [1 / 7., 0.5, 1 / 7.],
                           [3 / 7., 1 / 7., 1 / 7.]]])
@@ -191,7 +191,7 @@ def test_nonperiodic_mask():
     X_ = basis.discretize(X)
     mask = np.ones((X.shape))
     mask[0, 0, 0] = 0
-    X_auto_nonperiodic_mask = autocorrelate(X_, probability_mask=mask)
+    X_auto_nonperiodic_mask = autocorrelate(X_, confidence_index=mask)
     X_result_0 = np.array([[[1 / 3., 0, 0.5],
                           [0, 0.5, 0.],
                           [0.5, 0, 1 / 3.]]])
@@ -214,7 +214,7 @@ def test_mixperdic_mask():
     mask = np.ones((X.shape))
     mask[0, 0, 0] = 0
     X_auto_mixperiodic_mask = autocorrelate(X_, periodic_axes=[0],
-                                            probability_mask=mask)
+                                            confidence_index=mask)
     X_result_0 = np.array([[[1 / 5., 1 / 7., 2 / 5.],
                           [0, 0.5, 0],
                           [2 / 5., 1 / 7., 1 / 5.]]])
@@ -237,7 +237,7 @@ def test_mask_two_samples():
     X_ = basis.discretize(X)
     mask = np.ones(X.shape)
     mask[:, 0, 0] = 0.
-    X_corr = correlate(X_, probability_mask=mask)
+    X_corr = correlate(X_, confidence_index=mask)
     X_result = np.array([[[[1 / 3., 1 / 3., 1 / 3.],
                            [1 / 5., 1 / 5., 1 / 5.],
                            [1 / 4., 1 / 4., 0]],

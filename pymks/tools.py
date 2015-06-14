@@ -710,8 +710,9 @@ def draw_correlations(X_corr, correlations=None):
         X_corr (ND array): correlations
         correlations (list, optional): correlation labels
     """
-    L = X_corr.shape[-1]
     if correlations is None:
+        n_cross = X_corr.shape[-1]
+        L = (np.sqrt(1 + 8 * n_cross) - 1).astype(int) / 2
         correlations = _auto_correlations(L) + _cross_correlations(L)
     _draw_stats(X_corr, correlations=correlations)
 

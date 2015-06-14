@@ -2,12 +2,12 @@ import numpy as np
 from .filter import Correlation
 
 """
-The stats functions take in a microstructure and returns its two
+The stats functions take in a microstructure function and returns its two
 point statistics.
 """
 
 
-def autocorrelate(X_, periodic_axes=[], probability_mask=None,
+def autocorrelate(X_, periodic_axes=[], confidence_index=None,
                   autocorrelations=[]):
     """
     Computes the autocorrelation from a microstructure function.
@@ -19,7 +19,7 @@ def autocorrelate(X_, periodic_axes=[], probability_mask=None,
             patial discretization, and n_states is the number of local states.
         periodic_axes (list, optional): axes that are periodic. (0, 2) would
             indicate that axes x and z are periodic in a 3D microstrucure.
-        probability_mask (ND array, optional): array with same shape as X used
+        confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
         autocorrelations (list, optional): list of spatial autocorrelatiions to
             be computed. For example [(0, 0), (1, 1)] computes the
@@ -35,9 +35,9 @@ def autocorrelate(X_, periodic_axes=[], probability_mask=None,
     >>> X = np.array([[[0, 0, 0],
     ...                [0, 1, 0],
     ...                [0, 0, 0]]])
-    >>> from pymks.bases import DiscreteIndicatorBasis
-    >>> basis = DiscreteIndicatorBasis(n_states=n_states)
-    >>> X_ = basis.discretize(X)
+    >>> from pymks.bases import PrimitiveBasis
+    >>> prim_basis = PrimitiveBasis(n_states=n_states)
+    >>> X_ = prim_basis.discretize(X)
     >>> X_auto = autocorrelate(X_, periodic_axes=(0, 1))
     >>> X_test = np.array([[[0., 0., 0.],
     ...                   [0., 1./9, 0.],
@@ -47,10 +47,10 @@ def autocorrelate(X_, periodic_axes=[], probability_mask=None,
 
     if len(autocorrelations) is 0:
         correlations = _auto_correlations(X_.shape[-1])
-    X_ = _mask_X_(X_, probability_mask)
+    X_ = _mask_X_(X_, confidence_index)
     s = _Fkernel_shape(X_, periodic_axes)
     auto = _correlate(X_, s, correlations)
-    return auto / _normalize(X_, s, probability_mask)
+    return auto / _normalize(X_, s, confidence_index)
 
 
 def _correlate(X_, s, correlations=[]):
@@ -70,11 +70,11 @@ def _correlate(X_, s, correlations=[]):
     Example
 
     >>> from pymks.datasets import make_microstructure
-    >>> from pymks.bases import DiscreteIndicatorBasis
+    >>> from pymks.bases import PrimitiveBasis
     >>> X = make_microstructure(n_samples=2, n_phases=3,
     ...                         size=(2, 2), grain_size=(2, 2), seed=99)
-    >>> basis = DiscreteIndicatorBasis(n_states=3, domain=[0, 2])
-    >>> X_ = basis.discretize(X)
+    >>> prim_basis = PrimitiveBasis(n_states=3, domain=[0, 2])
+    >>> X_ = prim_basis.discretize(X)
     >>> correlations = [(l, l) for l in range(3)]
     >>> X_corr = _correlate(X_, X_.shape[1:-1], correlations=correlations)
     >>> X_result = np.array([[[[0, 0, 0],
@@ -93,7 +93,7 @@ def _correlate(X_, s, correlations=[]):
     return _truncate(corr, X_.shape[:-1])
 
 
-def crosscorrelate(X_, periodic_axes=[], probability_mask=None,
+def crosscorrelate(X_, periodic_axes=[], confidence_index=None,
                    crosscorrelations=[]):
     """
     Computes the crosscorrelations from a microstructure function.
@@ -105,7 +105,7 @@ def crosscorrelate(X_, periodic_axes=[], probability_mask=None,
             patial discretization, and n_states is the number of local states.
         periodic_axes (list, optional): axes that are periodic. (0, 2) would
             indicate that axes x and z are periodic in a 3D microstrucure.
-        probability_mask (ND array, optional): array with same shape as X used
+        confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
         crosscorrelations (list, optional): list of cross-correlatiions to
             be computed. For example [(0, 1), (0, 2)] computes the
@@ -123,9 +123,9 @@ def crosscorrelate(X_, periodic_axes=[], probability_mask=None,
     >>> X = np.array([[[0, 1, 0],
     ...                [0, 1, 0],
     ...                [0, 1, 0]]])
-    >>> from pymks.bases import DiscreteIndicatorBasis
-    >>> basis = DiscreteIndicatorBasis(n_states=n_states)
-    >>> X_ = basis.discretize(X)
+    >>> from pymks.bases import PrimitiveBasis
+    >>> prim_basis = PrimitiveBasis(n_states=n_states)
+    >>> X_ = prim_basis.discretize(X)
     >>> X_cross = crosscorrelate(X_, periodic_axes=[0, 1])
     >>> X_test = np.array([[[[1/3.], [0.], [1/3.]],
     ...                     [[1/3.], [0.], [1/3.]],
@@ -135,33 +135,33 @@ def crosscorrelate(X_, periodic_axes=[], probability_mask=None,
     Test for 3 states
 
     >>> n_states = 3
-    >>> basis = DiscreteIndicatorBasis(n_states=n_states)
-    >>> X_ = basis.discretize(X)
+    >>> prim_basis = PrimitiveBasis(n_states=n_states)
+    >>> X_ = prim_basis.discretize(X)
     >>> assert(crosscorrelate(X_, periodic_axes=[0, 1]).shape == (1, 3, 3, 3))
 
     Test for 4 states
 
     >>> n_states = 4
-    >>> basis = DiscreteIndicatorBasis(n_states=n_states)
-    >>> X_ = basis.discretize(X)
+    >>> prim_basis = PrimitiveBasis(n_states=n_states)
+    >>> X_ = prim_basis.discretize(X)
     >>> assert(crosscorrelate(X_, periodic_axes=[0, 1]).shape == (1, 3, 3, 6))
 
     Test for 5 states
 
     >>> n_states = 5
-    >>> basis = DiscreteIndicatorBasis(n_states=n_states)
-    >>> X_ = basis.discretize(X)
+    >>> prim_basis = PrimitiveBasis(n_states=n_states)
+    >>> X_ = prim_basis.discretize(X)
     >>> assert(crosscorrelate(X_, periodic_axes=[0, 1]).shape == (1, 3, 3, 10))
     """
     if len(crosscorrelations) is 0:
         correlations = _cross_correlations(X_.shape[-1])
-    X_ = _mask_X_(X_, probability_mask)
+    X_ = _mask_X_(X_, confidence_index)
     s = _Fkernel_shape(X_, periodic_axes)
     cross = _correlate(X_, s, correlations)
-    return cross / _normalize(X_, s, probability_mask)
+    return cross / _normalize(X_, s, confidence_index)
 
 
-def correlate(X_, periodic_axes=[], probability_mask=None, correlations=[]):
+def correlate(X_, periodic_axes=[], confidence_index=None, correlations=[]):
     """
     Computes the autocorrelations and crosscorrelations from a microstructure
     function.
@@ -173,7 +173,7 @@ def correlate(X_, periodic_axes=[], probability_mask=None, correlations=[]):
             patial discretization, and n_states is the number of local states.
         periodic_axes (list, optional): axes that are periodic. (0, 2) would
             indicate that axes x and z are periodic in a 3D microstrucure.
-        probability_mask (ND array, optional): array with same shape as X used
+        confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
         correlations (list, optional): list of  spatial correlatiions to
             be computed. For example [(0, 0), (1, 1), (0, 2)] computes the
@@ -187,12 +187,12 @@ def correlate(X_, periodic_axes=[], probability_mask=None, correlations=[]):
 
     Example
 
-    >>> from pymks import DiscreteIndicatorBasis
-    >>> dbasis = DiscreteIndicatorBasis(2, [0, 1])
+    >>> from pymks import PrimitiveBasis
+    >>> prim_basis = PrimitiveBasis(2, [0, 1])
     >>>
     >>> np.random.seed(0)
     >>> X = np.random.randint(2, size=(1, 3))
-    >>> X_ = dbasis.discretize(X)
+    >>> X_ = prim_basis.discretize(X)
     >>> X_corr = correlate(X_)
     >>> X_result = np.array([[0, 0.5, 0],
     ...                      [1 / 3., 2 / 3., 0],
@@ -202,10 +202,10 @@ def correlate(X_, periodic_axes=[], probability_mask=None, correlations=[]):
     if len(correlations) is 0:
         L = X_.shape[-1]
         correlations = _auto_correlations(L) + _cross_correlations(L)
-    X_ = _mask_X_(X_, probability_mask)
+    X_ = _mask_X_(X_, confidence_index)
     s = _Fkernel_shape(X_, periodic_axes)
     corr = _correlate(X_, s, correlations)
-    return corr / _normalize(X_, s, probability_mask)
+    return corr / _normalize(X_, s, confidence_index)
 
 
 def _auto_correlations(n_states):
@@ -241,7 +241,7 @@ def _cross_correlations(n_states):
     return [item for sublist in cross_corr for item in sublist]
 
 
-def _normalize(X_, s, probability_mask):
+def _normalize(X_, s, confidence_index):
     """
     Returns the normalization for the statistics
 
@@ -253,7 +253,7 @@ def _normalize(X_, s, probability_mask):
             where `n_samples` is the number of samples, `n_x` is thes
             patial discretization, and n_states is the number of local states.
         _Fkernel_shape : the shape of the kernel is Fourier space (array)
-        probability_mask: array with same shape as X used to assign a
+        confidence_index: array with same shape as X used to assign a
             confidence value for each data point.
 
     Returns:
@@ -269,10 +269,10 @@ def _normalize(X_, s, probability_mask):
     >>> assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
     """
 
-    if (s == X_.shape[1:-1]).all() and probability_mask is None:
+    if (s == X_.shape[1:-1]).all() and confidence_index is None:
         return float(np.prod(X_.shape[1:-1]))
     else:
-        mask = probability_mask
+        mask = confidence_index
         if mask is None:
             mask = np.ones(X_.shape[:-1])
         corr = Correlation(mask[..., None], Fkernel_shape=s)
@@ -352,9 +352,9 @@ def _truncate(a, shape):
     return a[multi_slice]
 
 
-def _mask_X_(X_, probability_mask):
+def _mask_X_(X_, confidence_index):
     """
-    Helper function to verify that the probability_mask is the correct
+    Helper function to verify that the confidence_index is the correct
     shape.
 
     Args:
@@ -362,15 +362,15 @@ def _mask_X_(X_, probability_mask):
             `(n_samples, n_x, ..., n_states)` shaped array
             where `n_samples` is the number of samples, `n_x` is thes
             patial discretization, and n_states is the number of local states.
-        probability_mask: array with same shape as X used to assign a
+        confidence_index: array with same shape as X used to assign a
             confidence value for each data point.
 
     Returns:
-        The discretized microstructure function scaled by the probability_mask.
+        The discretized microstructure function scaled by the confidence_index.
 
     """
-    if probability_mask is not None:
-        if X_.shape[:-1] != probability_mask.shape:
-            raise RuntimeError('probability_mask does not match shape of X')
-        X_ = X_ * probability_mask[..., None]
+    if confidence_index is not None:
+        if X_.shape[:-1] != confidence_index.shape:
+            raise RuntimeError('confidence_index does not match shape of X')
+        X_ = X_ * confidence_index[..., None]
     return X_

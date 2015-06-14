@@ -1,12 +1,8 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from .filter import Filter
-try:
-    import pyfftw
-    np.fft = pyfftw.interfaces.numpy_fft
-    pyfftw.interfaces.cache.enable()
-except:
-    pass
+from .filter import _import_pyfftw
+_import_pyfftw()
 
 
 class MKSLocalizationModel(LinearRegression):
@@ -54,9 +50,9 @@ class MKSLocalizationModel(LinearRegression):
 
     Use the `MKSLocalizationModel` to reconstruct the coefficients
 
-    >>> from .bases import ContinuousIndicatorBasis
-    >>> basis = ContinuousIndicatorBasis(n_states, [0, 1])
-    >>> model = MKSLocalizationModel(basis=basis)
+    >>> from .bases import PrimitiveBasis
+    >>> prim_basis = PrimitiveBasis(n_states, [0, 1])
+    >>> model = MKSLocalizationModel(basis=prim_basis)
     >>> model.fit(X, y)
 
     Check the result
@@ -96,9 +92,9 @@ class MKSLocalizationModel(LinearRegression):
 
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
         >>> y = X.swapaxes(1, 2)
-        >>> from .bases import ContinuousIndicatorBasis
-        >>> basis = ContinuousIndicatorBasis(2, [0, 1])
-        >>> model = MKSLocalizationModel(basis=basis)
+        >>> from .bases import PrimitiveBasis
+        >>> prim_basis = PrimitiveBasis(2, [0, 1])
+        >>> model = MKSLocalizationModel(basis=prim_basis)
         >>> model.fit(X, y)
         >>> assert np.allclose(model._filter.Fkernel, [[[ 0.5,  0.5],
         ...                                             [  -2,    0]],
@@ -147,17 +143,17 @@ class MKSLocalizationModel(LinearRegression):
 
         >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
         >>> y = X.swapaxes(1, 2)
-        >>> from .bases import ContinuousIndicatorBasis
-        >>> basis = ContinuousIndicatorBasis(2, [0, 1])
-        >>> model = MKSLocalizationModel(basis=basis)
+        >>> from .bases import PrimitiveBasis
+        >>> prim_basis = PrimitiveBasis(2, [0, 1])
+        >>> model = MKSLocalizationModel(basis=prim_basis)
         >>> model.fit(X, y)
         >>> assert np.allclose(y, model.predict(X))
 
         The fit method must be called to calibrate the coefficients before
         the predict method can be used.
 
-        >>> MKSmodel = MKSLocalizationModel(basis)
-        >>> MKSmodel.predict(X)
+        >>> MKSModel = MKSLocalizationModel(prim_basis)
+        >>> MKSModel.predict(X)
         Traceback (most recent call last):
         ...
         AttributeError: fit() method must be run before predict().
@@ -184,9 +180,9 @@ class MKSLocalizationModel(LinearRegression):
         Let's first instantitate a model and fabricate some
         coefficients.
 
-        >>> from pymks.bases import DiscreteIndicatorBasis
-        >>> basis = DiscreteIndicatorBasis(n_states=2)
-        >>> model = MKSLocalizationModel(basis)
+        >>> from pymks.bases import PrimitiveBasis
+        >>> prim_basis = PrimitiveBasis(n_states=2)
+        >>> model = MKSLocalizationModel(prim_basis)
         >>> coeff = np.arange(20).reshape((5, 4, 1))
         >>> coeff = np.concatenate((coeff , np.ones_like(coeff)), axis=2)
         >>> coeff = np.fft.ifftshift(coeff, axes=(0, 1))
@@ -216,9 +212,9 @@ class MKSLocalizationModel(LinearRegression):
         >>> n_states = 10
         >>> np.random.seed(3)
         >>> X = np.random.random((2, 5, 3))
-        >>> from .bases import ContinuousIndicatorBasis
-        >>> basis = ContinuousIndicatorBasis(n_states, [0, 1])
-        >>> X_ = basis.discretize(X)
+        >>> from .bases import PrimitiveBasis
+        >>> prim_basis = PrimitiveBasis(n_states, [0, 1])
+        >>> X_ = prim_basis.discretize(X)
         >>> H = np.linspace(0, 1, n_states)
         >>> Xtest = np.sum(X_ * H[None,None,None,:], axis=-1)
         >>> assert np.allclose(X, Xtest)
@@ -229,9 +225,9 @@ class MKSLocalizationModel(LinearRegression):
         >>> from .bases import LegendreBasis
         >>> np.random.seed(3)
         >>> X = np.random.random((1, 3, 3))
-        >>> basis = LegendreBasis(2, [0, 1])
-        >>> model = MKSLocalizationModel(basis=basis)
-        >>> X_ = basis.discretize(X)
+        >>> leg_basis = LegendreBasis(2, [0, 1])
+        >>> model = MKSLocalizationModel(basis=leg_basis)
+        >>> X_ = leg_basis.discretize(X)
         >>> FX = np.fft.fftn(X_, axes=(1, 2))
         >>>
         >>> FXtest = np.array([[[[4.50000000+0.j, -0.79735949+0.],

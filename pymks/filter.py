@@ -1,10 +1,15 @@
 import numpy as np
-try:
-    import pyfftw
-    np.fft = pyfftw.interfaces.numpy_fft
-    pyfftw.interfaces.cache.enable()
-except:
-    pass
+
+
+def _import_pyfftw():
+    try:
+        import pyfftw
+        np.fft = pyfftw.interfaces.numpy_fft
+        pyfftw.interfaces.cache.enable()
+    except:
+        pass
+
+_import_pyfftw()
 
 
 class Filter(object):
