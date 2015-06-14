@@ -79,11 +79,12 @@ class MKSHomogenizationModel(BaseEstimator):
             n_components = 2
         if property_linker is None:
             property_linker = LinearRegression()
-        self.linker = Pipeline([('poly', PolynomialFeatures(degree=degree)),
+        self._linker = Pipeline([('poly', PolynomialFeatures(degree=degree)),
                                 ('connector', property_linker)])
         self._check_methods
         self.degree = degree
         self.n_components = n_components
+        self.property_linker = property_linker
 
     @property
     def n_components(self):
@@ -105,7 +106,18 @@ class MKSHomogenizationModel(BaseEstimator):
         """Setter for the polynomial degree for property_linker.
         """
         self._degree = value
-        self.linker.set_params(poly__degree=value)
+        self._linker.set_params(poly__degree=value)
+
+    @property
+    def property_linker(self):
+        return self._property_linker
+
+    @property_linker.setter
+    def property_linker(self, prop_linker):
+        """Setter for the polynomial degree for property_linker.
+        """
+        self._property_linker = prop_linker
+        self._linker.set_params(connector=prop_linker)
 
     def _check_methods(self):
         """
@@ -176,7 +188,7 @@ class MKSHomogenizationModel(BaseEstimator):
         X_preped = self._X_prep(X, periodic_axes, confidence_index)
         X_reduced = self.dimension_reducer.fit_transform(X_preped,
                                                          X_reduce_label)
-        self.linker.fit(X_reduced, y)
+        self._linker.fit(X_reduced, y)
         self.fit_data = X_reduced
 
     def predict(self, X, periodic_axes=[], confidence_index=None):
@@ -216,7 +228,7 @@ class MKSHomogenizationModel(BaseEstimator):
         X_preped = self._X_prep(X, periodic_axes, confidence_index)
         X_reduced = self.dimension_reducer.transform(X_preped)
         self.predict_data = X_reduced
-        return self.linker.predict(X_reduced)
+        return self._linker.predict(X_reduced)
 
     def _X_prep(self, X, periodic_axes=[], confidence_index=None):
         """
