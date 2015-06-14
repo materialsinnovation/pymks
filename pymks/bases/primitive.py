@@ -13,8 +13,8 @@ class PrimitiveBasis(_AbstractMicrostructureBasis):
        \frac{1}{\Delta x} \int_{H} \int_{s} \Lambda(h - l)
        m(h, x) dx dh = m[l, s]
 
-    where :math:`\Lambda` is the primitive basis (also called hat basis
-    function)
+    where :math:`\Lambda` is the primitive basis (also called hat basis)
+    function
 
     .. math::
 
@@ -44,7 +44,7 @@ class PrimitiveBasis(_AbstractMicrostructureBasis):
     For example, if a cell has a label of 2, its local state will be
     `[0, 0, 1]`. The local state can only have values of 0 or 1.
 
-    >>> basis = PrimitiveBasis(n_states=3)
+    >>> prim_basis = PrimitiveBasis(n_states=3)
     >>> X_prim = np.array([[[[0, 1, 0],
     ...                      [0, 1, 0],
     ...                      [1, 0, 0]],
@@ -54,17 +54,17 @@ class PrimitiveBasis(_AbstractMicrostructureBasis):
     ...                     [[1, 0, 0],
     ...                      [0, 1, 0],
     ...                      [1, 0, 0]]]])
-    >>> assert(np.allclose(X_prim, basis.discretize(X)))
+    >>> assert(np.allclose(X_prim, prim_basis.discretize(X)))
 
     Check that the basis works when all the states are present in the
     microstructure.
 
-    >>> basis = PrimitiveBasis(n_states=3)
+    >>> prim_basis = PrimitiveBasis(n_states=3)
     >>> X = np.array([1, 1, 0])
     >>> X_prim = np.array([[0, 1, 0],
     ...                    [0, 1, 0],
     ...                    [1, 0, 0]])
-    >>> assert(np.allclose(X_prim, basis.discretize(X)))
+    >>> assert(np.allclose(X_prim, prim_basis.discretize(X)))
 
     In previous two microstructures had values that fell on the peak of the
     primitive (or hat) basis functions. If a local state value falls between
@@ -112,7 +112,7 @@ class PrimitiveBasis(_AbstractMicrostructureBasis):
     def _get_basis_slice(self, ijk, s0):
         """
         Helper method used to calibrate influence coefficients from in
-        mks_regresison_model to account for redundancies from linearly
+        mks_localization_model to account for redundancies from linearly
         dependent local states.
         """
         if np.all(np.array(ijk) == 0):

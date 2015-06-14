@@ -1,8 +1,8 @@
 import numpy as np
-from .polynomial import _Polynomial
+from .abstract import _AbstractMicrostructureBasis
 
 
-class LegendreBasis(_Polynomial):
+class LegendreBasis(_AbstractMicrostructureBasis):
 
     r"""
     Discretize a continuous field into `deg` local states using a
@@ -20,7 +20,8 @@ class LegendreBasis(_Polynomial):
 
        -1 \le  H \le 1
 
-    The mapping of :math:`H` into the domain is done automatically in PyMKS.
+    The mapping of :math:`H` into the domain is done automatically in PyMKS by
+    using the `domain` key work argument.
 
     >>> n_states = 3
     >>> X = np.array([[0.25, 0.1],
@@ -33,7 +34,27 @@ class LegendreBasis(_Polynomial):
     >>> basis = LegendreBasis(n_states, [0., 0.5])
     >>> assert(np.allclose(basis.discretize(X), P(X)))
 
+    If the microstructure local state values fall outside of the specified
+    domain they will no longer be mapped into the orthogonal domain of the
+    legendre polynomais.
+
+    >>> n_states = 2
+    >>> X = np.array([-1, 1])
+    >>> leg_basis = LegendreBasis(n_states, domain=[0, 1])
+    >>> leg_basis.discretize(X)
+    Traceback (most recent call last):
+    ...
+    RuntimeError: X must be within the specified domain
+
     """
+
+    def _get_basis_slice(self, ijk, s0):
+        """
+        Helper method used to calibrate influence coefficients from in
+        mks_localization_model to account for redundancies from linearly
+        dependent local states.
+        """
+        return s0
 
     def discretize(self, X):
         """
@@ -48,12 +69,12 @@ class LegendreBasis(_Polynomial):
 
         >>> X = np.array([[-1, 1],
         ...               [0, -1]])
-        >>> basis = LegendreBasis(3, [-1, 1])
-        >>> def P(x):
+        >>> leg_basis = LegendreBasis(3, [-1, 1])
+        >>> def p(x):
         ...    polys = np.array((np.ones_like(x), x, (3.*x**2 - 1.) / 2.))
         ...    tmp = (2. * np.arange(3)[:, None, None] + 1.) / 2. * polys
         ...    return np.rollaxis(tmp, 0, 3)
-        >>> assert(np.allclose(basis.discretize(X), P(X)))
+        >>> assert(np.allclose(leg_basis.discretize(X), p(X)))
 
         """
         self.check(X)
