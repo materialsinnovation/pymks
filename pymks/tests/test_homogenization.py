@@ -20,7 +20,7 @@ def test_n_components_with_reducer():
     assert model.n_components == 9
 
 
-def stress_test():
+def test_stress():
     from pymks.datasets import make_elastic_stress_random
     from pymks import MKSHomogenizationModel, DiscreteIndicatorBasis
     sample_size = 200
@@ -82,5 +82,21 @@ def test_default_n_components():
     model = MKSHomogenizationModel(basis=dbasis)
     assert model.n_components == 2
 
+
+def test_default_property_linker():
+    from sklearn.linear_model import LinearRegression
+    from pymks import MKSHomogenizationModel, PrimitiveBasis
+    prim_basis = PrimitiveBasis(n_states=2)
+    model = MKSHomogenizationModel(basis=prim_basis)
+    assert isinstance(model.property_linker, LinearRegression)
+
+
+def test_default_dimension_reducer():
+    from sklearn.decomposition import RandomizedPCA
+    from pymks import MKSHomogenizationModel
+    model = MKSHomogenizationModel()
+    assert isinstance(model.dimension_reducer, RandomizedPCA)
+
+
 if __name__ == '__main__':
-    stress_test()
+    test_default_dimension_reducer()
