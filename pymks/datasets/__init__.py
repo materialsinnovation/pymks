@@ -281,8 +281,9 @@ def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
 
     Example
 
-    >>> X, y = make_elastic_stress_random(elastic_modulus=(1, 1),
-    ...                                   poissons_ratio=(1, 1))
+    >>> X, y = make_elastic_stress_random(n_samples=1, elastic_modulus=(1, 1),
+    ...                                   poissons_ratio=(1, 1),
+    ...                                   grain_size=(3, 3), macro_strain=1.0)
     >>> assert np.allclose(y, np.ones(y.shape))
     >>> X, y = make_elastic_stress_random(n_samples=1, grain_size=(1, 1),
     ...                                   elastic_modulus=(100, 200),
