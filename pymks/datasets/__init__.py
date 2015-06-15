@@ -255,9 +255,10 @@ def make_checkerboard_microstructure(square_size, n_squares):
     return np.tile(X, ((n_squares + 1) / 2, (n_squares + 1) / 2))[None, :L, :L]
 
 
-def make_elastic_stress_random(n_samples=1, elastic_modulus=(100, 150),
+def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
                                poissons_ratio=(0.3, 0.3), size=(21, 21),
-                               macro_strain=1.0, grain_size=(3, 3), seed=10):
+                               macro_strain=0.01, grain_size=[(3, 3), (9, 9)],
+                               seed=10):
     """
     Generates microstructures and their macroscopic stress values for an
     applied macroscopic strain.
@@ -280,8 +281,9 @@ def make_elastic_stress_random(n_samples=1, elastic_modulus=(100, 150),
 
     Example
 
-    >>> X, y = make_elastic_stress_random(elastic_modulus=(1, 1),
-    ...                                   poissons_ratio=(1, 1))
+    >>> X, y = make_elastic_stress_random(n_samples=1, elastic_modulus=(1, 1),
+    ...                                   poissons_ratio=(1, 1),
+    ...                                   grain_size=(3, 3), macro_strain=1.0)
     >>> assert np.allclose(y, np.ones(y.shape))
     >>> X, y = make_elastic_stress_random(n_samples=1, grain_size=(1, 1),
     ...                                   elastic_modulus=(100, 200),

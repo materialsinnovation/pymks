@@ -16,9 +16,14 @@ class MKSHomogenizationModel(BaseEstimator):
     integrate with dimensionality reduction techniques and predictive models.
 
     Attributes:
-        degree: Degree of the polynomial used by `property_linker`.
+        degree: Degree of the polynomial used by
+            `property_linker`.
         n_components: Number of components used by `dimension_reducer`.
-        dimension_reducer: Class with method used for dimensionality reduction.
+        dimension_reducer: Instance of a dimensionality reduction class.
+        property_linker: Instance of class that maps materials property to the
+            microstuctures.
+        correlations: spatial correlations to be computed
+        basis: instance of a basis class
 
     Below is an examlpe of using MKSHomogenizationModel to predict (or
     classify) the type of microstructure using PCA and Logistic Regression.
@@ -26,8 +31,7 @@ class MKSHomogenizationModel(BaseEstimator):
     >>> n_states = 3
     >>> domain = [-1, 1]
 
-
-    >>> from .bases import LegendreBasis
+    >>> from pymks.bases import LegendreBasis
     >>> leg_basis = LegendreBasis(n_states=n_states, domain=domain)
     >>> from sklearn.decomposition import PCA
     >>> from sklearn.linear_model import LogisticRegression
@@ -35,7 +39,7 @@ class MKSHomogenizationModel(BaseEstimator):
     >>> linker = LogisticRegression()
     >>> model = MKSHomogenizationModel(
     ...     basis=leg_basis, dimension_reducer=reducer, property_linker=linker)
-    >>> from .datasets import make_cahn_hilliard
+    >>> from pymks.datasets import make_cahn_hilliard
     >>> X0, X1 = make_cahn_hilliard(n_samples=50)
     >>> y0 = np.zeros(X0.shape[0])
     >>> y1 = np.ones(X1.shape[0])
@@ -52,13 +56,13 @@ class MKSHomogenizationModel(BaseEstimator):
     >>> assert np.allclose(y1_test, [1, 1, 1])
     """
 
-    def __init__(self, basis, n_components=None, degree=1,
-                 dimension_reducer=None, property_linker=None):
+    def __init__(self, basis=None, dimension_reducer=None, n_components=None,
+                 property_linker=None, degree=1, correlations=None):
         """
         Create an instance of a `MKSHomogenizationModel`.
 
         Args:
-            basis (class): an instance of a bases class.
+            basis (class, optional): an instance of a bases class.
             dimension_reducer (class, optional): an instance of a
                 dimensionality reduction class with a fit_transform method.
             property_linker (class, optional): an instance for a machine
@@ -67,6 +71,10 @@ class MKSHomogenizationModel(BaseEstimator):
                 dimension_reducer
             degree (int, optional): degree of the polynomial used by
                 property_linker.
+            correlations (list, optional): list of spatial correlations to
+                compute, default is the autocorrelation with the first local
+                state and all of its cross correlations. For example if basis
+                has n_states=3, correlation would be [(0, 0), (0, 1), (0, 2)]
         """
 
         self.basis = basis
@@ -79,11 +87,16 @@ class MKSHomogenizationModel(BaseEstimator):
             n_components = 2
         if property_linker is None:
             property_linker = LinearRegression()
-        self.linker = Pipeline([('poly', PolynomialFeatures(degree=degree)),
+        if correlations is None and basis is not None:
+            correlations = [(0, l) for l in range(basis.n_states)]
+        self._linker = Pipeline([('poly', PolynomialFeatures(degree=degree)),
                                 ('connector', property_linker)])
         self._check_methods
         self.degree = degree
         self.n_components = n_components
+        self.property_linker = property_linker
+        self.correlations = correlations
+        self._fit = False
 
     @property
     def n_components(self):
@@ -105,7 +118,18 @@ class MKSHomogenizationModel(BaseEstimator):
         """Setter for the polynomial degree for property_linker.
         """
         self._degree = value
-        self.linker.set_params(poly__degree=value)
+        self._linker.set_params(poly__degree=value)
+
+    @property
+    def property_linker(self):
+        return self._property_linker
+
+    @property_linker.setter
+    def property_linker(self, prop_linker):
+        """Setter for the property_linker class.
+        """
+        self._property_linker = prop_linker
+        self._linker.set_params(connector=prop_linker)
 
     def _check_methods(self):
         """
@@ -126,7 +150,7 @@ class MKSHomogenizationModel(BaseEstimator):
             raise RuntimeError(
                 "property_linker does not have predict() method.")
 
-    def fit(self, X, y, X_reduce_label=None,
+    def fit(self, X, y, reduce_labels=None,
             periodic_axes=[], confidence_index=None, size=None):
         """
         Fits data by calculating 2-point statistics from X, preforming
@@ -138,7 +162,7 @@ class MKSHomogenizationModel(BaseEstimator):
                 shaped array where `n_samples` is the number of samples and
                 `n_x` is the spatial discretization.
             y (1D array): The material property associated with `X`.
-            reducer_label (1D array, optional): label for X used during the
+            reducer_labels (1D array, optional): label for X used during the
                 fit_transform method for the `dimension_reducer`.
             periodic_axes (list, optional): axes that are periodic. (0, 2)
                 would indicate that axes x and z are periodic in a 3D
@@ -156,16 +180,18 @@ class MKSHomogenizationModel(BaseEstimator):
         >>> reducer = PCA(n_components=2)
         >>> linker = LinearRegression()
         >>> prim_basis = PrimitiveBasis(n_states=2, domain=[0, 1])
+        >>> correlations = [(0, 0), (1, 1), (0, 1)]
         >>> model = MKSHomogenizationModel(prim_basis,
         ...                                dimension_reducer=reducer,
-        ...                                property_linker=linker)
+        ...                                property_linker=linker,
+        ...                                correlations=correlations)
         >>> np.random.seed(99)
         >>> X = np.random.randint(2, size=(3, 15))
         >>> y = np.array([1, 2, 3])
         >>> model.fit(X, y)
         >>> X_ = prim_basis.discretize(X)
-        >>> X_corr = correlate(X_)
-        >>> X_reshaped = X_corr.reshape((X_corr.shape[0], X_corr[0].size))
+        >>> X_stats = correlate(X_)
+        >>> X_reshaped = X_stats.reshape((X_stats.shape[0], X_stats[0].size))
         >>> X_pca = reducer.fit_transform(X_reshaped - np.mean(X_reshaped,
         ...                               axis=1)[:, None])
         >>> assert np.allclose(model.fit_data, X_pca)
@@ -173,11 +199,8 @@ class MKSHomogenizationModel(BaseEstimator):
         if size is not None:
             new_shape = (X.shape[0],) + size
             X = X.reshape(new_shape)
-        X_preped = self._X_prep(X, periodic_axes, confidence_index)
-        X_reduced = self.dimension_reducer.fit_transform(X_preped,
-                                                         X_reduce_label)
-        self.linker.fit(X_reduced, y)
-        self.fit_data = X_reduced
+        X_stats = self._correlate(X, periodic_axes, confidence_index)
+        self.stats_fit(X_stats, y, reduce_labels)
 
     def predict(self, X, periodic_axes=[], confidence_index=None):
         """Predicts macroscopic property for the microstructures `X`.
@@ -211,14 +234,103 @@ class MKSHomogenizationModel(BaseEstimator):
         ...                                property_linker=linker)
         >>> model.fit(X, y)
         >>> X_test = np.random.randint(2, size=(1, 100))
-        >>> assert np.allclose(model.predict(X_test), 0.53031958)
+        >>> assert np.allclose(model.predict(X_test), 0.53042314)
         """
-        X_preped = self._X_prep(X, periodic_axes, confidence_index)
-        X_reduced = self.dimension_reducer.transform(X_preped)
-        self.predict_data = X_reduced
-        return self.linker.predict(X_reduced)
+        if not self._fit:
+            raise RuntimeError('fit() method must be run before predict().')
+        X_stats = self._correlate(X, periodic_axes, confidence_index)
+        return self.stats_predict(X_stats)
 
-    def _X_prep(self, X, periodic_axes=[], confidence_index=None):
+    def stats_fit(self, X_stats, y, reduce_labels=None):
+        """Fit model using spatial correlations
+
+        Args:
+            X_stats (ND array): spatial correlations with dimensions (n_states,
+                n_x, ..., n_correlations) where `n_samples` is the number of
+                samples, `n_x` is the spatial discretization and
+                `n_correlations is the spatial correlations (2-point
+                statistics).
+            y (1D array): The material property associated with `X_stats`.
+            reducer_labels (1D array, optional): label for X used during the
+                fit_transform method for the `dimension_reducer`.
+
+        Example
+
+        >>> from sklearn.decomposition import PCA
+        >>> from sklearn.linear_model import LinearRegression
+        >>> from pymks.bases import PrimitiveBasis
+        >>> from pymks.stats import correlate
+
+        >>> reducer = PCA(n_components=2)
+        >>> linker = LinearRegression()
+        >>> prim_basis = PrimitiveBasis(n_states=2, domain=[0, 1])
+        >>> correlations = [(0, 0), (1, 1), (0, 1)]
+        >>> model = MKSHomogenizationModel(dimension_reducer=reducer,
+        ...                                property_linker=linker)
+        >>> np.random.seed(99)
+        >>> X = np.random.randint(2, size=(3, 15))
+        >>> y = np.array([1, 2, 3])
+        >>> X_ = prim_basis.discretize(X)
+        >>> X_stats = correlate(X_, correlations=correlations)
+        >>> model.stats_fit(X_stats, y)
+        >>> X_reshaped = X_stats.reshape((X_stats.shape[0], X_stats[0].size))
+        >>> X_pca = reducer.fit_transform(X_reshaped - np.mean(X_reshaped,
+        ...                               axis=1)[:, None])
+        >>> assert np.allclose(model.fit_data, X_pca)
+
+        """
+        X_reshape = self._reshape(X_stats)
+        X_reduced = self.dimension_reducer.fit_transform(X_reshape,
+                                                         reduce_labels)
+        self._linker.fit(X_reduced, y)
+        self.fit_data = X_reduced
+        self._fit = True
+
+    def stats_predict(self, X_stats):
+        """Predicts macroscopic property for 2-point statistics `X_stats`.
+
+        Args:
+            X_stats (ND array): spatial correlations with dimensions (n_states,
+                n_x, ..., n_correlations) where `n_samples` is the number of
+                samples, `n_x` is the spatial discretization and
+                `n_correlations is the spatial correlations (2-point
+                statistics).
+
+        Returns:
+            The predicted macroscopic property for `X_stats`.
+
+        Example
+
+        >>> from sklearn.manifold import LocallyLinearEmbedding
+        >>> from sklearn.linear_model import BayesianRidge
+        >>> from pymks.bases import PrimitiveBasis
+        >>> from pymks.stats import correlate
+        >>> np.random.seed(99)
+        >>> X = np.random.randint(2, size=(50, 100))
+        >>> y = np.random.random(50)
+        >>> reducer = LocallyLinearEmbedding()
+        >>> linker = BayesianRidge()
+        >>> prim_basis = PrimitiveBasis(2, domain=[0, 1])
+        >>> model = MKSHomogenizationModel(basis=prim_basis, n_components=2,
+        ...                                dimension_reducer=reducer,
+        ...                                property_linker=linker)
+        >>> X_ = prim_basis.discretize(X)
+        >>> model.fit(X, y)
+
+        Predict with `stats_predict`
+
+        >>> correlations = [(0, 0), (0, 1)]
+        >>> X_test = np.random.randint(2, size=(1, 100))
+        >>> X_test_ = prim_basis.discretize(X_test)
+        >>> X_test_stats = correlate(X_test_, correlations=correlations)
+        >>> assert np.allclose(model.stats_predict(X_test_stats), 0.53042314)
+        """
+        X_reshape = self._reshape(X_stats)
+        X_reduced = self.dimension_reducer.transform(X_reshape)
+        self.predict_data = X_reduced
+        return self._linker.predict(X_reduced)
+
+    def _correlate(self, X, periodic_axes, confidence_index):
         """
         Helper function used to calculated 2-point statistics from `X` and
         reshape them appropriately for fit and predict methods.
@@ -248,17 +360,49 @@ class MKSHomogenizationModel(BaseEstimator):
         >>> model = MKSHomogenizationModel(prim_basis, reducer, linker)
         >>> X = np.array([[0, 1],
         ...               [1, 0]])
-        >>> X_prep = model._X_prep(X, [], None)
-        >>> X_test = np.array([[-1 / 6., -1 / 6., -1 / 6.,
-        ...                      1 / 3., 1 / 3., -1 / 6.],
-        ...                    [-1 / 3., -1 / 3., 2 / 3.,
-        ...                      1 / 6., 1 / 6., -1 / 3.]])
-        >>> assert np.allclose(X_test, X_prep)
+        >>> X_stats = model._correlate(X, [], None)
+        >>> X_test = np.array([[[ 0, 0],
+        ...                     [0.5, 0]],
+        ...                    [[0, 1,],
+        ...                     [0.5, 0]]])
+        >>> assert np.allclose(X_test, X_stats)
         """
+        if self.basis is None:
+            raise AttributeError('basis must be specified')
         X_ = self.basis.discretize(X)
-        X_corr = correlate(X_, periodic_axes=periodic_axes,
-                           confidence_index=confidence_index)
-        X_reshaped = X_corr.reshape((X_corr.shape[0], X_corr[0].size))
+        X_stats = correlate(X_, periodic_axes=periodic_axes,
+                            confidence_index=confidence_index,
+                            correlations=self.correlations)
+        return X_stats
+
+    def _reshape(self, X_stats):
+        """
+        Helper function used to reshape 2-point statistics appropriately for
+        fit and predict methods.
+
+        Args:
+            `X_stats`: The discretized microstructure function, an
+                `(n_samples, n_x, ..., n_states)` shaped array
+                Where `n_samples` is the number of samples, `n_x` is thes
+                patial discretization, and n_states is the number of local
+                states.
+
+        Returns:
+            Spatial correlations for each sample formated with dimensions
+            (n_samples, n_features).
+
+        Example
+        >>> X_stats = np.zeros((2, 2, 2, 2))
+        >>> X_stats[1] = 3.
+        >>> X_stats[..., 1] = 1.
+        >>> X_results = np.array([[-.5, .5, -.5, .5, -.5, .5, -.5,  0.5],
+        ...                       [1., -1., 1., -1., 1., -1., 1., -1.]])
+        >>> from pymks import PrimitiveBasis
+        >>> prim_basis = PrimitiveBasis(2)
+        >>> model = MKSHomogenizationModel(prim_basis)
+        >>> assert np.allclose(X_results, model._reshape(X_stats))
+        """
+        X_reshaped = X_stats.reshape((X_stats.shape[0], X_stats[0].size))
         return X_reshaped - np.mean(X_reshaped, axis=1)[:, None]
 
     def score(self, X, y, periodic_axes=[], confidence_index=None):
@@ -281,9 +425,9 @@ class MKSHomogenizationModel(BaseEstimator):
              Score for MKSHomogenizationModel from the selected
              property_linker.
         """
-        if not callable(getattr(self.linker, "score", None)):
+        if not callable(getattr(self._linker, "score", None)):
             raise RuntimeError(
                 "property_linker does not have score() method.")
         X_preped = self._X_prep(X, periodic_axes, confidence_index)
         X_reduced = self.dimension_reducer.transform(X_preped)
-        return self.linker.score(X_reduced, y)
+        return self._linker.score(X_reduced, y)
