@@ -16,9 +16,14 @@ class MKSHomogenizationModel(BaseEstimator):
     integrate with dimensionality reduction techniques and predictive models.
 
     Attributes:
-        degree: Degree of the polynomial used by `property_linker`.
+        degree: Degree of the polynomial used by
+            `property_linker`.
         n_components: Number of components used by `dimension_reducer`.
-        dimension_reducer: Class with method used for dimensionality reduction.
+        dimension_reducer: Instance of a dimensionality reduction class.
+        property_linker: Instance of class that maps materials property to the
+            microstuctures.
+        correlations: spatial correlations to be computed
+        basis: instance of a basis class
 
     Below is an examlpe of using MKSHomogenizationModel to predict (or
     classify) the type of microstructure using PCA and Logistic Regression.
