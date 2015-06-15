@@ -98,5 +98,24 @@ def test_default_dimension_reducer():
     assert isinstance(model.dimension_reducer, RandomizedPCA)
 
 
+def test_default_correlations():
+    from pymks import PrimitiveBasis
+    from pymks import MKSHomogenizationModel
+    prim_basis = PrimitiveBasis(6)
+    model_prim = MKSHomogenizationModel(basis=prim_basis)
+    assert model_prim.correlations == [(0, 0), (0, 1), (0, 2),
+                                       (0, 3), (0, 4), (0, 5)]
+
+
+def test_set_correlations():
+    from pymks import PrimitiveBasis
+    from pymks import MKSHomogenizationModel
+    test_correlations = [(0, 0), (0, 2), (0, 4)]
+    prim_basis = PrimitiveBasis(6)
+    model_prim = MKSHomogenizationModel(basis=prim_basis,
+                                        correlations=test_correlations)
+    assert model_prim.correlations == test_correlations
+
+
 if __name__ == '__main__':
     test_default_dimension_reducer()
