@@ -151,7 +151,7 @@ class MKSHomogenizationModel(BaseEstimator):
                 "property_linker does not have predict() method.")
 
     def fit(self, X, y, reduce_labels=None,
-            periodic_axes=[], confidence_index=None, size=None):
+            periodic_axes=None, confidence_index=None, size=None):
         """
         Fits data by calculating 2-point statistics from X, preforming
         dimension reduction using dimension_reducer, and fitting the reduced
@@ -196,13 +196,15 @@ class MKSHomogenizationModel(BaseEstimator):
         ...                               axis=1)[:, None])
         >>> assert np.allclose(model.fit_data, X_pca)
         """
+        if periodic_axes is None:
+            periodic_axes = []
         if size is not None:
             new_shape = (X.shape[0],) + size
             X = X.reshape(new_shape)
         X_stats = self._correlate(X, periodic_axes, confidence_index)
         self.stats_fit(X_stats, y, reduce_labels)
 
-    def predict(self, X, periodic_axes=[], confidence_index=None):
+    def predict(self, X, periodic_axes=None, confidence_index=None):
         """Predicts macroscopic property for the microstructures `X`.
 
         Args:
@@ -236,6 +238,8 @@ class MKSHomogenizationModel(BaseEstimator):
         >>> X_test = np.random.randint(2, size=(1, 100))
         >>> assert np.allclose(model.predict(X_test), 0.53042314)
         """
+        if periodic_axes is None:
+            periodic_axes = []
         if not self._fit:
             raise RuntimeError('fit() method must be run before predict().')
         X_stats = self._correlate(X, periodic_axes, confidence_index)
@@ -405,7 +409,7 @@ class MKSHomogenizationModel(BaseEstimator):
         X_reshaped = X_stats.reshape((X_stats.shape[0], X_stats[0].size))
         return X_reshaped - np.mean(X_reshaped, axis=1)[:, None]
 
-    def score(self, X, y, periodic_axes=[], confidence_index=None):
+    def score(self, X, y, periodic_axes=None, confidence_index=None):
         """
         The score function for the MKSHomogenizationModel. It formats the
         data and uses the score method from the property_linker.
@@ -425,9 +429,12 @@ class MKSHomogenizationModel(BaseEstimator):
              Score for MKSHomogenizationModel from the selected
              property_linker.
         """
+        if periodic_axes is None:
+            periodic_axes = []
         if not callable(getattr(self._linker, "score", None)):
             raise RuntimeError(
                 "property_linker does not have score() method.")
-        X_preped = self._X_prep(X, periodic_axes, confidence_index)
-        X_reduced = self.dimension_reducer.transform(X_preped)
+        X_corr = self._correlate(X, periodic_axes, confidence_index)
+        X_reshaped = self._reshape(X_corr)
+        X_reduced = self.dimension_reducer.transform(X_reshaped)
         return self._linker.score(X_reduced, y)

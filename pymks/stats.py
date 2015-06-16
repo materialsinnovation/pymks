@@ -8,7 +8,7 @@ point statistics.
 
 
 def autocorrelate(X_, periodic_axes=[], confidence_index=None,
-                  autocorrelations=[]):
+                  autocorrelations=None):
     """
     Computes the autocorrelation from a microstructure function.
 
@@ -44,8 +44,9 @@ def autocorrelate(X_, periodic_axes=[], confidence_index=None,
     ...                   [0., 0., 0.]]])
     >>> assert(np.allclose(np.real_if_close(X_auto[0, ..., 1]), X_test[0]))
     """
-
-    if len(autocorrelations) is 0:
+    if periodic_axes is None:
+        periodic_axes = []
+    if autocorrelations is None:
         correlations = _auto_correlations(X_.shape[-1])
     X_ = _mask_X_(X_, confidence_index)
     s = _Fkernel_shape(X_, periodic_axes)
@@ -53,7 +54,7 @@ def autocorrelate(X_, periodic_axes=[], confidence_index=None,
     return auto / _normalize(X_, s, confidence_index)
 
 
-def _correlate(X_, s, correlations=[]):
+def _correlate(X_, s, correlations):
     """
     Helper function used to calculate the unnormalized correlation counts.
 
@@ -93,8 +94,8 @@ def _correlate(X_, s, correlations=[]):
     return _truncate(corr, X_.shape[:-1])
 
 
-def crosscorrelate(X_, periodic_axes=[], confidence_index=None,
-                   crosscorrelations=[]):
+def crosscorrelate(X_, periodic_axes=None, confidence_index=None,
+                   crosscorrelations=None):
     """
     Computes the crosscorrelations from a microstructure function.
 
@@ -153,7 +154,9 @@ def crosscorrelate(X_, periodic_axes=[], confidence_index=None,
     >>> X_ = prim_basis.discretize(X)
     >>> assert(crosscorrelate(X_, periodic_axes=[0, 1]).shape == (1, 3, 3, 10))
     """
-    if len(crosscorrelations) is 0:
+    if periodic_axes is None:
+        periodic_axes = []
+    if crosscorrelations is None:
         correlations = _cross_correlations(X_.shape[-1])
     X_ = _mask_X_(X_, confidence_index)
     s = _Fkernel_shape(X_, periodic_axes)
@@ -161,7 +164,8 @@ def crosscorrelate(X_, periodic_axes=[], confidence_index=None,
     return cross / _normalize(X_, s, confidence_index)
 
 
-def correlate(X_, periodic_axes=[], confidence_index=None, correlations=[]):
+def correlate(X_, periodic_axes=None,
+              confidence_index=None, correlations=None):
     """
     Computes the autocorrelations and crosscorrelations from a microstructure
     function.
@@ -199,7 +203,9 @@ def correlate(X_, periodic_axes=[], confidence_index=None, correlations=[]):
     ...                      [0, 0.5, 0.5]])
     >>> assert np.allclose(X_corr, X_result)
     """
-    if len(correlations) is 0:
+    if periodic_axes is None:
+        periodic_axes = []
+    if correlations is None:
         L = X_.shape[-1]
         correlations = _auto_correlations(L) + _cross_correlations(L)
     X_ = _mask_X_(X_, confidence_index)
@@ -274,7 +280,7 @@ def _normalize(X_, s, confidence_index):
     else:
         mask = confidence_index
         if mask is None:
-            mask = np.ones(X_.shape[:-1])
+            mask = np.ones(X_.shape[1:-1])[None]
         corr = Correlation(mask[..., None], Fkernel_shape=s)
         return _truncate(corr.convolve(mask[..., None]), X_.shape[:-1])
 
