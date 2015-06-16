@@ -1,6 +1,6 @@
 body {
     font-family: "Source Sans Pro",Calibri,Candara,Arial,sans-serif;
-    font-size: 20px;
+    font-size: 16px;
     line-height: 1.5;
     padding-top: 90px;
     color: #333;
@@ -11,7 +11,7 @@ body {
 .navbar .nav > li > a, .navbar .nav > li > a:first-letter,
 .navbar .nav > li.current-menu-item > a,
 .navbar .nav > li.current-menu-ancestor > a {
-    font-size:      25px;
+    font-size:      20px;
     padding-top:    35px;
     padding-bottom: 35px;
     font-weight: bold;
@@ -19,15 +19,15 @@ body {
 
 /* Version Number */
 .navbar-default .navbar-text {
-    font-size:      25px;
-    padding-top:    12px;
-    padding-bottom: 12px;
+    font-size:      20px;
+    padding-top:    16px;
+    padding-bottom: 16px;
 }
 
 /* Logo and project title */
 .navbar-default .navbar-brand {
     color: #FFF;
-    font-size: 35px;
+    font-size: 25px;
     padding-top:    14px;
     padding-bottom: 14px;
 }
