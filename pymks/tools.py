@@ -1,5 +1,4 @@
 import matplotlib.colors as colors
-import matplotlib.cm as cmx
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -7,7 +6,6 @@ from sklearn.learning_curve import learning_curve
 from .stats import _auto_correlations
 from .stats import _cross_correlations
 import numpy as np
-import itertools
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -138,79 +136,14 @@ def _get_color_list(n_sets):
     return color_list[:n_sets]
 
 
-def draw_microstructure_discretization(M, a=0, s=0, Nbin=6,
-                                       bound=0.016, height=1.7, ax=None):
-    """ Creates a diagram to illustrate the binning of a continues values
-    in local state space.
-
-    Args:
-        Array representing a microstructure with a continuous variable.
-
-    Returns:
-        Image of the continuous local state binned discretely in the local
-        state space.
-    """
-    if ax is not None:
-        ax = plt.axes()
-    dx = 1. / (Nbin - 1.)
-
-    cm = plt.get_cmap('cubehelix')
-    cNorm = colors.Normalize(vmin=0, vmax=Nbin - 1)
-    scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cm)
-
-    for i in range(Nbin - 1):
-        color = scalarMap.to_rgba(i)
-        r = plt.Rectangle((i * dx, 0), dx, dx, lw=4, ec='k', color=color)
-        ax.add_patch(r)
-
-    plt.yticks(())
-
-    plt.ylim(ymax=dx * height, ymin=-bound)
-    plt.xlim(xmin=-bound, xmax=1 + bound)
-
-    ax.set_aspect('equal')
-    for tick in ax.xaxis.get_major_ticks():
-        tick.label.set_fontsize(16)
-
-    for line in ax.xaxis.get_ticklines():
-        line.set_markersize(0)
-
-    all_spines = ['top', 'bottom', 'right', 'left']
-    for spline in all_spines:
-        ax.spines[spline].set_visible(False)
-
-    plt.xlabel(r'$\chi^h \;\; \left( H = 6 \right)$', fontsize=16)
-
-    v = M[a, s]
-
-    H = np.linspace(0, 1, Nbin)
-    m = np.maximum(1 - abs(v - H) / dx, 0)
-    Mstring = r'$m_{{{a},{s}}}={v:1.2g}$'.format(a=a, s=s, v=v)
-    arr = r'{0:1.2g}'.format(m[0])
-    for i in range(1, len(m)):
-        arr += r', {0:1.2g}'.format(m[i])
-    mstring = r'$m_{{{a},{s}}}^h=\left({arr}\right)$'.format(a=a, s=s, arr=arr)
-
-    plt.plot((v, v), (0, dx * height), 'r--', lw=3)
-    plt.text(v + 0.02,
-             dx * (1 + 0.65 * (height - 1)),
-             Mstring,
-             fontsize=16,
-             color='r')
-    plt.text(v + 0.02,
-             dx * (1 + 0.2 * (height - 1)),
-             mstring,
-             fontsize=16,
-             color='r')
-
-
 def draw_coeff(coeff, fontsize=15):
     """
     Visualize influence coefficients.
 
     Args:
-        coeff: influence coefficients with dimensions (x, y, n_states)
-        fontsize - scalar values used for the title font size
+        coeff (ND array): influence coefficients with dimensions (x, y,
+            n_states)
+        fontsize (int, optional): values used for the title font size
     """
     plt.close('all')
     coeff_cmap = _get_coeff_cmap()
@@ -226,8 +159,8 @@ def draw_microstructure_strain(microstructure, strain):
     Draw microstructure and its associated strain
 
     Args:
-        microstructure - numpy array with dimensions (x, y)
-        strain - numpy array with dimensions (x, y)
+        microstructure (2D array): numpy array with dimensions (x, y)
+        strain (2D array): numpy array with dimensions (x, y)
     """
     plt.close('all')
     cmap = _get_response_cmap()
@@ -255,7 +188,8 @@ def draw_microstructures(*microstructures):
     Draw microstructures
 
     Args:
-        microstructures - numpy array with dimensions (n_samples, x, y)
+        microstructures (3D array): numpy array with dimensions (n_samples, x,
+            y)
     """
     cmap = _get_microstructure_cmap()
     titles = [' ' for s in np.arange(microstructures[0].shape[0])]
@@ -267,9 +201,9 @@ def draw_strains(strains, titles=None, fontsize=15):
     Draw strain fields
 
     Args:
-        strains - numpy arrays with dimensions (n_samples, x, y)
-        titles - list of titles for strain fields
-        fontsize - scalar values used for the title font size
+        strains (3D array): numpy arrays with dimensions (n_samples, x, y)
+        titles (list, str, optional): titles for strain fields
+        fontsize (int, optional): title font size
     """
     cmap = _get_response_cmap()
     if titles is None:
@@ -277,29 +211,28 @@ def draw_strains(strains, titles=None, fontsize=15):
     _draw_fields(strains, cmap, fontsize, titles)
 
 
-def draw_concentrations(concentrations, titles=None, fontsize=15):
-    """
-    Draw comparison fields
+def draw_concentrations(concentrations, labels=None, fontsize=15):
+    """Draw comparison fields
 
     Args:
-        concentrations - list of numpy arrays with dimensions (x, y)
+        concentrations : list of numpy arrays with dimensions (x, y)
         titles - list of titles for concentrations
         fontsize - scalar values used for the title font size
     """
-    if titles is None:
-        titles = [" " for s in concentrations]
+    if labels is None:
+        labels = [" " for s in concentrations]
     cmap = _get_response_cmap()
-    _draw_fields(concentrations, cmap, fontsize, titles)
+    _draw_fields(concentrations, cmap, fontsize, labels)
 
 
 def draw_strains_compare(strain_FEM, strain_MKS, fontsize=20):
-    """
-    Draw comparison of strain fields.
+    """Draw comparison of strain fields.
 
     Args:
-        strain_FEM - numpy arrays with dimensions (x, y) from finite element
-        strain_MKS - numpy arrays with dimensions (x, y) from MKS
-        fontsize - scalar values used for the title font size
+        strain_FEM (2D array): strain field with dimensions (x, y) from finite
+            element
+        strain_MKS (2D array): strain fieldwith dimensions (x, y) from MKS
+        fontsize (int, optional): scalar values used for the title font size
     """
     cmap = _get_response_cmap()
     titles = ['Finite Element', 'MKS']
@@ -307,33 +240,32 @@ def draw_strains_compare(strain_FEM, strain_MKS, fontsize=20):
     _draw_fields((strain_FEM, strain_MKS), cmap, fontsize, titles_)
 
 
-def draw_concentrations_compare(con1, con2, fontsize=15):
-    """
-    Draw comparesion of concentrations.
+def draw_concentrations_compare(concentrations, labels, fontsize=15):
+    """Draw comparesion of concentrations.
 
     Args:
-        differences - list of difference arrays with dimensions (x, y)
-        titles - list of titles for difference arrays
-        fontsize - scalar values used for the title font size
+        concentrations (3D array): list of difference arrays with dimensions
+            (x, y)
+        labels (list, str): list of titles for difference arrays
+        fontsize (int, optional): scalar values used for the title font size
     """
-    titles = ['Simulation', 'MKS']
     cmap = _get_response_cmap()
-    _draw_fields((con1, con2), cmap, fontsize, titles)
+    _draw_fields(concentrations, cmap, fontsize, labels)
 
 
-def draw_differences(differences, titles=None, fontsize=15):
-    """
-    Draw differences in predicted response fields.
+def draw_differences(differences, labels=None, fontsize=15):
+    """Draw differences in predicted response fields.
 
     Args:
-        differences - list of difference arrays with dimesions (x, y)
-        titles - list of titles for difference arrays
-        fontsize - scalar values used for the title font size
+        differences (list, 2D arrays): list of difference arrays with
+            dimesions (x, y).
+        labels (list, str, optional): titles for difference arrays
+        fontsize (int, optional): scalar values used for the title font size
     """
     cmap = _get_diff_cmap()
-    if titles is None:
-        titles = [' ' for s in differences]
-    _draw_fields(differences, cmap, fontsize, titles)
+    if labels is None:
+        labels = [' ' for s in differences]
+    _draw_fields(differences, cmap, fontsize, labels)
 
 
 def _draw_fields(fields, field_cmap, fontsize, titles):
@@ -354,7 +286,7 @@ def _draw_fields(fields, field_cmap, fontsize, titles):
         n_titles = len(titles)
         if n_fields != n_titles:
             raise RuntimeError(
-                "number of plots does not make number of titles.")
+                "number of plots does not match number of labels.")
     plt.close('all')
     fig, axs = plt.subplots(1, n_fields, figsize=(n_fields * 4, 4))
     if n_fields > 1:
@@ -382,55 +314,76 @@ def _draw_fields(fields, field_cmap, fontsize, titles):
     plt.show()
 
 
-def draw_gridscores(grid_scores, param, score_label='', colors=('#1a9641',),
-                    data_labels=[None], param_label='', fontsize=20):
+def draw_gridscores(grid_scores, param, score_label=None, colors=None,
+                    data_labels=None, param_label=None, fontsize=20):
     """
     Visualize the score values and standard deviations from grids
     scores result from GridSearchCV while varying 1 parameters.
 
     Args:
-        grid_scores: list of grid_scores_ attribute from GridSearchCV
-        param: list of parameters used in grid_scores
-        score_label: label for score value axis
-        colors: list of colors used for this specified parameter
-        param_label: list of parameter titles to appear on plot
+        grid_scores (list, grid_scores): grid_scores_ attribute from
+            GridSearchCV
+        param (list, str): parameters used in grid_scores
+        score_label (str): label for score value axis
+        colors (list): colors used for this specified parameter
+        param_label (list): parameter titles to appear on plot
     """
     plt.close('all')
     if type(grid_scores[0]) is not list:
         grid_scores = [grid_scores]
+    if data_labels is None:
+        data_labels = [None for l in range(len(grid_scores))]
+    if score_label is None:
+        score_label = ''
+    if param_label is None:
+        param_label is ''
+    if colors is None:
+        colors = _get_color_list(len(grid_scores))
     if len(grid_scores) != len(data_labels) or len(data_labels) != len(colors):
         raise RuntimeError(
             "grid_scores, colors, and param_lables must have the same length.")
+    mins, maxes = [], []
     for grid_score, data_label, color in zip(grid_scores, data_labels, colors):
         tmp = [[params[param], mean_score, scores.std()]
                for params, mean_score, scores in grid_score]
-        param_, errors, stddev = list(zip(*tmp))
-        plt.fill_between(param_, np.array(errors) - np.array(stddev),
-                         np.array(errors) + np.array(stddev), alpha=0.1,
+        _param, errors, stddev = list(zip(*tmp))
+        _mins = np.array(errors) - np.array(stddev)
+        _maxes = np.array(errors) + np.array(stddev)
+        plt.fill_between(_param, _mins, _maxes, alpha=0.1,
                          color=color)
-        plt.plot(param_, errors, 'o-', color=color, label=data_label,
+        plt.plot(_param, errors, 'o-', color=color, label=data_label,
                  linewidth=2)
+        mins.append(min(_mins))
+        maxes.append(max(_maxes))
     if data_labels[0] is not None:
         plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.,
                    fontsize=15)
+    _min, _max = min(mins), max(maxes)
+    y_epsilon = (_max - _min) * 0.05
+    plt.ylim((_min - y_epsilon, _max + y_epsilon))
+    plt.ticklabel_format(style='sci', axis='y')
     plt.ylabel(score_label, fontsize=fontsize)
     plt.xlabel(param_label, fontsize=fontsize)
     plt.show()
 
 
-def draw_gridscores_matrix(grid_scores, params, score_label='R-Squared',
-                           param_labels=['', '']):
+def draw_gridscores_matrix(grid_scores, params, score_label=None,
+                           param_labels=None):
     """
     Visualize the score value matrix and standard deviation matrix from grids
-    scores result from GridSearchCV while varying 2 parameters.
+    scores result from GridSearchCV while varying two parameters.
 
     Args:
-        grid_scores: grid_scores_ attribute from GridSearchCV
-        params: list of 2 parameters used in grid_scores
-        score_label: label for score value axis
-        param_labels: list of parameter titles to appear on plot
+        grid_scores (list): grid_scores_ attribute from GridSearchCV
+        params (list): two parameters used in grid_scores
+        score_label (str): label for score value axis
+        param_labels (list): parameter titles to appear on plot
     """
     plt.close('all')
+    if score_label is None:
+        score_label = 'R-Squared'
+    if param_labels is None:
+        param_labels = ['', '']
     tmp = [[params, mean_score, scores.std()]
            for parameters, mean_score, scores in grid_scores.grid_scores_]
     param, means, stddev = list(zip(*tmp))
@@ -465,22 +418,12 @@ def draw_gridscores_matrix(grid_scores, params, score_label='R-Squared',
     plt.show()
 
 
-def _remove_figure_ticksline(axs):
-    """Removes lines from tick marks inside of a figure.
-
-    Args:
-        axs: matplotlib axis.
-    """
-
-    return axs
-
-
 def draw_component_variance(variance):
     """
     Visualize the percent variance as a function of components.
 
     Args:
-        variance: variance ration explanation function for dimensional
+        variance (list): variance ratio explanation from dimensional
             reduction technique.
     """
     plt.close('all')
@@ -490,47 +433,23 @@ def draw_component_variance(variance):
     plt.show()
 
 
-def bin(arr, n_bins):
-    """
-    Discretize the array `arr`, which must be between 0 and 1.
-
-    >>> res = bin(np.array((0.2, 0.5, 0.7)), 4)
-    >>> np.allclose(res,
-    ...             [[ 0.4,  0.6,  0. ,  0. ],
-    ...              [ 0. ,  0.5,  0.5,  0. ],
-    ...              [ 0. ,  0. ,  0.9,  0.1]])
-    True
-
-    Args:
-        arr: Array that must be between 0 and 1.
-        n_bins: Integer value representing the number of local states
-             in the local state space of the microstructure function.
-
-    Returns:
-        Microstructure function for array `arr`.
-    """
-    X = np.linspace(0, 1, n_bins)
-    dX = X[1] - X[0]
-
-    return np.maximum(1 - abs(arr[:, None] - X) / dX, 0)
-
-
-def draw_components(*X, **labels):
+def draw_components(*datasets, **labels):
     """
     Visualize low dimensional representations of microstructures.
 
     Args:
-        X: arrays with low dimensional data with dimensions [n_samplles,
-            n_componts]. The length of n_components must be 2 or 3.
-        labels: labes for each of each array X
+        datasets (list, 2D arrays): low dimensional data with dimensions
+            [n_samplles, n_componts]. The length of n_components must be 2 or
+            3.
+        labels (list, str): list of labes for each of each array datasets
 
     """
     plt.close('all')
-    size = np.array(X[0].shape)
-    if size[-1] == 2:
-        _draw_components_2D(X, labels)
-    elif size[-1] == 3:
-        _draw_components_3D(X, labels)
+    n_components = np.array(datasets[0][-1].shape)
+    if n_components[-1] == 2:
+        _draw_components_2D(datasets, labels)
+    elif n_components[-1] == 3:
+        _draw_components_3D(datasets, labels)
     else:
         raise RuntimeError("n_components must be 2 or 3.")
 
@@ -607,8 +526,8 @@ def draw_goodness_of_fit(fit_data, pred_data, labels):
     Visualize goodness of fit plot for MKSHomogenizationModel.
 
     Args:
-        fit_data: Low dimensional data used to fit the MKSHomogenizationModel
-        pred_data: Low dimensional data used for prediction
+        fit_data (1D array): Low dimensional data used to fit model
+        pred_data (1D array): Low dimensional data used for prediction
     """
     plt.close('all')
     y_total = np.concatenate((fit_data, pred_data), axis=-1)
@@ -626,80 +545,6 @@ def draw_goodness_of_fit(fit_data, pred_data, labels):
     plt.ylabel('Predicted', fontsize=18)
     plt.legend(loc=2, fontsize=15)
     plt.show()
-
-
-# def _get_correlation_titles(correlation_labels, selected_labels):
-#     """
-#     Helper function to get the correct spatial correlation keys.
-
-#     >>> corr_dict = {'(1, 1)': np.ones((3, 3)), '(2, 1)':np.zeros((3, 3))}
-#     >>> corr_plots = [(1, 1), (1, 2)]
-#     >>> result = ['(1, 1)', '(2, 1)']
-#     >>> assert result == _get_correlation_titles(corr_dict, corr_plots)
-
-#     Args:
-#         correlation_dict: dictionary that has spatial correlation lab as
-#             keys and spatial correlations as values
-#         selected_correlation_plots: list of correlations that will be drawn.
-
-#     Returns:
-#         list of correlation computed with local state labels in the correct
-#             order.
-#     """
-#     if selected_labels is None:
-#         return None
-#     selected_labels = map(str, selected_labels)
-#     new_names = selected_labels
-#     for plot_name in selected_labels:
-#         if plot_name not in correlation_labels:
-#             name = list(plot_name)
-#             name[1], name[4] = name[4], name[1]
-#             new_name = ''.join(str(e) for e in name)
-#             new_names[new_names.index(plot_name)] = new_name
-#             if new_name not in correlation_labels:
-#                 raise RuntimeError(str(plot_name) + " correlation not found", )
-#     return new_names
-
-
-# def _get_autocorrelation_titles(n_states):
-#     """
-#     Helper function to get the autocorrelations computed and returns them in
-#     a list.
-
-#     >>> result = [(1, 1), (2, 2), (3, 3), (4, 4)]
-#     >>> assert result == _get_autocorrelation_titles(4)
-
-#     Args:
-#         n_states: number of local states
-
-#     Returns:
-#         list of computed autocorrelations
-#     """
-#     states = np.arange(n_states) + 1
-#     return list(zip(states, states))
-
-
-# def _get_crosscorrelation_titles(n_states):
-#     """
-#     Helper function to get the crosscorrelations computed and returns them in
-#     a list.
-
-#     >>> result = [(1, 4), (2, 1), (3, 2), (4, 3), (1, 3), (2, 4)]
-#     >>> assert result == _get_crosscorrelation_titles(4)
-
-#     Args:
-#         n_states: number of local states
-
-#     Returns:
-#         list of computed crosscorrelations
-#     """
-
-#     states = np.arange(n_states) + 1
-#     Niter = n_states / 2
-#     Nslice = n_states * (n_states - 1) / 2
-#     tmp = [zip(states, np.roll(states, i)) for i in range(1, Niter + 1)]
-#     titles = list(itertools.chain.from_iterable(tmp))
-#     return titles[:Nslice]
 
 
 def draw_correlations(X_corr, correlations=None):
@@ -736,8 +581,8 @@ def draw_crosscorrelations(X_cross, crosscorrelations=None):
     Visualize spatial crosscorrelations.
 
     Args:
-        X_cross (ND array): crosscorrelations
-        correlations (list, optional: crosscorrelation labels.
+        X_cross (ND array): cross-correlations
+        correlations (list, optional): cross-correlation labels.
     """
     if crosscorrelations is None:
         n_cross = X_cross.shape[-1]
@@ -746,65 +591,11 @@ def draw_crosscorrelations(X_cross, crosscorrelations=None):
     _draw_stats(X_cross, correlations=crosscorrelations)
 
 
-# def _get_autocorrelation_list(X_auto):
-#     """
-#     Helper function to label autocorrelations.
-
-#     >>> X_auto = np.ones((3, 3, 2))
-#     >>> X_auto[..., 1] = 2.
-#     >>> X_auto_list = _get_autocorrelation_list(X_auto)
-#     >>> X_result = [['(1, 1)', '(2, 2)'],
-#     ...             np.concatenate([X_auto[..., 0][..., None],
-#     ...                             X_auto[..., 1][..., None]], axis=-1)]
-#     >>> assert X_result[0] == X_auto_list[0]
-#     >>> assert np.allclose(X_result[1], X_auto_list[1])
-
-#     Args:
-#         X_auto: autocorrelations
-
-#     Returns:
-#         nested list with the local states labels and the spatial
-#         correlations
-#     """
-#     auto_labels = map(str, _get_autocorrelation_titles(X_auto.shape[-1]))
-#     return [auto_labels, X_auto]
-
-
-# def _get_crosscorrelation_list(X_cross):
-#     """
-#     Helper function to label autocorrelations.
-
-#     >>> X_cross = np.zeros((3, 3, 3))
-#     >>> X_cross[..., 1] = 1
-#     >>> X_cross[..., 2] = 2
-#     >>> X_cross_list = _get_crosscorrelation_list(X_cross)
-#     >>> X_result = [['(1, 3)', '(2, 1)', '(3, 2)'],
-#     ...             np.concatenate([X_cross[..., 0][..., None],
-#     ...                             X_cross[..., 1][..., None],
-#     ...                             X_cross[..., 2][..., None]], axis=-1)]
-#     >>> assert X_result[0] == X_cross_list[0]
-#     >>> assert np.allclose(np.concatenate(X_result[1]),
-#     ...                    np.concatenate(X_cross_list[1]))
-
-#     Args:
-#         X_cross: crosscorrelations
-
-#     Returns:
-#         nested list with the local states labels and the spatial
-#         correlations
-#     """
-#     n_states = 0.5 + np.sqrt(1 + 8 * X_cross.shape[-1]) / 2.
-#     cross_labels = map(str, _get_crosscorrelation_titles(int(n_states)))
-#     return [cross_labels, X_cross]
-
-
 def _draw_stats(X_, correlations=None):
-    """
-    Helper function used by visualize the spatial correlations.
+    """Visualize the spatial correlations.
 
     Args:
-        X_lists: nested list with the local states labels and the spatial
-             correlations
+        X_: correlations
         correlations: list of tuples to select the spatial correlations
             that will be displayed.
     """
@@ -845,9 +636,7 @@ def _draw_stats(X_, correlations=None):
 
 
 def _get_ticks_params(l):
-    """
-    Helper function used to tick locations and lables for spatila correlation
-    plots.
+    """Get tick locations and labels for spatial correlation plots.
 
     >>> l = 4
     >>> result = ([0, 1, 2, 3, 4], [-2, -1, 0, 1, 2])
@@ -883,33 +672,31 @@ def draw_learning_curves(estimator, X, y, ylim=None, cv=None, n_jobs=1,
     Generate a simple plot of the test and traning learning curve.
 
     Args:
-        estimator : object type that implements the "fit" and "predict" methods
+        estimator (class): object type that implements the "fit" and "predict"
+            methods
             An object of that type which is cloned for each validation.
-        title: string
-            Used for the title for the chart.
-        X: array-like, shape (n_samples, n_features)
+        title (str): Used for the title for the chart.
+        X (2D array): array-like, shape (n_samples, n_features)
             Training vector, where n_samples is the number of samples and
             n_features is the number of features.
-        y: array-like, shape (n_samples) or (n_samples, n_features), optional
-            Target relative to X for classification or regression;
-            None for unsupervised learning.
-        ylim : tuple, shape (ymin, ymax), optional
-            Defines minimum and maximum yvalues plotted.
-        cv : integer, cross-validation generator, optional
-            If an integer is passed, it is the number of folds (defaults to 3).
-            Specific cross-validation objects can be passed, see
-            sklearn.cross_validation module for the list of possible objects
-        n_jobs : integer, optional
-            Number of jobs to run in parallel (default 1).
-        train_sizes : array-like, shape (n_ticks,), dtype float or int
-            Relative or absolute numbers of training examples that will be used
-            to generate the learning curve. If the dtype is float, it is
-            regarded as a fraction of the maximum size of the training set
-            (that is determined by the selected validation method), i.e. it has
-            to be within (0, 1]. Otherwise it is interpreted as absolute sizes
-            of the training sets. Note that for classification the number of
-            samples usually have to be big enough to contain at least one
-            sample from each class. (default: np.linspace(0.1, 1.0, 5))
+        y (1D array): array-like, shape (n_samples) or (n_samples,
+            n_features), optional Target relative to X for classification or
+            regression; None for unsupervised learning.
+        ylim (tuple, optional): Defines minimum and maximum yvalues plotted.
+        cv (int, optional): If an integer is passed, it is the number of folds
+            (defaults to 3). Specific cross-validation objects can be passed,
+            see sklearn.cross_validation module for the list of possible
+            objects
+        n_jobs(int, optional) : Number of jobs to run in parallel (default 1).
+        train_sizes (float): Relative or absolute numbers of training examples
+            that will be used to generate the learning curve. If the dtype is
+            float, it is regarded as a fraction of the maximum size of the
+            training set (that is determined by the selected validation
+            method), i.e. it has to be within (0, 1]. Otherwise it is
+            interpreted as absolute sizes of the training sets. Note that for
+            classification the number of samples usually have to be big enough
+            to contain at least one sample from each class. (default:
+            np.linspace(0.1, 1.0, 5))
 
         Returns:
             A plot of the learning curves for both the training curve and the
