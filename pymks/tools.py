@@ -196,28 +196,28 @@ def draw_microstructures(*microstructures):
     _draw_fields(microstructures[0], cmap, 10, titles)
 
 
-def draw_strains(strains, titles=None, fontsize=15):
+def draw_strains(strains, labels=None, fontsize=15):
     """
     Draw strain fields
 
     Args:
         strains (3D array): numpy arrays with dimensions (n_samples, x, y)
-        titles (list, str, optional): titles for strain fields
+        labels (list, str, optional): titles for strain fields
         fontsize (int, optional): title font size
     """
     cmap = _get_response_cmap()
-    if titles is None:
-        titles = [' ' for s in strains]
-    _draw_fields(strains, cmap, fontsize, titles)
+    if labels is None:
+        labels = [' ' for s in strains]
+    _draw_fields(strains, cmap, fontsize, labels)
 
 
 def draw_concentrations(concentrations, labels=None, fontsize=15):
     """Draw comparison fields
 
     Args:
-        concentrations : list of numpy arrays with dimensions (x, y)
-        titles - list of titles for concentrations
-        fontsize - scalar values used for the title font size
+        concentrations (list): numpy arrays with dimensions (x, y)
+        labels (list): titles for concentrations
+        fontsize (int): used for the title font size
     """
     if labels is None:
         labels = [" " for s in concentrations]
@@ -522,8 +522,7 @@ def _draw_components_3D(X, labels):
 
 
 def draw_goodness_of_fit(fit_data, pred_data, labels):
-    """
-    Visualize goodness of fit plot for MKSHomogenizationModel.
+    """Goodness of fit plot for MKSHomogenizationModel.
 
     Args:
         fit_data (1D array): Low dimensional data used to fit model

@@ -47,16 +47,16 @@ We can compute the 2-point statistics for these two periodic
 microstructures using the ``correlate`` function from ``pymks.stats``.
 This function computes all of the autocorrelations and
 cross-correlation(s) for a microstructure. Before we compute the 2-point
-statistics, we will discretize them using the ``DiscreteIndicatorBasis``
+statistics, we will discretize them using the ``PrimitiveBasis``
 function.
 
 .. code:: python
 
-    from pymks import DiscreteIndicatorBasis
+    from pymks import PrimitiveBasis
     from pymks.stats import correlate
     
-    dbasis = DiscreteIndicatorBasis(n_states=2, domain=[0, 1])
-    X_ = dbasis.discretize(X)
+    prim_basis = PrimitiveBasis(n_states=2, domain=[0, 1])
+    X_ = prim_basis.discretize(X)
     X_corr = correlate(X_, periodic_axes=[0, 1])
 Let's take a look at the two autocorrelations and the cross-correlation
 for these two microstructures.
@@ -65,10 +65,17 @@ for these two microstructures.
 
     from pymks.tools import draw_correlations
     
+    print X_corr[0].shape
+    
     draw_correlations(X_corr[0])
 
+.. parsed-literal::
 
-.. image:: intro_files/intro_9_0.png
+    (101, 101, 3)
+
+
+
+.. image:: intro_files/intro_9_1.png
 
 
 .. code:: python
@@ -98,11 +105,11 @@ types of microstructures, totaling to 600 microstructures.
 
     from pymks.datasets import make_elastic_stress_random
     
-    grain_size = [(37, 6), (4, 39), (14, 14)]
+    grain_size = [(47, 6), (4, 49), (14, 14)]
     n_samples = [200, 200, 200]
     
     X_train, y_train = make_elastic_stress_random(n_samples=n_samples, size=(51, 51),
-                                                  grain_size=grain_size, seed=1)
+                                                  grain_size=grain_size, seed=0)
 Once again, ``X_train`` is our microstructures. Throughout PyMKS ``y``
 is used as either the prpoerty or the field we would like to predict. In
 this case ``y_train`` is the effective stress values for ``X_train``.
@@ -119,14 +126,15 @@ microstructures.
 
 The ``MKSHomogenizationModel`` uses 2-point statistics, so we need
 provide a discretization method for the microstructures by providing a
-basis function.
+basis function. We will also specify which correlations we want.
 
 .. code:: python
 
     from pymks import MKSHomogenizationModel
     
-    dbasis = DiscreteIndicatorBasis(n_states=2, domain=[0, 1])
-    homogenize_model = MKSHomogenizationModel(basis=dbasis)
+    prim_basis = PrimitiveBasis(n_states=2, domain=[0, 1])
+    homogenize_model = MKSHomogenizationModel(basis=prim_basis,
+                                              correlations=[(0, 0), (1, 1), (0, 1)])
 Let's fit our model with the data we created.
 
 .. code:: python
@@ -204,8 +212,8 @@ we will also use the same basis function.
 
     from pymks import MKSLocalizationModel
     
-    dbasis = DiscreteIndicatorBasis(n_states=2)
-    localize_model = MKSLocalizationModel(basis=dbasis)
+    prim_basis = PrimitiveBasis(n_states=2)
+    localize_model = MKSLocalizationModel(basis=prim_basis)
 Let's use the data to fit our ``MKSLocalizationModel``.
 
 .. code:: python
