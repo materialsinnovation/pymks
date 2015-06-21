@@ -510,9 +510,6 @@ def _draw_components_3D(X, labels, title, component_labels):
     ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=10)
     ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=10)
     ax.set_zlabel('Component ' + str(component_labels[2]), fontsize=10)
-    # ax.set_xticks(())
-    # ax.set_yticks(())
-    # ax.set_zticks(())
     X_array = np.concatenate(X)
     x_min, x_max = [np.min(X_array[:, 0]), np.max(X_array[:, 0])]
     y_min, y_max = [np.min(X_array[:, 1]), np.max(X_array[:, 1])]
@@ -630,13 +627,23 @@ def _draw_stats(X_, correlations=None):
                      fontsize=15)
         fig.subplots_adjust(right=0.8)
         divider = make_axes_locatable(ax)
+
         cbar_ax = divider.append_axes("right", size="10%", pad=0.05)
         cbar_ticks = _get_colorbar_ticks(img, 5)
         cbar_ticks_diff = cbar_ticks[-1] - cbar_ticks[0]
-        cbar = plt.colorbar(im, cax=cbar_ax, ticks=cbar_ticks,
-                            boundaries=np.arange(cbar_ticks[0],
-                                                 cbar_ticks[-1] + 0.005,
-                                                 cbar_ticks_diff * 0.005))
+        cbar_top, cbar_grids = np.max(X_) * 0.005, 0.005
+        if cbar_ticks_diff <= 1e-15:
+            cbar_top = 0.
+            cbar_grids = 0.5
+        try:
+            cbar = plt.colorbar(im, cax=cbar_ax, ticks=cbar_ticks,
+                                boundaries=np.arange(cbar_ticks[0],
+                                                     cbar_ticks[-1] + cbar_top,
+                                                     cbar_ticks_diff *
+                                                     cbar_grids))
+            cbar.ax.tick_params(labelsize=12)
+        except:
+            cbar = plt.colorbar(im, cax=cbar_ax, boundaries=np.unique(X_))
         cbar.ax.tick_params(labelsize=12)
         fig.subplots_adjust(right=0.8)
         plt.tight_layout()
