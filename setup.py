@@ -30,7 +30,7 @@ def git_version():
     return GIT_REVISION
 
 
-def getVersion(version, release=False):
+def getVersion(version, release=True):
     if os.path.exists('.git'):
         _git_version = git_version()[:7]
     else:
@@ -41,10 +41,10 @@ def getVersion(version, release=False):
         return version + '-dev.' + _git_version
 
 setup(name='pymks',
-      version=getVersion('0.2', release=False),
-      description='Package for the Materials Knowledge System (MKS)',
-      author='Daniel Wheeler',
-      author_email='daniel.wheeler2@gmail.com',
+      version=getVersion('0.2.0', release=True),
+      description='Materials Knowledge Systems in Python (PyMKS)',
+      author='David Brough',
+      author_email='david.brough.0416@gmail.com',
       url='http://pymks.org',
       packages=find_packages(),
       package_data={'': ['tests/*.py']},
