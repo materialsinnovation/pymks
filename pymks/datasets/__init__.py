@@ -302,7 +302,7 @@ def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
     ...                      [[1, 1],
     ...                       [0, 0]]])
     >>> assert np.allclose(X, X_result)
-    >>> assert float(y[0]) == 150.
+    >>> assert np.round(y[0]).astype(int) == 150
 
     """
     if not isinstance(grain_size[0], (list, tuple, np.ndarray)):

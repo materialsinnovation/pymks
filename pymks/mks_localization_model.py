@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from .filter import Filter
 from .filter import _import_pyfftw
+from scipy.linalg import lstsq
 _import_pyfftw()
 
 
@@ -117,8 +118,7 @@ class MKSLocalizationModel(LinearRegression):
         s0 = (slice(None),)
         for ijk in np.ndindex(X_.shape[1:-1]):
             s1 = self.basis._get_basis_slice(ijk, s0)
-            Fkernel[ijk + s1] = np.linalg.lstsq(FX[s0 + ijk + s1],
-                                                Fy[s0 + ijk])[0]
+            Fkernel[ijk + s1] = lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk])[0]
         self._filter = Filter(Fkernel[None])
 
     @property
