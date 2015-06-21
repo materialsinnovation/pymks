@@ -433,7 +433,7 @@ def draw_component_variance(variance):
     plt.show()
 
 
-def draw_components(*datasets, **labels):
+def draw_components(datasets, labels, title=None, component_labels=None):
     """
     Visualize low dimensional representations of microstructures.
 
@@ -442,19 +442,30 @@ def draw_components(*datasets, **labels):
             [n_samplles, n_componts]. The length of n_components must be 2 or
             3.
         labels (list, str): list of labes for each of each array datasets
+        title: main title for plot
+        component_labels: labels for components
 
     """
     plt.close('all')
+    if title is None:
+        title = 'Low Dimensional Representation'
     n_components = np.array(datasets[0][-1].shape)
+    if component_labels is None:
+        component_labels = range(1, n_components + 1)
+    if len(datasets) != len(labels):
+        raise RuntimeError('datasets and labels must have the same length')
+    if n_components != len(component_labels):
+        raise RuntimeError('number of components and component_labels must'
+                           ' have the same length')
     if n_components[-1] == 2:
-        _draw_components_2D(datasets, labels)
+        _draw_components_2D(datasets, labels, title, component_labels[:2])
     elif n_components[-1] == 3:
-        _draw_components_3D(datasets, labels)
+        _draw_components_3D(datasets, labels, title, component_labels)
     else:
         raise RuntimeError("n_components must be 2 or 3.")
 
 
-def _draw_components_2D(X, labels):
+def _draw_components_2D(X, labels, title, component_labels):
     """
     Helper function to plot 2 components.
 
@@ -466,10 +477,8 @@ def _draw_components_2D(X, labels):
     color_list = _get_color_list(n_sets)
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.set_xlabel('Component 1', fontsize=15)
-    ax.set_ylabel('Component 2', fontsize=15)
-    ax.set_xticks(())
-    ax.set_yticks(())
+    ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=15)
+    ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=15)
     X_array = np.concatenate(X)
     x_min, x_max = [np.min(X_array[:, 0]), np.max(X_array[:, 0])]
     y_min, y_max = [np.min(X_array[:, 1]), np.max(X_array[:, 1])]
@@ -477,15 +486,14 @@ def _draw_components_2D(X, labels):
     y_epsilon = (y_max - y_min) * 0.05
     ax.set_xlim([x_min - x_epsilon, x_max + x_epsilon])
     ax.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
-    for key, n in zip(labels.keys(), np.arange(n_sets)):
-        ax.plot(X[n][:, 0], X[n][:, 1], 'o', color=color_list[n],
-                label=labels[key])
+    for label, pts, color in zip(labels, X, color_list):
+        ax.plot(pts[:, 0], pts[:, 1], 'o', color=color, label=label)
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=15)
-    plt.title('Low Dimensional Representation', fontsize=20)
+    plt.title(title, fontsize=20)
     plt.show()
 
 
-def _draw_components_3D(X, labels):
+def _draw_components_3D(X, labels, title, component_labels):
     """
     Helper function to plot 2 components.
 
@@ -497,12 +505,12 @@ def _draw_components_3D(X, labels):
     color_list = _get_color_list(n_sets)
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.set_xlabel('Component 1', fontsize=10)
-    ax.set_ylabel('Component 2', fontsize=10)
-    ax.set_zlabel('Component 3', fontsize=10)
-    ax.set_xticks(())
-    ax.set_yticks(())
-    ax.set_zticks(())
+    ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=10)
+    ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=10)
+    ax.set_zlabel('Component ' + str(component_labels[2]), fontsize=10)
+    # ax.set_xticks(())
+    # ax.set_yticks(())
+    # ax.set_zticks(())
     X_array = np.concatenate(X)
     x_min, x_max = [np.min(X_array[:, 0]), np.max(X_array[:, 0])]
     y_min, y_max = [np.min(X_array[:, 1]), np.max(X_array[:, 1])]
@@ -513,10 +521,9 @@ def _draw_components_3D(X, labels):
     ax.set_xlim([x_min - x_epsilon, x_max + x_epsilon])
     ax.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
     ax.set_zlim([z_min - z_epsilon, z_max + z_epsilon])
-    for key, n in zip(labels.keys(), np.arange(n_sets)):
-        ax.plot(X[n][:, 0], X[n][:, 1], X[n][:, 2], 'o', color=color_list[n],
-                label=labels[key])
-    plt.title('Low Dimensional Representation', fontsize=15)
+    for label, pts, color in zip(labels, X, color_list):
+        ax.plot(pts[:, 0], pts[:, 1], pts[:, 2], 'o', color=color, label=label)
+    plt.title(title, fontsize=15)
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=15)
     plt.show()
 
