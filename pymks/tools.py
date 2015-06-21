@@ -131,8 +131,10 @@ def _get_color_list(n_sets):
     Returns:
         list of colors for n_sets
     """
-    color_list = ['#1a9850', '#f46d43', '#762a83', '#1a1a1a',
-                  '#ffffbf', '#a6d96a', '#c2a5cf', '#878787']
+    color_list = ['#1a9850', '#f46d43', '#762a83', '#41b6c4',
+                  '#ffff33', '#a50026', '#dd3497', '#ffffff',
+                  '#36454f', '#081d58', '#d9ef8b', '#fee08b']
+
     return color_list[:n_sets]
 
 
