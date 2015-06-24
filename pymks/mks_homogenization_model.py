@@ -306,7 +306,7 @@ class MKSHomogenizationModel(BaseEstimator):
             X = self._correlate(X, periodic_axes, confidence_index)
         X_reshape = self._reduce_shape(X)
         X_reduced = self.dimension_reducer.transform(X_reshape)
-        self.predict_data = X_reduced
+        self.reduced_predict_data = X_reduced
         return self._linker.predict(X_reduced)
 
     def _correlate(self, X, periodic_axes, confidence_index):
