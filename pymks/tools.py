@@ -429,8 +429,11 @@ def draw_component_variance(variance):
             reduction technique.
     """
     plt.close('all')
-    plt.plot(np.cumsum(variance * 100), 'o-', color='#1a9641', linewidth=2)
+    n_components = len(variance)
+    x = np.arange(1, n_components + 1)
+    plt.plot(x, np.cumsum(variance * 100), 'o-', color='#1a9641', linewidth=2)
     plt.xlabel('Number of Components', fontsize=15)
+    plt.xlim(0, n_components + 1)
     plt.ylabel('Percent Variance', fontsize=15)
     plt.show()
 
@@ -531,8 +534,11 @@ def draw_goodness_of_fit(fit_data, pred_data, labels):
     """Goodness of fit plot for MKSHomogenizationModel.
 
     Args:
-        fit_data (1D array): Low dimensional data used to fit model
-        pred_data (1D array): Low dimensional data used for prediction
+        fit_data (2D array): Low dimensional representation of the prediction
+            values of the data used to fit the model and the actual values.
+        pred_data (2D array): Low dimensional representation of the prediction
+            values of the data used for prediction with the model and the
+            actual values.
     """
     plt.close('all')
     y_total = np.concatenate((fit_data, pred_data), axis=-1)
