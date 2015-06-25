@@ -54,12 +54,8 @@ See the [PyFFTW installation instructions](https://github.com/hgomersall/pyFFTW#
 
 ## Installation on Windows
 
-It is recommended to follow the installation instructions below using
-[Anaconda](https://store.continuum.io/cshop/anaconda/).
-
-Alternatively, if you already have a Python environment installed, all
-of the required packages and their dependencies can be downloaded from
-[Christoph Gohlke Unofficial Windows installers][chris].
+We recommend you download and install [Anaconda Python Distribution](http://continuum.io/downloads)
+for Python 2.7 and then download and install PyMKS using the [windows installer](https://www.dropbox.com/s/ja251y4f5ss2y44/PyMKS-x64-anaconda27.exe?dl=1).
 
 ## Installation with Anaconda
 
