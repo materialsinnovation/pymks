@@ -536,14 +536,16 @@ class ElasticFESimulation(object):
             pb.evaluate(
                 'ev_cauchy_strain.{dim}.region_all(u)'.format(
                     dim=dims),
-                mode='el_avg'))
+                mode='el_avg',
+                copy_materials=False))
         strain_reshape = np.reshape(strain, (shape + strain.shape[-1:]))
 
         stress = np.squeeze(
             pb.evaluate(
                 'ev_cauchy_stress.{dim}.region_all(m.D, u)'.format(
                     dim=dims),
-                mode='el_avg'))
+                mode='el_avg',
+                copy_materials=False))
         stress_reshape = np.reshape(stress, (shape + stress.shape[-1:]))
 
         return strain_reshape, u_reshape, stress_reshape
