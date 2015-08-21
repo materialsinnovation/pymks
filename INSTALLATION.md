@@ -55,8 +55,14 @@ See the [PyFFTW installation instructions](https://github.com/hgomersall/pyFFTW#
 
 ## Installation on Windows
 
-We recommend you download and install the [Anaconda Python Distribution](http://continuum.io/downloads) 
+We recommend you download and install the [Anaconda Python Distribution](http://continuum.io/downloads)
 for Python 2.7 (x64) and then download and install PyMKS using the [windows installer](https://github.com/materialsinnovation/pymks/releases/download/version-0_2_1/PyMKS-x64-anaconda27.exe).
+
+## Installation on Mac OS X
+
+We recommend you download and install the [Anaconda Python Distibution](http://continuum.io/downloads)
+for Python 2.7 (x64). Once Anaconda has been installed, follow the above procedures to install SfePy. 
+Finally, install PyMKS using `pip` as described above.
 
 ## Installation with Anaconda
 
