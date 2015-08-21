@@ -74,7 +74,7 @@ use your terminal or shell to install PyMKS using pip.
 
 ## Requirements
 
-The [REQUIREMENTS.md](REQUIREMENTS.html) file has a list of required
+The [REQUIREMENTS.md](https://github.com/materialsinnovation/pymks/blob/master/REQUIREMENTS.md) file has a list of required
 packages in a Python environment used to run tests and examples
 for the current release of PyMKS.
 
