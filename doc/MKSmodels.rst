@@ -2,7 +2,7 @@ MKS Models
 ==========
 
 MKSHomogenizationModel
---------------------
+----------------------
 .. autoclass:: pymks.mks_homogenization_model.MKSHomogenizationModel
    :members:
 

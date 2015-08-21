@@ -33,7 +33,7 @@ __version__ = get_version()
 
 __all__ = ['__version__',
            'test',
-           'MKSLocalizationModel'
+           'MKSLocalizationModel',
            'PrimitiveBasis',
            'LegendreBasis',
            'MKSHomogenizationModel']

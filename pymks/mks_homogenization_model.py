@@ -26,7 +26,7 @@ class MKSHomogenizationModel(BaseEstimator):
         basis: instance of a basis class
         reduced_fit_data: Low dimensionality representation of spatial
             correlations used to fit the model.
-        preduced_predict_data: Low dimensionality representation of spatial
+        reduced_predict_data: Low dimensionality representation of spatial
             correlations predicted by the model.
 
     Below is an examlpe of using MKSHomogenizationModel to predict (or
