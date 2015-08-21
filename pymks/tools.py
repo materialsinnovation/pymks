@@ -323,7 +323,7 @@ def draw_gridscores(grid_scores, param, score_label=None, colors=None,
     scores result from GridSearchCV while varying 1 parameters.
 
     Args:
-        grid_scores (list, grid_scores): grid_scores_ attribute from
+        grid_scores (list, grid_scores): `grid_scores_` attribute from
             GridSearchCV
         param (list, str): parameters used in grid_scores
         score_label (str): label for score value axis
@@ -376,7 +376,7 @@ def draw_gridscores_matrix(grid_scores, params, score_label=None,
     scores result from GridSearchCV while varying two parameters.
 
     Args:
-        grid_scores (list): grid_scores_ attribute from GridSearchCV
+        grid_scores (list): `grid_scores_` attribute from GridSearchCV
         params (list): two parameters used in grid_scores
         score_label (str): label for score value axis
         param_labels (list): parameter titles to appear on plot
