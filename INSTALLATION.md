@@ -61,7 +61,7 @@ for Python 2.7 (x64) and then download and install PyMKS using the [windows inst
 ## Installation on Mac OS X
 
 We recommend you download and install the [Anaconda Python Distibution](http://continuum.io/downloads)
-for Python 2.7 (x64). Once Anaconda has been installed, follow the above procedures to install SfePy. 
+for Python 2.7 (x64). Once Anaconda has been installed, follow the above procedures to install SfePy.
 Finally, install PyMKS using `pip` as described above.
 
 ## Installation with Anaconda
@@ -70,7 +70,7 @@ The [Anaconda Python Distributionn](https://store.continuum.io/cshop/anaconda/)
 contains all of the required packages outside of [SfePy][sfepy] and
 works on multiple platforms. [Download][conda] and
 [install](http://docs.continuum.io/anaconda/install.html) Anaconda, and
-use the Anaconda Command Prompt to install PyMKS using pip.
+use your terminal or shell to install PyMKS using pip.
 
 ## Requirements
 
