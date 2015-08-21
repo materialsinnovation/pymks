@@ -513,7 +513,6 @@ class ElasticFESimulation(object):
         ls = ScipyDirect({})
 
         pb = Problem('elasticity', equations=eqs, auto_solvers=None)
-        pb.save_regions_as_groups('regions')
 
         pb.time_update(
             ebcs=ebcs, epbcs=epbcs, lcbcs=lcbcs, functions=functions)
