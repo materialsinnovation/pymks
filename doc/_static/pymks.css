@@ -11,36 +11,36 @@ body {
 .navbar .nav > li > a, .navbar .nav > li > a:first-letter,
 .navbar .nav > li.current-menu-item > a,
 .navbar .nav > li.current-menu-ancestor > a {
-    font-size:      20px;
-    padding-top:    35px;
-    padding-bottom: 35px;
+    font-size:      18px;
+    padding-top:    20px;
+    padding-bottom: 20px;
     font-weight: bold;
 }
 
 /* Version Number */
 .navbar-default .navbar-text {
-    font-size:      20px;
-    padding-top:    16px;
-    padding-bottom: 16px;
+    font-size:      18px;
+    padding-top:    2px;
+    padding-bottom: 2px;
 }
 
 /* Logo and project title */
 .navbar-default .navbar-brand {
     color: #FFF;
     font-size: 25px;
-    padding-top:    14px;
-    padding-bottom: 14px;
+    padding-top:    3px;
+    padding-bottom: 3px;
 }
 
 /* Dropdown menu */
 .dropdown-menu > li > a {
-    font-size:      20px;
+    font-size:      18px;
 }
 
 /* Dropdown hover */
 /* Dropdown menu */
 .dropdown-menu > li > a:hover {
-    font-size:      20px;
+    font-size:      18px;
     background: #f46d43;
 }
 
