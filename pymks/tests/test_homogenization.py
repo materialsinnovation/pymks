@@ -1,4 +1,5 @@
 import numpy as np
+from test import check_module_installation
 
 
 def test_n_componets_from_reducer():
@@ -21,6 +22,7 @@ def test_n_components_with_reducer():
 
 
 def test_stress():
+    check_module_installation('sfepy')
     from pymks.datasets import make_elastic_stress_random
     from pymks import MKSHomogenizationModel, DiscreteIndicatorBasis
     sample_size = 200

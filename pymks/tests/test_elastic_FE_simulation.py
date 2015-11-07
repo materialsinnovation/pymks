@@ -1,6 +1,8 @@
+from test import check_module_installation
 
 
 def test_issue106():
+    check_module_installation('sfepy')
     """
     Using a doctest to check the error strings.
 

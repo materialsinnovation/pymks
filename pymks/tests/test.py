@@ -1,7 +1,17 @@
 import numpy as np
+from nose.plugins.skip import SkipTest
+
+
+def check_module_installation(module_name):
+    try:
+        __import__(module_name)
+    except ImportError:
+        print("%s could not be imported." % module_name)
+        raise SkipTest
 
 
 def test_elastic_FE_simulation_3D():
+    check_module_installation('sfepy')
     from pymks.datasets.elastic_FE_simulation import ElasticFESimulation
     nx = 5
     ii = (nx - 1) / 2
@@ -16,6 +26,7 @@ def test_elastic_FE_simulation_3D():
 
 
 def test_elastic_FE_simulation_3D_BCs():
+    check_module_installation('sfepy')
     from pymks.datasets.elastic_FE_simulation import ElasticFESimulation
     np.random.seed(8)
     N = 4
@@ -31,6 +42,7 @@ def test_elastic_FE_simulation_3D_BCs():
 
 
 def get_delta_data(nx, ny):
+    check_module_installation('sfepy')
     from pymks.datasets import make_elastic_FE_strain_delta
     return make_elastic_FE_strain_delta(elastic_modulus=(1, 1.1),
                                         poissons_ratio=(0.3, 0.3),
@@ -38,6 +50,7 @@ def get_delta_data(nx, ny):
 
 
 def get_random_data(nx, ny):
+    check_module_installation('sfepy')
     from pymks.datasets import make_elastic_FE_strain_random
     np.random.seed(8)
     return make_elastic_FE_strain_random(elastic_modulus=(1., 1.1),
