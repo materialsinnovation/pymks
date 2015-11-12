@@ -53,7 +53,9 @@ class FourierBasis(_AbstractMicrostructureBasis):
                 shaped array where `n_samples` is the number of samples and
                 `n_x` is the spatial discretization.
         Returns:
-            Float valued field of of Legendre polynomial coefficients.
+            Float valued field of Fourier series coefficients in the following
+            order 0, 1, ,-1, 2, -2, with shaped `(n_samples, n_x, ...,
+            n_states)`.
 
         >>> X = np.array([[-1, -1./2, 0.,  1./2, 1]])
         >>> f_basis = FourierBasis(4, [-1, 1.])
