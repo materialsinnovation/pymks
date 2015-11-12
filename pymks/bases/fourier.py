@@ -65,7 +65,7 @@ class FourierBasis(_AbstractMicrostructureBasis):
         >>> assert(np.allclose(X_result, f_basis.discretize(X)))
 
         """
-        X_scaled = 2. * np.pi * ((X - self.domain[0]) /
+        X_scaled = 2. * np.pi * ((X.astype(float) - self.domain[0]) /
                                  (self.domain[1] - self.domain[0]))
         nones = ([None for i in X.shape])
         X_states = np.zeros(X_scaled.shape + (self.n_states,))
