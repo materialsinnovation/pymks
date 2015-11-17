@@ -1,12 +1,15 @@
 import numpy as np
 from .cahn_hilliard_simulation import CahnHilliardSimulation
 from .microstructure_generator import MicrostructureGenerator
-from pymks import DiscreteIndicatorBasis, MKSRegressionModel
+from .elastic_FE_simulation import ElasticFESimulation
+from pymks import MKSLocalizationModel
+from pymks import PrimitiveBasis
 
 __all__ = ['make_delta_microstructures', 'make_elastic_FE_strain_delta',
            'make_elastic_FE_strain_random', 'make_cahn_hilliard',
            'make_microstructure', 'make_checkerboard_microstructure',
-           'make_elastic_stress_random']
+           'make_elastic_stress_random', 'ElasticFESimulation',
+           'CahnHilliardSimulation']
 
 
 def make_elastic_FE_strain_delta(elastic_modulus=(100, 150),
@@ -45,12 +48,9 @@ def make_elastic_FE_strain_delta(elastic_modulus=(100, 150),
     strain response fields.
 
     """
-    from .elastic_FE_simulation import ElasticFESimulation
-
     FEsim = ElasticFESimulation(elastic_modulus=elastic_modulus,
                                 poissons_ratio=poissons_ratio,
                                 macro_strain=macro_strain)
-
     X = make_delta_microstructures(len(elastic_modulus), size=size)
     FEsim.run(X)
     return X, FEsim.response
@@ -138,12 +138,9 @@ def make_elastic_FE_strain_random(n_samples=1, elastic_modulus=(100, 150),
     strain response fields.
 
     """
-    from .elastic_FE_simulation import ElasticFESimulation
-
     FEsim = ElasticFESimulation(elastic_modulus=elastic_modulus,
                                 poissons_ratio=poissons_ratio,
                                 macro_strain=macro_strain)
-
     X = np.random.randint(len(elastic_modulus), size=((n_samples, ) + size))
     FEsim.run(X)
     return X, FEsim.response
@@ -177,7 +174,6 @@ def make_cahn_hilliard(n_samples=1, size=(21, 21), dx=0.25, width=1.,
 
     """
     CHsim = CahnHilliardSimulation(dx=dx, dt=dt, gamma=width ** 2)
-
     X0 = 2 * np.random.random((n_samples,) + size) - 1
     X = X0.copy()
     for ii in range(n_steps):
@@ -320,8 +316,8 @@ def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
                                                 poissons_ratio, size,
                                                 macro_strain)
     n_states = len(elastic_modulus)
-    basis = DiscreteIndicatorBasis(n_states)
-    model = MKSRegressionModel(basis=basis)
+    basis = PrimitiveBasis(n_states)
+    model = MKSLocalizationModel(basis=basis)
     model.fit(X_cal, y_cal)
     X = np.concatenate([make_microstructure(n_samples=sample, size=size,
                                             n_phases=n_states,

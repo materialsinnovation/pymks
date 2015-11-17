@@ -1,5 +1,9 @@
 import numpy as np
-from sfepy.base.goptions import goptions
+try:
+    from sfepy.base.goptions import goptions
+except:
+    import pytest
+    sfepy = pytest.importorskip('sfepy')
 from sfepy.discrete.fem import Field
 try:
     from sfepy.discrete.fem import FEDomain as Domain

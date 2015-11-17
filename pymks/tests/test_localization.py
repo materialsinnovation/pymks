@@ -1,7 +1,12 @@
 import numpy as np
 from test import get_delta_data
 from test import get_random_data
-from test import check_module_installation
+
+
+def setup_module(module):
+    """py.test support"""
+    import pytest
+    sfepy = pytest.importorskip('sfepy')
 
 
 def test_MKS_elastic_delta():
@@ -69,7 +74,6 @@ def test_resize_coeff():
 
 
 def test_multiphase_FE_strain():
-    check_module_installation('sfepy')
     from pymks import MKSRegressionModel
     from pymks.datasets import make_elastic_FE_strain_delta
     from pymks.datasets import make_elastic_FE_strain_random

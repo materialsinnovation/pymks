@@ -1,5 +1,9 @@
+try:
+    import pytest
+    plt = pytest.importorskip('matplotlib.pylab')
+except ImportError:
+    raise ImportError('could not load matplotlib')
 import matplotlib.colors as colors
-import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from sklearn.learning_curve import learning_curve
