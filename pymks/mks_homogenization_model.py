@@ -33,18 +33,20 @@ class MKSHomogenizationModel(BaseEstimator):
     classify) the type of microstructure using PCA and Logistic Regression.
 
     >>> n_states = 3
-    >>> domain = [-1, 1]
+    >>> domain = [0, 2]
 
-    >>> from pymks.bases import LegendreBasis
-    >>> leg_basis = LegendreBasis(n_states=n_states, domain=domain)
+    >>> from pymks.bases import PrimitiveBasis
+    >>> prim_basis = PrimitiveBasis(n_states=n_states, domain=domain)
     >>> from sklearn.decomposition import PCA
     >>> from sklearn.linear_model import LogisticRegression
     >>> reducer = PCA(n_components=3)
     >>> linker = LogisticRegression()
-    >>> model = MKSHomogenizationModel(
-    ...     basis=leg_basis, dimension_reducer=reducer, property_linker=linker)
-    >>> from pymks.datasets import make_cahn_hilliard
-    >>> X0, X1 = make_cahn_hilliard(n_samples=50)
+    >>> model = MKSHomogenizationModel(basis=prim_basis,
+    ...                                dimension_reducer=reducer,
+    ...                                property_linker=linker)
+    >>> np.random.seed(10)
+    >>> X0 = np.random.randint(3, size=(50, 10, 10))
+    >>> X1 = np.random.randint(2, size=(50, 10, 10))
     >>> y0 = np.zeros(X0.shape[0])
     >>> y1 = np.ones(X1.shape[0])
 
@@ -53,7 +55,8 @@ class MKSHomogenizationModel(BaseEstimator):
 
     >>> model.fit(X, y)
 
-    >>> X0_test, X1_test = make_cahn_hilliard(n_samples=3)
+    >>> X0_test = np.random.randint(3, size=(3, 10, 10))
+    >>> X1_test = np.random.randint(2, size=(3, 10, 10))
     >>> y0_test = model.predict(X0_test)
     >>> y1_test = model.predict(X1_test)
     >>> assert np.allclose(y0_test, [0, 0, 0])
