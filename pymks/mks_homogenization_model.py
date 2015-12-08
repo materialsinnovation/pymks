@@ -27,7 +27,7 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
         reduced_predict_data: Low dimensionality representation of spatial
             correlations predicted by the model.
 
-    Below is an examlpe of using MKSHomogenizationModel to predict (or
+    Below is an example of using MKSHomogenizationModel to predict (or
     classify) the type of microstructure using PCA and Logistic Regression.
 
     >>> import numpy as np
@@ -61,14 +61,16 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
 
     def __init__(self, basis=None, dimension_reducer=None, n_components=None,
                  property_linker=None, degree=1, correlations=None,
-                 compute_correlations=True, store_correlations=False):
+                 compute_correlations=True, store_correlations=False,
+                 mean_center=True):
         """
         Create an instance of a `MKSHomogenizationModel`.
 
         Args:
             basis (class, optional): an instance of a bases class.
             dimension_reducer (class, optional): an instance of a
-                dimensionality reduction class with a fit_transform method.
+                dimensionality reduction class with a fit_transform method. The
+                default class is RandomizedPCA.
             property_linker (class, optional): an instance for a machine
                 learning class with fit and predict methods.
             n_components (int, optional): number of components kept by the
@@ -83,6 +85,8 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
                 correlations will not be calculated as part of the fit and
                 predict methods. The spatial correlations can be passed as `X`
                 to both methods, default is True.
+            mean_center (boolean, optional): If true the data will be mean
+                centered before dimensionality reduction is computed.
         """
 
         if property_linker is None:
@@ -105,19 +109,9 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
         super(MKSHomogenizationModel,
               self).__init__(store_correlations=store_correlations,
                              dimension_reducer=dimension_reducer,
-                             basis=basis, correlations=correlations,
-                             n_components=n_components)
-
-    # @property
-    # def n_components(self):
-    #     return self._n_components
-
-    # @n_components.setter
-    # def n_components(self, value):
-    #     """Setter for the number of components using by the dimension_reducer
-    #     """
-    #     self._n_components = value
-    #     self.dimension_reducer.n_components = value
+                             correlations=correlations,
+                             n_components=n_components, basis=basis,
+                             mean_center=mean_center)
 
     @property
     def degree(self):
@@ -286,81 +280,6 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
         X_reduced = self._transform(X)
         self.reduced_predict_data = X_reduced
         return self._linker.predict(X_reduced)
-
-    # def _correlate(self, X, periodic_axes, confidence_index):
-    #     """
-    #     Helper function used to calculated 2-point statistics from `X` and
-    #     reshape them appropriately for fit and predict methods.
-
-    #     Args:
-    #         X (ND array): The microstructure, an `(n_samples, n_x, ...)`
-    #             shaped array where `n_samples` is the number of samples and
-    #             `n_x` is the spatial discretization..
-    #         periodic_axes (list, optional): axes that are periodic. (0, 2)
-    #             would indicate that axes x and z are periodic in a 3D
-    #             microstrucure.
-    #         confidence_index (ND array, optional): array with same shape as X
-    #             used to assign a confidence value for each data point.
-
-    #     Returns:
-    #         Spatial correlations for each sample formated with dimensions
-    #         (n_samples, n_features).
-
-    #     Example
-
-    #     >>> from sklearn.manifold import Isomap
-    #     >>> from sklearn.linear_model import ARDRegression
-    #     >>> from pymks.bases import PrimitiveBasis
-    #     >>> reducer = Isomap()
-    #     >>> linker = ARDRegression()
-    #     >>> prim_basis = PrimitiveBasis(2, [0, 1])
-    #     >>> model = MKSHomogenizationModel(prim_basis, reducer, linker)
-    #     >>> X = np.array([[0, 1],
-    #     ...               [1, 0]])
-    #     >>> X_stats = model._correlate(X, [], None)
-    #     >>> X_test = np.array([[[ 0, 0],
-    #     ...                     [0.5, 0]],
-    #     ...                    [[0, 1,],
-    #     ...                     [0.5, 0]]])
-    #     >>> assert np.allclose(X_test, X_stats)
-    #     """
-    #     if self.basis is None:
-    #         raise AttributeError('basis must be specified')
-    #     X_ = self.basis.discretize(X)
-    #     X_stats = correlate(X_, periodic_axes=periodic_axes,
-    #                         confidence_index=confidence_index,
-    #                         correlations=self.correlations)
-    #     return X_stats
-
-    # def _reduce_shape(self, X_stats):
-    #     """
-    #     Helper function used to reshape 2-point statistics appropriately for
-    #     fit and predict methods.
-
-    #     Args:
-    #         `X_stats`: The discretized microstructure function, an
-    #             `(n_samples, n_x, ..., n_states)` shaped array
-    #             Where `n_samples` is the number of samples, `n_x` is thes
-    #             patial discretization, and n_states is the number of local
-    #             states.
-
-    #     Returns:
-    #         Spatial correlations for each sample formated with dimensions
-    #         (n_samples, n_features).
-
-    #     Example
-    #     >>> X_stats = np.zeros((2, 2, 2, 2))
-    #     >>> X_stats[1] = 3.
-    #     >>> X_stats[..., 1] = 1.
-    #     >>> X_results = np.array([[-.5, .5, -.5, .5, -.5, .5, -.5,  0.5],
-    #     ...                       [1., -1., 1., -1., 1., -1., 1., -1.]])
-    #     >>> from pymks import PrimitiveBasis
-    #     >>> prim_basis = PrimitiveBasis(2)
-    #     >>> model = MKSHomogenizationModel(prim_basis)
-    #     >>> assert np.allclose(X_results, model._reduce_shape(X_stats))
-    #     """
-    #     X_reshaped = X_stats.reshape((X_stats.shape[0], X_stats[0].size))
-    #     return X_reshaped - np.mean(X_reshaped, axis=1)[:, None]
 
     def score(self, X, y, periodic_axes=None, confidence_index=None):
         """
