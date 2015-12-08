@@ -1,4 +1,4 @@
-# from pymks import MKSStructureAnalysis
+import numpy as np
 
 
 def test_n_componets_from_reducer():
@@ -66,6 +66,15 @@ def test_set_correlations():
     model_prim = MKSStructureAnalysis(basis=prim_basis,
                                       correlations=test_correlations)
     assert model_prim.correlations == test_correlations
+
+
+def test_reshape_X():
+    from pymks import MKSStructureAnalysis
+    from pymks import PrimitiveBasis
+    anaylzer = MKSStructureAnalysis(basis=PrimitiveBasis())
+    X = np.arange(18).reshape(2, 3, 3)
+    X_test = np.concatenate((np.arange(-4, 5)[None], np.arange(-4, 5)[None]))
+    assert np.allclose(anaylzer._reduce_shape(X), X_test)
 
 if __name__ == '__main__':
     test_set_correlations()
