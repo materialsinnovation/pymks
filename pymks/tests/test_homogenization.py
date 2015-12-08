@@ -12,8 +12,8 @@ def test_n_componets_from_reducer():
 
 def test_n_components_with_reducer():
     from pymks import MKSHomogenizationModel, DiscreteIndicatorBasis
-    from sklearn.manifold import SpectralEmbedding
-    reducer = SpectralEmbedding(n_components=7)
+    from sklearn.manifold import Isomap
+    reducer = Isomap(n_components=7)
     dbasis = DiscreteIndicatorBasis(n_states=3, domain=[0, 2])
     model = MKSHomogenizationModel(dimension_reducer=reducer, basis=dbasis,
                                    n_components=9)
@@ -80,7 +80,7 @@ def test_default_n_components():
     from pymks import MKSHomogenizationModel, DiscreteIndicatorBasis
     dbasis = DiscreteIndicatorBasis(n_states=2)
     model = MKSHomogenizationModel(basis=dbasis)
-    assert model.n_components == 2
+    assert model.n_components == 5
 
 
 def test_default_property_linker():
@@ -94,7 +94,7 @@ def test_default_property_linker():
 def test_default_dimension_reducer():
     from sklearn.decomposition import RandomizedPCA
     from pymks import MKSHomogenizationModel
-    model = MKSHomogenizationModel()
+    model = MKSHomogenizationModel(compute_correlations=False)
     assert isinstance(model.dimension_reducer, RandomizedPCA)
 
 
