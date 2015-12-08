@@ -1,4 +1,3 @@
-# import numpy as np
 from mks_structure_analysis import MKSStructureAnalysis
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
