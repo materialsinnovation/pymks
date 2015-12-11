@@ -1,1 +1,8 @@
-Change from of make_elastic_stress_random to make_elastic_FE_stress_random to match the other make functions using the finite element simulation and make the API consistent.
+#   * Why is this change necessary?
+      match the other make functions using the finite element simulation and make the API consistent.
+
+#   * How does it address the issue?
+	  replaced functions
+
+#   * What side effects does this change have?
+	  consistent code
