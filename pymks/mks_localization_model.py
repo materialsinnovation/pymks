@@ -122,7 +122,7 @@ class MKSLocalizationModel(LinearRegression):
         self._filter = Filter(Fkernel[None])
 
     @property
-    def coeff(self):
+    def coef_(self):
         """Returns the coefficients in real space with origin shifted to the
         center.
         """
