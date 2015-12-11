@@ -1,0 +1,302 @@
+
+Cahn-Hilliard Example
+=====================
+
+This example demonstrates how to use PyMKS to solve the Cahn-Hilliard
+equation. The first section provides some background information about
+the Cahn-Hilliard equation as well as details about calibrating and
+validating the MKS model. The example demonstrates how to generate
+sample data, calibrate the influence coefficients and then pick an
+appropriate number of local states when state space is continuous. The
+MKS model and a spectral solution of the Cahn-Hilliard equation are
+compared on a larger test microstructure over multiple time steps.
+
+Cahn-Hilliard Equation
+~~~~~~~~~~~~~~~~~~~~~~
+
+The Cahn-Hilliard equation is used to simulate microstructure evolution
+during spinodial decomposition and has the following form,
+
+.. math::  \dot{\phi} = \nabla^2 \left( \phi^3 - \phi \right) - \gamma \nabla^4 \phi 
+
+where :math:`\phi` is a conserved ordered parameter and
+:math:`\sqrt{\gamma}` represents the width of the interface. In this
+example, the Cahn-Hilliard equation is solved using a semi-implicit
+spectral scheme with periodic boundary conditions, see `Chang and
+Rutenberg <http://dx.doi.org/10.1103/PhysRevE.72.055701>`__ for more
+details.
+
+.. code:: python
+
+    %matplotlib inline
+    %load_ext autoreload
+    %autoreload 2
+    
+    import numpy as np
+    import matplotlib.pyplot as plt
+Modeling with MKS
+-----------------
+
+Calibration Datasets
+~~~~~~~~~~~~~~~~~~~~
+
+Unlike the elastostatic examples, the microstructure (concentration
+field) for this simulation doesn't have discrete phases. The
+microstructure is a continuous field that can have a range of values
+which can change over time, therefore the first order influence
+coefficients cannot be calibrated with delta microstructures. Instead a
+large number of simulations with random initial conditions are used to
+calibrate the first order influence coefficients using linear
+regression.
+
+The function ``make_cahn_hilliard`` from ``pymks.datasets`` provides an
+interface to generate calibration datasets for the influence
+coefficients. To use ``make_cahn_hilliard``, we need to set the number
+of samples we want to use to calibrate the influence coefficients using
+``n_samples``, the size of the simulation domain using ``size`` and the
+time step using ``dt``.
+
+.. code:: python
+
+    import pymks
+    from pymks.datasets import make_cahn_hilliard
+    
+    L = 41
+    n_samples = 400
+    dt = 1e-2
+    np.random.seed(99)
+    X, y = make_cahn_hilliard(n_samples=n_samples, size=(L, L), dt=dt)
+
+The function ``make_cahnHilliard`` generates ``n_samples`` number of
+random microstructures, ``X``, and the associated updated
+microstructures, ``y``, after one time step ``y``. The following cell
+plots one of these microstructures along with its update.
+
+.. code:: python
+
+    from pymks.tools import draw_concentrations
+    
+    draw_concentrations(X[0], y[0], title0='time=0', title1='time = 1')
+
+
+.. image:: cahn_hilliard_files/cahn_hilliard_6_0.png
+
+
+Calibrate Influence Coefficients
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As mentioned above, the microstructures (concentration fields) does not
+have discrete phases. This leaves the number of local states in local
+state space as a free hyper parameter. In previous work it has been
+shown that as you increase the number of local states, the accuracy of
+MKS model increases (see `Fast et
+al. <http://dx.doi.org/10.1016/j.actamat.2010.10.008>`__), but as the
+number of local states increases, the difference in accuracy decreases.
+Some work needs to be done in order to find the practical number of
+local states that we will use.
+
+Optimizing the Number of Local States
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Let's split the calibrate dataset into testing and training datasets.
+The function ``train_test_split`` for the machine learning python module
+```sklearn`` <http://scikit-learn.org/stable/>`__ provides a convenient
+interface to do this. 80% of the dataset will be used for training and
+the remaining 20% will be used for testing by setting ``test_size``
+equal to 0.2. The state of the random number generator used to make the
+split can be set using ``random_state``.
+
+.. code:: python
+
+    import sklearn
+    from sklearn.cross_validation import train_test_split
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=3)
+    print X_train.shape
+
+.. parsed-literal::
+
+    (200, 41, 41)
+
+
+We are now going to calibrate the influence coefficients while varying
+the number of local states from 2 up to 20. Each of these models will
+then predict the evolution of the concentration fields. Mean square
+error will be used to compared the results with the testing dataset to
+evaluate how the MKS model's performance changes as we change the number
+of local states.
+
+First we need to import the class ``MKSRegressionModel`` from ``pymks``.
+We will also use metrics from ``sklearn`` to calculate the mean squared
+error.
+
+.. code:: python
+
+    from sklearn import metrics
+    mse = metrics.mean_squared_error
+    
+    from pymks import MKSRegressionModel
+    from pymks.bases import ContinuousIndicatorBasis
+Next we will calibrate the influence coefficients while varying the
+number of local states and compute the mean squared error. The following
+demonstrates how to use Scikit-learn's ``GridSearchCV`` to optimize
+``n_states`` as a hyperparameter. Of course, the best fit is always with
+a larger value of ``n_states``. Increasing this parameter does not
+overfit the data.
+
+.. code:: python
+
+    from sklearn.grid_search import GridSearchCV
+    
+    parameters_to_tune = {'n_states': np.arange(2, 11)}
+    basis = ContinuousIndicatorBasis(2, [-1, 1])
+    model = MKSRegressionModel(basis)
+    scoring = metrics.make_scorer(lambda a, b: -mse(a, b))
+    gs = GridSearchCV(model, parameters_to_tune, cv=5, scoring=scoring)
+    gs.fit(X_train, y_train)
+
+
+
+.. parsed-literal::
+
+    GridSearchCV(cv=5,
+           estimator=MKSRegressionModel(basis=<pymks.bases.continuous.ContinuousIndicatorBasis object at 0x7f484b2c68d0>,
+              n_states=2),
+           fit_params={}, iid=True, loss_func=None, n_jobs=1,
+           param_grid={'n_states': array([ 2,  3,  4,  5,  6,  7,  8,  9, 10])},
+           pre_dispatch='2*n_jobs', refit=True, score_func=None,
+           scoring=make_scorer(<lambda>), verbose=0)
+
+
+
+.. code:: python
+
+    print(gs.best_estimator_)
+    print(gs.score(X_test, y_test))
+
+.. parsed-literal::
+
+    MKSRegressionModel(basis=<pymks.bases.continuous.ContinuousIndicatorBasis object at 0x7f484b3d64d0>,
+              n_states=10)
+    0.99999908222
+
+
+.. code:: python
+
+    from pymks.tools import draw_gridscores
+    
+    draw_gridscores(gs.grid_scores_)
+
+
+.. image:: cahn_hilliard_files/cahn_hilliard_14_0.png
+
+
+As expected the accuracy of the MKS model monotonically increases as we
+increase n\_states, but accuracy doesn't improve significantly as
+n\_states gets larger than signal digits.
+
+In order to save on computation costs let's set calibrate the influence
+coefficients with ``n_states`` equal to 6, but realize that if we need
+slightly more accuracy the value can be increased.
+
+.. code:: python
+
+    MKSmodel = MKSRegressionModel(basis=ContinuousIndicatorBasis(6, [-1, 1]))
+    MKSmodel.fit(X, y)
+Here are the first 4 influence coefficients.
+
+.. code:: python
+
+    from pymks.tools import draw_coeff
+    
+    draw_coeff(MKSmodel.coeff[...,:4])
+
+
+.. image:: cahn_hilliard_files/cahn_hilliard_18_0.png
+
+
+Predict Microstructure Evolution
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+With the calibrated influence coefficients, we are ready to predict the
+evolution of a concentration field. In order to do this, we need to have
+the Cahn-Hilliard simulation and the MKS model start with the same
+initial concentration ``phi0`` and evolve in time. In order to do the
+Cahn-Hilliard simulation we need an instance of the class
+``CahnHilliardSimulation``.
+
+.. code:: python
+
+    from pymks.datasets.cahn_hilliard_simulation import CahnHilliardSimulation
+    np.random.seed(191)
+    
+    phi0 = 2 * np.random.random((1, L, L)) - 1
+    CHSim = CahnHilliardSimulation(dt=dt)
+    phi = phi0.copy()
+    phi_pred = phi0.copy()
+    
+
+In order to move forward in time, we need to feed the concentration back
+into the Cahn-Hilliard simulation and the MKS model.
+
+.. code:: python
+
+    time_steps = 10
+    
+    for ii in range(time_steps):
+        CHSim.run(phi)
+        phi = CHSim.response
+        phi_pred = MKSmodel.predict(phi_pred)
+Let's take a look at the concentration fields.
+
+.. code:: python
+
+    from pymks.tools import draw_concentrations_compare
+    
+    draw_concentrations_compare(phi[0], phi_pred[0])
+
+
+.. image:: cahn_hilliard_files/cahn_hilliard_24_0.png
+
+
+The MKS model was able to capture the microstructure evolution with 6
+local states.
+
+Resizing the Coefficients to use on Larger Systems
+--------------------------------------------------
+
+Now let's try and predict a larger simulation by resizing the
+coefficients and provide a larger initial concentratio field.
+
+.. code:: python
+
+    N = 3 * L
+    MKSmodel.resize_coeff((N, N))
+    
+    phi0 = 2 * np.random.random((1, N, N)) - 1
+    phi = phi0.copy()
+    phi_pred = phi0.copy()
+Once again we are going to march forward in time by feeding the
+concentration fields back into the Cahn-Hilliard simulation and the MKS
+model.
+
+.. code:: python
+
+    for ii in range(1000):
+        CHSim.run(phi)
+        phi = CHSim.response
+        phi_pred = MKSmodel.predict(phi_pred)
+Let's take a look at the results.
+
+.. code:: python
+
+    from pymks.tools import draw_concentrations_compare
+    
+    draw_concentrations_compare(phi[0], phi_pred[0])
+
+
+.. image:: cahn_hilliard_files/cahn_hilliard_30_0.png
+
+
+The MKS model with resized influence coefficients was able to reasonably
+predict the structure evolution for a larger concentration field.

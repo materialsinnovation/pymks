@@ -1,0 +1,226 @@
+
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&lt;no title&gt; &mdash; PyMKS</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootswatch-3.1.0/cosmo/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pymks.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.1.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="../_static/pymks_logo.ico"/>
+    <link rel="top" title="PyMKS" href="../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html"><img src="../_static/pymks_logo.png">
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+                <li><a href="INSTALLATION.html">Installation</a></li>
+                <li><a href="../EXAMPLES.html">Examples</a></li>
+                <li><a href="../API.html">API</a></li>
+                <li><a href="https://github.com/openmaterials/pymks/">Github</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">More <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../THEORY.html">Theory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="derivation.html">Derivation of Materials Knowledge Systems Equation using Linear Elasticity</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="CREDITS.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CITATION.html">Citing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="REQUIREMENTS.html">Requirements</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="code python highlight-python"><pre>%load_ext autoreload
+%autoreload 2
+
+from skimage import io
+from pymks.filter import CorrelationNonPeriodic
+from pymks import DiscreteIndicatorBasis</pre>
+</div>
+<div class="highlight-python"><pre>The autoreload extension is already loaded. To reload it, use:
+  %reload_ext autoreload</pre>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">url</span> <span class="o">=</span> <span class="s">&#39;https://farm8.staticflickr.com/7368/12972465885_1bcb9717bd_c.jpg&#39;</span>
+<span class="c"># Load remote image</span>
+<span class="n">image_data</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span> <span class="n">url</span> <span class="p">)</span>
+<span class="n">io</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/PyMKS-reimplement_1_0.png" src="../_images/PyMKS-reimplement_1_0.png" />
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">X</span> <span class="o">=</span> <span class="p">(</span><span class="n">image_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span> <span class="s">&#39;double&#39;</span> <span class="p">)</span> <span class="o">/</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)[</span><span class="bp">None</span><span class="p">];</span>
+<span class="n">basis</span> <span class="o">=</span> <span class="n">DiscreteIndicatorBasis</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">X_</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">discretize</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">cor_numer</span> <span class="o">=</span> <span class="n">CorrelationNonPeriodic</span><span class="p">(</span><span class="n">X_</span><span class="p">,</span> <span class="n">periodic_axes</span><span class="o">=</span><span class="p">())</span>
+<span class="n">y_numer</span> <span class="o">=</span> <span class="n">cor_numer</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">X_</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><pre>ones = np.ones(X.shape)
+#basis = DiscreteIndicatorBasis(2, domain=(0, 1))
+#X_ = basis.discretize(X)
+cor_denom = CorrelationNonPeriodic(ones[..., None], periodic_axes=())
+y_denom = cor_denom.convolve(ones[..., None)]</pre>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">y_numer</span><span class="p">,</span> <span class="n">y_denom</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mf">0.468413621262</span><span class="o">+</span><span class="mi">0j</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">y_denom</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">y_denom</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">481600</span><span class="o">+</span><span class="mi">0j</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="c">#print cor_numer.axes</span>
+<span class="c">#print y.shape</span>
+<span class="c">#y_shift = np.fft.fftshift(y, axes=cor_numer.axes)</span>
+<span class="c">#print y_shift[0, 0, 0, 1]</span>
+<span class="c">#print y[0, 0, :10, 1]</span>
+
+<span class="c">#i = np.argmin(y[0, :, :, 1].flatten())</span>
+<span class="c">#print &#39;i:&#39;,i,&#39;value:&#39;,y.flatten()[i]</span>
+<span class="c">#print np.argwhere(y==(-np.inf))</span>
+<span class="k">print</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">602</span><span class="p">,</span> <span class="mi">220</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mf">0.190491781885</span><span class="o">-</span><span class="mf">0.0722255034714j</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>&lt;matplotlib.colorbar.Colorbar instance at 0x7f5fa352ee60&gt;</pre>
+</div>
+<img alt="../_images/PyMKS-reimplement_6_2.png" src="../_images/PyMKS-reimplement_6_2.png" />
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymks.stats</span> <span class="kn">import</span> <span class="n">crosscorelate</span>
+
+<span class="n">crosscorelate</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">shift_numer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real_if_close</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">y_numer</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">cor_numer</span><span class="o">.</span><span class="n">axes</span><span class="p">))</span>
+<span class="k">print</span> <span class="n">shift_numer</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">shift_numer</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="k">print</span> <span class="n">y_numer</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1204</span><span class="p">,</span> <span class="mi">1600</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="mf">225588.0</span>
+</pre></div>
+</div>
+<img alt="../_images/PyMKS-reimplement_8_1.png" src="../_images/PyMKS-reimplement_8_1.png" />
+<div class="code python highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">y_denom</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">shift_denom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real_if_close</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">y_denom</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+<span class="c">#print shift_numer.shape</span>
+<span class="k">print</span> <span class="n">shift_denom</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">shift_denom</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="k">print</span> <span class="n">y_denom</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1204</span><span class="p">,</span> <span class="mi">1600</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1204</span><span class="p">,</span> <span class="mi">1600</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="mf">481600.0</span>
+</pre></div>
+</div>
+<img alt="../_images/PyMKS-reimplement_9_1.png" src="../_images/PyMKS-reimplement_9_1.png" />
+<div class="code python highlight-python"><div class="highlight"><pre><span class="mf">225588.</span> <span class="o">/</span> <span class="mf">481600.</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">0.46841362126245845</span>
+</pre></div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
