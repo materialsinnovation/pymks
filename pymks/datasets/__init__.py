@@ -114,6 +114,7 @@ def make_elastic_FE_strain_random(n_samples=1, elastic_modulus=(100, 150),
     microstructure with dimensions of `(5, 5)`.
 
     Args:
+        n_samples (int, optional): number of samples
         elastic_modulus (list, optional): elastic moduli for the phases
         poissons_ratio (list, optional): Poisson's ratios for the phases
         size (tuple, optional): size of the microstructure
