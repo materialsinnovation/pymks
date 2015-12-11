@@ -258,7 +258,7 @@ def make_checkerboard_microstructure(square_size, n_squares):
 def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
                                poissons_ratio=(0.3, 0.3), size=(21, 21),
                                macro_strain=0.01, grain_size=[(3, 3), (9, 9)],
-                               seed=10):
+                               seed=10, power = 2):
     """
     Generates microstructures and their macroscopic stress values for an
     applied macroscopic strain.
@@ -325,7 +325,7 @@ def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
     model.fit(X_cal, y_cal)
     X = np.concatenate([make_microstructure(n_samples=sample, size=size,
                                             n_phases=n_states,
-                                            grain_size=gs, seed=seed) for gs,
+                                            grain_size=gs, seed=seed, power=power) for gs,
                         sample in zip(grain_size, n_samples)])
     X_ = basis.discretize(X)
     index = tuple([None for i in range(len(size) + 1)]) + (slice(None),)

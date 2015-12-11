@@ -36,7 +36,7 @@ class MicrostructureGenerator(BaseMicrostructureGenerator):
         if len(self.size) != len(self.grain_size):
             raise RuntimeError("Dimensions of size and grain_size are"
                                " not equal.")
-        X = np.random.random((self.n_samples,) + self.size)
+        X = np.random.power(self.power, (self.n_samples,) + self.size)
         gaussian = fourier_gaussian(np.ones(self.grain_size),
                                     np.ones(len(self.size)))
         filter_ = Filter(np.fft.fftn(gaussian)[None, ..., None])
