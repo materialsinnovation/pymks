@@ -494,6 +494,16 @@ def _draw_components_2D(X, labels, title, component_labels):
     ax.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
     for label, pts, color in zip(labels, X, color_list):
         ax.plot(pts[:, 0], pts[:, 1], 'o', color=color, label=label)
+    ##################ADDED################# 
+        print "started"   
+        data_labels=['{0}'.format(i) for i in range(len(pts))]
+        counter=0
+        for data_label, x, y in zip(data_labels,pts[:, 0], pts[:, 1]):
+          if counter%10==0:
+            plt.annotate(data_label,xy=(x,y),bbox=dict(boxstyle='round,pad=0.9',fc='white',alpha=0.5))
+          counter+=1
+        print "finished"
+    ########################################
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=15)
     plt.title(title, fontsize=20)
     plt.show()
