@@ -1,10 +1,7 @@
-
-
-def test_issue106():
+def test_issue106(sfepy_check):
+    sfepy_check
     """
-    Using a doctest to check the error strings.
-
-    >>> from pymks.datasets.elastic_FE_simulation import ElasticFESimulation
+    Using a doctest to check the error strings.)
     >>> import numpy as np
     >>> L = 5
     >>> elastic_modulus = (1, 2, 3)

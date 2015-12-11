@@ -1,5 +1,12 @@
 import numpy as np
-from test import get_delta_data, get_random_data
+from test import get_delta_data
+from test import get_random_data
+
+
+def setup_module(module):
+    """py.test support"""
+    import pytest
+    sfepy = pytest.importorskip('sfepy')
 
 
 def test_MKS_elastic_delta():

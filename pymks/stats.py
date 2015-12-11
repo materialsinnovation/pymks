@@ -1,11 +1,6 @@
 import numpy as np
 from .filter import Correlation
 
-"""
-The stats functions take in a microstructure function and returns its two
-point statistics.
-"""
-
 
 def autocorrelate(X_, periodic_axes=[], confidence_index=None,
                   autocorrelations=None):
@@ -70,10 +65,11 @@ def _correlate(X_, s, correlations):
 
     Example
 
-    >>> from pymks.datasets import make_microstructure
     >>> from pymks.bases import PrimitiveBasis
-    >>> X = make_microstructure(n_samples=2, n_phases=3,
-    ...                         size=(2, 2), grain_size=(2, 2), seed=99)
+    >>> X = np.array([[[2, 1],
+    ...                [2, 0]],
+    ...               [[2, 2],
+    ...                [0, 0]]])
     >>> prim_basis = PrimitiveBasis(n_states=3, domain=[0, 2])
     >>> X_ = prim_basis.discretize(X)
     >>> correlations = [(l, l) for l in range(3)]
@@ -327,17 +323,17 @@ def _truncate(a, shape):
 
     Example
 
-    >>> print _truncate(np.arange(10).reshape(1, 10, 1), (1, 5))[0, ..., 0]
+    >>> print(_truncate(np.arange(10).reshape(1, 10, 1), (1, 5))[0, ..., 0])
     [3 4 5 6 7]
-    >>> print _truncate(np.arange(9).reshape(1, 9, 1), (1, 5))[0, ..., 0]
+    >>> print(_truncate(np.arange(9).reshape(1, 9, 1), (1, 5))[0, ..., 0])
     [2 3 4 5 6]
-    >>> print _truncate(np.arange(10).reshape((1, 10, 1)), (1, 4))[0, ..., 0]
+    >>> print(_truncate(np.arange(10).reshape((1, 10, 1)), (1, 4))[0, ..., 0])
     [3 4 5 6]
-    >>> print _truncate(np.arange(9).reshape((1, 9, 1)), (1, 4))[0, ..., 0]
+    >>> print(_truncate(np.arange(9).reshape((1, 9, 1)), (1, 4))[0, ..., 0])
     [2 3 4 5]
 
     >>> a = np.arange(5 * 4).reshape((1, 5, 4, 1))
-    >>> print _truncate(a, shape=(1, 3, 2))[0, ..., 0]
+    >>> print(_truncate(a, shape=(1, 3, 2))[0, ..., 0])
     [[ 5  6]
      [ 9 10]
      [13 14]]

@@ -91,16 +91,16 @@ class MKSLocalizationModel(LinearRegression):
 
         Example
 
-        >>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
+        >>> X = np.arange(0, 4).reshape((1, 2, 2))
         >>> y = X.swapaxes(1, 2)
         >>> from .bases import PrimitiveBasis
-        >>> prim_basis = PrimitiveBasis(2, [0, 1])
+        >>> prim_basis = PrimitiveBasis(2, [0, 3])
         >>> model = MKSLocalizationModel(basis=prim_basis)
         >>> model.fit(X, y)
-        >>> assert np.allclose(model._filter.Fkernel, [[[ 0.5,  0.5],
-        ...                                             [  -2,    0]],
-        ...                                            [[-0.5,  0  ],
-        ...                                             [  -1,  0  ]]])
+        >>> assert np.allclose(model._filter.Fkernel, [[[ 1.5,  1.5],
+        ...                                             [  -6,    0]],
+        ...                                            [[-1.5,  0  ],
+        ...                                             [-0.0,  0  ]]])
         """
         self.basis = self.basis.__class__(self.n_states, self.domain)
         if size is not None:

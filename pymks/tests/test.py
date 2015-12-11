@@ -76,4 +76,4 @@ def test_cahn_hilliard():
     assert mse(y_test[0], y_pred[0]) < 0.03
 
 if __name__ == '__main__':
-    test_MKS_elastic_delta()
+    test_cahn_hilliard()
