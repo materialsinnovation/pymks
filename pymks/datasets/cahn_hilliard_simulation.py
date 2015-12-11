@@ -1,4 +1,6 @@
 import numpy as np
+from ..filter import _import_pyfftw
+_import_pyfftw()
 
 
 class CahnHilliardSimulation(object):
@@ -63,10 +65,12 @@ class CahnHilliardSimulation(object):
 
     def __init__(self, dx=0.25, gamma=1., dt=0.001):
         r"""
+        Instanitate a CahnHilliardSimulation
+
         Args:
-          dx: grid spacing
-          dt: time step size
-          gamma: paramater in CH equation
+            dx (float, optional): grid spacing
+            dt (float, optional): time step size
+            gamma (float, optional): paramater in CH equation
 
         """
         self.dx = dx
@@ -78,8 +82,8 @@ class CahnHilliardSimulation(object):
         Return the response field
 
         Args:
-          X: Array representing the concentration field between -1 and
-             1 with shape (n_samples, N, N)
+            X (ND array): Array representing the concentration field between -1
+                and 1 with shape (n_samples, n_x, ...)
 
         """
         N = X.shape[1]
@@ -87,8 +91,8 @@ class CahnHilliardSimulation(object):
             raise RuntimeError("X must represent a square domain")
 
         L = self.dx * N
-        k = np.arange(N) 
-        
+        k = np.arange(N)
+
         if N % 2 == 0:
             N1 = N / 2
             N2 = N1
@@ -114,4 +118,3 @@ class CahnHilliardSimulation(object):
 
         Fy = (FX * (1 + dt * explicit) - ksq * dt * FX3) / (1 - dt * implicit)
         self.response = np.fft.ifftn(Fy, axes=axes).real
-

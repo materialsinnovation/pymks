@@ -1,190 +1,33 @@
 Requirements
 ============
 
-BeautifulSoup==3.2.1
-CherryPy==3.2.2
-Cython==0.19.1
-Django==1.5.4
--e git+ssh://git@code.matforge.org/nist/fipy.git@ae5484815f1dae2e7446928dbb08e9041da99603#egg=FiPy-dev
-Flask==0.10.1
-GitPython==0.3.2.RC1
-GnuPGInterface==0.3.2
-JSAnimation==0.1
-Jinja2==2.7.1
-Mako==0.8.1
-Markdown==2.3.1
-MarkupSafe==0.18
-MySQL-python==1.2.3
-PAM==0.4.2
-Pillow==2.0.0
-PyFFTW3==0.2.1
-PyYAML==3.10
-Pygments==1.6
-Routes==1.13
-RunSnakeRun==2.0.2a1
-SQLAlchemy==0.8.2
-SecretStorage==1.0.0
--e hg+https://bitbucket.org/birkenfeld/sphinx@ef3092d458cc00c4b74dd342ea05ba1059a5da70#egg=Sphinx-dev
-SphinxBase==0.8
-SquareMap==1.0.1
--e hg+ssh://hg@bitbucket.org/wd15/sumatra@3c00d7ccfbd1104ea2397c63047b08da11f9e880#egg=Sumatra-ticket187
-Tempita==0.5.1
-Twisted-Core==13.0.0
-Twisted-Mail==13.0.0
-Twisted-Names==13.0.0
-Twisted-Web==13.0.0
-Twisted-Words==13.0.0
-VTK==5.8.0
-WebOb==1.2.3
-Werkzeug==0.9.1
-adium-theme-ubuntu==0.3.3
-apptools==4.1.0
-## FIXME: could not find svn URL in dependency_links for this package:
-apsw==3.7.17-r1
-apt-xapian-index==0.45
-argparse==1.2.1
-async==0.6.1
-brewer2mpl==1.3.1
-buildbot==0.8.7p1
-buildbot-slave==0.8.7p1
-bzr==2.6.0
-ccsm==0.9.10.2
-chaco==4.3.0
-chardet==2.0.1
-command-not-found==0.3
-compizconfig-python==0.9.10.2
-configglue==1.1.2
-configobj==4.7.2
-cracklib==2.8.22
-cssselect==0.8
-cssutils==0.9.10b1
-dblatex==0.3.4-3
-debtagshw==0.1
-decorator==3.4.0
-defer==1.0.6
-dirspec==13.10
-disco==0.4.3
-distribute==0.6.34
-django-tagging==0.3.1
-dnspython==1.11.0
-docutils==0.11
-dumbo==0.21.35
-duplicity==0.6.21
-envisage==4.1.0
--e git+git@github.com:wd15/extremefill2D.git@05b0aec47fb7fca94c0f0fb866a6c2b3bd5ee69b#egg=extremefill2D-dev
-ez-setup==0.9
-feedparser==5.1.2
-gitdb==0.5.4
-gm-notify==0.10.3
-httplib2==0.8
-ipdb==0.6.1
-ipy-table==1.11
--e git+https://github.com/ipython/ipython.git@b31eb2f2d95146bfc0873670c649378872492dc7#egg=ipython-dev
-itsdangerous==0.21
-jockey==0.9.7
-keyring==1.6
-latexcodec==0.3.0
-launchpadlib==1.10.2
-lazr.restfulclient==0.13.3
-lazr.uri==1.0.3
-line-profiler==1.0b3
-logilab-astng==0.24.1
-logilab-common==0.59.1
-lxml==3.2.0
-matplotlib==1.2.1
-mayavi==4.1.0
-mechanize==0.2.5
-memory-profiler==0.27
-mercurial==2.6.3
-mpi4py==1.3
-netifaces==0.8
-nose==1.3.0
-numexpr==2.2.2
-numpy==1.7.1
-oauth==1.0.1
-oauthlib==0.5.1
-oneconf==0.3.5
-oset==0.1.3
-pandas==0.12.0
-parameters==0.2.0
-paramiko==1.10.1
-pep8==1.4.6
-pexpect==2.4
-piston-mini-client==0.7.5
-prettyplotlib==0.1.3
-protobuf==2.4.1
-psutil==0.7.1
-psycopg2==2.4.5
-pyFFTW==0.9.2
-pyOpenSSL==0.13
--e bzr+http://bazaar.launchpad.net/~pybtex-devs/pybtex/trunk/@892#egg=pybtex-0.16-py2.7-dev_r892
--e git+git@github.com:mcmtroffaes/pybtex-docutils.git@3649b9f77121cdf0087b99e5112569297b4cfc1d#egg=pybtex_docutils-dev
-pychecker==0.8.19
-pycrypto==2.6
-pycups==1.9.63
-pycurl==7.19.0
-pyface==4.1.0
-pyflakes==0.7.3
-pygit==0.1
-pygobject==3.10.0
-pygpgme==0.3
-pyinotify==0.9.3
-pylint==0.26.0
-pylsmlib==0.1
-pymc==2.3
--e git+git@github.com:wd15/pymks.git@8ba7039121a565bc4170dcbf764e4decfb4397ef#egg=pymks-dev
-pyparsing==2.0.1
-pyrallel==0.2.1
-pyserial==2.6
-pysmbc==1.0.13
--e git://pysparse.git.sourceforge.net/gitroot/pysparse/pysparse@1751931aa5c06429245c3aca3a3ba6d7622ea8b5#egg=pysparse-dev
-python-apt==0.8.9.1ubuntu1
-python-dateutil==2.1
-python-debian==0.1.21-nmu2ubuntu1
-pytz==2013b
-pyxdg==0.25
-pyzmq==13.1.0
-## FIXME: could not find svn URL in dependency_links for this package:
-reimport==1.3dev-r77
-reportlab==2.6
-repoze.lru==0.6
-requests==1.2.3
-rhythmbox-ubuntuone==13.10
--e git+git@github.com:wd15/scikit-fmm.git@78a243dd9d8cf014e86bb859523226fa8ed65f10#egg=scikit_fmm-dev
-scikit-learn==0.13.1
-scikits.bootstrap==0.3.1
-scipy==0.13.0
-sessioninstaller==0.0.0
-simplegeneric==0.8.1
-simplejson==3.3.0
-six==1.3.0
-smmap==0.8.2
-software-center-aptd-plugins==0.0.0
--e git+git@github.com:mcmtroffaes/sphinxcontrib-bibtex.git@baef921e2de8038de62f26be945087a249127ed2#egg=sphinxcontrib_bibtex-dev
-sqlalchemy-migrate==0.7.2
-ssh-import-id==3.19
-stdeb==0.6.0
-system-service==0.1.6
-tables==2.4.0
-texttable==0.8.1
-tornado==3.1.1
-## FIXME: could not find svn URL in dependency_links for this package:
-traclinks==0.1dev-20130910
-traits==4.1.0
-traitsui==4.1.0
-typedbytes==0.3.8
-uTidylib==0.2
-ubuntuone-storage-protocol==13.10
-unity-lens-photos==1.0
-urllib3==1.6
-vboxapi==1.0
-virtkey==0.63.0
-virtualenv==1.10.1
-virtualenvwrapper==3.4
-wadllib==1.3.2
-wsgiref==0.1.2
-wxPython==2.8.12.1
-wxPython-common==2.8.12.1
-xdiagnose==3.6.1
-xkit==0.0.0
-zope.interface==4.0.5
+Packages Required for PyMKS
+
+ - nose==1.3.6
+ - numpy==1.9.2
+ - scikit-learn==0.16.1
+ - scipy==0.15.1
+
+Packages Required to Run Tests and Examples
+
+ - backports.ssl-match-hostname==3.4.0.2
+ - certifi==14.5.14
+ - cython==0.22
+ - fastcache==1.0.2
+ - ipython==3.1.0
+ - jinja2==2.7.3
+ - jsonschema==2.4.0
+ - markupsafe==0.23
+ - matplotlib==1.4.3
+ - numexpr==2.3.1
+ - pip==7.0.1
+ - pyparsing==2.0.3
+ - python-dateutil==2.4.2
+ - pytz==2015.4
+ - pyzmq==14.6.0
+ - setuptools==17.0
+ - sfepy==2015.1
+ - six==1.9.0
+ - sympy==0.7.6
+ - tables==3.1.1
+ - tornado==4.2

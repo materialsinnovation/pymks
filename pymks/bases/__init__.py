@@ -1,5 +1,7 @@
-from .discrete import DiscreteIndicatorBasis
-from .continuous import ContinuousIndicatorBasis
+from .primitive import PrimitiveBasis
 from .legendre import LegendreBasis
 
-__all__ = ['DiscreteIndicatorBasis', 'ContinuousIndicatorBasis', 'LegendreBasis']
+__all__ = ['PrimitiveBasis', 'LegendreBasis']
+
+DiscreteIndicatorBasis = PrimitiveBasis
+ContinuousIndicatorBasis = PrimitiveBasis

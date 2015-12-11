@@ -1,13 +1,13 @@
 import os
-
-
 import nose
 from nose.tools import nottest
-from .mks_regression_model import MKSRegressionModel
-from .bases.discrete import DiscreteIndicatorBasis
+from .mks_localization_model import MKSLocalizationModel
+from .bases.primitive import PrimitiveBasis
 from .bases.legendre import LegendreBasis
-from .bases.continuous import ContinuousIndicatorBasis
-from .mks_kernel_pca_model import MKSKernelPCAModel
+from .mks_homogenization_model import MKSHomogenizationModel
+MKSRegressionModel = MKSLocalizationModel
+DiscreteIndicatorBasis = PrimitiveBasis
+ContinuousIndicatorBasis = PrimitiveBasis
 
 
 @nottest
@@ -33,8 +33,7 @@ __version__ = get_version()
 
 __all__ = ['__version__',
            'test',
-           'MKSRegressionModel',
-           'MKSKernelPCAModel',
-           'DiscreteIndicatorBasis',
-           'ContinuousIndicatorBasis',
-           'LegendreBasis']
+           'MKSLocalizationModel',
+           'PrimitiveBasis',
+           'LegendreBasis',
+           'MKSHomogenizationModel']

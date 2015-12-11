@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2014, Daniel Wheeler, David Brough, Tony Fast, Surya Kalidindi, Andrew Reid
+Copyright (c) 2014, David Brough, Daniel Wheeler, Tony Fast, Surya Kalidindi, Andrew Reid
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
