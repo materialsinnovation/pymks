@@ -23,3 +23,11 @@ class _AbstractMicrostructureBasis(object):
 
     def discretize(self, X):
         raise NotImplementedError
+
+    def _select_slice(self, ijk, s0):
+        """
+        Helper method used to calibrate influence coefficients from in
+        mks_localization_model to account for redundancies from linearly
+        dependent local states.
+        """
+        return s0
