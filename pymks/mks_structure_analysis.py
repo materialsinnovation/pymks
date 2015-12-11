@@ -217,7 +217,8 @@ class MKSStructureAnalysis(BaseEstimator):
             else:
                 self.transform_correlations = X
         X_reshaped = self._reduce_shape(X)
-        return self.dimension_reducer.transform(X_reshaped)
+        self.transform_data =  self.dimension_reducer.transform(X_reshaped)
+        return self.transform_data
 
     def _fit_transform(self, X, y):
         """Reshapes X and uses it to compute the components"""
