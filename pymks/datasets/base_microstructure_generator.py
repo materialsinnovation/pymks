@@ -3,7 +3,7 @@ import numpy as np
 
 class BaseMicrostructureGenerator(object):
     def __init__(self, n_samples=1, size=(21, 21),
-                 n_phases=2, grain_size=None, seed=3, power = 2):
+                 n_phases=2, grain_size=None, seed=3, power=None):
         """
         Instantiate a MicrostructureGenerator.
 
@@ -25,7 +25,7 @@ class BaseMicrostructureGenerator(object):
         if self.grain_size is None:
             self.grain_size = np.array(size) / 2
         np.random.seed(seed)
-        self.power = power
+        self.power=power
 
     def generate(self):
         raise NotImplementedError

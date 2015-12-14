@@ -187,7 +187,7 @@ def make_cahn_hilliard(n_samples=1, size=(21, 21), dx=0.25, width=1.,
 
 
 def make_microstructure(n_samples=10, size=(101, 101), n_phases=2,
-                        grain_size=(33, 14), seed=10, power = 2):
+                        grain_size=(33, 14), seed=10, power=None):
     """
     Constructs microstructures for an arbitrary number of phases
     given the size of the domain, and relative grain size.
@@ -218,7 +218,7 @@ def make_microstructure(n_samples=10, size=(101, 101), n_phases=2,
     """
     MS = MicrostructureGenerator(n_samples=n_samples, size=size,
                                  n_phases=n_phases, grain_size=grain_size,
-                                 seed=seed, power = power)
+                                 seed=seed, power=power)
     return MS.generate()
 
 
@@ -258,7 +258,7 @@ def make_checkerboard_microstructure(square_size, n_squares):
 def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
                                poissons_ratio=(0.3, 0.3), size=(21, 21),
                                macro_strain=0.01, grain_size=[(3, 3), (9, 9)],
-                               seed=10, power = 2):
+                               seed=10, power=None):
     """
     Generates microstructures and their macroscopic stress values for an
     applied macroscopic strain.

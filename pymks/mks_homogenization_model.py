@@ -23,7 +23,7 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
         basis: instance of a basis class
         reduced_fit_data: Low dimensionality representation of spatial
             correlations used to fit the model.
-        reduced_predict_data: Low dimensionality representation of spatial
+        predict_data: Low dimensionality representation of spatial
             correlations predicted by the model.
 
     Below is an example of using MKSHomogenizationModel to predict (or
@@ -277,7 +277,7 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
             X = self._compute_stats(X, periodic_axes, confidence_index)
 
         X_reduced = self._transform(X)
-        self.reduced_predict_data = X_reduced
+        self.predict_data = X_reduced
         return self._linker.predict(X_reduced)
 
     def score(self, X, y, periodic_axes=None, confidence_index=None):
