@@ -48,14 +48,6 @@ class LegendreBasis(_AbstractMicrostructureBasis):
 
     """
 
-    def _get_basis_slice(self, ijk, s0):
-        """
-        Helper method used to calibrate influence coefficients from in
-        mks_localization_model to account for redundancies from linearly
-        dependent local states.
-        """
-        return s0
-
     def discretize(self, X):
         """
         Discretize `X`.
