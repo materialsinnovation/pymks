@@ -452,7 +452,8 @@ def draw_components(datasets, labels, title=None, component_labels=None,
         title: main title for plot
         component_labels: labels for components
         view_angles (int,int): the elevation and azimuth angles of the axes to rotate the axes.
-
+        legend_outside : specify to move legend box outside the main plot domain
+        figsize: (width, height) figure size in inches
     """
     plt.close('all')
     if title is None:
