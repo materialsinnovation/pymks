@@ -4,6 +4,7 @@ from scipy.ndimage.fourier import fourier_gaussian
 from .base_microstructure_generator import BaseMicrostructureGenerator
 from ..filter import _import_pyfftw
 _import_pyfftw()
+import math
 
 
 class MicrostructureGenerator(BaseMicrostructureGenerator):
@@ -53,8 +54,20 @@ class MicrostructureGenerator(BaseMicrostructureGenerator):
         Returns:
           microstructure with assigned phases
         """
-        epsilon = 1e-5
-        X0, X1 = np.min(X_blur), np.max(X_blur)
-        Xphases = float(self.n_phases) * (X_blur - X0) / (X1 - X0) * \
+        if self.n_phases > 2:
+            epsilon = 1e-5
+            X0, X1 = np.min(X_blur), np.max(X_blur)
+            Xphases = float(self.n_phases) * (X_blur - X0) / (X1 - X0) * \
                                          (1. - epsilon) + epsilon
+        else:
+            X_reshape = X_blur.reshape((X_blur.shape[0], -1))
+            X_sort = np.sort(X_reshape, axis=1)
+            v_frac = self.v_frac
+            length = X_sort.shape[1]
+            ind = int(math.floor(v_frac*length))
+            seg = X_sort[:, ind-1]
+            Xphases = X_reshape >= seg[:, None]
+
+
+
         return np.floor(Xphases)
