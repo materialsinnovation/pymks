@@ -187,7 +187,7 @@ def make_cahn_hilliard(n_samples=1, size=(21, 21), dx=0.25, width=1.,
 
 
 def make_microstructure(n_samples=10, size=(101, 101), n_phases=2,
-                        grain_size=(33, 14), seed=10, power=None):
+                        grain_size=(33, 14), seed=10, v_frac = 0.5):
     """
     Constructs microstructures for an arbitrary number of phases
     given the size of the domain, and relative grain size.
@@ -217,8 +217,8 @@ def make_microstructure(n_samples=10, size=(101, 101), n_phases=2,
 
     """
     MS = MicrostructureGenerator(n_samples=n_samples, size=size,
-                                 n_phases=n_phases, grain_size=grain_size,
-                                 seed=seed, power=power)
+                                 n_phases=n_phases, grain_size=grain_size, seed=seed,v_frac=v_frac)
+
     return MS.generate()
 
 
