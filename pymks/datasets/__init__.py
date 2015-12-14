@@ -252,7 +252,7 @@ def make_checkerboard_microstructure(square_size, n_squares):
     X = np.ones((2 * square_size, 2 * square_size), dtype=int)
     X[:square_size, :square_size] = 0
     X[square_size:, square_size:] = 0
-    return np.tile(X, ((n_squares + 1) / 2, (n_squares + 1) / 2))[None, :L, :L]
+    return np.tile(X, (int((n_squares + 1) / 2), int((n_squares + 1) / 2)))[None, :L, :L]
 
 
 def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),

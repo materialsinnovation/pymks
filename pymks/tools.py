@@ -669,9 +669,9 @@ def _get_ticks_params(l):
     """
     segments = np.roll(np.arange(4, 7, dtype=int), 1, 0)
     m = segments[np.argmin(l % segments)]
-    n = max((l + 1) / m, 1)
-    tick_loc = range(0, l + n, n)
-    tick_labels = range(- (l - 1) / 2, (l + 1) / 2 + n, n)
+    n = int(max((l + 1) / m, 1))
+    tick_loc = list(range(0, l + n, n))
+    tick_labels = list(range(int(round(- (l - 1) / 2)), int(round(int((l + 1) / 2 + n))), n))
     return tick_loc, tick_labels
 
 
