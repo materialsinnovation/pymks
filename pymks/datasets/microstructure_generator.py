@@ -54,20 +54,30 @@ class MicrostructureGenerator(BaseMicrostructureGenerator):
         Returns:
           microstructure with assigned phases
         """
-        if self.n_phases > 2:
+        '''
+        Former version    
+            if self.n_phases > 3:
             epsilon = 1e-5
             X0, X1 = np.min(X_blur), np.max(X_blur)
             Xphases = float(self.n_phases) * (X_blur - X0) / (X1 - X0) * \
                                          (1. - epsilon) + epsilon
-        else:
-            X_reshape = X_blur.reshape((X_blur.shape[0], -1))
-            X_sort = np.sort(X_reshape, axis=1)
-            v_frac = self.v_frac
+        '''
+        v_frac = self.v_frac
+        if sum(v_frac)!=1.0:
+            raise RuntimeError("Volume fractions do not add up to 1")
+        X_reshape = X_blur.reshape((X_blur.shape[0], -1))
+        X_sort = np.sort(X_reshape, axis=1)
+        X_segs = np.zeros((X_reshape.shape))
+        if sum(v_frac)!=1.0:
+            raise RuntimeError("Volume fractions do not add up to 1")
+        for i in range(1,len(v_frac)):
+            v = sum(v_frac[0:i])
             length = X_sort.shape[1]
-            ind = int(math.floor(v_frac*length))
-            seg = X_sort[:, ind-1]
-            Xphases = X_reshape >= seg[:, None]
-
+            ind = int(math.floor(v*length))
+            seg = X_sort[:, ind]
+            X_seg = X_reshape >= seg[:, None]
+            X_segs = X_segs+X_seg
+        Xphases = X_segs.reshape((X_blur.shape))
 
 
         return np.floor(Xphases)
