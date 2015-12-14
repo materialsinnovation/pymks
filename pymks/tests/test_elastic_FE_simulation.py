@@ -1,5 +1,4 @@
-def test_issue106(sfepy_check):
-    sfepy_check
+def test_issue106():
     """
     Using a doctest to check the error strings.)
     >>> import numpy as np
