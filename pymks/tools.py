@@ -439,7 +439,8 @@ def draw_component_variance(variance):
     plt.show()
 
 
-def draw_components(datasets, labels, title=None, component_labels=None):
+def draw_components(datasets, labels, title=None, component_labels=None,
+                    view_angles=None):
     """
     Visualize low dimensional representations of microstructures.
 
@@ -450,6 +451,7 @@ def draw_components(datasets, labels, title=None, component_labels=None):
         labels (list, str): list of labes for each of each array datasets
         title: main title for plot
         component_labels: labels for components
+        view_angles (int,int): the elevation and azimuth angles of the axes to rotate the axes.
 
     """
     plt.close('all')
@@ -466,7 +468,8 @@ def draw_components(datasets, labels, title=None, component_labels=None):
     if n_components[-1] == 2:
         _draw_components_2D(datasets, labels, title, component_labels[:2])
     elif n_components[-1] == 3:
-        _draw_components_3D(datasets, labels, title, component_labels)
+        _draw_components_3D(datasets, labels, title, component_labels,
+                           view_angles)
     else:
         raise RuntimeError("n_components must be 2 or 3.")
 
@@ -499,7 +502,7 @@ def _draw_components_2D(X, labels, title, component_labels):
     plt.show()
 
 
-def _draw_components_3D(X, labels, title, component_labels):
+def _draw_components_3D(X, labels, title, component_labels, view_angles):
     """
     Helper function to plot 2 components.
 
@@ -527,6 +530,8 @@ def _draw_components_3D(X, labels, title, component_labels):
     for label, pts, color in zip(labels, X, color_list):
         ax.plot(pts[:, 0], pts[:, 1], pts[:, 2], 'o', color=color, label=label)
     plt.title(title, fontsize=15)
+    if view_angles is not None:
+        ax.view_init(view_angles[0], view_angles[1])
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=15)
     plt.show()
 
