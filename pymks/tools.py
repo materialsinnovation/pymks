@@ -440,7 +440,7 @@ def draw_component_variance(variance):
 
 
 def draw_components(datasets, labels, title=None, component_labels=None,
-                    view_angles=None):
+                    view_angles=None,legend_outside=None,figsize=None):
     """
     Visualize low dimensional representations of microstructures.
 
@@ -466,15 +466,17 @@ def draw_components(datasets, labels, title=None, component_labels=None,
         raise RuntimeError('number of components and component_labels must'
                            ' have the same length')
     if n_components[-1] == 2:
-        _draw_components_2D(datasets, labels, title, component_labels[:2])
+        _draw_components_2D(datasets, labels, title, component_labels[:2],
+                            legend_outside,figsize)
     elif n_components[-1] == 3:
         _draw_components_3D(datasets, labels, title, component_labels,
-                           view_angles)
+                           view_angles,legend_outside,figsize)
     else:
         raise RuntimeError("n_components must be 2 or 3.")
 
 
-def _draw_components_2D(X, labels, title, component_labels):
+def _draw_components_2D(X, labels, title, component_labels,
+                        legend_outside,figsize):
     """
     Helper function to plot 2 components.
 
@@ -485,6 +487,8 @@ def _draw_components_2D(X, labels, title, component_labels):
     n_sets = len(X)
     color_list = _get_color_list(n_sets)
     fig = plt.figure()
+    if figsize is not None:
+        fig = plt.figure(figsize=(figsize[0], figsize[1]))
     ax = fig.add_subplot(111)
     ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=15)
     ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=15)
@@ -497,12 +501,17 @@ def _draw_components_2D(X, labels, title, component_labels):
     ax.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
     for label, pts, color in zip(labels, X, color_list):
         ax.plot(pts[:, 0], pts[:, 1], 'o', color=color, label=label)
-    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=15)
+#    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=15)
+    lg = plt.legend(loc=1, borderaxespad=0., fontsize=15)
+    if legend_outside is not None:
+        lg = plt.legend(bbox_to_anchor=(1.05, 1.0), loc=2, borderaxespad=0., fontsize=15)
+    lg.draggable()
     plt.title(title, fontsize=20)
     plt.show()
 
 
-def _draw_components_3D(X, labels, title, component_labels, view_angles):
+def _draw_components_3D(X, labels, title, component_labels, view_angles,
+                       legend_outside,figsize):
     """
     Helper function to plot 2 components.
 
@@ -513,10 +522,12 @@ def _draw_components_3D(X, labels, title, component_labels, view_angles):
     n_sets = len(X)
     color_list = _get_color_list(n_sets)
     fig = plt.figure()
+    if figsize is not None:
+        fig = plt.figure(figsize=(figsize[0], figsize[1]))
     ax = fig.add_subplot(111, projection='3d')
-    ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=10)
-    ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=10)
-    ax.set_zlabel('Component ' + str(component_labels[2]), fontsize=10)
+    ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=12)
+    ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=12)
+    ax.set_zlabel('Component ' + str(component_labels[2]), fontsize=12)
     X_array = np.concatenate(X)
     x_min, x_max = [np.min(X_array[:, 0]), np.max(X_array[:, 0])]
     y_min, y_max = [np.min(X_array[:, 1]), np.max(X_array[:, 1])]
@@ -532,7 +543,10 @@ def _draw_components_3D(X, labels, title, component_labels, view_angles):
     plt.title(title, fontsize=15)
     if view_angles is not None:
         ax.view_init(view_angles[0], view_angles[1])
-    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=15)
+  #  plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=15)
+    lg = plt.legend(loc=1, borderaxespad=0., fontsize=15)
+    if legend_outside is not None:
+        lg = plt.legend(bbox_to_anchor=(1.05, 1.0), loc=2, borderaxespad=0., fontsize=15)
     plt.show()
 
 
