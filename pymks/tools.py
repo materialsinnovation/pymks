@@ -523,25 +523,25 @@ def _draw_components_2D_time(X, labels, title, component_labels):
     """
     n_sets = len(X)
     color_list = _get_color_list(n_sets)
-    fig = plt.figure()
+    fig = plt.figure(figsize=(17,10))
     ax = fig.add_subplot(221,projection='3d')
     ax2 = fig.add_subplot(222)
     ax3 = fig.add_subplot(223)
     ax4 = fig.add_subplot(224)
     
     
-    ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=8)
-    ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=8)
-    ax.set_zlabel('Time (fs)', fontsize=8)
+    ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=12)
+    ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=12)
+    ax.set_zlabel('Time (fs)', fontsize=12)
     
-    ax2.set_xlabel('Component ' + str(component_labels[0]), fontsize=8)
-    ax2.set_ylabel('Component ' + str(component_labels[1]), fontsize=8)
+    ax2.set_xlabel('Component ' + str(component_labels[0]), fontsize=12)
+    ax2.set_ylabel('Component ' + str(component_labels[1]), fontsize=12)
     
-    ax3.set_xlabel('Time', fontsize=8)
-    ax3.set_ylabel('Component ' + str(component_labels[0]), fontsize=8)
+    ax3.set_xlabel('Time', fontsize=12)
+    ax3.set_ylabel('Component ' + str(component_labels[0]), fontsize=12)
     
-    ax4.set_xlabel('Time', fontsize=8)
-    ax4.set_ylabel('Component ' + str(component_labels[1]), fontsize=8)
+    ax4.set_xlabel('Time', fontsize=12)
+    ax4.set_ylabel('Component ' + str(component_labels[1]), fontsize=12)
     
     time = X[-1]
     X = X[0:2]
