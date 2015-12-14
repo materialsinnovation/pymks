@@ -11,7 +11,8 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
+import sys
+import os
 import sphinx_bootstrap_theme
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -19,7 +20,7 @@ import sphinx_bootstrap_theme
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
 
-# -- General configuration -----------------------------------------------------
+# -- General configuration -----------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #needs_sphinx = '1.0'
@@ -44,7 +45,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pymks'
-copyright = u'2014, Daniel Wheeler'
+copyright = u'2015, David Brough'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -92,7 +93,7 @@ pygments_style = 'sphinx'
 #modindex_common_prefix = []
 
 
-# -- Options for HTML output ---------------------------------------------------
+# -- Options for HTML output ---------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
@@ -104,14 +105,14 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    'navbar_title': " ",
+    'navbar_title': "PyMKS",
     'navbar_site_name': "More",
     'navbar_links': [
         ("Installation", "rst/INSTALLATION.html", True),
         ("Examples", "EXAMPLES.html", True),
         ("API", "API.html", True),
-        ("Github", "https://github.com/openmaterials/pymks/", True),
-        ],
+        ("Github", "https://github.com/materialsinnovation/pymks/", True),
+    ],
     'navbar_pagenav': False,
     'navbar_sidebarrel': False,
     'globaltoc_depth': 2,
@@ -133,9 +134,9 @@ html_short_title = "PyMKS"
 # of the sidebar.
 html_logo = 'pymks_logo.png'
 
-# # The name of an image file (within the static path) to use as favicon of the
-# # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
-# # pixels large.
+# The name of an image file (within the static path) to use as favicon of the
+# docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
+# pixels large.
 html_favicon = 'pymks_logo.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -188,24 +189,24 @@ html_show_copyright = False
 htmlhelp_basename = 'pymksdoc'
 
 
-# -- Options for LaTeX output --------------------------------------------------
+# -- Options for LaTeX output --------------------------------------------
 
 latex_elements = {
-# The paper size ('letterpaper' or 'a4paper').
-#'papersize': 'letterpaper',
+    # The paper size ('letterpaper' or 'a4paper').
+    #'papersize': 'letterpaper',
 
-# The font size ('10pt', '11pt' or '12pt').
-#'pointsize': '10pt',
+    # The font size ('10pt', '11pt' or '12pt').
+    #'pointsize': '10pt',
 
-# Additional stuff for the LaTeX preamble.
-#'preamble': '',
+    # Additional stuff for the LaTeX preamble.
+    #'preamble': '',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'extremefill.tex', u'Extreme Fill Documentation',
-   u'Daniel Wheeler', 'manual'),
+    ('index', 'pymks.tex', u'PyMKS Documentation',
+     u'David Brough', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -229,28 +230,28 @@ latex_documents = [
 #latex_domain_indices = True
 
 
-# -- Options for manual page output --------------------------------------------
+# -- Options for manual page output --------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'extremefill', u'Extreme Fill Documentation',
-     [u'Daniel Wheeler'], 1)
+    ('index', 'pymks', u'PyMKS Documentation',
+     [u'David Brough'], 1)
 ]
 
 # If true, show URL addresses after external links.
 #man_show_urls = False
 
 
-# -- Options for Texinfo output ------------------------------------------------
+# -- Options for Texinfo output ------------------------------------------
 
 # Grouping the document tree into Texinfo files. List of tuples
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'extremefill', u'Extreme Fill Documentation',
-   u'Daniel Wheeler', 'extremefill', 'Reproduce Extreme fill Paper.',
-   'Miscellaneous'),
+    ('index', 'pymks', u'PyMKS Documentation',
+     u'David Brough', 'pymks', 'Materials Knowledge Systems in Python',
+     'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.

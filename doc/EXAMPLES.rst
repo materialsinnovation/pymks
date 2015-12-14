@@ -1,13 +1,13 @@
+:orphan:
+
 Examples
 ========
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   rst/elasticity_2D.rst
-   rst/elasticity_2D_Multiphase.rst
-   rst/elasticity_3D.rst
-   rst/filter.rst
-   rst/cahn_hilliard.rst
-   rst/cahn_hilliard_Legendre.rst
+   spatial_stats.rst
+   homogenization.rst
+   localization.rst
+
 

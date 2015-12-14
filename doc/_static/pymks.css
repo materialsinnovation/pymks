@@ -1,1 +1,97 @@
+body {
+    font-family: "Source Sans Pro",Calibri,Candara,Arial,sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    padding-top: 90px;
+    color: #333;
+}
+
+/* START OF Change the Navbar Font/Size/Alignment */
+/* Navbar Options */
+.navbar .nav > li > a, .navbar .nav > li > a:first-letter,
+.navbar .nav > li.current-menu-item > a,
+.navbar .nav > li.current-menu-ancestor > a {
+    font-size:      18px;
+    padding-top:    20px;
+    padding-bottom: 20px;
+    font-weight: bold;
+}
+
+/* Version Number */
+.navbar-default .navbar-text {
+    font-size:      18px;
+    padding-top:    2px;
+    padding-bottom: 2px;
+}
+
+/* Logo and project title */
+.navbar-default .navbar-brand {
+    color: #FFF;
+    font-size: 25px;
+    padding-top:    3px;
+    padding-bottom: 3px;
+}
+
+/* Dropdown menu */
+.dropdown-menu > li > a {
+    font-size:      18px;
+}
+
+/* Dropdown hover */
+/* Dropdown menu */
+.dropdown-menu > li > a:hover {
+    font-size:      18px;
+    background: #f46d43;
+}
+
+/*START OF Change to links*/
+
+/* link hover */
+a:hover, a:focus {
+    color: #f46d43;
+    text-decoration: underline;
+}
+
+/* link */
+a {
+    color: #1a9850;
+    text-decoration: none;
+}
+
+a:focus {
+    outline: thin dotted;
+    outline-offset: -2px;
+}
+
+/*START OF Change to code reference text in documentation */
+code {
+    font-size: 90%;
+    color: #762a83;
+}
+
+/* START OF Change for code blocks*/
+
+pre {
+    display: block;
+    padding: 10px;
+    margin: 0px 0px 10.5px;
+    font-size: 17px;
+    line-height: 1.42857;
+    word-break: break-all;
+    word-wrap: break-word;
+    color: #333;
+    border: 2px solid #CCC;
+    border-radius: 0px;
+}
+
+
+/*Change paragraph margins */
+p {
+    margin: 10.5px 10.5px 10.5px;
+}
+
+/* Background color for Parameters and Returns in API*/
+th {
+    background: #E4E4E4;
+}
 

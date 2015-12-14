@@ -11,6 +11,8 @@ Materials Knowledge Systems in Python
 
 .. include:: intro.rst
 
+.. include:: support.rst
+
 .. toctree::
    :hidden:
 

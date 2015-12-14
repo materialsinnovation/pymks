@@ -17,9 +17,10 @@ def git_version():
         env['LANGUAGE'] = 'C'
         env['LANG'] = 'C'
         env['LC_ALL'] = 'C'
-        out = subprocess.Popen(cmd, stdout = subprocess.PIPE, env=env).communicate()[0]
+        out = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, env=env).communicate()[0]
         return out
-    
+
     try:
         out = _minimal_ext_cmd(['git', 'rev-parse', 'HEAD'])
         GIT_REVISION = out.strip().decode('ascii')
@@ -28,7 +29,8 @@ def git_version():
 
     return GIT_REVISION
 
-def getVersion(version, release=False):
+
+def getVersion(version, release=True):
     if os.path.exists('.git'):
         _git_version = git_version()[:7]
     else:
@@ -39,11 +41,11 @@ def getVersion(version, release=False):
         return version + '-dev.' + _git_version
 
 setup(name='pymks',
-      version=getVersion('0.2', release=False),
-      description='Package for the Materials Knowledge System (MKS)',
-      author='Daniel Wheeler',
-      author_email='daniel.wheeler2@gmail.com',
+      version=getVersion('0.2.3', release=True),
+      description='Materials Knowledge Systems in Python (PyMKS)',
+      author='David Brough, Daniel Wheeler',
+      author_email='david.brough.0416@gmail.com',
       url='http://pymks.org',
       packages=find_packages(),
-      package_data={'' : ['tests/*.py']},
+      package_data={'': ['tests/*.py']},
       )

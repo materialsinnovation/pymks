@@ -2,7 +2,8 @@ Theory
 ======
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    rst/derivation.rst
+   rst/tech_overview.rst
 
