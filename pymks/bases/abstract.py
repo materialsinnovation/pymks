@@ -24,6 +24,12 @@ class _AbstractMicrostructureBasis(object):
     def discretize(self, X):
         raise NotImplementedError
 
+    def _shape_check(self, X, y):
+        if not len(y.shape) > 1:
+            raise RuntimeError("The shape of y is incorrect.")
+        if y.shape != X.shape:
+            raise RuntimeError("X and y must be the same shape.")     
+
     def _select_slice(self, ijk, s0):
         """
         Helper method used to calibrate influence coefficients from in

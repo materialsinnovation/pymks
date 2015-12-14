@@ -106,10 +106,13 @@ class MKSLocalizationModel(LinearRegression):
         if size is not None:
             y = self._reshape_feature(y, size)
             X = self._reshape_feature(X, size)
-        if not len(y.shape) > 1:
-            raise RuntimeError("The shape of y is incorrect.")
-        if y.shape != X.shape:
-            raise RuntimeError("X and y must be the same shape.")
+
+        # if not len(y.shape) > 1:
+        #     raise RuntimeError("The shape of y is incorrect.")
+        # if y.shape != X.shape:
+        #     raise RuntimeError("X and y must be the same shape.")
+        self.basis._shape_check(X, y)  # call error check for shapes of X and y
+
         X_ = self.basis.discretize(X)
         axes = np.arange(X_.ndim)[1:-1]
         FX = np.fft.fftn(X_, axes=axes)
@@ -118,7 +121,11 @@ class MKSLocalizationModel(LinearRegression):
         s0 = (slice(None),)
         for ijk in np.ndindex(X_.shape[1:-1]):
             s1 = self.basis._select_slice(ijk, s0)
-            Fkernel[ijk + s1] = lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk])[0]
+            # print FX[s0 + ijk + s1].shape
+            # print Fy[s0 + ijk].shape
+            # Fkernel[ijk + s1] = lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk])[0]
+            Fkernel[ijk + s1] = lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk], 0.0001)[0]
+
         self._filter = Filter(Fkernel[None])
 
     @property
