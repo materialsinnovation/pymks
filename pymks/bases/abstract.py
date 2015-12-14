@@ -30,6 +30,13 @@ class _AbstractMicrostructureBasis(object):
         if y.shape != X.shape:
             raise RuntimeError("X and y must be the same shape.")     
 
+    def _output_shape(self,X):
+        """
+        Function to describe the expected output shape of a given
+        microstructure X.
+        """
+        return X.shape
+
     def _select_slice(self, ijk, s0):
         """
         Helper method used to calibrate influence coefficients from in
@@ -37,3 +44,19 @@ class _AbstractMicrostructureBasis(object):
         dependent local states.
         """
         return s0
+
+    def _reshape_feature(self, X, size):
+        """
+        Helper function used to check the shape of the microstructure,
+        and change to appropriate shape.
+
+        Args:
+            X: The microstructure, an `(n_samples, n_x, ...)` shaped array
+                where `n_samples` is the number of samples and `n_x` is thes
+                patial discretization.
+
+        Returns:
+            microstructure with shape (n_samples, size)
+        """
+        new_shape = (X.shape[0],) + size
+        return X.reshape(new_shape)
