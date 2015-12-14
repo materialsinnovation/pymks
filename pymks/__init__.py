@@ -11,7 +11,7 @@ ContinuousIndicatorBasis = PrimitiveBasis
 
 
 def test():
-    r"""
+    """
     Run all the doctests available.
     """
     path = os.path.split(__file__)[0]
