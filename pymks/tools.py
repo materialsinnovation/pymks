@@ -439,7 +439,7 @@ def draw_component_variance(variance):
     plt.show()
 
 
-def draw_components(datasets, labels, title=None, component_labels=None):
+def draw_components(datasets, labels, title=None, component_labels=None,time=None):
     """
     Visualize low dimensional representations of microstructures.
 
@@ -456,15 +456,20 @@ def draw_components(datasets, labels, title=None, component_labels=None):
     if title is None:
         title = 'Low Dimensional Representation'
     n_components = np.array(datasets[0][-1].shape)
+    print n_components
     if component_labels is None:
         component_labels = range(1, n_components + 1)
+        if (time is True):
+            component_labels = range(1, 4)
     if len(datasets) != len(labels):
         raise RuntimeError('datasets and labels must have the same length')
-    if n_components != len(component_labels):
+    if n_components != len(component_labels) and (time is None):
         raise RuntimeError('number of components and component_labels must'
                            ' have the same length')
-    if n_components[-1] == 2:
+    if n_components[-1] == 2 and (time is None):
         _draw_components_2D(datasets, labels, title, component_labels[:2])
+    elif n_components[-1] == 2 and (time is True):
+        _draw_components_2D_time(datasets,labels,title,component_labels)
     elif n_components[-1] == 3:
         _draw_components_3D(datasets, labels, title, component_labels)
     else:
@@ -508,6 +513,77 @@ def _draw_components_2D(X, labels, title, component_labels):
     plt.title(title, fontsize=20)
     plt.show()
 
+def _draw_components_2D_time(X, labels, title, component_labels):
+    """
+    Helper function to plot 2 components.
+
+    Args:
+        X: Arrays with low dimensional data
+        labels: labels for each of the low dimensional arrays
+    """
+    n_sets = len(X)
+    color_list = _get_color_list(n_sets)
+    fig = plt.figure()
+    ax = fig.add_subplot(221,projection='3d')
+    ax2 = fig.add_subplot(222)
+    ax3 = fig.add_subplot(223)
+    ax4 = fig.add_subplot(224)
+    
+    
+    ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=8)
+    ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=8)
+    ax.set_zlabel('Time (fs)', fontsize=8)
+    
+    ax2.set_xlabel('Component ' + str(component_labels[0]), fontsize=8)
+    ax2.set_ylabel('Component ' + str(component_labels[1]), fontsize=8)
+    
+    ax3.set_xlabel('Time', fontsize=8)
+    ax3.set_ylabel('Component ' + str(component_labels[0]), fontsize=8)
+    
+    ax4.set_xlabel('Time', fontsize=8)
+    ax4.set_ylabel('Component ' + str(component_labels[1]), fontsize=8)
+    
+    time = X[-1]
+    X = X[0:2]
+    X_array = np.concatenate(X)
+    
+    x_min, x_max = [np.min(X_array[:, 0]), np.max(X_array[:, 0])]
+    y_min, y_max = [np.min(X_array[:, 1]), np.max(X_array[:, 1])]
+    z_min, z_max = [np.min(time[:]), np.max(time[:])]
+    x_epsilon = (x_max - x_min) * 0.05
+    y_epsilon = (y_max - y_min) * 0.05
+    ax.set_xlim([x_min - x_epsilon, x_max + x_epsilon])
+    ax.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
+    ax.set_zlim([z_min,z_max])
+    ax2.set_xlim([x_min - x_epsilon, x_max + x_epsilon])
+    ax2.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
+    ax3.set_ylim([x_min - x_epsilon, x_max + x_epsilon])
+    ax3.set_xlim([z_min,z_max])
+    ax4.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
+    ax4.set_xlim([z_min,z_max])
+    
+    for label, pts, color in zip(labels, X, color_list):
+        ax.plot(pts[:, 0], pts[:, 1], time[:], 'o', color=color, label=label)
+        ax2.plot(pts[:, 0], pts[:, 1], 'o', color=color, label=label)
+        ax3.plot(time[:], pts[:, 0], 'o', color=color, label=label)
+        ax4.plot(time[:], pts[:, 1], 'o', color=color, label=label)
+        
+    ##################ADDED################# 
+    '''
+        print "started"   
+        data_labels=['{0}'.format(i) for i in range(len(pts))]
+        counter=0
+        for data_label, x, y in zip(data_labels,pts[:, 0], pts[:, 1]):
+          if counter%10==0:
+            plt.annotate(data_label,xy=(x,y),bbox=dict(boxstyle='round,pad=0.9',fc='white',alpha=0.5))
+          counter+=1
+        print "finished"
+    '''
+    ########################################
+    #plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=15)
+    #plt.title(title, fontsize=12)
+    plt.tight_layout(pad=5,w_pad=0.5,h_pad=1)
+    plt.show()
 
 def _draw_components_3D(X, labels, title, component_labels):
     """
