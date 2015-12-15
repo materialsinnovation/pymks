@@ -1,6 +1,5 @@
 import os
-import nose
-from nose.tools import nottest
+import pytest
 from .mks_localization_model import MKSLocalizationModel
 from .bases.primitive import PrimitiveBasis
 from .bases.legendre import LegendreBasis
@@ -11,13 +10,17 @@ DiscreteIndicatorBasis = PrimitiveBasis
 ContinuousIndicatorBasis = PrimitiveBasis
 
 
-@nottest
 def test():
-    r"""
+    """
     Run all the doctests available.
     """
+    try:
+        import sfepy
+    except ImportError:
+        print "==============================================================="
+        print "Optional package 'sfepy' not found. Some tests will be skipped."
     path = os.path.split(__file__)[0]
-    nose.main(argv=['-w', path, '--with-doctest'])
+    pytest.main(args=[path, '--doctest-module'])
 
 
 def get_version():
