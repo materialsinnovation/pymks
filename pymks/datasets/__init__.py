@@ -354,7 +354,6 @@ def teardown_module(module):
 
 
 if __name__ == '__main__':
-    print str(2)
     print make_elastic_stress_random
     import pymks.simple_datasets
     modules = {
@@ -362,7 +361,9 @@ if __name__ == '__main__':
     }
     the_patcher = mock.patch.dict('sys.modules', modules)
     the_patcher.start()
-    from pymks.datasets import make_elastic_FE_strain_delta, make_elastic_FE_strain_random, make_elastic_stress_random
+    from pymks.datasets import make_elastic_FE_strain_delta
+    from pymks.datasets import make_elastic_FE_strain_random
+    from pymks.datasets import make_elastic_stress_random
     print make_elastic_stress_random
     the_patcher.stop()
     print make_elastic_stress_random
