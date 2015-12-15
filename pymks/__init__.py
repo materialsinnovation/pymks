@@ -14,8 +14,13 @@ def test():
     """
     Run all the doctests available.
     """
+    try:
+        import sfepy
+    except ImportError:
+        print "==============================================================="
+        print "Optional package 'sfepy' not found. Some tests will be skipped."
     path = os.path.split(__file__)[0]
-    pytest.main(args=[path])
+    pytest.main(args=[path, '--doctest-module'])
 
 
 def get_version():
