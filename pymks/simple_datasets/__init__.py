@@ -8,6 +8,12 @@ __all__ = ['imposter',
 
 
 def imposter():
+    """
+    this function is a placeholder if one
+    wants to use explore sending more tests
+    to simple_datasets. asserting this function
+    will throw an error.
+    """
     print 'this is a fake thing'
     return 0
 
