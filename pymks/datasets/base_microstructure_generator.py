@@ -3,7 +3,7 @@ import numpy as np
 
 class BaseMicrostructureGenerator(object):
     def __init__(self, n_samples=1, size=(21, 21),
-                 n_phases=2, grain_size=None, seed=3, v_frac = 0.5):
+                 n_phases=2, grain_size=None, seed=3, v_frac = 0.5, sigma = 2):
         """
         Instantiate a MicrostructureGenerator.
 
@@ -25,6 +25,7 @@ class BaseMicrostructureGenerator(object):
         if self.grain_size is None:
             self.grain_size = np.array(size) / 2
         np.random.seed(seed)
+        self.sigma = sigma
 
         self.v_frac = v_frac
 

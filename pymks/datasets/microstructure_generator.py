@@ -38,11 +38,7 @@ class MicrostructureGenerator(BaseMicrostructureGenerator):
             raise RuntimeError("Dimensions of size and grain_size are"
                                " not equal.")
 
-        if self.power==None:
-            X = np.random.random((self.n_samples,) + self.size)
-        else:
-            X = np.random.power(self.power, (self.n_samples,) + self.size)
-        
+        X = np.random.random((self.n_samples,) + self.size)
         gaussian = fourier_gaussian(np.ones(self.grain_size),
                                     np.ones(len(self.size)))
         filter_ = Filter(np.fft.fftn(gaussian)[None, ..., None])
@@ -79,7 +75,12 @@ class MicrostructureGenerator(BaseMicrostructureGenerator):
             v = sum(v_frac[0:i])
             length = X_sort.shape[1]
             ind = int(math.floor(v*length))
-            seg = X_sort[:, ind]
+            print "sigma =" +str(self.sigma)
+            var = self.sigma*np.random.randn()
+            print "variance = " + str(var)
+            index = ind + var
+            print "Index = " + str(index)
+            seg = X_sort[:, index]
             X_seg = X_reshape >= seg[:, None]
             X_segs = X_segs+X_seg
         Xphases = X_segs.reshape((X_blur.shape))
