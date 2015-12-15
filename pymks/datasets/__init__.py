@@ -346,8 +346,6 @@ def setup_module(module):
     }
     module.the_patcher = mock.patch.dict('sys.modules', modules)
     module.the_patcher.start()
-    from pymks.datasets import make_elastic_FE_strain_delta, make_elastic_FE_strain_random, make_elastic_stress_random
-    print make_elastic_stress_random
 
 
 def teardown_module(module):
