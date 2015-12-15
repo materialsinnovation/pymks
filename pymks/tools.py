@@ -440,7 +440,7 @@ def draw_component_variance(variance):
 
 
 def draw_components(datasets, labels, title=None, component_labels=None,
-                    view_angles=None,legend_outside=None,figsize=None):
+                    view_angles=None,legend_outside=None,fig_size=None):
     """
     Visualize low dimensional representations of microstructures.
 
@@ -468,16 +468,16 @@ def draw_components(datasets, labels, title=None, component_labels=None,
                            ' have the same length')
     if n_components[-1] == 2:
         _draw_components_2D(datasets, labels, title, component_labels[:2],
-                            legend_outside,figsize)
+                            legend_outside,fig_size)
     elif n_components[-1] == 3:
         _draw_components_3D(datasets, labels, title, component_labels,
-                           view_angles,legend_outside,figsize)
+                           view_angles,legend_outside,fig_size)
     else:
         raise RuntimeError("n_components must be 2 or 3.")
 
 
 def _draw_components_2D(X, labels, title, component_labels,
-                        legend_outside,figsize):
+                        legend_outside,fig_size):
     """
     Helper function to plot 2 components.
 
@@ -487,9 +487,10 @@ def _draw_components_2D(X, labels, title, component_labels,
     """
     n_sets = len(X)
     color_list = _get_color_list(n_sets)
-    fig = plt.figure()
-    if figsize is not None:
-        fig = plt.figure(figsize=(figsize[0], figsize[1]))
+    if fig_size is not None:
+        fig = plt.figure(figsize=(fig_size[0], fig_size[1]))
+    else:
+        fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=15)
     ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=15)
@@ -512,7 +513,7 @@ def _draw_components_2D(X, labels, title, component_labels,
 
 
 def _draw_components_3D(X, labels, title, component_labels, view_angles,
-                       legend_outside,figsize):
+                       legend_outside,fig_size):
     """
     Helper function to plot 2 components.
 
@@ -522,9 +523,10 @@ def _draw_components_3D(X, labels, title, component_labels, view_angles,
     """
     n_sets = len(X)
     color_list = _get_color_list(n_sets)
-    fig = plt.figure()
-    if figsize is not None:
-        fig = plt.figure(figsize=(figsize[0], figsize[1]))
+    if fig_size is not None:
+        fig = plt.figure(figsize=(fig_size[0], fig_size[1]))
+    else:
+        fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=12)
     ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=12)
