@@ -60,7 +60,7 @@ for Python 2.7 (x64) and then download and install PyMKS using the [windows inst
 
 ## Installation on Mac OS X
 
-We recommend you download and install the [Anaconda Python Distibution](http://continuum.io/downloads)
+We recommend you download and install the [Anaconda Python Distribution](http://continuum.io/downloads)
 for Python 2.7 (x64). Once Anaconda has been installed, follow the above procedures to install SfePy.
 Finally, install PyMKS using `pip` as described above.
 
@@ -74,7 +74,7 @@ use your terminal or shell to install PyMKS using pip.
 
 ## Requirements
 
-The [REQUIREMENTS.md](https://github.com/materialsinnovation/pymks/blob/master/REQUIREMENTS.md) file has a list of required
+The [REQUIREMENTS.md](REQUIREMENTS.html) file has a list of required
 packages in a Python environment used to run tests and examples
 for the current release of PyMKS.
 
