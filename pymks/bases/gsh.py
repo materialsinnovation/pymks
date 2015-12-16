@@ -1,9 +1,9 @@
 import numpy as np
-import gsh_hex_tri_L0_4_alt as gsh
+import gsh_hex_tri_L0_4_alt as GSHHex
 from .abstract import _AbstractMicrostructureBasis
 
 
-class GSHBasisHexagonal(_AbstractMicrostructureBasis):
+class GSHBasis(_AbstractMicrostructureBasis):
 
     r"""
 
@@ -52,19 +52,30 @@ class GSHBasisHexagonal(_AbstractMicrostructureBasis):
 
     """
 
+    def __init__(self, n_states=np.arange(15), domain=None):
+        """
+        Instantiate a `Basis`
 
-    def _select_slice(self, ijk, s0):
+        Args:
+            n_states (int): The number of local states
+            domain (list, optional): indicate the range of expected values for
+                the microstructure, default is [0, n_states - 1].
         """
-        Helper method used to calibrate influence coefficients from in
-        mks_localization_model to account for redundancies from linearly
-        dependent local states.
-        """
-        if np.all(np.array(ijk) == 0):
-            s1 = s0
+
+        if type(n_states) == int:
+            self.n_states = np.arange(n_states)
+            print "Warning: for an integer n_states, the GSH basis functions with" +\
+                  " linear indices up to n_states will be used. To use a single " +\
+                  "basis function or a set of indices assign a list, tuple or " +\
+                  "array to n_states"
         else:
-            s1 = (slice(-1),)
-        return s1
+            self.n_states = n_states
 
+        self.domain = domain
+
+    def check(self, X):
+        if (np.min(X) < -90.) or (np.max(X) > 90.):
+            raise UserError("X may be defined in degrees instead of radians")
 
     def _shape_check(self, X, y):
         if not len(y.shape) > 1:
@@ -104,13 +115,15 @@ class GSHBasisHexagonal(_AbstractMicrostructureBasis):
         """
         self.check(X)
 
-        # leg = np.polynomial.legendre
-        # X_scaled = (2. * X - self.domain[0] - self.domain[1]) /\
-        #            (self.domain[1] - self.domain[0])
-        # norm = (2. * np.arange(self.n_states) + 1) / 2.
+        if self.domain == None:
+            X_GSH = GSHHex.gsh_eval(X, self.n_states)
+            # replace with vanila GSH basis functions
+        elif self.domain in ['hex', 'Hex', 'hexagonal',
+                             'Hexagonal', 'hcp', 'HCP']:
+            X_GSH = GSHHex.gsh_eval(X, self.n_states)
+        else:
+            raise UserError("please select a valid crystal symmetry")
 
-        X_GSH = gsh.gsh_eval(X, np.arange(self.n_states))
-        # return np.rollaxis(X_GSH, 0, len(X_GSH.shape))
         return X_GSH
 
     def _reshape_feature(self, X, size):

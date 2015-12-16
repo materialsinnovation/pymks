@@ -36,74 +36,77 @@ def gsh_eval(X, Bvec):
     randvecopp = np.ones(zvec.shape) - randvec
     phi += (1e-7)*zvec*(randvec - randvecopp)
 
-    final_shape = np.hstack([phi1.shape, Bvec.size])  # shape of the output data
+    final_shape = np.hstack([phi1.shape, len(Bvec)])  # shape of the output data
     out_tvalues = np.zeros(final_shape, dtype = 'complex128')
 
-    for Bindx in xrange(Bvec.size):
+    c = 0
+    for Bval in Bvec:
 
-        if Bvec[Bindx] == 0:
-            out_tvalues[..., Bindx] = 1
+        if Bval == 0:
+            out_tvalues[..., c] = 1
 
-        if Bvec[Bindx] == 1:
+        if Bval == 1:
             t183 = np.sin(phi)
-            out_tvalues[..., Bindx] = -(0.5e1 / 0.4e1) * np.exp((-2*1j) * phi1) * np.sqrt(0.6e1) * t183 ** 2
+            out_tvalues[..., c] = -(0.5e1 / 0.4e1) * np.exp((-2*1j) * phi1) * np.sqrt(0.6e1) * t183 ** 2
 
-        if Bvec[Bindx] == 2:
+        if Bval == 2:
             t184 = np.cos(phi)
-            out_tvalues[..., Bindx] = (-0.5e1 / 0.2e1*1j) * np.exp((-1*1j) * phi1) * np.sqrt(0.6e1) * np.sqrt((1 + t184)) * t184 * np.sqrt((1 - t184))
+            out_tvalues[..., c] = (-0.5e1 / 0.2e1*1j) * np.exp((-1*1j) * phi1) * np.sqrt(0.6e1) * np.sqrt((1 + t184)) * t184 * np.sqrt((1 - t184))
 
-        if Bvec[Bindx] == 3:
+        if Bval == 3:
             t185 = np.cos(phi)
-            out_tvalues[..., Bindx] = 0.15e2 / 0.2e1 * t185 ** 2 - 0.5e1 / 0.2e1
+            out_tvalues[..., c] = 0.15e2 / 0.2e1 * t185 ** 2 - 0.5e1 / 0.2e1
 
-        if Bvec[Bindx] == 4:
+        if Bval == 4:
             t186 = np.cos(phi)
-            out_tvalues[..., Bindx] = (-0.5e1 / 0.2e1*1j) * np.exp((1j) * phi1) * np.sqrt(0.6e1) * np.sqrt((1 - t186)) * np.sqrt((1 + t186)) * t186
+            out_tvalues[..., c] = (-0.5e1 / 0.2e1*1j) * np.exp((1j) * phi1) * np.sqrt(0.6e1) * np.sqrt((1 - t186)) * np.sqrt((1 + t186)) * t186
 
-        if Bvec[Bindx] == 5:
+        if Bval == 5:
             t187 = np.sin(phi)
-            out_tvalues[..., Bindx] = -(0.5e1 / 0.4e1) * np.exp((2*1j) * phi1) * np.sqrt(0.6e1) * t187 ** 2
+            out_tvalues[..., c] = -(0.5e1 / 0.4e1) * np.exp((2*1j) * phi1) * np.sqrt(0.6e1) * t187 ** 2
 
-        if Bvec[Bindx] == 6:
+        if Bval == 6:
             t190 = np.sin(phi)
             t188 = t190 ** 2
-            out_tvalues[..., Bindx] = (0.9e1 / 0.16e2) * np.exp((-4*1j) * phi1) * np.sqrt(0.70e2) * t188 ** 2
+            out_tvalues[..., c] = (0.9e1 / 0.16e2) * np.exp((-4*1j) * phi1) * np.sqrt(0.70e2) * t188 ** 2
 
-        if Bvec[Bindx] == 7:
+        if Bval == 7:
             t191 = np.cos(phi)
-            out_tvalues[..., Bindx] = (0.9e1 / 0.4e1*1j) * t191 * (1 + (-2 + t191) * t191) * ((1 + t191) ** (0.3e1 / 0.2e1)) * np.sqrt(0.35e2) * np.exp((-3*1j) * phi1) * ((1 - t191) ** (-0.1e1 / 0.2e1))
+            out_tvalues[..., c] = (0.9e1 / 0.4e1*1j) * t191 * (1 + (-2 + t191) * t191) * ((1 + t191) ** (0.3e1 / 0.2e1)) * np.sqrt(0.35e2) * np.exp((-3*1j) * phi1) * ((1 - t191) ** (-0.1e1 / 0.2e1))
 
-        if Bvec[Bindx] == 8:
+        if Bval == 8:
             t193 = np.cos(phi)
             t192 = np.sin(phi)
-            out_tvalues[..., Bindx] = -(0.9e1 / 0.8e1) * np.exp((-2*1j) * phi1) * np.sqrt(0.10e2) * t192 ** 2 * (7 * t193 ** 2 - 1)
+            out_tvalues[..., c] = -(0.9e1 / 0.8e1) * np.exp((-2*1j) * phi1) * np.sqrt(0.10e2) * t192 ** 2 * (7 * t193 ** 2 - 1)
 
-        if Bvec[Bindx] == 9:
+        if Bval == 9:
             t194 = np.cos(phi)
-            out_tvalues[..., Bindx] = (-0.9e1 / 0.4e1*1j) * np.exp((-1*1j) * phi1) * np.sqrt(0.5e1) * np.sqrt((1 + t194)) * t194 * np.sqrt((1 - t194)) * (7 * t194 ** 2 - 3)
+            out_tvalues[..., c] = (-0.9e1 / 0.4e1*1j) * np.exp((-1*1j) * phi1) * np.sqrt(0.5e1) * np.sqrt((1 + t194)) * t194 * np.sqrt((1 - t194)) * (7 * t194 ** 2 - 3)
 
-        if Bvec[Bindx] == 10:
+        if Bval == 10:
             t199 = np.cos(phi)
             t200 = t199 ** 2
-            out_tvalues[..., Bindx] = 0.27e2 / 0.8e1 + (-0.135e3 / 0.4e1 + 0.315e3 / 0.8e1 * t200) * t200
+            out_tvalues[..., c] = 0.27e2 / 0.8e1 + (-0.135e3 / 0.4e1 + 0.315e3 / 0.8e1 * t200) * t200
 
-        if Bvec[Bindx] == 11:
+        if Bval == 11:
             t202 = np.cos(phi)
-            out_tvalues[..., Bindx] = (-0.9e1 / 0.4e1*1j) * np.exp((1j) * phi1) * np.sqrt(0.5e1) * np.sqrt((1 - t202)) * np.sqrt((1 + t202)) * t202 * (7 * t202 ** 2 - 3)
+            out_tvalues[..., c] = (-0.9e1 / 0.4e1*1j) * np.exp((1j) * phi1) * np.sqrt(0.5e1) * np.sqrt((1 - t202)) * np.sqrt((1 + t202)) * t202 * (7 * t202 ** 2 - 3)
 
-        if Bvec[Bindx]  == 12:
+        if Bval  == 12:
             t204 = np.cos(phi)
             t203 = np.sin(phi)
-            out_tvalues[..., Bindx] = -(0.9e1 / 0.8e1) * np.exp((2*1j) * phi1) * np.sqrt(0.10e2) * t203 ** 2 * (7 * t204 ** 2 - 1)
+            out_tvalues[..., c] = -(0.9e1 / 0.8e1) * np.exp((2*1j) * phi1) * np.sqrt(0.10e2) * t203 ** 2 * (7 * t204 ** 2 - 1)
 
-        if Bvec[Bindx]  == 13:
+        if Bval  == 13:
             t205 = np.cos(phi)
-            out_tvalues[..., Bindx] = (0.9e1 / 0.4e1*1j) * np.exp((3*1j) * phi1) * np.sqrt(0.35e2) * ((1 - t205) ** (0.3e1 / 0.2e1)) * ((1 + t205) ** (0.3e1 / 0.2e1)) * t205
+            out_tvalues[..., c] = (0.9e1 / 0.4e1*1j) * np.exp((3*1j) * phi1) * np.sqrt(0.35e2) * ((1 - t205) ** (0.3e1 / 0.2e1)) * ((1 + t205) ** (0.3e1 / 0.2e1)) * t205
 
-        if Bvec[Bindx]  == 14:
+        if Bval  == 14:
             t208 = np.sin(phi)
             t206 = t208 ** 2
-            out_tvalues[..., Bindx] = (0.9e1 / 0.16e2) * np.exp((4*1j) * phi1) * np.sqrt(0.70e2) * t206 ** 2
+            out_tvalues[..., c] = (0.9e1 / 0.16e2) * np.exp((4*1j) * phi1) * np.sqrt(0.70e2) * t206 ** 2
+
+        c += 1
 
     return out_tvalues
 

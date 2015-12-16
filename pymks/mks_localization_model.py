@@ -75,6 +75,9 @@ class MKSLocalizationModel(LinearRegression):
         if n_states is None:
             self.n_states = basis.n_states
         self.domain = basis.domain
+        #any singular values not 4 orders of magnitude above machine epsilon
+        #are considered linearly dependent and discarded
+        self.lstsq_rcond = np.finfo(float).eps*1e4
 
     def fit(self, X, y, size=None):
         """
@@ -121,10 +124,7 @@ class MKSLocalizationModel(LinearRegression):
         s0 = (slice(None),)
         for ijk in np.ndindex(X_.shape[1:-1]):
             s1 = self.basis._select_slice(ijk, s0)
-            #any singular values not 2 orders of magnitude above machine epsilon
-            #are considered linearly dependent and discarded
-            eps = np.finfo(float).eps*1e2 
-            Fkernel[ijk + s1] = lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk], eps)[0]
+            Fkernel[ijk + s1] = lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk], self.lstsq_rcond)[0]
 
         self._filter = Filter(Fkernel[None])
 
