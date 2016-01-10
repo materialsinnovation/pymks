@@ -1,8 +1,0 @@
-#   * Why is this change necessary?
-      match the other make functions using the finite element simulation and make the API consistent.
-
-#   * How does it address the issue?
-	  replaced functions
-
-#   * What side effects does this change have?
-	  consistent code
