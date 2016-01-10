@@ -226,7 +226,7 @@ def _auto_correlations(n_states):
     >>> l = _auto_correlations(3)
     >>> assert l == [(0, 0), (1, 1), (2, 2)]
     """
-    local_states = range(n_states)
+    local_states = list(range(int(n_states)))
     return [(l, l) for l in local_states]
 
 
@@ -242,7 +242,7 @@ def _cross_correlations(n_states):
     >>> l = _cross_correlations(3)
     >>> assert l == [(0, 1), (0, 2), (1, 2)]
     """
-    l = range(n_states)
+    l = list(range(int(n_states)))
     cross_corr = [[(l[i], l[j]) for j in l[1:][i:]] for i in l[:-1]]
     return [item for sublist in cross_corr for item in sublist]
 
@@ -327,17 +327,17 @@ def _truncate(a, shape):
 
     Example
 
-    >>> print _truncate(np.arange(10).reshape(1, 10, 1), (1, 5))[0, ..., 0]
+    >>> print(_truncate(np.arange(10).reshape(1, 10, 1), (1, 5))[0, ..., 0])
     [3 4 5 6 7]
-    >>> print _truncate(np.arange(9).reshape(1, 9, 1), (1, 5))[0, ..., 0]
+    >>> print(_truncate(np.arange(9).reshape(1, 9, 1), (1, 5))[0, ..., 0])
     [2 3 4 5 6]
-    >>> print _truncate(np.arange(10).reshape((1, 10, 1)), (1, 4))[0, ..., 0]
+    >>> print(_truncate(np.arange(10).reshape((1, 10, 1)), (1, 4))[0, ..., 0])
     [3 4 5 6]
-    >>> print _truncate(np.arange(9).reshape((1, 9, 1)), (1, 4))[0, ..., 0]
+    >>> print(_truncate(np.arange(9).reshape((1, 9, 1)), (1, 4))[0, ..., 0])
     [2 3 4 5]
 
     >>> a = np.arange(5 * 4).reshape((1, 5, 4, 1))
-    >>> print _truncate(a, shape=(1, 3, 2))[0, ..., 0]
+    >>> print(_truncate(a, shape=(1, 3, 2))[0, ..., 0])
     [[ 5  6]
      [ 9 10]
      [13 14]]
