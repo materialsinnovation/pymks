@@ -61,13 +61,16 @@ class MKSLocalizationModel(LinearRegression):
     >>> assert np.allclose(np.fft.fftshift(coeff, axes=(0,)), model.coeff)
     """
 
-    def __init__(self, basis, n_states=None):
+    def __init__(self, basis, n_states=None, lstsq_rcond=None):
         """
         Instantiate a MKSLocalizationModel.
 
         Args:
             basis (class): an instance of a bases class.
             n_states (int, optional): number of local states
+            lstsq_rcond (float, optional): rcond argument to linalg.lstsq
+            function. Defaults to 4 orders of magnitude above machine
+            epsilon.
 
         """
         self.basis = basis
@@ -77,7 +80,9 @@ class MKSLocalizationModel(LinearRegression):
         self.domain = basis.domain
         #any singular values not 4 orders of magnitude above machine epsilon
         #are considered linearly dependent and discarded
-        self.lstsq_rcond = np.finfo(float).eps*1e4
+        self.lstsq_rcond = lstsq_rcond
+        if self.lstsq_rcond is None:
+            self.lstsq_rcond = np.finfo(float).eps*1e4
 
     def fit(self, X, y, size=None):
         """
