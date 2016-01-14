@@ -133,13 +133,13 @@ def _get_color_list(n_sets):
         list of colors for n_sets
     """
     color_list = ['#1a9850', '#f46d43', '#1f78b4', '#e31a1c',
-                  '#6a3d9a', '#b2df8a', '#fdbf6f', '#a6cee3', 
+                  '#6a3d9a', '#b2df8a', '#fdbf6f', '#a6cee3',
                   '#fb9a99', '#cab2d6', '#ffff99', '#b15928']
 
     return color_list[:n_sets]
 
 
-def draw_coeff(coeff, fontsize=15):
+def draw_coeff(coeff, fontsize=15, figsize=None):
     """
     Visualize influence coefficients.
 
@@ -154,7 +154,7 @@ def draw_coeff(coeff, fontsize=15):
     titles = [r'Influence Coefficients $l = %s$' % ii for ii
               in np.arange(n_coeff)]
     _draw_fields(np.rollaxis(coeff, -1, 0), coeff_cmap,
-                 fontsize=fontsize, titles=titles)
+                 fontsize=fontsize, titles=titles, figsize=figsize)
 
 
 def draw_microstructure_strain(microstructure, strain):
@@ -271,7 +271,7 @@ def draw_differences(differences, labels=None, fontsize=15):
     _draw_fields(differences, cmap, fontsize, labels)
 
 
-def _draw_fields(fields, field_cmap, fontsize, titles):
+def _draw_fields(fields, field_cmap, fontsize, titles, figsize=None):
     """
     Helper function used to draw fields.
 
@@ -291,16 +291,18 @@ def _draw_fields(fields, field_cmap, fontsize, titles):
             raise RuntimeError(
                 "number of plots does not match number of labels.")
     plt.close('all')
-    # fig, axs = plt.subplots(1, n_fields, figsize=(n_fields * 4, 4))
+    if figsize is None:
+        figsize = (1, n_fields)
+    fig, axs = plt.subplots(figsize[0], figsize[1],
+                            figsize=(figsize[1] * 4, figsize[0] * 4))
 
-    xdim = 5
-    ydim = np.int64(np.ceil(n_fields/np.float64(xdim)))
-    print ydim
+    # xdim = 5
+    # ydim = np.int64(np.ceil(n_fields/np.float64(xdim)))
 
-    if n_fields < 5:
-        xdim = n_fields
+    # if n_fields < 5:
+    #     xdim = n_fields
     
-    fig, axs = plt.subplots(ydim, xdim, figsize=(xdim * 4, ydim * 4))
+    # fig, axs = plt.subplots(ydim, xdim, figsize=(xdim * 4, ydim * 4))
 
 
     if n_fields > 1:

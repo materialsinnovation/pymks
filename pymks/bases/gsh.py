@@ -26,24 +26,22 @@ class GSHBasis(_AbstractMicrostructureBasis):
 
     >>> X = np.array([[0.1, 0.2, 0.3],
     ...               [6.5, 2.3, 3.4]])
-    >>> gsh_basis = GSHBasis(n_states = [1], domain='hexagonal')
+    >>> gsh_basis = GSHBasis(n_states = [3], domain='hexagonal')
     >>> def test_gsh(x):
-    ...     phi1 = x[:, 0]
     ...     phi = x[:, 1]
-    ...     t913 = np.sin(phi)
-    ...     X_gsh = -((0.5e1 / 0.4e1) * np.exp((-2*1j) * phi1) *
-    ...               np.sqrt(0.6e1) * t913 ** 2)
-    ...     return X_gsh
+    ...     t915 = np.cos(phi)
+    ...     tfunc[..., c] = 0.15e2 / 0.2e1 * t915 ** 2 - 0.5e1 / 0.2e1
+
     >>> assert(np.allclose(np.squeeze(gsh_basis.discretize(X)), test_gsh(X)))
 
     If you select an invalid crystal symmetry PyMKS will give an error
 
-    >>> gsh_basis = GSHBasis(n_states=[1], domain='squishy') # doctest: +ELLIPSIS
+    >>> gsh_basis = GSHBasis(n_states=[3], domain='squishy') # doctest: +ELLIPSIS
     Traceback (most recent call last):
     ...
     RuntimeError: invalid crystal symmetry
 
-    >>> gsh_basis = GSHBasis(n_states=[1], domain='hex') # doctest: +ELLIPSIS
+    >>> gsh_basis = GSHBasis(n_states=[3], domain='hex') # doctest: +ELLIPSIS
     Traceback (most recent call last):
     ...
     RuntimeError: invalid crystal symmetry
@@ -74,14 +72,17 @@ class GSHBasis(_AbstractMicrostructureBasis):
             self.n_states = n_states
 
         if domain in [None, 'triclinic']:
-            self.domain = gsh_tri
+            self.domain = 'triclinic'
+            self._symmetry = gsh_tri
         elif domain in ['hexagonal']:
-            self.domain = gsh_hex
+            self.domain = 'hexagonal'
+            self._symmetry = gsh_hex
         elif domain in ['cubic']:
-            self.domain = gsh_cub
+            self.domain = 'cubic'
+            self._symmetry = gsh_cub
         else:
             raise RuntimeError("invalid crystal symmetry")
-        full_indx = self.domain.gsh_basis_info()
+        full_indx = self._symmetry.gsh_basis_info()
         self.basis_indices = full_indx[self.n_states, :]
 
     def check(self, X):
@@ -148,7 +149,7 @@ class GSHBasis(_AbstractMicrostructureBasis):
         >>> assert(np.allclose(np.squeeze(gsh_basis.discretize(X)), q(X)))
         """
         self.check(X)
-        return self.domain.gsh_eval(X, self.n_states)
+        return self._symmetry.gsh_eval(X, self.n_states)
 
     def _reshape_feature(self, X, size):
         """
