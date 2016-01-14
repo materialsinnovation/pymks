@@ -291,7 +291,18 @@ def _draw_fields(fields, field_cmap, fontsize, titles):
             raise RuntimeError(
                 "number of plots does not match number of labels.")
     plt.close('all')
-    fig, axs = plt.subplots(1, n_fields, figsize=(n_fields * 4, 4))
+    # fig, axs = plt.subplots(1, n_fields, figsize=(n_fields * 4, 4))
+
+    xdim = 5
+    ydim = np.int64(np.ceil(n_fields/np.float64(xdim)))
+    print ydim
+
+    if n_fields < 5:
+        xdim = n_fields
+    
+    fig, axs = plt.subplots(ydim, xdim, figsize=(xdim * 4, ydim * 4))
+
+
     if n_fields > 1:
         for field, ax, title in zip(fields, axs.flat, titles):
             im = ax.imshow(field.swapaxes(0, 1),
