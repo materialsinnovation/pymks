@@ -17,7 +17,7 @@ class MKSLocalizationModel(LinearRegression):
         basis: Basis function used to discretize the microstucture.
         n_states: Interger value for number of local states, if a basis
             is specified, n_states indicates the order of the polynomial.
-        coef: Array of values that are the influence coefficients.
+        coef_: Array of values that are the influence coefficients.
 
     >>> n_states = 2
     >>> n_spaces = 81
@@ -32,21 +32,21 @@ class MKSLocalizationModel(LinearRegression):
 
     Use the filter function to construct some coefficients.
 
-    >>> coeff = np.linspace(1, 0, n_states)[None,:] * filter(np.linspace(0, 20,
+    >>> coef_ = np.linspace(1, 0, n_states)[None,:] * filter(np.linspace(0, 20,
     ...                                                      n_spaces))[:,None]
-    >>> Fcoeff = np.fft.fft(coeff, axis=0)
+    >>> Fcoef_ = np.fft.fft(coef_, axis=0)
 
     Make some test samples.
 
     >>> np.random.seed(2)
     >>> X = np.random.random((n_samples, n_spaces))
 
-    Construct a response with the `Fcoeff`.
+    Construct a response with the `Fcoef_`.
 
     >>> H = np.linspace(0, 1, n_states)
     >>> X_ = np.maximum(1 - abs(X[:,:,None] - H) / (H[1] - H[0]), 0)
     >>> FX = np.fft.fft(X_, axis=1)
-    >>> Fy = np.sum(Fcoeff[None] * FX, axis=-1)
+    >>> Fy = np.sum(Fcoef_[None] * FX, axis=-1)
     >>> y = np.fft.ifft(Fy, axis=1).real
 
     Use the `MKSLocalizationModel` to reconstruct the coefficients
@@ -58,7 +58,7 @@ class MKSLocalizationModel(LinearRegression):
 
     Check the result
 
-    >>> assert np.allclose(np.fft.fftshift(coeff, axes=(0,)), model.coeff)
+    >>> assert np.allclose(np.fft.fftshift(coef_, axes=(0,)), model.coef_)
     """
 
     def __init__(self, basis, n_states=None, lstsq_rcond=None):
@@ -134,7 +134,7 @@ class MKSLocalizationModel(LinearRegression):
         self._filter = Filter(Fkernel[None])
 
     @property
-    def coeff(self):
+    def coef_(self):
         """Returns the coefficients in real space with origin shifted to the
         center.
         """
@@ -195,16 +195,16 @@ class MKSLocalizationModel(LinearRegression):
         >>> from pymks.bases import PrimitiveBasis
         >>> prim_basis = PrimitiveBasis(n_states=2)
         >>> model = MKSLocalizationModel(prim_basis)
-        >>> coeff = np.arange(20).reshape((5, 4, 1))
-        >>> coeff = np.concatenate((coeff , np.ones_like(coeff)), axis=2)
-        >>> coeff = np.fft.ifftshift(coeff, axes=(0, 1))
-        >>> model._filter = Filter(np.fft.fftn(coeff, axes=(0, 1))[None])
+        >>> coef_ = np.arange(20).reshape((5, 4, 1))
+        >>> coef_ = np.concatenate((coef_ , np.ones_like(coef_)), axis=2)
+        >>> coef_ = np.fft.ifftshift(coef_, axes=(0, 1))
+        >>> model._filter = Filter(np.fft.fftn(coef_, axes=(0, 1))[None])
 
         The coefficients can be reshaped by passing the new shape that
         coefficients should have.
 
         >>> model.resize_coeff((10, 7))
-        >>> assert np.allclose(model.coeff[:,:,0],
+        >>> assert np.allclose(model.coef_[:,:,0],
         ...                    [[0, 0, 0, 0, 0, 0, 0],
         ...                     [0, 0, 0, 0, 0, 0, 0],
         ...                     [0, 0, 0, 0, 0, 0, 0],
