@@ -1,7 +1,7 @@
 import numpy as np
-import gsh_hex_tri_L0_16 as GSHHex
-import gsh_cub_tri_L0_16 as GSHCub
-import gsh_tri_tri_L0_13 as GSHTri
+import gsh_hex_tri_L0_16 as gsh_hex
+import gsh_cub_tri_L0_16 as gsh_cub
+import gsh_tri_tri_L0_13 as gsh_tri
 from .abstract import _AbstractMicrostructureBasis
 
 
@@ -26,24 +26,27 @@ class GSHBasis(_AbstractMicrostructureBasis):
 
     >>> X = np.array([[0.1, 0.2, 0.3],
     ...               [6.5, 2.3, 3.4]])
-    >>> gsh_basis = GSHBasis(n_states = [1], domain='hex')
-    >>> def q(x):
-    ...    phi1 = x[:, 0]
-    ...    phi = x[:, 1]
-    ...    phi2 = x[:, 2]
-    ...    t913 = np.sin(phi)
-    ...    x_GSH = (0.3e1 / 0.2e1) * (0.1e1 + np.cos(phi)) * np.exp((-1*1j) * \
-    ...            (phi1 + phi2))
-    ...    return x_GSH
-    >>> assert(np.allclose(np.squeeze(gsh_basis.discretize(X)), q(X)))
+    >>> gsh_basis = GSHBasis(n_states = [1], domain='hexagonal')
+    >>> def test_gsh(x):
+    ...     phi1 = x[:, 0]
+    ...     phi = x[:, 1]
+    ...     t913 = np.sin(phi)
+    ...     X_gsh = -((0.5e1 / 0.4e1) * np.exp((-2*1j) * phi1) *
+    ...               np.sqrt(0.6e1) * t913 ** 2)
+    ...     return X_gsh
+    >>> assert(np.allclose(np.squeeze(gsh_basis.discretize(X)), test_gsh(X)))
 
     If you select an invalid crystal symmetry PyMKS will give an error
 
-    >>> gsh_basis = GSHBasis(n_states = [1], domain='squishy')
+    >>> gsh_basis = GSHBasis(n_states=[1], domain='squishy') # doctest: +ELLIPSIS
     Traceback (most recent call last):
     ...
-    RuntimeError: please select a valid crystal symmetry
+    RuntimeError: invalid crystal symmetry
 
+    >>> gsh_basis = GSHBasis(n_states=[1], domain='hex') # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    ...
+    RuntimeError: invalid crystal symmetry
     """
 
     def __init__(self, n_states=np.arange(15), domain=None):
@@ -71,34 +74,15 @@ class GSHBasis(_AbstractMicrostructureBasis):
             self.n_states = n_states
 
         if domain in [None, 'triclinic']:
-            self.domain = 'triclinic'
+            self.domain = gsh_tri
         elif domain in ['hexagonal']:
-            self.domain = 'hexagonal'
+            self.domain = gsh_hex
         elif domain in ['cubic']:
-            self.domain = 'cubic'
+            self.domain = gsh_cub
         else:
-            raise RuntimeError("please select a valid crystal symmetry")
-
-        if self.domain == 'triclinic':
-            full_indx = GSHTri.gsh_basis_info()
-        elif self.domain == 'hexagonal':
-            full_indx = GSHHex.gsh_basis_info()
-        elif self.domain == 'cubic':
-            full_indx = GSHCub.gsh_basis_info()
-
+            raise RuntimeError("invalid crystal symmetry")
+        full_indx = self.domain.gsh_basis_info()
         self.basis_indices = full_indx[self.n_states, :]
-
-    def _basis_indices(self):
-        """Returns the array of indices for the selected basis functions.
-        """
-        if self.domain == 'triclinic':
-            full_indx = GSHTri.gsh_basis_info()
-        elif self.domain == 'hexagonal':
-            full_indx = GSHHex.gsh_basis_info()
-        elif self.domain == 'cubic':
-            full_indx = GSHCub.gsh_basis_info()
-
-        return full_indx[self.n_states, :]
 
     def check(self, X):
         """Warns the user if Euler angles apear to be defined in degrees
@@ -155,24 +139,16 @@ class GSHBasis(_AbstractMicrostructureBasis):
         ...               [6.5, 2.3, 3.4]])
         >>> gsh_basis = GSHBasis(n_states = [1])
         >>> def q(x):
-        ...    phi1 = x[:, 0]
-        ...    phi = x[:, 1]
-        ...    phi2 = x[:, 2]
-        ...    x_GSH = (0.3e1 / 0.2e1) * (0.1e1 + np.cos(phi)) * \
-        ...            np.exp((-1*1j) * (phi1 + phi2))
-        ...    return x_GSH
+        ...     phi1 = x[:, 0]
+        ...     phi = x[:, 1]
+        ...     phi2 = x[:, 2]
+        ...     x_GSH = ((0.3e1 / 0.2e1) * (0.1e1 + np.cos(phi)) *
+        ...              np.exp((-1*1j) * (phi1 + phi2)))
+        ...     return x_GSH
         >>> assert(np.allclose(np.squeeze(gsh_basis.discretize(X)), q(X)))
         """
         self.check(X)
-
-        if self.domain == 'triclinic':
-            X_GSH = GSHTri.gsh_eval(X, self.n_states)
-        elif self.domain == 'hexagonal':
-            X_GSH = GSHHex.gsh_eval(X, self.n_states)
-        elif self.domain == 'cubic':
-            X_GSH = GSHCub.gsh_eval(X, self.n_states)
-
-        return X_GSH
+        return self.domain.gsh_eval(X, self.n_states)
 
     def _reshape_feature(self, X, size):
         """
