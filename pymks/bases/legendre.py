@@ -36,7 +36,7 @@ class LegendreBasis(_AbstractMicrostructureBasis):
 
     If the microstructure local state values fall outside of the specified
     domain they will no longer be mapped into the orthogonal domain of the
-    legendre polynomais.
+    legendre polynomials.
 
     >>> n_states = 2
     >>> X = np.array([-1, 1])
@@ -47,14 +47,6 @@ class LegendreBasis(_AbstractMicrostructureBasis):
     RuntimeError: X must be within the specified domain
 
     """
-
-    def _get_basis_slice(self, ijk, s0):
-        """
-        Helper method used to calibrate influence coefficients from in
-        mks_localization_model to account for redundancies from linearly
-        dependent local states.
-        """
-        return s0
 
     def discretize(self, X):
         """

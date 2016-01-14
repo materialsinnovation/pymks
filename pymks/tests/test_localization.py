@@ -62,7 +62,7 @@ def test_resize_coeff():
     model.fit(X_delta, y_delta)
     big_model.fit(X_big_delta, y_big_delta)
     model.resize_coeff((resize * nx, resize * ny))
-    assert np.allclose(model.coeff, big_model.coeff,
+    assert np.allclose(model.coef_, big_model.coef_,
                        rtol=1e-2, atol=2.1e-3)
 
 
