@@ -46,6 +46,7 @@ def _get_microstructure_cmap():
     Returns:
         dictionary with colors and microstructure on color bar.
     """
+
     HighRGB = np.array([229, 229, 229]) / 255.
     MediumRGB = np.array([114.5, 114.5, 114.5]) / 255.
     LowRGB = np.array([0, 0, 0]) / 255.
@@ -131,9 +132,9 @@ def _get_color_list(n_sets):
     Returns:
         list of colors for n_sets
     """
-    color_list = ['#1a9850', '#f46d43', '#762a83', '#41b6c4',
-                  '#ffff33', '#a50026', '#dd3497', '#ffffff',
-                  '#36454f', '#081d58', '#d9ef8b', '#fee08b']
+    color_list = ['#1a9850', '#f46d43', '#1f78b4', '#e31a1c',
+                  '#6a3d9a', '#b2df8a', '#fdbf6f', '#a6cee3', 
+                  '#fb9a99', '#cab2d6', '#ffff99', '#b15928']
 
     return color_list[:n_sets]
 
