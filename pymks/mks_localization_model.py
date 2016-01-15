@@ -78,8 +78,8 @@ class MKSLocalizationModel(LinearRegression):
         if n_states is None:
             self.n_states = basis.n_states
         self.domain = basis.domain
-        #any singular values not 4 orders of magnitude above machine epsilon
-        #are considered linearly dependent and discarded
+        # any singular values not 4 orders of magnitude above machine epsilon
+        # are considered linearly dependent and discarded
         self.lstsq_rcond = lstsq_rcond
         if self.lstsq_rcond is None:
             self.lstsq_rcond = np.finfo(float).eps*1e4
@@ -114,11 +114,6 @@ class MKSLocalizationModel(LinearRegression):
         if size is not None:
             y = self.basis._reshape_feature(y, size)
             X = self.basis._reshape_feature(X, size)
-
-        # if not len(y.shape) > 1:
-        #     raise RuntimeError("The shape of y is incorrect.")
-        # if y.shape != X.shape:
-        #     raise RuntimeError("X and y must be the same shape.")
         self.basis._shape_check(X, y)  # call error check for shapes of X and y
 
         X_ = self.basis.discretize(X)
@@ -129,8 +124,8 @@ class MKSLocalizationModel(LinearRegression):
         s0 = (slice(None),)
         for ijk in np.ndindex(X_.shape[1:-1]):
             s1 = self.basis._select_slice(ijk, s0)
-            Fkernel[ijk + s1] = lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk], self.lstsq_rcond)[0]
-
+            Fkernel[ijk + s1] = lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk],
+                                      self.lstsq_rcond)[0]
         self._filter = Filter(Fkernel[None])
 
     @property
@@ -173,7 +168,7 @@ class MKSLocalizationModel(LinearRegression):
 
         if not hasattr(self, '_filter'):
             raise AttributeError("fit() method must be run before predict().")
-        y_pred_shape = self.basis._output_shape(X)
+        y_pred_shape = self.basis._pred_shape(X)
         X = self.basis._reshape_feature(X, self._filter.Fkernel.shape[1:-1])
         X_ = self.basis.discretize(X)
         return self._filter.convolve(X_).reshape(y_pred_shape)

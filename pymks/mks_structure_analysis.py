@@ -76,7 +76,7 @@ class MKSStructureAnalysis(BaseEstimator):
             n_components = 5
         self.n_components = n_components
         if self.correlations is None and basis is not None:
-            self.correlations = [(0, l) for l in range(basis.n_states)]
+            self.correlations = [(0, l) for l in self.basis.n_states]
         if not callable(getattr(self.dimension_reducer,
                                 "fit_transform", None)):
             raise RuntimeError(
@@ -231,7 +231,7 @@ class MKSStructureAnalysis(BaseEstimator):
                     (self.transform_correlations, X))
               else:
                   self.transform_correlations = X
- 
+
     def _compute_stats(self, X, periodic_axes, confidence_index):
         """
         Helper function used to calculated 2-point statistics from `X` and

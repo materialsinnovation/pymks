@@ -14,11 +14,11 @@ class GSHBasis(_AbstractMicrostructureBasis):
     .. math::
 
        \frac{1}{\Delta} \int_s m(g, x) dx =
-       \sum_{l, m, n} m[l, s] T_l^{mn}(g)
+       \sum_{l, m, n} m[l, \tilde{m}, n, s] T_l^{\tilde{m}n}(g)
 
-    where the :math:`T_l^{mn}` are GSH basis functions and the local state
-    space :math:`H` is mapped into the orthogonal, periodic domain of the
-    GSH functions
+    where the :math:`T_l^{\tilde{m}n}` are GSH basis functions and the
+    local state space :math:`H` is mapped into the orthogonal, periodic
+    domain of the GSH functions
 
     The mapping of :math:`H` into some desired periodic domain is done
     automatically in PyMKS by using the `domain` key work argument to
@@ -30,7 +30,7 @@ class GSHBasis(_AbstractMicrostructureBasis):
     >>> def test_gsh(x):
     ...     phi = x[:, 1]
     ...     t915 = np.cos(phi)
-    ...     tfunc[..., c] = 0.15e2 / 0.2e1 * t915 ** 2 - 0.5e1 / 0.2e1
+    ...     return 0.15e2 / 0.2e1 * t915 ** 2 - 0.5e1 / 0.2e1
 
     >>> assert(np.allclose(np.squeeze(gsh_basis.discretize(X)), test_gsh(X)))
 
@@ -52,25 +52,18 @@ class GSHBasis(_AbstractMicrostructureBasis):
         Instantiate a `Basis`
 
         Args:
-            n_states (int, list, tuple, array, ...): the specific set of local
-            states requested. If an integer is provided, all local states up
-            to that number will be used.
+            n_states (int, array): An array of local states to be used. states
+                requested. If an integer is provided, all local states up
+                to that number will be used.
             domain (list, optional): indicate the desired crystal symmetry for
-            the GSH. Valid choices for symmetry are "hexagonal", "cubic" or
-            "triclinic" if no symmetry is desired (not specifying any symmetry
-            has the same effect)
+                the GSH. Valid choices for symmetry are "hexagonal", "cubic" or
+                "triclinic" if no symmetry is desired (not specifying any
+                symmetry has the same effect)
         """
 
-        if type(n_states) == int:
+        self.n_states = n_states
+        if isinstance(self.n_states, int):
             self.n_states = np.arange(n_states)
-            print "Warning: for an integer n_states, the GSH basis " +\
-                  "functions with linear indices up to n_states " +\
-                  "will be used. To use a single basis function " +\
-                  "or a set of indices assign a list, tuple or " +\
-                  "array to n_states"
-        else:
-            self.n_states = n_states
-
         if domain in [None, 'triclinic']:
             self.domain = 'triclinic'
             self._symmetry = gsh_tri
@@ -116,7 +109,7 @@ class GSHBasis(_AbstractMicrostructureBasis):
             raise RuntimeError("X must have 3 continuous local states " +
                                "(euler angles)")
 
-    def _output_shape(self, X):
+    def _pred_shape(self, X):
         """
         Function to describe the expected output shape of a given
         microstructure X.

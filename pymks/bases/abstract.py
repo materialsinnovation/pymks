@@ -8,13 +8,16 @@ class _AbstractMicrostructureBasis(object):
         Instantiate a `Basis`
 
         Args:
-            n_states (int): The number of local states
+            n_states (int, list): The number of local states, or an array of
+                local states to be used.
             domain (list, optional): indicate the range of expected values for
                 the microstructure, default is [0, n_states - 1].
         """
         self.n_states = n_states
+        if isinstance(self.n_states, int):
+            self.n_states = np.arange(n_states)
         if domain is None:
-            domain = [0, n_states - 1]
+            domain = [0, max(self.n_states)]
         self.domain = domain
 
     def check(self, X):
@@ -28,9 +31,9 @@ class _AbstractMicrostructureBasis(object):
         if not len(y.shape) > 1:
             raise RuntimeError("The shape of y is incorrect.")
         if y.shape != X.shape:
-            raise RuntimeError("X and y must be the same shape.")     
+            raise RuntimeError("X and y must be the same shape.")
 
-    def _output_shape(self,X):
+    def _pred_shape(self, X):
         """
         Function to describe the expected output shape of a given
         microstructure X.

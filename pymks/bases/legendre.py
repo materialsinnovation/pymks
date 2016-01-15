@@ -73,6 +73,6 @@ class LegendreBasis(_AbstractMicrostructureBasis):
         leg = np.polynomial.legendre
         X_scaled = (2. * X - self.domain[0] - self.domain[1]) /\
                    (self.domain[1] - self.domain[0])
-        norm = (2. * np.arange(self.n_states) + 1) / 2.
-        X_Legendre = (leg.legval(X_scaled, np.eye(self.n_states) * norm))
+        norm = (2. * np.array(self.n_states) + 1) / 2.
+        X_Legendre = (leg.legval(X_scaled, np.eye(len(self.n_states)) * norm))
         return np.rollaxis(X_Legendre, 0, len(X_Legendre.shape))
