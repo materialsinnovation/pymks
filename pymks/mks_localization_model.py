@@ -61,13 +61,16 @@ class MKSLocalizationModel(LinearRegression):
     >>> assert np.allclose(np.fft.fftshift(coef_, axes=(0,)), model.coef_)
     """
 
-    def __init__(self, basis, n_states=None):
+    def __init__(self, basis, n_states=None, lstsq_rcond=None):
         """
         Instantiate a MKSLocalizationModel.
 
         Args:
             basis (class): an instance of a bases class.
             n_states (int, optional): number of local states
+            lstsq_rcond (float, optional): rcond argument to linalg.lstsq
+            function. Defaults to 4 orders of magnitude above machine
+            epsilon.
 
         """
         self.basis = basis
@@ -75,6 +78,11 @@ class MKSLocalizationModel(LinearRegression):
         if n_states is None:
             self.n_states = basis.n_states
         self.domain = basis.domain
+        #any singular values not 4 orders of magnitude above machine epsilon
+        #are considered linearly dependent and discarded
+        self.lstsq_rcond = lstsq_rcond
+        if self.lstsq_rcond is None:
+            self.lstsq_rcond = np.finfo(float).eps*1e4
 
     def fit(self, X, y, size=None):
         """
@@ -104,12 +112,15 @@ class MKSLocalizationModel(LinearRegression):
         """
         self.basis = self.basis.__class__(self.n_states, self.domain)
         if size is not None:
-            y = self._reshape_feature(y, size)
-            X = self._reshape_feature(X, size)
-        if not len(y.shape) > 1:
-            raise RuntimeError("The shape of y is incorrect.")
-        if y.shape != X.shape:
-            raise RuntimeError("X and y must be the same shape.")
+            y = self.basis._reshape_feature(y, size)
+            X = self.basis._reshape_feature(X, size)
+
+        # if not len(y.shape) > 1:
+        #     raise RuntimeError("The shape of y is incorrect.")
+        # if y.shape != X.shape:
+        #     raise RuntimeError("X and y must be the same shape.")
+        self.basis._shape_check(X, y)  # call error check for shapes of X and y
+
         X_ = self.basis.discretize(X)
         axes = np.arange(X_.ndim)[1:-1]
         FX = np.fft.fftn(X_, axes=axes)
@@ -118,7 +129,8 @@ class MKSLocalizationModel(LinearRegression):
         s0 = (slice(None),)
         for ijk in np.ndindex(X_.shape[1:-1]):
             s1 = self.basis._select_slice(ijk, s0)
-            Fkernel[ijk + s1] = lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk])[0]
+            Fkernel[ijk + s1] = lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk], self.lstsq_rcond)[0]
+
         self._filter = Filter(Fkernel[None])
 
     @property
@@ -161,8 +173,8 @@ class MKSLocalizationModel(LinearRegression):
 
         if not hasattr(self, '_filter'):
             raise AttributeError("fit() method must be run before predict().")
-        y_pred_shape = X.shape
-        X = self._reshape_feature(X, self._filter.Fkernel.shape[1:-1])
+        y_pred_shape = self.basis._output_shape(X)
+        X = self.basis._reshape_feature(X, self._filter.Fkernel.shape[1:-1])
         X_ = self.basis.discretize(X)
         return self._filter.convolve(X_).reshape(y_pred_shape)
 
@@ -242,19 +254,3 @@ class MKSLocalizationModel(LinearRegression):
         >>> assert np.allclose(FX, FXtest)
         """
         pass
-
-    def _reshape_feature(self, X, size):
-        """
-        Helper function used to check the shape of the microstructure,
-        and change to appropriate shape.
-
-        Args:
-            X: The microstructure, an `(n_samples, n_x, ...)` shaped array
-                where `n_samples` is the number of samples and `n_x` is thes
-                patial discretization.
-
-        Returns:
-            microstructure with shape (n_samples, size)
-        """
-        new_shape = (X.shape[0],) + size
-        return X.reshape(new_shape)
