@@ -42,8 +42,8 @@ for more details.
 ## [PyFFTW][pyfftw]
 
 If installed, PyMKS will use [PyFFTW][pyfftw] to
-computed FFTs instead of [Numpy][numpy]. As long as [Numpy][numpy] is
-not using [Intel MKL][MKL], [PyFFTW][pyfftw] should improvement the
+compute FFTs instead of [Numpy][numpy]. As long as [Numpy][numpy] is
+not using [Intel MKL][MKL], [PyFFTW][pyfftw] should improve the
 performance of PyMKS.
 
 To install [PyFFTW][pyfftw] use pip
@@ -56,7 +56,7 @@ See the [PyFFTW installation instructions](https://github.com/hgomersall/pyFFTW#
 ## Installation on Windows
 
 We recommend you download and install the [Anaconda Python Distribution](http://continuum.io/downloads)
-for Python 2.7 (x64) and then download and install PyMKS using the [windows installer](https://github.com/materialsinnovation/pymks/releases/download/version-0_2_1/PyMKS-x64-anaconda27.exe).
+for Python 2.7 (x64) and then download and install PyMKS, using the [windows installer](https://github.com/materialsinnovation/pymks/releases/download/version-0_2_1/PyMKS-x64-anaconda27.exe).
 
 ## Installation on Mac OS X
 
