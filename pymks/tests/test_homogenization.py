@@ -47,8 +47,8 @@ def test_stress():
                                               macro_strain=macro_strain,
                                               seed=8)
     y_result = model.predict(X_new)
-    print np.round(y_result, decimals=2)
-    print np.round(y_new, decimals=2)
+    print(np.round(y_result, decimals=2))
+    print(np.round(y_new, decimals=2))
     assert np.allclose(np.round(y_new, decimals=2),
                        np.round(y_result, decimals=2))
 

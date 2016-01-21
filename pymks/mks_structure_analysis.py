@@ -76,7 +76,7 @@ class MKSStructureAnalysis(BaseEstimator):
             n_components = 5
         self.n_components = n_components
         if self.correlations is None and basis is not None:
-            self.correlations = [(0, l) for l in range(basis.n_states)]
+            self.correlations = [(0, l) for l in self.basis.n_states]
         if not callable(getattr(self.dimension_reducer,
                                 "fit_transform", None)):
             raise RuntimeError(
@@ -210,22 +210,27 @@ class MKSStructureAnalysis(BaseEstimator):
 
     def _transform(self, X):
         """Reshapes and reduces X"""
-        if self.store_correlations:
-            if hasattr(self, 'transform_correlations'):
-                self.transform_correlations = np.concatenate(
-                    (self.transform_correlations, X))
-            else:
-                self.transform_correlations = X
+        self._store_correlations(X)
         X_reshaped = self._reduce_shape(X)
-        return self.dimension_reducer.transform(X_reshaped)
+        self.transform_data =  self.dimension_reducer.transform(X_reshaped)
+        return self.transform_data
 
     def _fit_transform(self, X, y):
         """Reshapes X and uses it to compute the components"""
         if self.store_correlations:
-            self.fit_correlations = np.concatenate((self.correlations, X))
+            self.fit_correlations = X
         X_reshaped = self._reduce_shape(X)
         self.fit_data = self.dimension_reducer.fit_transform(X_reshaped, y)
         return self.fit_data
+
+    def _store_correlations(self, X):
+        """store stats"""
+        if self.store_correlations:
+              if hasattr(self, 'transform_correlations'):
+                  self.transform_correlations = np.concatenate(
+                    (self.transform_correlations, X))
+              else:
+                  self.transform_correlations = X
 
     def _compute_stats(self, X, periodic_axes, confidence_index):
         """
