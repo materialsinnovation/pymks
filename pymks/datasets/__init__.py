@@ -6,7 +6,7 @@ from pymks import DiscreteIndicatorBasis, MKSRegressionModel
 __all__ = ['make_delta_microstructures', 'make_elastic_FE_strain_delta',
            'make_elastic_FE_strain_random', 'make_cahn_hilliard',
            'make_microstructure', 'make_checkerboard_microstructure',
-           'make_elastic_FE_stress_random']
+           'make_elastic_stress_random']
 
 
 def make_elastic_FE_strain_delta(elastic_modulus=(100, 150),
@@ -114,6 +114,7 @@ def make_elastic_FE_strain_random(n_samples=1, elastic_modulus=(100, 150),
     microstructure with dimensions of `(5, 5)`.
 
     Args:
+        n_samples (int, optional): number of samples
         elastic_modulus (list, optional): elastic moduli for the phases
         poissons_ratio (list, optional): Poisson's ratios for the phases
         size (tuple, optional): size of the microstructure
@@ -252,10 +253,10 @@ def make_checkerboard_microstructure(square_size, n_squares):
     X = np.ones((2 * square_size, 2 * square_size), dtype=int)
     X[:square_size, :square_size] = 0
     X[square_size:, square_size:] = 0
-    return np.tile(X, ((n_squares + 1) / 2, (n_squares + 1) / 2))[None, :L, :L]
+    return np.tile(X, (int((n_squares + 1) / 2), int((n_squares + 1) / 2)))[None, :L, :L]
 
 
-def make_elastic_FE_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
+def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
                                poissons_ratio=(0.3, 0.3), size=(21, 21),
                                macro_strain=0.01, grain_size=[(3, 3), (9, 9)],
                                seed=10):
@@ -281,11 +282,11 @@ def make_elastic_FE_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150)
 
     Example
 
-    >>> X, y = make_elastic_FE_stress_random(n_samples=1, elastic_modulus=(1, 1),
+    >>> X, y = make_elastic_stress_random(n_samples=1, elastic_modulus=(1, 1),
     ...                                   poissons_ratio=(1, 1),
     ...                                   grain_size=(3, 3), macro_strain=1.0)
     >>> assert np.allclose(y, np.ones(y.shape))
-    >>> X, y = make_elastic_FE_stress_random(n_samples=1, grain_size=(1, 1),
+    >>> X, y = make_elastic_stress_random(n_samples=1, grain_size=(1, 1),
     ...                                   elastic_modulus=(100, 200),
     ...                                   size=(2, 2), poissons_ratio=(1, 3),
     ...                                   macro_strain=1., seed=3)
@@ -293,7 +294,7 @@ def make_elastic_FE_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150)
     ...                       [0, 1]]])
     >>> assert np.allclose(X, X_result)
     >>> assert float(np.round(y, decimals=5)[0]) == 228.74696
-    >>> X, y = make_elastic_FE_stress_random(n_samples=1, grain_size=(1, 1, 1),
+    >>> X, y = make_elastic_stress_random(n_samples=1, grain_size=(1, 1, 1),
     ...                                   elastic_modulus=(100, 200),
     ...                                   poissons_ratio=(1, 3),  seed=3,
     ...                                   macro_strain=1., size=(2, 2, 2))

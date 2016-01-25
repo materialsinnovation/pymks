@@ -46,6 +46,7 @@ def _get_microstructure_cmap():
     Returns:
         dictionary with colors and microstructure on color bar.
     """
+
     HighRGB = np.array([229, 229, 229]) / 255.
     MediumRGB = np.array([114.5, 114.5, 114.5]) / 255.
     LowRGB = np.array([0, 0, 0]) / 255.
@@ -131,14 +132,14 @@ def _get_color_list(n_sets):
     Returns:
         list of colors for n_sets
     """
-    color_list = ['#1a9850', '#f46d43', '#762a83', '#41b6c4',
-                  '#ffff33', '#a50026', '#dd3497', '#ffffff',
-                  '#36454f', '#081d58', '#d9ef8b', '#fee08b']
+    color_list = ['#1a9850', '#f46d43', '#1f78b4', '#e31a1c',
+                  '#6a3d9a', '#b2df8a', '#fdbf6f', '#a6cee3',
+                  '#fb9a99', '#cab2d6', '#ffff99', '#b15928']
 
     return color_list[:n_sets]
 
 
-def draw_coeff(coeff, fontsize=15):
+def draw_coeff(coeff, fontsize=15, figsize=None):
     """
     Visualize influence coefficients.
 
@@ -153,7 +154,7 @@ def draw_coeff(coeff, fontsize=15):
     titles = [r'Influence Coefficients $l = %s$' % ii for ii
               in np.arange(n_coeff)]
     _draw_fields(np.rollaxis(coeff, -1, 0), coeff_cmap,
-                 fontsize=fontsize, titles=titles)
+                 fontsize=fontsize, titles=titles, figsize=figsize)
 
 
 def draw_microstructure_strain(microstructure, strain):
@@ -270,7 +271,7 @@ def draw_differences(differences, labels=None, fontsize=15):
     _draw_fields(differences, cmap, fontsize, labels)
 
 
-def _draw_fields(fields, field_cmap, fontsize, titles):
+def _draw_fields(fields, field_cmap, fontsize, titles, figsize=None):
     """
     Helper function used to draw fields.
 
@@ -290,7 +291,11 @@ def _draw_fields(fields, field_cmap, fontsize, titles):
             raise RuntimeError(
                 "number of plots does not match number of labels.")
     plt.close('all')
-    fig, axs = plt.subplots(1, n_fields, figsize=(n_fields * 4, 4))
+    if figsize is None:
+        figsize = (1, n_fields)
+    fig, axs = plt.subplots(figsize[0], figsize[1],
+                            figsize=(figsize[1] * 4, figsize[0] * 4))
+
     if n_fields > 1:
         for field, ax, title in zip(fields, axs.flat, titles):
             im = ax.imshow(field.swapaxes(0, 1),
@@ -438,7 +443,9 @@ def draw_component_variance(variance):
     plt.show()
 
 
-def draw_components(datasets, labels, title=None, component_labels=None):
+def draw_components(datasets, labels, title=None, component_labels=None,
+                    view_angles=None, legend_outside=False, fig_size=None,
+                    time=None):
     """
     Visualize low dimensional representations of microstructures.
 
@@ -449,7 +456,11 @@ def draw_components(datasets, labels, title=None, component_labels=None):
         labels (list, str): list of labes for each of each array datasets
         title: main title for plot
         component_labels: labels for components
-
+        view_angles (int,int): the elevation and azimuth angles of the axes
+            to rotate the axes.
+        legend_outside : specify to move legend box outside the main plot
+            domain
+        figsize: (width, height) figure size in inches
     """
     plt.close('all')
     if title is None:
@@ -457,20 +468,27 @@ def draw_components(datasets, labels, title=None, component_labels=None):
     n_components = np.array(datasets[0][-1].shape)
     if component_labels is None:
         component_labels = range(1, n_components + 1)
+        if (time is True):
+            component_labels = range(1, 4)
     if len(datasets) != len(labels):
         raise RuntimeError('datasets and labels must have the same length')
-    if n_components != len(component_labels):
+    if n_components != len(component_labels) and (time is None):
         raise RuntimeError('number of components and component_labels must'
                            ' have the same length')
-    if n_components[-1] == 2:
-        _draw_components_2D(datasets, labels, title, component_labels[:2])
+    if n_components[-1] == 2 and (time is None):
+        _draw_components_2D(datasets, labels, title, component_labels[:2],
+                            legend_outside, fig_size)
+    elif n_components[-1] == 2 and (time is True):
+        _draw_components_2D_time(datasets, labels, title, component_labels)
     elif n_components[-1] == 3:
-        _draw_components_3D(datasets, labels, title, component_labels)
+        _draw_components_3D(datasets, labels, title, component_labels,
+                            view_angles, legend_outside, fig_size)
     else:
         raise RuntimeError("n_components must be 2 or 3.")
 
 
-def _draw_components_2D(X, labels, title, component_labels):
+def _draw_components_2D(X, labels, title, component_labels,
+                        legend_outside, fig_size):
     """
     Helper function to plot 2 components.
 
@@ -480,7 +498,10 @@ def _draw_components_2D(X, labels, title, component_labels):
     """
     n_sets = len(X)
     color_list = _get_color_list(n_sets)
-    fig = plt.figure()
+    if fig_size is not None:
+        fig = plt.figure(figsize=(fig_size[0], fig_size[1]))
+    else:
+        fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=15)
     ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=15)
@@ -493,12 +514,24 @@ def _draw_components_2D(X, labels, title, component_labels):
     ax.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
     for label, pts, color in zip(labels, X, color_list):
         ax.plot(pts[:, 0], pts[:, 1], 'o', color=color, label=label)
-    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=15)
+        data_labels = ['{0}'.format(i) for i in range(len(pts))]
+        counter = 0
+        for data_label, x, y in zip(data_labels, pts[:, 0], pts[:, 1]):
+            if counter % 10 == 0:
+                plt.annotate(data_label, xy=(x, y),
+                             bbox=dict(boxstyle='round,pad=0.9',
+                                       fc='white', alpha=0.5))
+            counter+=1
+        lg = plt.legend(loc=1, borderaxespad=0., fontsize=15)
+    if legend_outside is not None:
+        lg = plt.legend(bbox_to_anchor=(1.05, 1.0), loc=2,
+                        borderaxespad=0., fontsize=15)
+    lg.draggable()
     plt.title(title, fontsize=20)
     plt.show()
 
 
-def _draw_components_3D(X, labels, title, component_labels):
+def _draw_components_2D_time(X, labels, title, component_labels):
     """
     Helper function to plot 2 components.
 
@@ -508,11 +541,72 @@ def _draw_components_3D(X, labels, title, component_labels):
     """
     n_sets = len(X)
     color_list = _get_color_list(n_sets)
-    fig = plt.figure()
+    fig = plt.figure(figsize=(17, 10))
+    ax = fig.add_subplot(221, projection='3d')
+    ax2 = fig.add_subplot(222)
+    ax3 = fig.add_subplot(223)
+    ax4 = fig.add_subplot(224)
+
+    ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=12)
+    ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=12)
+    ax.set_zlabel('Time (fs)', fontsize=12)
+
+    ax2.set_xlabel('Component ' + str(component_labels[0]), fontsize=12)
+    ax2.set_ylabel('Component ' + str(component_labels[1]), fontsize=12)
+
+    ax3.set_xlabel('Time', fontsize=12)
+    ax3.set_ylabel('Component ' + str(component_labels[0]), fontsize=12)
+
+    ax4.set_xlabel('Time', fontsize=12)
+    ax4.set_ylabel('Component ' + str(component_labels[1]), fontsize=12)
+
+    time = X[-1]
+    X = X[0:2]
+    X_array = np.concatenate(X)
+
+    x_min, x_max = [np.min(X_array[:, 0]), np.max(X_array[:, 0])]
+    y_min, y_max = [np.min(X_array[:, 1]), np.max(X_array[:, 1])]
+    z_min, z_max = [np.min(time[:]), np.max(time[:])]
+    x_epsilon = (x_max - x_min) * 0.05
+    y_epsilon = (y_max - y_min) * 0.05
+    ax.set_xlim([x_min - x_epsilon, x_max + x_epsilon])
+    ax.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
+    ax.set_zlim([z_min, z_max])
+    ax2.set_xlim([x_min - x_epsilon, x_max + x_epsilon])
+    ax2.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
+    ax3.set_ylim([x_min - x_epsilon, x_max + x_epsilon])
+    ax3.set_xlim([z_min, z_max])
+    ax4.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
+    ax4.set_xlim([z_min, z_max])
+
+    for label, pts, color in zip(labels, X, color_list):
+        ax.plot(pts[:, 0], pts[:, 1], time[:], 'o', color=color, label=label)
+        ax2.plot(pts[:, 0], pts[:, 1], 'o', color=color, label=label)
+        ax3.plot(time[:], pts[:, 0], 'o', color=color, label=label)
+        ax4.plot(time[:], pts[:, 1], 'o', color=color, label=label)
+    plt.tight_layout(pad=5,w_pad=0.5,h_pad=1)
+    plt.show()
+
+
+def _draw_components_3D(X, labels, title, component_labels, view_angles,
+                        legend_outside, fig_size):
+    """
+    Helper function to plot 2 components.
+
+    Args:
+        X: Arrays with low dimensional data
+        labels: labels for each of the low dimensional arrays
+    """
+    n_sets = len(X)
+    color_list = _get_color_list(n_sets)
+    if fig_size is not None:
+        fig = plt.figure(figsize=(fig_size[0], fig_size[1]))
+    else:
+        fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=10)
-    ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=10)
-    ax.set_zlabel('Component ' + str(component_labels[2]), fontsize=10)
+    ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=12)
+    ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=12)
+    ax.set_zlabel('Component ' + str(component_labels[2]), fontsize=12)
     X_array = np.concatenate(X)
     x_min, x_max = [np.min(X_array[:, 0]), np.max(X_array[:, 0])]
     y_min, y_max = [np.min(X_array[:, 1]), np.max(X_array[:, 1])]
@@ -526,7 +620,12 @@ def _draw_components_3D(X, labels, title, component_labels):
     for label, pts, color in zip(labels, X, color_list):
         ax.plot(pts[:, 0], pts[:, 1], pts[:, 2], 'o', color=color, label=label)
     plt.title(title, fontsize=15)
-    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=15)
+    if view_angles is not None:
+        ax.view_init(view_angles[0], view_angles[1])
+    lg = plt.legend(loc=1, borderaxespad=0., fontsize=15)
+    if legend_outside:
+        lg = plt.legend(bbox_to_anchor=(1.05, 1.0), loc=2,
+                        borderaxespad=0., fontsize=15)
     plt.show()
 
 
@@ -668,9 +767,9 @@ def _get_ticks_params(l):
     """
     segments = np.roll(np.arange(4, 7, dtype=int), 1, 0)
     m = segments[np.argmin(l % segments)]
-    n = max((l + 1) / m, 1)
-    tick_loc = range(0, l + n, n)
-    tick_labels = range(- (l - 1) / 2, (l + 1) / 2 + n, n)
+    n = int(max((l + 1) / m, 1))
+    tick_loc = list(range(0, l + n, n))
+    tick_labels = list(range(int(round(- (l - 1) / 2)), int(round(int((l + 1) / 2 + n))), n))
     return tick_loc, tick_labels
 
 

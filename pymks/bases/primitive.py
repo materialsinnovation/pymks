@@ -109,7 +109,7 @@ class PrimitiveBasis(_AbstractMicrostructureBasis):
 
     """
 
-    def _get_basis_slice(self, ijk, s0):
+    def _select_slice(self, ijk, s0):
         """
         Helper method used to calibrate influence coefficients from in
         mks_localization_model to account for redundancies from linearly
@@ -133,5 +133,6 @@ class PrimitiveBasis(_AbstractMicrostructureBasis):
             Float valued field of local states between 0 and 1.
         """
         self.check(X)
-        H = np.linspace(self.domain[0], self.domain[1], self.n_states)
-        return np.maximum(1 - (abs(X[..., None] - H)) / (H[1] - H[0]), 0)
+        H = np.linspace(self.domain[0], self.domain[1], max(self.n_states) + 1)
+        X_ = np.maximum(1 - (abs(X[..., None] - H)) / (H[1] - H[0]), 0)
+        return X_[..., list(self.n_states)]
