@@ -4,8 +4,6 @@ from scipy.ndimage.fourier import fourier_gaussian
 from .base_microstructure_generator import BaseMicrostructureGenerator
 from ..filter import _import_pyfftw
 _import_pyfftw()
-import math
-import datetime
 
 
 class MicrostructureGenerator(BaseMicrostructureGenerator):
@@ -56,56 +54,21 @@ class MicrostructureGenerator(BaseMicrostructureGenerator):
         Returns:
           microstructure with assigned phases
         """
-        '''
-        Former version    
-            if self.n_phases > 3:
+        if self.volume_fraction is None:
             epsilon = 1e-5
             X0, X1 = np.min(X_blur), np.max(X_blur)
-            Xphases = float(self.n_phases) * (X_blur - X0) / (X1 - X0) * \
-                                         (1. - epsilon) + epsilon
-        '''
-        v_cum = np.cumsum(self.volume_fraction)
-        if v_cum[-1] > 1:
-            raise RuntimeError("Volume fractions do not add up to 1")
-        X_reshape = X_blur.reshape((X_blur.shape[0], -1))
-        X_sort = np.sort(X_reshape, axis=1)
-        X_segs = np.zeros((X_reshape.shape))
-        length = X_sort.shape[1]
-        
-        
-        #v_boundaries = np.concatenate((v_cum[None], np.roll(v_cum, -1)[None]))
-        #v_slices = np.mean(v_boundaries, axis=0)
-        #v_slices[0] = 0
-        #v_slices[-1] = 1
-        #_slices = [slice(np.floor(i * length) , np.floor(j * length))
-        #           for i, j in zip(v_slices[:-1], v_slices[1:])]
-        
-        #print _slices
-        #print v_cum[:-1]
-        seg_shape = (length, len(v_cum[1:]))
-        per_diff = self.percent_variance * (2 * np.random.random((seg_shape)) - 1)
-        seg_ind = np.floor((v_cum[:-1] + per_diff) * length)
-        seg_values = np.concatenate([x[list(i)][None]
-                                     for i, x in zip(seg_ind, X_sort)])
-        X_bool = np.less(X_blur[..., None], seg_values[:, None, None, :])
-        X_phases = np.sum(X_bool, axis=-1)
-        #ind = int(math.floor(v_cum*length))
-        #print X_blur.shape
-        #print np.unique(X_phases)
-            #for i in range(1,len(v_frac)):
-            #t= datetime.datetime.now()
-            #np.random.seed((t.microsecond))
-            #v = v_cum[i]
-            #
-            #var = self.sigma*np.random.randn()
-            #print "variance = " + str(var)
-            ##index = ind + var
-            #print "Index = " + str(index)
-            #print X_sort.shape
-            #seg = X_sort[:, index]
-            #X_seg = X_reshape >= seg[:, None]
-            #X_segs = X_segs+X_seg
-            #Xphases = X_segs.reshape((X_blur.shape))
-
-
+            Xphases = float(self.n_phases) * ((X_blur - X0) / (X1 - X0) *
+                                              (1. - epsilon) + epsilon)
+            X_phases = np.floor(Xphases - epsilon)
+        else:
+            v_cum = np.cumsum(self.volume_fraction)
+            X_sort = np.sort(X_blur.reshape((X_blur.shape[0], -1)), axis=1)
+            seg_shape = (X_sort.shape[1], len(v_cum[:-1]))
+            per_diff = (2 * np.random.random((seg_shape)) -
+                        1) * np.array(self.percent_variance)
+            seg_ind = np.floor((v_cum[:-1] + per_diff) * X_sort.shape[1])
+            seg_values = np.concatenate([x[list(i)][None]
+                                         for i, x in zip(seg_ind, X_sort)])
+            X_bool = np.less(X_blur[..., None], seg_values[:, None, None, :])
+            X_phases = np.sum(X_bool, axis=-1)
         return X_phases
