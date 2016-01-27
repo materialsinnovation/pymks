@@ -114,6 +114,7 @@ def make_elastic_FE_strain_random(n_samples=1, elastic_modulus=(100, 150),
     microstructure with dimensions of `(5, 5)`.
 
     Args:
+        n_samples (int, optional): number of samples
         elastic_modulus (list, optional): elastic moduli for the phases
         poissons_ratio (list, optional): Poisson's ratios for the phases
         size (tuple, optional): size of the microstructure
@@ -187,7 +188,8 @@ def make_cahn_hilliard(n_samples=1, size=(21, 21), dx=0.25, width=1.,
 
 
 def make_microstructure(n_samples=10, size=(101, 101), n_phases=2,
-                        grain_size=(33, 14), seed=10, volume_fraction=(0.5, 0.5), percent_variance=0):
+                        grain_size=None, seed=10, volume_fraction=None,
+                        percent_variance=None):
     """
     Constructs microstructures for an arbitrary number of phases
     given the size of the domain, and relative grain size.
@@ -198,8 +200,10 @@ def make_microstructure(n_samples=10, size=(101, 101), n_phases=2,
         n_phases (int, optional): number of phases
         grain_size (tuple, optional): effective dimensions of grains
         seed (int, optional): seed for random number microstructureGenerator
-        volume_fraction(tuple, optional): specify the volume fraction of each phase
-        percent_variance(int, optional): varies the volume fraction of the microstructure up to this percentage
+        volume_fraction(tuple, optional): specify the volume fraction of each
+            phase
+        percent_variance(int, optional): varies the volume fraction of the
+            microstructure up to this percentage
 
     Returns:
         microstructures for the system of shape (n_samples, n_x, ...)
@@ -218,11 +222,14 @@ def make_microstructure(n_samples=10, size=(101, 101), n_phases=2,
     >>> assert(np.allclose(X, Xtest))
 
     """
+    if grain_size is None:
+        grain_size = np.array(size) / 3.
+    if np.sum(np.array(grain_size) > np.array(size)):
+        raise RuntimeError('grain_size must be smaller than size')
     MS = MicrostructureGenerator(n_samples=n_samples, size=size,
                                  n_phases=n_phases, grain_size=grain_size,
-                                 seed=seed,volume_fraction=volume_fraction,
+                                 seed=seed, volume_fraction=volume_fraction,
                                  percent_variance=percent_variance)
-
     return MS.generate()
 
 
@@ -256,13 +263,15 @@ def make_checkerboard_microstructure(square_size, n_squares):
     X = np.ones((2 * square_size, 2 * square_size), dtype=int)
     X[:square_size, :square_size] = 0
     X[square_size:, square_size:] = 0
-    return np.tile(X, ((n_squares + 1) / 2, (n_squares + 1) / 2))[None, :L, :L]
+    return np.tile(X, (int((n_squares + 1) / 2),
+                   int((n_squares + 1) / 2)))[None, :L, :L]
 
 
 def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
                                poissons_ratio=(0.3, 0.3), size=(21, 21),
                                macro_strain=0.01, grain_size=[(3, 3), (9, 9)],
-                               seed=10, volume_fraction=[0.5,0.5], percent_variance=0.0):
+                               seed=10, volume_fraction=None,
+                               percent_variance=None):
     """
     Generates microstructures and their macroscopic stress values for an
     applied macroscopic strain.
@@ -278,9 +287,12 @@ def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
             sample.
         grain_size (tuple, optional): effective dimensions of grains
         seed (int, optional): seed for random number generator
-        volume_fraction(tuple, optional): specify the volume fraction of each phase
-        percent_variance(int, optional): varies the volume fraction of the microstructure up to this percentage
-        
+        volume_fraction(tuple, optional): specify the volume fraction of
+            each phase
+        percent_variance(int, optional): Only used if volume_fraction is
+            specified. Randomly varies the volume fraction of the
+            microstructure.
+
 
     Returns:
         array of microstructures with dimensions (n_samples, n_x, ...) and
@@ -316,10 +328,19 @@ def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
         grain_size = (grain_size,)
     if not isinstance(n_samples, (list, tuple, np.ndarray)):
         n_samples = (n_samples,)
+    if volume_fraction is None:
+        volume_fraction = (None,)
+    vf_0 = volume_fraction[0]
+    if not isinstance(vf_0, (list, tuple, np.ndarray)) and vf_0 is not None:
+        volume_fraction = (volume_fraction,)
     if not isinstance(size, (list, tuple, np.ndarray)) or len(size) > 3:
         raise RuntimeError('size must have length of 2 or 3')
     [RuntimeError('dimensions of size and grain_size are not the same.')
      for grains in grain_size if len(size) != len(grains)]
+    if vf_0 is not None:
+        [RuntimeError('dimensions of size and grain_size are not the same.')
+         for volume_frac in volume_fraction
+         if len(elastic_modulus) != len(volume_frac)]
     if len(elastic_modulus) != len(poissons_ratio):
         raise RuntimeError('length of elastic_modulus and poissons_ratio are \
                            not the same.')
@@ -333,12 +354,12 @@ def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
     X = np.concatenate([make_microstructure(n_samples=sample, size=size,
                                             n_phases=n_states,
                                             grain_size=gs, seed=seed,
-                                            volume_fraction=volume_fraction,
+                                            volume_fraction=vf,
                                             percent_variance=percent_variance)
-                        for gs, sample in zip(grain_size, n_samples)])
+                        for vf, gs, sample in zip(volume_fraction,
+                                                  grain_size, n_samples)])
     X_ = basis.discretize(X)
     index = tuple([None for i in range(len(size) + 1)]) + (slice(None),)
     modulus = np.sum(X_ * np.array(elastic_modulus)[index], axis=-1)
     y_stress = model.predict(X) * modulus
-    return X, np.average(y_stress.reshape(np.sum(n_samples), y_stress[0].size),
-                         axis=1)
+    return X, np.average(y_stress.reshape(len(y_stress), -1), axis=1)

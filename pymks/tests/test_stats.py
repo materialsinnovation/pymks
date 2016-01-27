@@ -256,8 +256,8 @@ def test_mask_two_samples():
                           [[0., 0., 1 / 2.],
                            [2 / 5., 3 / 5., 0.],
                            [0., 0., 2 / 3.]]]])
-    print np.round(X_corr, decimals=4)
-    print X_result
+    print(np.round(X_corr, decimals=4))
+    print(X_result)
     assert np.allclose(X_corr, X_result)
 
 
