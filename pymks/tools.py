@@ -296,15 +296,6 @@ def _draw_fields(fields, field_cmap, fontsize, titles, figsize=None):
     fig, axs = plt.subplots(figsize[0], figsize[1],
                             figsize=(figsize[1] * 4, figsize[0] * 4))
 
-    # xdim = 5
-    # ydim = np.int64(np.ceil(n_fields/np.float64(xdim)))
-
-    # if n_fields < 5:
-    #     xdim = n_fields
-    
-    # fig, axs = plt.subplots(ydim, xdim, figsize=(xdim * 4, ydim * 4))
-
-
     if n_fields > 1:
         for field, ax, title in zip(fields, axs.flat, titles):
             im = ax.imshow(field.swapaxes(0, 1),
@@ -452,7 +443,9 @@ def draw_component_variance(variance):
     plt.show()
 
 
-def draw_components(datasets, labels, title=None, component_labels=None,time=None):
+def draw_components(datasets, labels, title=None, component_labels=None,
+                    view_angles=None, legend_outside=False, fig_size=None,
+                    time=None):
     """
     Visualize low dimensional representations of microstructures.
 
@@ -463,13 +456,16 @@ def draw_components(datasets, labels, title=None, component_labels=None,time=Non
         labels (list, str): list of labes for each of each array datasets
         title: main title for plot
         component_labels: labels for components
-
+        view_angles (int,int): the elevation and azimuth angles of the axes
+            to rotate the axes.
+        legend_outside : specify to move legend box outside the main plot
+            domain
+        figsize: (width, height) figure size in inches
     """
     plt.close('all')
     if title is None:
         title = 'Low Dimensional Representation'
     n_components = np.array(datasets[0][-1].shape)
-    print n_components
     if component_labels is None:
         component_labels = range(1, n_components + 1)
         if (time is True):
@@ -480,16 +476,19 @@ def draw_components(datasets, labels, title=None, component_labels=None,time=Non
         raise RuntimeError('number of components and component_labels must'
                            ' have the same length')
     if n_components[-1] == 2 and (time is None):
-        _draw_components_2D(datasets, labels, title, component_labels[:2])
+        _draw_components_2D(datasets, labels, title, component_labels[:2],
+                            legend_outside, fig_size)
     elif n_components[-1] == 2 and (time is True):
-        _draw_components_2D_time(datasets,labels,title,component_labels)
+        _draw_components_2D_time(datasets, labels, title, component_labels)
     elif n_components[-1] == 3:
-        _draw_components_3D(datasets, labels, title, component_labels)
+        _draw_components_3D(datasets, labels, title, component_labels,
+                            view_angles, legend_outside, fig_size)
     else:
         raise RuntimeError("n_components must be 2 or 3.")
 
 
-def _draw_components_2D(X, labels, title, component_labels):
+def _draw_components_2D(X, labels, title, component_labels,
+                        legend_outside, fig_size):
     """
     Helper function to plot 2 components.
 
@@ -499,7 +498,10 @@ def _draw_components_2D(X, labels, title, component_labels):
     """
     n_sets = len(X)
     color_list = _get_color_list(n_sets)
-    fig = plt.figure()
+    if fig_size is not None:
+        fig = plt.figure(figsize=(fig_size[0], fig_size[1]))
+    else:
+        fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=15)
     ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=15)
@@ -512,19 +514,22 @@ def _draw_components_2D(X, labels, title, component_labels):
     ax.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
     for label, pts, color in zip(labels, X, color_list):
         ax.plot(pts[:, 0], pts[:, 1], 'o', color=color, label=label)
-    ##################ADDED################# 
-        print "started"   
-        data_labels=['{0}'.format(i) for i in range(len(pts))]
-        counter=0
-        for data_label, x, y in zip(data_labels,pts[:, 0], pts[:, 1]):
-          if counter%10==0:
-            plt.annotate(data_label,xy=(x,y),bbox=dict(boxstyle='round,pad=0.9',fc='white',alpha=0.5))
-          counter+=1
-        print "finished"
-    ########################################
-    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=15)
+        data_labels = ['{0}'.format(i) for i in range(len(pts))]
+        counter = 0
+        for data_label, x, y in zip(data_labels, pts[:, 0], pts[:, 1]):
+            if counter % 10 == 0:
+                plt.annotate(data_label, xy=(x, y),
+                             bbox=dict(boxstyle='round,pad=0.9',
+                                       fc='white', alpha=0.5))
+            counter+=1
+        lg = plt.legend(loc=1, borderaxespad=0., fontsize=15)
+    if legend_outside is not None:
+        lg = plt.legend(bbox_to_anchor=(1.05, 1.0), loc=2,
+                        borderaxespad=0., fontsize=15)
+    lg.draggable()
     plt.title(title, fontsize=20)
     plt.show()
+
 
 def _draw_components_2D_time(X, labels, title, component_labels):
     """
@@ -536,30 +541,29 @@ def _draw_components_2D_time(X, labels, title, component_labels):
     """
     n_sets = len(X)
     color_list = _get_color_list(n_sets)
-    fig = plt.figure(figsize=(17,10))
-    ax = fig.add_subplot(221,projection='3d')
+    fig = plt.figure(figsize=(17, 10))
+    ax = fig.add_subplot(221, projection='3d')
     ax2 = fig.add_subplot(222)
     ax3 = fig.add_subplot(223)
     ax4 = fig.add_subplot(224)
-    
-    
+
     ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=12)
     ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=12)
     ax.set_zlabel('Time (fs)', fontsize=12)
-    
+
     ax2.set_xlabel('Component ' + str(component_labels[0]), fontsize=12)
     ax2.set_ylabel('Component ' + str(component_labels[1]), fontsize=12)
-    
+
     ax3.set_xlabel('Time', fontsize=12)
     ax3.set_ylabel('Component ' + str(component_labels[0]), fontsize=12)
-    
+
     ax4.set_xlabel('Time', fontsize=12)
     ax4.set_ylabel('Component ' + str(component_labels[1]), fontsize=12)
-    
+
     time = X[-1]
     X = X[0:2]
     X_array = np.concatenate(X)
-    
+
     x_min, x_max = [np.min(X_array[:, 0]), np.max(X_array[:, 0])]
     y_min, y_max = [np.min(X_array[:, 1]), np.max(X_array[:, 1])]
     z_min, z_max = [np.min(time[:]), np.max(time[:])]
@@ -567,38 +571,25 @@ def _draw_components_2D_time(X, labels, title, component_labels):
     y_epsilon = (y_max - y_min) * 0.05
     ax.set_xlim([x_min - x_epsilon, x_max + x_epsilon])
     ax.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
-    ax.set_zlim([z_min,z_max])
+    ax.set_zlim([z_min, z_max])
     ax2.set_xlim([x_min - x_epsilon, x_max + x_epsilon])
     ax2.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
     ax3.set_ylim([x_min - x_epsilon, x_max + x_epsilon])
-    ax3.set_xlim([z_min,z_max])
+    ax3.set_xlim([z_min, z_max])
     ax4.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
-    ax4.set_xlim([z_min,z_max])
-    
+    ax4.set_xlim([z_min, z_max])
+
     for label, pts, color in zip(labels, X, color_list):
         ax.plot(pts[:, 0], pts[:, 1], time[:], 'o', color=color, label=label)
         ax2.plot(pts[:, 0], pts[:, 1], 'o', color=color, label=label)
         ax3.plot(time[:], pts[:, 0], 'o', color=color, label=label)
         ax4.plot(time[:], pts[:, 1], 'o', color=color, label=label)
-        
-    ##################ADDED################# 
-    '''
-        print "started"   
-        data_labels=['{0}'.format(i) for i in range(len(pts))]
-        counter=0
-        for data_label, x, y in zip(data_labels,pts[:, 0], pts[:, 1]):
-          if counter%10==0:
-            plt.annotate(data_label,xy=(x,y),bbox=dict(boxstyle='round,pad=0.9',fc='white',alpha=0.5))
-          counter+=1
-        print "finished"
-    '''
-    ########################################
-    #plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=15)
-    #plt.title(title, fontsize=12)
     plt.tight_layout(pad=5,w_pad=0.5,h_pad=1)
     plt.show()
 
-def _draw_components_3D(X, labels, title, component_labels):
+
+def _draw_components_3D(X, labels, title, component_labels, view_angles,
+                        legend_outside, fig_size):
     """
     Helper function to plot 2 components.
 
@@ -608,11 +599,14 @@ def _draw_components_3D(X, labels, title, component_labels):
     """
     n_sets = len(X)
     color_list = _get_color_list(n_sets)
-    fig = plt.figure()
+    if fig_size is not None:
+        fig = plt.figure(figsize=(fig_size[0], fig_size[1]))
+    else:
+        fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=10)
-    ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=10)
-    ax.set_zlabel('Component ' + str(component_labels[2]), fontsize=10)
+    ax.set_xlabel('Component ' + str(component_labels[0]), fontsize=12)
+    ax.set_ylabel('Component ' + str(component_labels[1]), fontsize=12)
+    ax.set_zlabel('Component ' + str(component_labels[2]), fontsize=12)
     X_array = np.concatenate(X)
     x_min, x_max = [np.min(X_array[:, 0]), np.max(X_array[:, 0])]
     y_min, y_max = [np.min(X_array[:, 1]), np.max(X_array[:, 1])]
@@ -626,7 +620,12 @@ def _draw_components_3D(X, labels, title, component_labels):
     for label, pts, color in zip(labels, X, color_list):
         ax.plot(pts[:, 0], pts[:, 1], pts[:, 2], 'o', color=color, label=label)
     plt.title(title, fontsize=15)
-    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=15)
+    if view_angles is not None:
+        ax.view_init(view_angles[0], view_angles[1])
+    lg = plt.legend(loc=1, borderaxespad=0., fontsize=15)
+    if legend_outside:
+        lg = plt.legend(bbox_to_anchor=(1.05, 1.0), loc=2,
+                        borderaxespad=0., fontsize=15)
     plt.show()
 
 
