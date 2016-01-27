@@ -61,14 +61,16 @@ class MicrostructureGenerator(BaseMicrostructureGenerator):
                                               (1. - epsilon) + epsilon)
             X_phases = np.floor(Xphases - epsilon)
         else:
-            v_cum = np.cumsum(self.volume_fraction)
+            v_cum = np.cumsum(self.volume_fraction[:-1])
             X_sort = np.sort(X_blur.reshape((X_blur.shape[0], -1)), axis=1)
-            seg_shape = (X_sort.shape[1], len(v_cum[:-1]))
-            per_diff = (2 * np.random.random((seg_shape)) -
+            seg_shape = (len(X_sort), len(v_cum))
+            per_diff = (2 * np.random.random(seg_shape) -
                         1) * np.array(self.percent_variance)
-            seg_ind = np.floor((v_cum[:-1] + per_diff) * X_sort.shape[1])
+            if -np.sum(per_diff) < self.percent_variance:
+                per_diff -= np.sum(per_diff) / len(self.volume_fraction)
+            seg_ind = np.floor((v_cum + per_diff) * X_sort.shape[1])
             seg_values = np.concatenate([x[list(i)][None]
                                          for i, x in zip(seg_ind, X_sort)])
-            X_bool = np.less(X_blur[..., None], seg_values[:, None, None, :])
+            X_bool = X_blur[..., None] > seg_values[:, None, None, :]
             X_phases = np.sum(X_bool, axis=-1)
         return X_phases
