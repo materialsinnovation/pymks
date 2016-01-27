@@ -33,12 +33,20 @@ class BaseMicrostructureGenerator(object):
         np.random.seed(seed)
         self.volume_fraction = volume_fraction
         if self.volume_fraction is not None:
-            if not np.allclose(np.array(np.cumsum(volume_fraction)[-1],
-                               np.array([1]))):
+            if len(self.volume_fraction) != self.n_phases:
+                raise RuntimeError(('n_phases and lenth of volume_fraction' +
+                                   ' must be the same'))
+            cum_frac = np.cumsum(volume_fraction)
+            if not np.allclose(cum_frac[-1], 1):
                 raise RuntimeError("volume fractions do not add up to 1")
             if percent_variance is None:
-                percent_variance = np.zeros(len(volume_fraction))
+                percent_variance = 0.
             self.percent_variance = percent_variance
+            min_frac = cum_frac[0] - percent_variance
+            max_frac = cum_frac[-2] + percent_variance
+            if max_frac > 1 or min_frac < 0:
+                raise RuntimeError(('percent_variance cannot extend' +
+                                    'volume_fraction values beyond 0 or 1'))
 
     def generate(self):
         raise NotImplementedError
