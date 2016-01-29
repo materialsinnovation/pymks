@@ -32,9 +32,10 @@ def _get_response_cmap():
     Returns:
         dictionary with colors and localizations on color bar.
     """
-    HighRGB = np.array([26, 152, 80]) / 255.
-    MediumRGB = np.array([255, 255, 191]) / 255.
-    LowRGB = np.array([0, 0, 0]) / 255.
+    HighRGB = np.array([179,255,204]) / 255.
+    MediumRGB = np.array([28,137,63]) / 255.
+    LowRGB = np.array([11,53,24]) / 255.
+
     cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
     return colors.LinearSegmentedColormap('coeff_cmap', cdict, 256)
 
@@ -61,9 +62,9 @@ def _get_diff_cmap():
     Returns:
         dictionary with colors and localizations on color bar.
     """
-    HighRGB = np.array([118, 42, 131]) / 255.
-    MediumRGB = np.array([255, 255, 191]) / 255.
-    LowRGB = np.array([0, 0, 0]) / 255.
+    HighRGB = np.array([255, 207, 181]) / 255.
+    MediumRGB = np.array([238, 86, 52]) / 255.
+    LowRGB = np.array([99, 35, 21]) / 255.
     cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
     return colors.LinearSegmentedColormap('diff_cmap', cdict, 256)
 
@@ -115,9 +116,9 @@ def _get_coeff_cmap():
 
     Returns
     """
-    HighRGB = np.array([244, 109, 67]) / 255.
-    MediumRGB = np.array([255, 255, 191]) / 255.
-    LowRGB = np.array([0, 0, 0]) / 255.
+    HighRGB = np.array([205, 0, 29]) / 255.
+    MediumRGB = np.array([240, 240, 240]) / 255.
+    LowRGB = np.array([17, 55, 126]) / 255.
     cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
     return colors.LinearSegmentedColormap('coeff_cmap', cdict, 256)
 
