@@ -21,7 +21,7 @@ def test_n_components_with_reducer():
 
 
 def test_stress():
-    from pymks.datasets import make_elastic_stress_random
+    from pymks.datasets import make_elastic_FE_stress_random
     from pymks import MKSHomogenizationModel, DiscreteIndicatorBasis
     sample_size = 200
     grain_size = [(7, 7), (8, 3), (3, 9), (2, 2)]
@@ -30,22 +30,20 @@ def test_stress():
     poissons_ratio = (0.28, 0.3)
     macro_strain = 0.001
     size = (21, 21)
-    X, y = make_elastic_stress_random(n_samples=n_samples, size=size,
-                                      grain_size=grain_size,
-                                      elastic_modulus=elastic_modulus,
-                                      poissons_ratio=poissons_ratio,
-                                      macro_strain=macro_strain, seed=0)
+    X, y = make_elastic_FE_stress_random(n_samples=n_samples, size=size,
+                                         grain_size=grain_size,
+                                         elastic_modulus=elastic_modulus,
+                                         poissons_ratio=poissons_ratio,
+                                         macro_strain=macro_strain, seed=0)
     dbasis = DiscreteIndicatorBasis(n_states=2, domain=[0, 1])
     model = MKSHomogenizationModel(basis=dbasis, n_components=3, degree=3)
     model.fit(X, y)
     test_sample_size = 1
     n_samples = [test_sample_size] * len(grain_size)
-    X_new, y_new = make_elastic_stress_random(n_samples=n_samples,
-                                              size=size, grain_size=grain_size,
-                                              elastic_modulus=elastic_modulus,
-                                              poissons_ratio=poissons_ratio,
-                                              macro_strain=macro_strain,
-                                              seed=8)
+    X_new, y_new = make_elastic_FE_stress_random(
+        n_samples=n_samples, size=size, grain_size=grain_size,
+        elastic_modulus=elastic_modulus, poissons_ratio=poissons_ratio,
+        macro_strain=macro_strain, seed=8)
     y_result = model.predict(X_new)
     print np.round(y_result, decimals=2)
     print np.round(y_new, decimals=2)
