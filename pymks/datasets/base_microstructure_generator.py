@@ -1,7 +1,9 @@
 import numpy as np
+from ..filter import Filter
+from ..filter import _module_exists
 
 
-class BaseMicrostructureGenerator(object):
+class BaseMicrostructureGenerator(Filter):
     def __init__(self, n_samples=1, size=(21, 21),
                  n_phases=2, grain_size=None, seed=3):
         """
@@ -18,6 +20,9 @@ class BaseMicrostructureGenerator(object):
           n_samples number of a periodic random microstructure with size equal
           to size and with n_phases number of phases.
         """
+        self._pyfftw = _module_exists('pyfftw')
+        self._fftmodule = self._load_fftmodule()
+        self._axes = np.arange(len(size)) + 1
         self.n_samples = n_samples
         self.size = size
         self.n_phases = n_phases

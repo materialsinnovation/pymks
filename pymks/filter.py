@@ -1,15 +1,13 @@
 import numpy as np
 
 
-def _import_pyfftw():
+def _module_exists(module_name):
     try:
-        import pyfftw
-        np.fft = pyfftw.interfaces.numpy_fft
-        pyfftw.interfaces.cache.enable()
-    except:
-        pass
-
-_import_pyfftw()
+        __import__(module_name)
+    except ImportError:
+        return False
+    else:
+        return True
 
 
 class Filter(object):
@@ -25,8 +23,27 @@ class Filter(object):
         Args:
           Fkernel: an array representing a convolution kernel
         """
-        self.axes = np.arange(len(Fkernel.shape) - 2) + 1
-        self.Fkernel = Fkernel
+        self._pyfftw = self._module_exists('pyfftw')
+        self._fftmodule = self._load_fftmodule()
+        self._axes = np.arange(len(Fkernel.shape) - 2) + 1
+        self._Fkernel = Fkernel
+
+    def _module_exists(self, module_name):
+        try:
+            __import__(module_name)
+        except ImportError:
+            return False
+        else:
+            return True
+
+    def _load_fftmodule(self):
+        if _module_exists('pyfftw'):
+            import pyfftw.builders as fftmodule
+        elif _module_exists('numpy.fft'):
+            import numpy.fft as fftmodule
+        else:
+            raise RuntimeError('numpy or pyfftw cannot be imported')
+        return fftmodule
 
     def _frequency_2_real(self):
         """
@@ -36,9 +53,9 @@ class Filter(object):
         Returns:
           an array in real space
         """
-        return np.real_if_close(np.fft.fftshift(np.fft.ifftn(self.Fkernel,
-                                                             axes=self.axes),
-                                                axes=self.axes))
+        return np.real_if_close(np.fft.fftshift(np.fft.ifftn(self._Fkernel,
+                                                             axes=self._axes),
+                                                axes=self._axes))
 
     def _real_2_frequency(self, kernel):
         """
@@ -50,8 +67,8 @@ class Filter(object):
         Returns:
           an array in frequency space
         """
-        return np.fft.fftn(np.fft.ifftshift(kernel, axes=self.axes),
-                           axes=self.axes)
+        return np.fft.fftn(np.fft.ifftshift(kernel, axes=self._axes),
+                           axes=self._axes)
 
     def convolve(self, X):
         """
@@ -63,11 +80,11 @@ class Filter(object):
         Returns:
           convolution of X with the kernel
         """
-        if X.shape[1:] != self.Fkernel.shape[1:]:
+        if X.shape[1:] != self._Fkernel.shape[1:]:
             raise RuntimeError("Dimensions of X are incorrect.")
-        FX = np.fft.fftn(X, axes=self.axes)
-        Fy = self._sum(FX * self.Fkernel)
-        return np.fft.ifftn(Fy, axes=self.axes).real
+        FX = self._fftn(X, threads=3, avoid_copy=True)
+        Fy = self._sum(FX * self._Fkernel)
+        return self._ifftn(Fy).real
 
     def _sum(self, Fy):
         return np.sum(Fy, axis=-1)
@@ -79,9 +96,9 @@ class Filter(object):
         Args:
           size: tuple with the shape of the new kernel
         """
-        if len(size) != len(self.Fkernel.shape[1:-1]):
+        if len(size) != len(self._Fkernel.shape[1:-1]):
             raise RuntimeError("length of resize shape is incorrect.")
-        if not np.all(size >= self.Fkernel.shape[1:-1]):
+        if not np.all(size >= self._Fkernel.shape[1:-1]):
             raise RuntimeError("resize shape is too small.")
 
         kernel = self._frequency_2_real()
@@ -94,8 +111,27 @@ class Filter(object):
         pads = tuple([tuple(p) for p in padarray])
         kernel_pad = np.pad(kernel, pads, 'constant', constant_values=0)
         Fkernel_pad = self._real_2_frequency(kernel_pad)
+        self._Fkernel = Fkernel_pad
 
-        self.Fkernel = Fkernel_pad
+    def _fftn(self, X, s=None, threads=1, avoid_copy=False):
+        if self._pyfftw:
+            return self._fftmodule.fftn(X, axes=self._axes, s=s,
+                                        threads=threads,
+                                        planner_effort='FFTW_ESTIMATE',
+                                        overwrite_input=True,
+                                        avoid_copy=avoid_copy)()
+        else:
+            return self._fftmodule.fftn(X, axes=self._axes, s=s)
+
+    def _ifftn(self, X, s=None, threads=1, avoid_copy=False):
+        if self._pyfftw:
+            return self._fftmodule.ifftn(X, axes=self._axes, s=s,
+                                         threads=threads,
+                                         planner_effort='FFTW_ESTIMATE',
+                                         overwrite_input=True,
+                                         avoid_copy=avoid_copy)()
+        else:
+            return self._fftmodule.ifftn(X, axes=self._axes, s=s)
 
 
 class Correlation(Filter):
@@ -134,9 +170,11 @@ class Correlation(Filter):
     """
 
     def __init__(self, kernel, Fkernel_shape=None):
-        axes = np.arange(len(kernel.shape) - 2) + 1
-        Fkernel = np.conjugate(np.fft.fftn(kernel, axes=axes, s=Fkernel_shape))
-        super(Correlation, self).__init__(Fkernel)
+        self._axes = np.arange(len(kernel.shape) - 2) + 1
+        self._pyfftw = self._module_exists('pyfftw')
+        self._fftmodule = self._load_fftmodule()
+        Fkernel = self._fftn(kernel, threads=3, s=Fkernel_shape)
+        super(Correlation, self).__init__(np.conjugate(Fkernel))
 
     def convolve(self, X):
         """
@@ -148,13 +186,11 @@ class Correlation(Filter):
         Returns:
             correlation of X with the kernel
         """
-        Fkernel_shape = np.array(self.Fkernel.shape)[self.axes]
-        FX = np.fft.fftn(X, axes=self.axes, s=Fkernel_shape)
-        Fy = self._sum(FX * self.Fkernel)
-        correlation = np.real_if_close(
-            np.fft.ifftn(Fy, axes=self.axes))
-        return np.real_if_close(np.fft.fftshift(correlation, axes=self.axes),
-                                tol=1e7)
+        Fkernel_shape = np.array(self._Fkernel.shape)[self._axes]
+        FX = self._fftn(X, s=Fkernel_shape, threads=3)
+        Fy = self._sum(FX * self._Fkernel)
+        correlation = self._ifftn(Fy).real
+        return np.fft.fftshift(correlation, axes=self._axes)
 
     def _sum(self, Fy):
         return Fy

@@ -1,9 +1,7 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from .filter import Filter
-from .filter import _import_pyfftw
 from scipy.linalg import lstsq
-_import_pyfftw()
 
 
 class MKSLocalizationModel(LinearRegression):
@@ -97,10 +95,10 @@ class MKSLocalizationModel(LinearRegression):
         >>> prim_basis = PrimitiveBasis(2, [0, 1])
         >>> model = MKSLocalizationModel(basis=prim_basis)
         >>> model.fit(X, y)
-        >>> assert np.allclose(model._filter.Fkernel, [[[ 0.5,  0.5],
-        ...                                             [  -2,    0]],
-        ...                                            [[-0.5,  0  ],
-        ...                                             [  -1,  0  ]]])
+        >>> assert np.allclose(model._filter._Fkernel, [[[ 0.5,  0.5],
+        ...                                              [  -2,    0]],
+        ...                                             [[-0.5,  0  ],
+        ...                                              [  -1,  0  ]]])
         """
         self.basis = self.basis.__class__(self.n_states, self.domain)
         if size is not None:
@@ -162,7 +160,7 @@ class MKSLocalizationModel(LinearRegression):
         if not hasattr(self, '_filter'):
             raise AttributeError("fit() method must be run before predict().")
         y_pred_shape = X.shape
-        X = self._reshape_feature(X, self._filter.Fkernel.shape[1:-1])
+        X = self._reshape_feature(X, self._filter._Fkernel.shape[1:-1])
         X_ = self.basis.discretize(X)
         return self._filter.convolve(X_).reshape(y_pred_shape)
 
