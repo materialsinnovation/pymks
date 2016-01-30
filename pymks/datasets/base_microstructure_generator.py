@@ -1,9 +1,8 @@
 import numpy as np
-from ..filter import Filter
-from ..filter import _module_exists
+from ..bases.imag_ffts import _ImagFFTBasis
 
 
-class BaseMicrostructureGenerator(Filter):
+class _BaseMicrostructureGenerator(_ImagFFTBasis):
     def __init__(self, n_samples=1, size=(21, 21),
                  n_phases=2, grain_size=None, seed=3):
         """
@@ -20,8 +19,6 @@ class BaseMicrostructureGenerator(Filter):
           n_samples number of a periodic random microstructure with size equal
           to size and with n_phases number of phases.
         """
-        self._pyfftw = _module_exists('pyfftw')
-        self._fftmodule = self._load_fftmodule()
         self._axes = np.arange(len(size)) + 1
         self.n_samples = n_samples
         self.size = size
@@ -30,6 +27,7 @@ class BaseMicrostructureGenerator(Filter):
         if self.grain_size is None:
             self.grain_size = np.array(size) / 2
         np.random.seed(seed)
+        super(_BaseMicrostructureGenerator, self).__init__()
 
     def generate(self):
         raise NotImplementedError

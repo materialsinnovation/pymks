@@ -1,10 +1,10 @@
 import numpy as np
 from ..filter import Filter
 from scipy.ndimage.fourier import fourier_gaussian
-from .base_microstructure_generator import BaseMicrostructureGenerator
+from .base_microstructure_generator import _BaseMicrostructureGenerator
 
 
-class MicrostructureGenerator(BaseMicrostructureGenerator):
+class MicrostructureGenerator(_BaseMicrostructureGenerator):
     """
     Generates n_samples number of a periodic random microstructures
     with domain size equal to size and with n_phases number of
@@ -37,7 +37,7 @@ class MicrostructureGenerator(BaseMicrostructureGenerator):
         X = np.random.random((self.n_samples,) + self.size)
         gaussian = fourier_gaussian(np.ones(self.grain_size),
                                     np.ones(len(self.size)))
-        filter_ = Filter(self._fftn(gaussian[None, ..., None]))
+        filter_ = Filter(self._fftn(gaussian[None, ..., None]), self)
         filter_.resize(self.size)
         X_blur = filter_.convolve(X[..., None])
         return self._assign_phases(X_blur).astype(int)

@@ -1,7 +1,7 @@
 import numpy as np
-from sklearn.linear_model import LinearRegression
 from .filter import Filter
 from scipy.linalg import lstsq
+from sklearn.linear_model import LinearRegression
 
 
 class MKSLocalizationModel(LinearRegression):
@@ -109,15 +109,14 @@ class MKSLocalizationModel(LinearRegression):
         if y.shape != X.shape:
             raise RuntimeError("X and y must be the same shape.")
         X_ = self.basis.discretize(X)
-        axes = np.arange(X_.ndim)[1:-1]
-        FX = np.fft.fftn(X_, axes=axes)
-        Fy = np.fft.fftn(y, axes=axes)
+        FX = self.basis._fftn(X_)
+        Fy = self.basis._fftn(y)
         Fkernel = np.zeros(FX.shape[1:], dtype=np.complex)
         s0 = (slice(None),)
         for ijk in np.ndindex(X_.shape[1:-1]):
             s1 = self.basis._get_basis_slice(ijk, s0)
             Fkernel[ijk + s1] = lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk])[0]
-        self._filter = Filter(Fkernel[None])
+        self._filter = Filter(Fkernel[None], self.basis)
 
     @property
     def coeff(self):
@@ -179,18 +178,20 @@ class MKSLocalizationModel(LinearRegression):
         coefficients.
 
         >>> from pymks.bases import PrimitiveBasis
-        >>> prim_basis = PrimitiveBasis(n_states=2)
+        >>> prim_basis = PrimitiveBasis(n_states=1)
+        >>> prim_basis._axes = np.array([1, 2])
         >>> model = MKSLocalizationModel(prim_basis)
         >>> coeff = np.arange(20).reshape((5, 4, 1))
-        >>> coeff = np.concatenate((coeff , np.ones_like(coeff)), axis=2)
+        >>> coeff = np.concatenate((coeff, np.ones_like(coeff)), axis=2)
         >>> coeff = np.fft.ifftshift(coeff, axes=(0, 1))
-        >>> model._filter = Filter(np.fft.fftn(coeff, axes=(0, 1))[None])
+        >>> model._filter = Filter(np.fft.fftn(coeff,
+        ...                        axes=(0, 1))[None], prim_basis)
 
         The coefficients can be reshaped by passing the new shape that
         coefficients should have.
 
         >>> model.resize_coeff((10, 7))
-        >>> assert np.allclose(model.coeff[:,:,0],
+        >>> assert np.allclose(model.coeff[... ,0],
         ...                    [[0, 0, 0, 0, 0, 0, 0],
         ...                     [0, 0, 0, 0, 0, 0, 0],
         ...                     [0, 0, 0, 0, 0, 0, 0],

@@ -1,8 +1,8 @@
 import numpy as np
-from ..filter import Filter
+from ..bases.imag_ffts import _ImagFFTBasis
 
 
-class CahnHilliardSimulation(Filter):
+class CahnHilliardSimulation(_ImagFFTBasis):
     r"""
     Solve the `Cahn-Hilliard equation
     <https://en.wikipedia.org/wiki/Cahn-Hilliard_equation>`__ for
@@ -72,11 +72,10 @@ class CahnHilliardSimulation(Filter):
             gamma (float, optional): paramater in CH equation
 
         """
-        self._pyfftw = self._module_exists('pyfftw')
-        self._fftmodule = self._load_fftmodule()
         self.dx = dx
         self.dt = dt
         self.gamma = gamma
+        super(CahnHilliardSimulation, self).__init__()
 
     def run(self, X):
         r"""

@@ -1,8 +1,8 @@
 import numpy as np
-from .abstract import _AbstractMicrostructureBasis
+from .imag_ffts import _ImagFFTBasis
 
 
-class PrimitiveBasis(_AbstractMicrostructureBasis):
+class PrimitiveBasis(_ImagFFTBasis):
 
     r"""
     Discretize the microstructure function into `n_states` local states such
@@ -133,5 +133,6 @@ class PrimitiveBasis(_AbstractMicrostructureBasis):
             Float valued field of local states between 0 and 1.
         """
         self.check(X)
+        self._axes = np.arange(X.ndim - 1) + 1
         H = np.linspace(self.domain[0], self.domain[1], self.n_states)
         return np.maximum(1 - (abs(X[..., None] - H)) / (H[1] - H[0]), 0)

@@ -13,8 +13,7 @@ def test_nonperiodic_autocorrelation():
                    [0, 0, 0, 0],
                    [0, 0, 0, 0]]])
     basis = DiscreteIndicatorBasis(n_states=2)
-    X_ = basis.discretize(X)
-    X_auto = autocorrelate(X_)
+    X_auto = autocorrelate(X, basis)
 
     X_result = np.array([[[0,       0,       0,       0],
                           [1. / 8, 1. / 12, 3. / 16, 1. / 12],
@@ -37,8 +36,7 @@ def test_periodic_autocorrelation():
                    [0, 0, 0, 0],
                    [0, 0, 0, 0]]])
     basis = DiscreteIndicatorBasis(n_states=2)
-    X_ = basis.discretize(X)
-    X_auto = autocorrelate(X_, periodic_axes=(0, 1))
+    X_auto = autocorrelate(X, basis, periodic_axes=(0, 1))
 
     X_result = np.array([[[0,   0,    0,   0],
                           [0.1, 0.1, 0.15, 0.1],
@@ -61,8 +59,7 @@ def test_nonperiodic_crosscorrelation():
                    [0, 0, 0, 0],
                    [0, 0, 0, 0]]])
     basis = DiscreteIndicatorBasis(n_states=2)
-    X_ = basis.discretize(X)
-    X_cross = crosscorrelate(X_)
+    X_cross = crosscorrelate(X, basis)
 
     X_result = np.array([[[1 / 3., 4 / 9., 0.5,  4 / 9., ],
                           [1 / 8., 0.25, 3 / 16., 0.25],
@@ -84,8 +81,7 @@ def test_periodic_crosscorrelation():
                    [0, 0, 0, 0],
                    [0, 0, 0, 0]]])
     basis = DiscreteIndicatorBasis(n_states=2)
-    X_ = basis.discretize(X)
-    X_cross = crosscorrelate(X_, periodic_axes=(0, 1))
+    X_cross = crosscorrelate(X, basis, periodic_axes=(0, 1))
 
     X_result = np.array([[[0.3, 0.3, 0.3,  0.3],
                           [0.2, 0.2, 0.15, 0.2],
@@ -114,8 +110,7 @@ def test_nonperiodic_correlate():
                    [0, 0, 0, 0],
                    [0, 1, 0, 0]]])
     basis = DiscreteIndicatorBasis(n_states=2)
-    X_ = basis.discretize(X)
-    X_corr = correlate(X_)
+    X_corr = correlate(X, basis)
     X_result = [[2 / 3.,  4 / 9.,  0.75,  4 / 9.],
                 [5 / 8.,   0.5,  0.75,   0.5],
                 [0.6,  7 / 15.,   0.8,  7 / 15.],
@@ -142,8 +137,7 @@ def test_periodic_correlate():
                    [0, 0, 0, 0],
                    [0, 1, 0, 0]]])
     basis = DiscreteIndicatorBasis(n_states=2)
-    X_ = basis.discretize(X)
-    X_corr = correlate(X_, periodic_axes=(0, 1))
+    X_corr = correlate(X, basis, periodic_axes=(0, 1))
     X_result = [[0.6,  0.6,  0.75,  0.6],
                 [0.6,  0.6,  0.75,  0.6],
                 [0.6,  0.6,   0.8,  0.6],
@@ -162,10 +156,9 @@ def test_periodic_mask():
 
     X = make_checkerboard_microstructure(1, 3)
     basis = DiscreteIndicatorBasis(n_states=2)
-    X_ = basis.discretize(X)
     mask = np.ones((X.shape))
     mask[0, 0, 0] = 0
-    X_auto_periodic_mask = autocorrelate(X_, periodic_axes=[0, 1],
+    X_auto_periodic_mask = autocorrelate(X, basis, periodic_axes=[0, 1],
                                          confidence_index=mask)
     X_result_0 = np.array([[[1 / 7., 1 / 7., 3 / 7.],
                           [1 / 7., 0.5, 1 / 7.],
@@ -188,10 +181,9 @@ def test_nonperiodic_mask():
 
     X = make_checkerboard_microstructure(1, 3)
     basis = DiscreteIndicatorBasis(n_states=2)
-    X_ = basis.discretize(X)
     mask = np.ones((X.shape))
     mask[0, 0, 0] = 0
-    X_auto_nonperiodic_mask = autocorrelate(X_, confidence_index=mask)
+    X_auto_nonperiodic_mask = autocorrelate(X, basis, confidence_index=mask)
     X_result_0 = np.array([[[1 / 3., 0, 0.5],
                           [0, 0.5, 0.],
                           [0.5, 0, 1 / 3.]]])
@@ -210,10 +202,9 @@ def test_mixperdic_mask():
 
     X = make_checkerboard_microstructure(1, 3)
     basis = DiscreteIndicatorBasis(n_states=2)
-    X_ = basis.discretize(X)
     mask = np.ones((X.shape))
     mask[0, 0, 0] = 0
-    X_auto_mixperiodic_mask = autocorrelate(X_, periodic_axes=[0],
+    X_auto_mixperiodic_mask = autocorrelate(X, basis, periodic_axes=[0],
                                             confidence_index=mask)
     X_result_0 = np.array([[[1 / 5., 1 / 7., 2 / 5.],
                           [0, 0.5, 0],
@@ -234,10 +225,9 @@ def test_mask_two_samples():
     X = make_microstructure(n_samples=2, n_phases=2, size=(3, 3),
                             grain_size=(2, 2), seed=99)
     basis = DiscreteIndicatorBasis(n_states=2)
-    X_ = basis.discretize(X)
     mask = np.ones(X.shape)
     mask[:, 0, 0] = 0.
-    X_corr = correlate(X_, confidence_index=mask)
+    X_corr = correlate(X, basis, confidence_index=mask)
     X_result = np.array([[[[1 / 3., 1 / 3., 1 / 3.],
                            [1 / 5., 1 / 5., 1 / 5.],
                            [1 / 4., 1 / 4., 0]],
@@ -260,6 +250,18 @@ def test_mask_two_samples():
     print X_result
     assert np.allclose(X_corr, X_result)
 
+
+def test_normalization():
+    from pymks import PrimitiveBasis
+    from pymks.stats import _normalize
+    prim_basis = PrimitiveBasis()
+    Nx = Ny = 5
+    X_ = np.zeros((1, Nx, Ny, 1))
+    prim_basis._axes = np.arange(X_.ndim - 2) + 1
+    _Fkernel_shape = np.array((2 * Nx, Ny))
+    norm = _normalize(X_, prim_basis, _Fkernel_shape, None)
+    assert norm.shape == (1, Nx, Ny, 1)
+    assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
 
 if __name__ == '__main__':
     test_periodic_crosscorrelation()

@@ -185,6 +185,9 @@ class MKSHomogenizationModel(BaseEstimator):
 
         Example
 
+        Let's first start with using the microstructure and effective
+        properties.
+
         >>> from sklearn.decomposition import PCA
         >>> from sklearn.linear_model import LinearRegression
         >>> from pymks.bases import PrimitiveBasis
@@ -202,11 +205,12 @@ class MKSHomogenizationModel(BaseEstimator):
         >>> X = np.random.randint(2, size=(3, 15))
         >>> y = np.array([1, 2, 3])
         >>> model.fit(X, y)
-        >>> X_ = prim_basis.discretize(X)
-        >>> X_stats = correlate(X_)
-        >>> X_reshaped = X_stats.reshape((X_stats.shape[0], X_stats[0].size))
+        >>> X_stats = correlate(X, prim_basis)
+        >>> X_reshaped = X_stats.reshape((X_stats.shape[0], -1))
         >>> X_pca = reducer.fit_transform(X_reshaped - np.mean(X_reshaped,
         ...                               axis=1)[:, None])
+        >>> # print model.reduced_fit_data
+        >>> # print X_pca
         >>> assert np.allclose(model.reduced_fit_data, X_pca)
 
         Now let's use the same method with spatial correlations instead of
@@ -227,8 +231,7 @@ class MKSHomogenizationModel(BaseEstimator):
         >>> np.random.seed(99)
         >>> X = np.random.randint(2, size=(3, 15))
         >>> y = np.array([1, 2, 3])
-        >>> X_ = prim_basis.discretize(X)
-        >>> X_stats = correlate(X_, correlations=correlations)
+        >>> X_stats = correlate(X, prim_basis, correlations=correlations)
         >>> model.fit(X_stats, y)
         >>> X_reshaped = X_stats.reshape((X_stats.shape[0], X_stats[0].size))
         >>> X_pca = reducer.fit_transform(X_reshaped - np.mean(X_reshaped,
@@ -243,7 +246,7 @@ class MKSHomogenizationModel(BaseEstimator):
             if size is not None:
                 new_shape = (X.shape[0],) + size
                 X = X.reshape(new_shape)
-            X = self._correlate(X, periodic_axes, confidence_index)
+            X = self._correlate(X, self.basis, periodic_axes, confidence_index)
         X_reshape = self._reduce_shape(X)
         X_reduced = self.dimension_reducer.fit_transform(X_reshape,
                                                          reduce_labels)
@@ -272,7 +275,7 @@ class MKSHomogenizationModel(BaseEstimator):
         >>> from sklearn.manifold import LocallyLinearEmbedding
         >>> from sklearn.linear_model import BayesianRidge
         >>> from pymks.bases import PrimitiveBasis
-        >>> np.random.seed(99)
+        >>> np.random.seed(1)
         >>> X = np.random.randint(2, size=(50, 100))
         >>> y = np.random.random(50)
         >>> reducer = LocallyLinearEmbedding()
@@ -292,10 +295,12 @@ class MKSHomogenizationModel(BaseEstimator):
 
         >>> from pymks.stats import correlate
         >>> model.compute_correlations = False
-        >>> X_ = prim_basis.discretize(X_test)
-        >>> X_corr = correlate(X_, correlations=[(0, 0), (0, 1)])
-        >>> y_pred_stats = model.predict(X_corr)
-        >>> assert y_pred_stats == y_pred
+        >>> X_corr = correlate(X, prim_basis, correlations=[(0, 0)])
+        >>> model.fit(X_corr, y)
+        >>> X_corr_test = correlate(X_test, prim_basis,
+        ...                         correlations=[(0, 0)])
+        >>> y_pred_stats = model.predict(X_corr_test)
+        >>> assert np.allclose(y_pred_stats, y_pred, atol=1e-3)
 
         """
         if not self._fit:
@@ -303,13 +308,13 @@ class MKSHomogenizationModel(BaseEstimator):
         if self.compute_correlations is True:
             if periodic_axes is None:
                 periodic_axes = []
-            X = self._correlate(X, periodic_axes, confidence_index)
+            X = self._correlate(X, self.basis, periodic_axes, confidence_index)
         X_reshape = self._reduce_shape(X)
         X_reduced = self.dimension_reducer.transform(X_reshape)
         self.reduced_predict_data = X_reduced
         return self._linker.predict(X_reduced)
 
-    def _correlate(self, X, periodic_axes, confidence_index):
+    def _correlate(self, X, basis, periodic_axes, confidence_index):
         """
         Helper function used to calculated 2-point statistics from `X` and
         reshape them appropriately for fit and predict methods.
@@ -339,7 +344,7 @@ class MKSHomogenizationModel(BaseEstimator):
         >>> model = MKSHomogenizationModel(prim_basis, reducer, linker)
         >>> X = np.array([[0, 1],
         ...               [1, 0]])
-        >>> X_stats = model._correlate(X, [], None)
+        >>> X_stats = model._correlate(X, prim_basis, [], None)
         >>> X_test = np.array([[[ 0, 0],
         ...                     [0.5, 0]],
         ...                    [[0, 1,],
@@ -348,8 +353,7 @@ class MKSHomogenizationModel(BaseEstimator):
         """
         if self.basis is None:
             raise AttributeError('basis must be specified')
-        X_ = self.basis.discretize(X)
-        X_stats = correlate(X_, periodic_axes=periodic_axes,
+        X_stats = correlate(X, basis, periodic_axes=periodic_axes,
                             confidence_index=confidence_index,
                             correlations=self.correlations)
         return X_stats
@@ -381,7 +385,7 @@ class MKSHomogenizationModel(BaseEstimator):
         >>> model = MKSHomogenizationModel(prim_basis)
         >>> assert np.allclose(X_results, model._reduce_shape(X_stats))
         """
-        X_reshaped = X_stats.reshape((X_stats.shape[0], X_stats[0].size))
+        X_reshaped = X_stats.reshape((X_stats.shape[0], -1))
         return X_reshaped - np.mean(X_reshaped, axis=1)[:, None]
 
     def score(self, X, y, periodic_axes=None, confidence_index=None):
@@ -409,7 +413,8 @@ class MKSHomogenizationModel(BaseEstimator):
         if not callable(getattr(self._linker, "score", None)):
             raise RuntimeError(
                 "property_linker does not have score() method.")
-        X_corr = self._correlate(X, periodic_axes, confidence_index)
+        X_corr = self._correlate(X, self.basis, periodic_axes,
+                                 confidence_index)
         X_reshaped = self._reduce_shape(X_corr)
         X_reduced = self.dimension_reducer.transform(X_reshaped)
         return self._linker.score(X_reduced, y)
