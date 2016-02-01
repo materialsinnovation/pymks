@@ -7,7 +7,7 @@ class Filter(object):
     Wrapper class for convolution with a kernel and resizing of a kernel
     """
 
-    def __init__(self, Fkernel, basis):
+    def __init__(self, Fkernel, basis, Fkernel_shape=None):
         """
         Instantiate a Filter.
 
@@ -16,7 +16,6 @@ class Filter(object):
         """
         self.basis = basis
         self._Fkernel = Fkernel
-        self
 
     def _frequency_2_real(self):
         """
@@ -73,9 +72,22 @@ class Filter(object):
             raise RuntimeError("length of resize shape is incorrect.")
         if not np.all(size >= self._Fkernel.shape[1:-1]):
             raise RuntimeError("resize shape is too small.")
-
         kernel = self._frequency_2_real()
-        size = kernel.shape[:1] + size + kernel.shape[-1:]
+        kernel_pad = self._zero_pad_and_transform(kernel, size)
+        self._Fkernel = self._real_2_frequency(kernel_pad)
+
+    def _zero_pad_and_transform(self, kernel, size):
+        """
+        Zero pads a real space array with zeros and does a Fourier transform
+
+        Args:
+            kernel: real space array
+
+        Returns:
+            Fourier transform of a zero padded kernel
+
+        """
+        size = kernel.shape[:1] + tuple(size) + kernel.shape[-1:]
         padsize = np.array(size) - np.array(kernel.shape)
         paddown = padsize // 2
         padup = padsize - paddown
@@ -83,8 +95,7 @@ class Filter(object):
                                    paddown[..., None]), axis=1)
         pads = tuple([tuple(p) for p in padarray])
         kernel_pad = np.pad(kernel, pads, 'constant', constant_values=0)
-        Fkernel_pad = self._real_2_frequency(kernel_pad)
-        self._Fkernel = Fkernel_pad
+        return kernel_pad
 
 
 class Correlation(Filter):
@@ -124,8 +135,11 @@ class Correlation(Filter):
 
     def __init__(self, kernel, basis, Fkernel_shape=None):
         self.basis = basis
-        Fkernel = self.basis._fftn(kernel, threads=3, s=Fkernel_shape)
-        super(Correlation, self).__init__(np.conjugate(Fkernel), basis)
+        if Fkernel_shape is not None:
+            kernel = self._zero_pad_and_transform(kernel, Fkernel_shape)
+        Fkernel = self.basis._fftn(kernel, threads=3)
+        super(Correlation, self).__init__(np.conjugate(Fkernel), basis,
+                                          Fkernel_shape)
 
     def convolve(self, X):
         """
@@ -137,10 +151,11 @@ class Correlation(Filter):
         Returns:
             correlation of X with the kernel
         """
-        Fkernel_shape = np.array(self._Fkernel.shape)[self.basis._axes]
-        FX = self.basis._fftn(X, s=Fkernel_shape, threads=3)
+        if X.shape != self._Fkernel.shape:
+            X = self._zero_pad_and_transform(X, self._Fkernel.shape[1:-1])
+        FX = self.basis._fftn(X, threads=3)
         Fy = self._sum(FX * self._Fkernel)
-        correlation = self.basis._ifftn(Fy).real
+        correlation = self.basis._ifftn(Fy)
         return np.fft.fftshift(correlation, axes=self.basis._axes)
 
     def _sum(self, Fy):

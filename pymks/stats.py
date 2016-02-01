@@ -49,7 +49,7 @@ def autocorrelate(X, basis, periodic_axes=[], confidence_index=None,
         correlations = _auto_correlations(basis.n_states)
     X_ = basis.discretize(X)
     X_ = _mask_X_(X_, confidence_index)
-    s = _Fkernel_shape(X_, periodic_axes)
+    s = _Fkernel_shape(X_.shape, basis, periodic_axes)
     auto = _correlate(X_, basis, s, correlations)
     return auto / _normalize(X_, basis, s, confidence_index)
 
@@ -163,7 +163,7 @@ def crosscorrelate(X, basis, periodic_axes=None, confidence_index=None,
         correlations = _cross_correlations(basis.n_states)
     X_ = basis.discretize(X)
     X_ = _mask_X_(X_, confidence_index)
-    s = _Fkernel_shape(X_, periodic_axes)
+    s = _Fkernel_shape(X_.shape, basis, periodic_axes)
     cross = _correlate(X_, basis, s, correlations)
     return cross / _normalize(X_, basis, s, confidence_index)
 
@@ -213,7 +213,7 @@ def correlate(X, basis, periodic_axes=None,
         correlations = _auto_correlations(L) + _cross_correlations(L)
     X_ = basis.discretize(X)
     X_ = _mask_X_(X_, confidence_index)
-    s = _Fkernel_shape(X_, periodic_axes)
+    s = _Fkernel_shape(X_.shape, basis, periodic_axes)
     corr = _correlate(X_, basis, s, correlations)
     return corr / _normalize(X_, basis, s, confidence_index)
 
@@ -282,15 +282,16 @@ def _normalize(X_, basis, s, confidence_index):
         return _truncate(corr.convolve(mask[..., None]), X_.shape[:-1])
 
 
-def _Fkernel_shape(X_, periodic_axes):
+def _Fkernel_shape(X_shape, basis, periodic_axes):
     """
     Returns the shape of the kernel in Fourier space with non-periodic padding.
 
     Args:
-        `X_`: The discretized microstructure function, an
-            `(n_samples, n_x, ..., n_states)` shaped array
-            where `n_samples` is the number of samples, `n_x` is thes
-            patial discretization, and n_states is the number of local states.
+        `X_shape`: The shape of discretized microstructure function,
+            `(n_samples, n_x, ..., n_states)` where `n_samples` is the number
+            of samples, `n_x` is the spatial discretization, and n_states is
+            the number of local states.
+        basis (class): an instance of a bases class
         periodic_axes: the axes of the array that are periodic
 
     Returns:
@@ -301,13 +302,13 @@ def _Fkernel_shape(X_, periodic_axes):
     >>> Nx = Ny = 5
     >>> X_ = np.zeros((1, Nx, Ny, 1))
     >>> periodic_axes = [1]
-    >>> assert (_Fkernel_shape(X_,
+    >>> from pymks import PrimitiveBasis
+    >>> p_basis = PrimitiveBasis(2)
+    >>> p_basis._axes = np.array([1, 2])
+    >>> assert (_Fkernel_shape(X_.shape, p_basis,
     ...                        periodic_axes=periodic_axes) == [8, 5]).all()
     """
-    axes = np.arange(len(X_.shape) - 2) + 1
-    a = np.ones(len(axes), dtype=float) * 1.75
-    a[list(periodic_axes)] = 1
-    return (np.array(X_.shape)[axes] * a).astype(int)
+    return basis._pad_axes(X_shape, periodic_axes)
 
 
 def _truncate(a, shape):
