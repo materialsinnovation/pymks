@@ -562,7 +562,7 @@ def _draw_components_2D_time(X, labels, title, component_labels):
     ax4.set_ylabel('Component ' + str(component_labels[1]), fontsize=12)
 
     time = X[-1]
-    X = X[0:2]
+    X = X[:-1]
     X_array = np.concatenate(X)
 
     x_min, x_max = [np.min(X_array[:, 0]), np.max(X_array[:, 0])]
@@ -727,7 +727,7 @@ def _draw_stats(X_, correlations=None):
         ax.set_yticks(y_loc)
         ax.set_yticklabels(y_labels, fontsize=12)
         im = ax.imshow(np.swapaxes(img, 0, 1), cmap=X_cmap,
-                       interpolation='none', vmin=vmin, vmax=vmax)
+                       interpolation='none'))
         ax.set_title(r"Correlation $l = {0}$, $l' = {1}$".format(label[0],
                                                                  label[1]),
                      fontsize=15)
@@ -854,3 +854,6 @@ def draw_learning_curves(estimator, X, y, ylim=None, cv=None, n_jobs=1,
 
     plt.legend(loc="best")
     plt.show()
+
+
+plt.rcParams.update(mpl.rcParamsDefault)
