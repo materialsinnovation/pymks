@@ -71,7 +71,7 @@ def test_nonperiodic_crosscorrelation():
 
 def test_periodic_crosscorrelation():
     '''
-    test nonperiodic crosscorrelation
+    test periodic crosscorrelation
     '''
     from pymks import DiscreteIndicatorBasis
     from pymks.stats import crosscorrelate
@@ -121,7 +121,7 @@ def test_nonperiodic_correlate():
 
 def test_periodic_correlate():
     '''
-    test corrleate for non-periodic microstructures
+    test corrleate for periodic microstructures
     '''
     from pymks import DiscreteIndicatorBasis
     from pymks.stats import correlate
@@ -246,8 +246,6 @@ def test_mask_two_samples():
                           [[0., 0., 1 / 2.],
                            [2 / 5., 3 / 5., 0.],
                            [0., 0., 2 / 3.]]]])
-    print np.round(X_corr, decimals=4)
-    print X_result
     assert np.allclose(X_corr, X_result)
 
 
