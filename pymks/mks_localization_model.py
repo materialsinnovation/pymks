@@ -113,10 +113,11 @@ class MKSLocalizationModel(LinearRegression):
         Fy = self.basis._fftn(y)
         Fkernel = np.zeros(FX.shape[1:], dtype=np.complex)
         s0 = (slice(None),)
-        for ijk in np.ndindex(X_.shape[1:-1]):
+        for ijk in np.ndindex(FX.shape[1:-1]):
             s1 = self.basis._get_basis_slice(ijk, s0)
             Fkernel[ijk + s1] = lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk])[0]
-        self._filter = Filter(Fkernel[None], self.basis)
+        self._filter = Filter(Fkernel[None], self.basis,
+                              Fkernel_shape=y[1:].shape)
 
     @property
     def coeff(self):
@@ -184,8 +185,9 @@ class MKSLocalizationModel(LinearRegression):
         >>> coeff = np.arange(20).reshape((5, 4, 1))
         >>> coeff = np.concatenate((coeff, np.ones_like(coeff)), axis=2)
         >>> coeff = np.fft.ifftshift(coeff, axes=(0, 1))
-        >>> model._filter = Filter(np.fft.fftn(coeff,
-        ...                        axes=(0, 1))[None], prim_basis)
+        >>> model._filter = Filter(np.fft.fftn(coeff, axes=(0, 1))[None],
+        ...                        prim_basis,
+        ...                        Fkernel_shape=coeff[..., 0][None].shape)
 
         The coefficients can be reshaped by passing the new shape that
         coefficients should have.
@@ -255,5 +257,7 @@ class MKSLocalizationModel(LinearRegression):
         Returns:
             microstructure with shape (n_samples, size)
         """
+        if X.shape[-1] // 2 + 1 == size[-1] and X.ndim - 1 == len(size):
+            size = X.shape[1:]
         new_shape = (X.shape[0],) + size
         return X.reshape(new_shape)

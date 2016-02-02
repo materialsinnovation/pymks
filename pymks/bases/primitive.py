@@ -1,8 +1,8 @@
 import numpy as np
-from .imag_ffts import _ImagFFTBasis
+from .real_ffts import _RealFFTBasis
 
 
-class PrimitiveBasis(_ImagFFTBasis):
+class PrimitiveBasis(_RealFFTBasis):
 
     r"""
     Discretize the microstructure function into `n_states` local states such

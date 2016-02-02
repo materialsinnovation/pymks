@@ -6,7 +6,7 @@ class _RealFFTBasis(_AbstractMicrostructureBasis):
     def __init__(self, *args, **kwargs):
         super(_RealFFTBasis, self).__init__(*args, **kwargs)
 
-    def _fftn(self, X, threads=1, avoid_copy=False):
+    def _fftn(self, X, threads=1, avoid_copy=True):
         if self._pyfftw:
             return self._fftmodule.rfftn(np.ascontiguousarray(X),
                                          axes=self._axes,
@@ -17,18 +17,15 @@ class _RealFFTBasis(_AbstractMicrostructureBasis):
         else:
             return self._fftmodule.rfftn(X, axes=self._axes)
 
-    def _ifftn(self, X, s=None, threads=1, avoid_copy=False):
+    def _ifftn(self, X, s=None, threads=1, avoid_copy=True):
         if self._pyfftw:
-            return self._fftmodule.irfftn(np.ascontiguousarray(X),
+            return self._fftmodule.irfftn(np.ascontiguousarray(X), s=s,
                                           axes=self._axes,
                                           threads=threads,
                                           planner_effort='FFTW_ESTIMATE',
-                                          avoid_copy=avoid_copy)()
+                                          avoid_copy=avoid_copy)().real
         else:
             return self._fftmodule.irfftn(X, axes=self._axes).real
 
     def discretize(self, X):
         raise NotImplementedError
-
-    def _pad_axes(self, X_shape, periodic_axes):
-        return X_shape

@@ -96,3 +96,6 @@ def test_multiphase_FE_strain():
 
     assert np.allclose(strain_pred[0, i:-i], strain[0, i:-i],
                        rtol=1e-2, atol=6.1e-3)
+
+if __name__ == '__main__':
+    test_resize_coeff()

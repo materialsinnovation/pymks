@@ -272,7 +272,7 @@ def _normalize(X_, basis, s, confidence_index):
 
     """
 
-    if (s == X_.shape[1:-1]).all() and confidence_index is None:
+    if s == X_.shape[1:-1] and confidence_index is None:
         return float(np.prod(X_.shape[1:-1]))
     else:
         mask = confidence_index
@@ -306,9 +306,11 @@ def _Fkernel_shape(X_shape, basis, periodic_axes):
     >>> p_basis = PrimitiveBasis(2)
     >>> p_basis._axes = np.array([1, 2])
     >>> assert (_Fkernel_shape(X_.shape, p_basis,
-    ...                        periodic_axes=periodic_axes) == [8, 5]).all()
+    ...                        periodic_axes=periodic_axes) == (10, 5))
     """
-    return basis._pad_axes(X_shape, periodic_axes)
+    a = np.ones(len(basis._axes), dtype=float) * 2
+    a[list(periodic_axes)] = 1
+    return tuple((np.array(X_shape)[basis._axes] * a).astype(int))
 
 
 def _truncate(a, shape):

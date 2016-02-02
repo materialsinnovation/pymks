@@ -168,7 +168,7 @@ def test_periodic_mask():
                           [2 / 7., 1 / 7., 2 / 7.]]])
     X_result = np.concatenate((X_result_0[..., None],
                                X_result_1[..., None]), axis=-1)
-    assert np.allclose(X_auto_periodic_mask, np.concatenate(X_result))
+    assert np.allclose(X_auto_periodic_mask, X_result)
 
 
 def test_nonperiodic_mask():
@@ -249,20 +249,34 @@ def test_mask_two_samples():
     assert np.allclose(X_corr, X_result)
 
 
-def test_normalization():
+def test_normalization_rfftn():
+    """Test normalization with rfftn
+    """
     from pymks import PrimitiveBasis
     from pymks.stats import _normalize
     prim_basis = PrimitiveBasis()
     Nx = Ny = 5
     X_ = np.zeros((1, Nx, Ny, 1))
     prim_basis._axes = np.arange(X_.ndim - 2) + 1
-    _Fkernel_shape = np.array((2 * Nx, Ny))
+    _Fkernel_shape = (2 * Nx, Ny)
     norm = _normalize(X_, prim_basis, _Fkernel_shape, None)
     assert norm.shape == (1, Nx, Ny, 1)
     assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
 
+
+def test_normalization_fftn():
+    """Test normalization with fftn
+    """
+    from pymks import LegendreBasis
+    from pymks.stats import _normalize
+    l_basis = LegendreBasis()
+    Nx = Ny = 5
+    X_ = np.zeros((1, Nx, Ny, 1))
+    l_basis._axes = np.arange(X_.ndim - 2) + 1
+    _Fkernel_shape = (2 * Nx, Ny)
+    norm = _normalize(X_, l_basis, _Fkernel_shape, None)
+    assert norm.shape == (1, Nx, Ny, 1)
+    assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
+
 if __name__ == '__main__':
-    test_periodic_crosscorrelation()
-    test_nonperiodic_crosscorrelation()
-    test_periodic_autocorrelation()
-    test_nonperiodic_autocorrelation()
+    test_normalization_rfftn()

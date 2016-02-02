@@ -16,6 +16,7 @@ class Filter(object):
         """
         self.basis = basis
         self._Fkernel = Fkernel
+        self._kernel_shape = Fkernel_shape
 
     def _frequency_2_real(self):
         """
@@ -25,9 +26,9 @@ class Filter(object):
         Returns:
           an array in real space
         """
-        return np.real_if_close(
-                np.fft.fftshift(self.basis._ifftn(self._Fkernel),
-                                axes=self.basis._axes))
+        return np.fft.fftshift(self.basis._ifftn(self._Fkernel,
+                               s=self._kernel_shape[1:]),
+                               axes=self.basis._axes)
 
     def _real_2_frequency(self, kernel):
         """
@@ -52,11 +53,11 @@ class Filter(object):
         Returns:
           convolution of X with the kernel
         """
-        if X.shape[1:] != self._Fkernel.shape[1:]:
-            raise RuntimeError("Dimensions of X are incorrect.")
         FX = self.basis._fftn(X, threads=3, avoid_copy=True)
+        if FX.shape[1:] != self._Fkernel.shape[1:]:
+            raise RuntimeError("Dimensions of X are incorrect.")
         Fy = self._sum(FX * self._Fkernel)
-        return self.basis._ifftn(Fy).real
+        return self.basis._ifftn(Fy, s=X.shape[1:-1])
 
     def _sum(self, Fy):
         return np.sum(Fy, axis=-1)
@@ -73,10 +74,11 @@ class Filter(object):
         if not np.all(size >= self._Fkernel.shape[1:-1]):
             raise RuntimeError("resize shape is too small.")
         kernel = self._frequency_2_real()
-        kernel_pad = self._zero_pad_and_transform(kernel, size)
+        kernel_pad = self._zero_pad(kernel, size)
         self._Fkernel = self._real_2_frequency(kernel_pad)
+        self._kernel_shape = kernel_pad.shape[:-1]
 
-    def _zero_pad_and_transform(self, kernel, size):
+    def _zero_pad(self, kernel, size):
         """
         Zero pads a real space array with zeros and does a Fourier transform
 
@@ -87,7 +89,8 @@ class Filter(object):
             Fourier transform of a zero padded kernel
 
         """
-        size = kernel.shape[:1] + tuple(size) + kernel.shape[-1:]
+        if len(size) != kernel.ndim:
+            size = kernel.shape[:1] + tuple(size) + kernel.shape[-1:]
         padsize = np.array(size) - np.array(kernel.shape)
         paddown = padsize // 2
         padup = padsize - paddown
@@ -136,8 +139,10 @@ class Correlation(Filter):
     def __init__(self, kernel, basis, Fkernel_shape=None):
         self.basis = basis
         if Fkernel_shape is not None:
-            kernel = self._zero_pad_and_transform(kernel, Fkernel_shape)
+            if Fkernel_shape > kernel.shape[1:-1]:
+                kernel = self._zero_pad(kernel, Fkernel_shape)
         Fkernel = self.basis._fftn(kernel, threads=3)
+        self._Fkernel_shape = Fkernel_shape
         super(Correlation, self).__init__(np.conjugate(Fkernel), basis,
                                           Fkernel_shape)
 
@@ -151,11 +156,11 @@ class Correlation(Filter):
         Returns:
             correlation of X with the kernel
         """
-        if X.shape != self._Fkernel.shape:
-            X = self._zero_pad_and_transform(X, self._Fkernel.shape[1:-1])
+        if X.shape[1:-1] < self._Fkernel_shape:
+            X = self._zero_pad(X, self._Fkernel_shape)
         FX = self.basis._fftn(X, threads=3)
         Fy = self._sum(FX * self._Fkernel)
-        correlation = self.basis._ifftn(Fy)
+        correlation = self.basis._ifftn(Fy, s=X.shape[1:-1])
         return np.fft.fftshift(correlation, axes=self.basis._axes)
 
     def _sum(self, Fy):
