@@ -16,7 +16,7 @@ class MKSStructureAnalysis(BaseEstimator):
         dimension_reducer: Instance of a dimensionality reduction class.
         correlations: spatial correlations to be computed
         basis: instance of a basis class
-        fit_data: Low dimensionality representation of spatial
+        reduced_fit_data: Low dimensionality representation of spatial
             correlations used to fit the components.
         transformed_data: Reduced of spatial correlations.
 
@@ -220,8 +220,8 @@ class MKSStructureAnalysis(BaseEstimator):
         if self.store_correlations:
             self.fit_correlations = X
         X_reshaped = self._reduce_shape(X)
-        self.fit_data = self.dimension_reducer.fit_transform(X_reshaped, y)
-        return self.fit_data
+        self.reduced_fit_data = self.dimension_reducer.fit_transform(X_reshaped, y)
+        return self.reduced_fit_data
 
     def _store_correlations(self, X):
         """store stats"""

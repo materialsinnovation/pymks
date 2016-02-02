@@ -444,9 +444,8 @@ def draw_component_variance(variance):
     plt.show()
 
 
-def draw_components(datasets, labels, title=None, component_labels=None,
-                    view_angles=None, legend_outside=False, fig_size=None,
-                    time=None):
+def draw_components_scatter(datasets, labels, title=None, component_labels=None,
+                            view_angles=None, legend_outside=False, fig_size=None):
     """
     Visualize low dimensional representations of microstructures.
 
@@ -469,18 +468,14 @@ def draw_components(datasets, labels, title=None, component_labels=None,
     n_components = np.array(datasets[0][-1].shape)
     if component_labels is None:
         component_labels = range(1, n_components + 1)
-        if (time is True):
-            component_labels = range(1, 4)
     if len(datasets) != len(labels):
         raise RuntimeError('datasets and labels must have the same length')
-    if n_components != len(component_labels) and (time is None):
+    if n_components != len(component_labels):
         raise RuntimeError('number of components and component_labels must'
                            ' have the same length')
-    if n_components[-1] == 2 and (time is None):
+    if n_components[-1] == 2:
         _draw_components_2D(datasets, labels, title, component_labels[:2],
                             legend_outside, fig_size)
-    elif n_components[-1] == 2 and (time is True):
-        _draw_components_2D_time(datasets, labels, title, component_labels)
     elif n_components[-1] == 3:
         _draw_components_3D(datasets, labels, title, component_labels,
                             view_angles, legend_outside, fig_size)
@@ -516,13 +511,6 @@ def _draw_components_2D(X, labels, title, component_labels,
     for label, pts, color in zip(labels, X, color_list):
         ax.plot(pts[:, 0], pts[:, 1], 'o', color=color, label=label)
         data_labels = ['{0}'.format(i) for i in range(len(pts))]
-        counter = 0
-        for data_label, x, y in zip(data_labels, pts[:, 0], pts[:, 1]):
-            if counter % 10 == 0:
-                plt.annotate(data_label, xy=(x, y),
-                             bbox=dict(boxstyle='round,pad=0.9',
-                                       fc='white', alpha=0.5))
-            counter+=1
         lg = plt.legend(loc=1, borderaxespad=0., fontsize=15)
     if legend_outside is not None:
         lg = plt.legend(bbox_to_anchor=(1.05, 1.0), loc=2,
@@ -727,7 +715,7 @@ def _draw_stats(X_, correlations=None):
         ax.set_yticks(y_loc)
         ax.set_yticklabels(y_labels, fontsize=12)
         im = ax.imshow(np.swapaxes(img, 0, 1), cmap=X_cmap,
-                       interpolation='none'))
+                       interpolation='none')
         ax.set_title(r"Correlation $l = {0}$, $l' = {1}$".format(label[0],
                                                                  label[1]),
                      fontsize=15)
@@ -855,5 +843,3 @@ def draw_learning_curves(estimator, X, y, ylim=None, cv=None, n_jobs=1,
     plt.legend(loc="best")
     plt.show()
 
-
-plt.rcParams.update(mpl.rcParamsDefault)
