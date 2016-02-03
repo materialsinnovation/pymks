@@ -18,7 +18,7 @@ class Filter(object):
         self._Fkernel = Fkernel
         self._kernel_shape = Fkernel_shape
 
-    def _frequency_2_real(self):
+    def _frequency_2_real(self, copy=False):
         """
         Converts the kernel from frequency space to real space with
         the origin shifted to the center.
@@ -26,7 +26,10 @@ class Filter(object):
         Returns:
           an array in real space
         """
-        return np.fft.fftshift(self.basis._ifftn(self._Fkernel,
+        Fkernel = self._Fkernel
+        if copy:
+            Fkernel = self._Fkernel.copy()
+        return np.fft.fftshift(self.basis._ifftn(Fkernel,
                                s=self._kernel_shape[1:]),
                                axes=self.basis._axes)
 
