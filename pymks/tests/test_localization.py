@@ -97,5 +97,28 @@ def test_multiphase_FE_strain():
     assert np.allclose(strain_pred[0, i:-i], strain[0, i:-i],
                        rtol=1e-2, atol=6.1e-3)
 
+
+def test_coeff_stablity_with_irfftn():
+    from pymks import MKSRegressionModel
+    from pymks.bases import DiscreteIndicatorBasis
+
+    nx, ny = 21, 21
+    resize = 3
+    X_delta, y_delta = get_delta_data(nx, ny)
+    X_test, y_test = get_random_data(nx, ny)
+    X_big_test, y_big_test = get_random_data(resize * nx, resize * ny)
+    basis = DiscreteIndicatorBasis(n_states=2)
+
+    model = MKSRegressionModel(basis)
+    model.fit(X_delta, y_delta)
+    y_pred = model.predict(X_test)
+    assert np.allclose(y_pred, y_test, rtol=1e-2, atol=6.1e-3)
+    model.resize_coeff((resize * nx, resize * ny))
+    for i in range(4):
+        model.coeff
+    y_big_pred = model.predict(X_big_test)
+    assert np.allclose(y_big_pred, y_big_test, rtol=1e-2, atol=6.1e-2)
+
+
 if __name__ == '__main__':
     test_resize_coeff()

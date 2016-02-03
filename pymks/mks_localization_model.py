@@ -124,7 +124,7 @@ class MKSLocalizationModel(LinearRegression):
         """Returns the coefficients in real space with origin shifted to the
         center.
         """
-        return self._filter._frequency_2_real()[0]
+        return self._filter._frequency_2_real(copy=True)[0]
 
     def predict(self, X):
         """Predicts a new response from the microstructure function `X` with
@@ -185,9 +185,9 @@ class MKSLocalizationModel(LinearRegression):
         >>> coeff = np.arange(20).reshape((5, 4, 1))
         >>> coeff = np.concatenate((coeff, np.ones_like(coeff)), axis=2)
         >>> coeff = np.fft.ifftshift(coeff, axes=(0, 1))
-        >>> model._filter = Filter(np.fft.fftn(coeff, axes=(0, 1))[None],
+        >>> model._filter = Filter(np.fft.rfftn(coeff, axes=(0, 1))[None],
         ...                        prim_basis,
-        ...                        Fkernel_shape=coeff[..., 0][None].shape)
+        ...                        Fkernel_shape=coeff[None, ..., 0].shape)
 
         The coefficients can be reshaped by passing the new shape that
         coefficients should have.
