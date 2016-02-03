@@ -123,7 +123,7 @@ class MKSLocalizationModel(LinearRegression):
             s1 = self.basis._get_basis_slice(ijk, s0)
             Fkernel[ijk + s1] = lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk])[0]
         self._filter = Filter(Fkernel[None], self.basis,
-                              Fkernel_shape=y[1:].shape, n_jobs=self.n_jobs)
+                              y[1:].shape, n_jobs=self.n_jobs)
 
     @property
     def coeff(self):
@@ -192,8 +192,7 @@ class MKSLocalizationModel(LinearRegression):
         >>> coeff = np.concatenate((coeff, np.ones_like(coeff)), axis=2)
         >>> coeff = np.fft.ifftshift(coeff, axes=(0, 1))
         >>> model._filter = Filter(np.fft.rfftn(coeff, axes=(0, 1))[None],
-        ...                        prim_basis,
-        ...                        Fkernel_shape=coeff[None, ..., 0].shape)
+        ...                        prim_basis, coeff[None, ..., 0].shape)
 
         The coefficients can be reshaped by passing the new shape that
         coefficients should have.

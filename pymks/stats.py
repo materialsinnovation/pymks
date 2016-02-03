@@ -19,6 +19,7 @@ def autocorrelate(X, basis, periodic_axes=[], n_jobs=1, confidence_index=None,
         basis (class): an instance of a bases class
         periodic_axes (list, optional): axes that are periodic. (0, 2) would
             indicate that axes x and z are periodic in a 3D microstrucure.
+        n_jobs (int, optional): number of parallel jobs to run
         confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
         autocorrelations (list, optional): list of spatial autocorrelatiions to
@@ -110,6 +111,7 @@ def crosscorrelate(X, basis, periodic_axes=None, n_jobs=1,
         basis (class): an instance of a bases class
         periodic_axes (list, optional): axes that are periodic. (0, 2) would
             indicate that axes x and z are periodic in a 3D microstrucure.
+        n_jobs (int, optional): number of parallel jobs to run
         confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
         crosscorrelations (list, optional): list of cross-correlatiions to
@@ -181,6 +183,7 @@ def correlate(X, basis, periodic_axes=None, n_jobs=1,
         basis (class): an instance of a bases class
         periodic_axes (list, optional): axes that are periodic. (0, 2) would
             indicate that axes x and z are periodic in a 3D microstrucure.
+        n_jobs (int, optional): number of parallel jobs to run
         confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
         correlations (list, optional): list of  spatial correlatiions to
@@ -266,6 +269,7 @@ def _normalize(X_, basis, s, confidence_index, n_jobs):
         _Fkernel_shape : the shape of the kernel is Fourier space (array)
         confidence_index: array with same shape as X used to assign a
             confidence value for each data point.
+        n_jobs: number of parallel jobs to run
 
     Returns:
         Normalization
@@ -291,7 +295,7 @@ def _Fkernel_shape(X_shape, basis, periodic_axes):
             `(n_samples, n_x, ..., n_states)` where `n_samples` is the number
             of samples, `n_x` is the spatial discretization, and n_states is
             the number of local states.
-        basis (class): an instance of a bases class
+        basis: an instance of a bases class
         periodic_axes: the axes of the array that are periodic
 
     Returns:

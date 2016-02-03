@@ -2,21 +2,26 @@ import numpy as np
 
 
 class Filter(object):
-
     """
     Wrapper class for convolution with a kernel and resizing of a kernel
     """
 
-    def __init__(self, Fkernel, basis, Fkernel_shape, n_jobs=1):
+    def __init__(self, Fkernel, basis, axes_shape, n_jobs=1):
         """
         Instantiate a Filter.
 
         Args:
-          Fkernel: an array representing a convolution kernel
+            _Fkernel: an array representing a convolution kernel
+            basis: an instance of a bases class.
+            axes_shape: The shape of the axes for which the FFTs are computed.
+                This is used to get the correct shape when using irfftn.
+            n_jobs: number of parallel jobs to run
+
+
         """
         self.basis = basis
         self._Fkernel = Fkernel
-        self._kernel_shape = Fkernel_shape
+        self._axes_shape = axes_shape
         self._n_jobs = n_jobs
 
     def _frequency_2_real(self, copy=False):
@@ -31,7 +36,7 @@ class Filter(object):
         if copy:
             Fkernel = self._Fkernel.copy()
         return np.fft.fftshift(self.basis._ifftn(Fkernel,
-                                                 s=self._kernel_shape[1:],
+                                                 s=self._axes_shape[1:],
                                                  n_jobs=self._n_jobs),
                                axes=self.basis._axes)
 
@@ -81,7 +86,7 @@ class Filter(object):
         kernel = self._frequency_2_real()
         kernel_pad = self._zero_pad(kernel, size)
         self._Fkernel = self._real_2_frequency(kernel_pad)
-        self._kernel_shape = kernel_pad.shape[:-1]
+        self._axes_shape = kernel_pad.shape[:-1]
 
     def _zero_pad(self, kernel, size):
         """
@@ -141,15 +146,25 @@ class Correlation(Filter):
         Autocorrelations for microstructure X_
     """
 
-    def __init__(self, kernel, basis, Fkernel_shape, n_jobs=1):
+    def __init__(self, kernel, basis, axes_shape, n_jobs=1):
+        """
+        Instantiate a Correlation.
+
+        Args:
+            kernel: an array representing a convolution kernel
+            basis: an instance of a bases class.
+            axes_shape: The shape of the axes for which the FFTs are computed.
+                This is used to get the correct shape when using irfftn.
+            n_jobs: number of parallel jobs to run
+
+        """
         self.basis = basis
-        if Fkernel_shape is not None:
-            if Fkernel_shape > kernel.shape[1:-1]:
-                kernel = self._zero_pad(kernel, Fkernel_shape)
+        if axes_shape is not None:
+            if axes_shape > kernel.shape[1:-1]:
+                kernel = self._zero_pad(kernel, axes_shape)
         Fkernel = self.basis._fftn(kernel, n_jobs=n_jobs)
-        self._Fkernel_shape = Fkernel_shape
         super(Correlation, self).__init__(np.conjugate(Fkernel), basis,
-                                          Fkernel_shape, n_jobs=n_jobs)
+                                          axes_shape, n_jobs=n_jobs)
 
     def convolve(self, X):
         """
@@ -161,8 +176,8 @@ class Correlation(Filter):
         Returns:
             correlation of X with the kernel
         """
-        if X.shape[1:-1] < self._Fkernel_shape:
-            X = self._zero_pad(X, self._Fkernel_shape)
+        if X.shape[1:-1] < self._axes_shape:
+            X = self._zero_pad(X, self._axes_shape)
         FX = self.basis._fftn(X, n_jobs=self._n_jobs)
         Fy = self._sum(FX * self._Fkernel)
         correlation = self.basis._ifftn(Fy, s=X.shape[1:-1])
