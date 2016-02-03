@@ -16,6 +16,10 @@ class MKSLocalizationModel(LinearRegression):
         n_states: Interger value for number of local states, if a basis
             is specified, n_states indicates the order of the polynomial.
         coef: Array of values that are the influence coefficients.
+        n_jobs: number of parallel jobs to run
+
+
+
 
     >>> n_states = 2
     >>> n_spaces = 81
@@ -59,13 +63,14 @@ class MKSLocalizationModel(LinearRegression):
     >>> assert np.allclose(np.fft.fftshift(coeff, axes=(0,)), model.coeff)
     """
 
-    def __init__(self, basis, n_states=None):
+    def __init__(self, basis, n_states=None, n_jobs=1):
         """
         Instantiate a MKSLocalizationModel.
 
         Args:
             basis (class): an instance of a bases class.
             n_states (int, optional): number of local states
+            n_jobs (int, optional): number of parallel jobs to run
 
         """
         self.basis = basis
@@ -73,6 +78,7 @@ class MKSLocalizationModel(LinearRegression):
         if n_states is None:
             self.n_states = basis.n_states
         self.domain = basis.domain
+        self.n_jobs = n_jobs
 
     def fit(self, X, y, size=None):
         """
@@ -109,15 +115,15 @@ class MKSLocalizationModel(LinearRegression):
         if y.shape != X.shape:
             raise RuntimeError("X and y must be the same shape.")
         X_ = self.basis.discretize(X)
-        FX = self.basis._fftn(X_)
-        Fy = self.basis._fftn(y)
+        FX = self.basis._fftn(X_, n_jobs=self.n_jobs)
+        Fy = self.basis._fftn(y, n_jobs=self.n_jobs)
         Fkernel = np.zeros(FX.shape[1:], dtype=np.complex)
         s0 = (slice(None),)
         for ijk in np.ndindex(FX.shape[1:-1]):
             s1 = self.basis._get_basis_slice(ijk, s0)
             Fkernel[ijk + s1] = lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk])[0]
         self._filter = Filter(Fkernel[None], self.basis,
-                              Fkernel_shape=y[1:].shape)
+                              Fkernel_shape=y[1:].shape, n_jobs=self.n_jobs)
 
     @property
     def coeff(self):

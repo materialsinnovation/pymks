@@ -7,7 +7,7 @@ point statistics.
 """
 
 
-def autocorrelate(X, basis, periodic_axes=[], confidence_index=None,
+def autocorrelate(X, basis, periodic_axes=[], n_jobs=1, confidence_index=None,
                   autocorrelations=None):
     """
     Computes the autocorrelation from a microstructure function.
@@ -50,11 +50,11 @@ def autocorrelate(X, basis, periodic_axes=[], confidence_index=None,
     X_ = basis.discretize(X)
     X_ = _mask_X_(X_, confidence_index)
     s = _Fkernel_shape(X_.shape, basis, periodic_axes)
-    auto = _correlate(X_, basis, s, correlations)
-    return auto / _normalize(X_, basis, s, confidence_index)
+    auto = _correlate(X_, basis, s, correlations, n_jobs)
+    return auto / _normalize(X_, basis, s, confidence_index, n_jobs)
 
 
-def _correlate(X_, basis, s, correlations):
+def _correlate(X_, basis, s, correlations, n_jobs=1):
     """
     Helper function used to calculate the unnormalized correlation counts.
 
@@ -94,12 +94,12 @@ def _correlate(X_, basis, s, correlations):
 
     l_0, l_1 = [l[0] for l in correlations], [l[1] for l in correlations]
     corr = Correlation(X_[..., l_0], basis,
-                       Fkernel_shape=s).convolve(X_[..., l_1])
+                       s, n_jobs=n_jobs).convolve(X_[..., l_1])
     return _truncate(corr, X_.shape[:-1])
 
 
-def crosscorrelate(X, basis, periodic_axes=None, confidence_index=None,
-                   crosscorrelations=None):
+def crosscorrelate(X, basis, periodic_axes=None, n_jobs=1,
+                   confidence_index=None, crosscorrelations=None):
     """
     Computes the crosscorrelations from a microstructure function.
 
@@ -164,11 +164,11 @@ def crosscorrelate(X, basis, periodic_axes=None, confidence_index=None,
     X_ = basis.discretize(X)
     X_ = _mask_X_(X_, confidence_index)
     s = _Fkernel_shape(X_.shape, basis, periodic_axes)
-    cross = _correlate(X_, basis, s, correlations)
-    return cross / _normalize(X_, basis, s, confidence_index)
+    cross = _correlate(X_, basis, s, correlations, n_jobs)
+    return cross / _normalize(X_, basis, s, confidence_index, n_jobs)
 
 
-def correlate(X, basis, periodic_axes=None,
+def correlate(X, basis, periodic_axes=None, n_jobs=1,
               confidence_index=None, correlations=None):
     """
     Computes the autocorrelations and crosscorrelations from a microstructure
@@ -214,8 +214,8 @@ def correlate(X, basis, periodic_axes=None,
     X_ = basis.discretize(X)
     X_ = _mask_X_(X_, confidence_index)
     s = _Fkernel_shape(X_.shape, basis, periodic_axes)
-    corr = _correlate(X_, basis, s, correlations)
-    return corr / _normalize(X_, basis, s, confidence_index)
+    corr = _correlate(X_, basis, s, correlations, n_jobs)
+    return corr / _normalize(X_, basis, s, confidence_index, n_jobs)
 
 
 def _auto_correlations(n_states):
@@ -251,7 +251,7 @@ def _cross_correlations(n_states):
     return [item for sublist in cross_corr for item in sublist]
 
 
-def _normalize(X_, basis, s, confidence_index):
+def _normalize(X_, basis, s, confidence_index, n_jobs):
     """
     Returns the normalization for the statistics
 
@@ -278,7 +278,7 @@ def _normalize(X_, basis, s, confidence_index):
         mask = confidence_index
         if mask is None:
             mask = np.ones(X_.shape[1:-1])[None]
-        corr = Correlation(mask[..., None], basis, Fkernel_shape=s)
+        corr = Correlation(mask[..., None], basis, s, n_jobs=n_jobs)
         return _truncate(corr.convolve(mask[..., None]), X_.shape[:-1])
 
 

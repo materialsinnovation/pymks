@@ -28,6 +28,7 @@ class MKSHomogenizationModel(BaseEstimator):
             correlations used to fit the model.
         reduced_predict_data: Low dimensionality representation of spatial
             correlations predicted by the model.
+        n_jobs: number of parallel jobs to run
 
     Below is an examlpe of using MKSHomogenizationModel to predict (or
     classify) the type of microstructure using PCA and Logistic Regression.
@@ -62,7 +63,7 @@ class MKSHomogenizationModel(BaseEstimator):
 
     def __init__(self, basis=None, dimension_reducer=None, n_components=None,
                  property_linker=None, degree=1, correlations=None,
-                 compute_correlations=True):
+                 compute_correlations=True, n_jobs=1):
         """
         Create an instance of a `MKSHomogenizationModel`.
 
@@ -84,6 +85,7 @@ class MKSHomogenizationModel(BaseEstimator):
                 correlations will not be calculated as part of the fit and
                 predict methods. The spatial correlations can be passed as `X`
                 to both methods, default is True.
+            n_jobs (int, optional): number of parallel jobs to run
         """
 
         self.basis = basis
@@ -110,6 +112,7 @@ class MKSHomogenizationModel(BaseEstimator):
         self.compute_correlations = compute_correlations
         self.reduced_fit_data = None
         self.reduced_predict_data = None
+        self.n_jobs = n_jobs
 
     @property
     def n_components(self):
@@ -246,7 +249,7 @@ class MKSHomogenizationModel(BaseEstimator):
             if size is not None:
                 new_shape = (X.shape[0],) + size
                 X = X.reshape(new_shape)
-            X = self._correlate(X, self.basis, periodic_axes, confidence_index)
+            X = self._correlate(X, periodic_axes, confidence_index)
         X_reshape = self._reduce_shape(X)
         X_reduced = self.dimension_reducer.fit_transform(X_reshape,
                                                          reduce_labels)
@@ -308,13 +311,13 @@ class MKSHomogenizationModel(BaseEstimator):
         if self.compute_correlations is True:
             if periodic_axes is None:
                 periodic_axes = []
-            X = self._correlate(X, self.basis, periodic_axes, confidence_index)
+            X = self._correlate(X, periodic_axes, confidence_index)
         X_reshape = self._reduce_shape(X)
         X_reduced = self.dimension_reducer.transform(X_reshape)
         self.reduced_predict_data = X_reduced
         return self._linker.predict(X_reduced)
 
-    def _correlate(self, X, basis, periodic_axes, confidence_index):
+    def _correlate(self, X, periodic_axes, confidence_index):
         """
         Helper function used to calculated 2-point statistics from `X` and
         reshape them appropriately for fit and predict methods.
@@ -344,7 +347,7 @@ class MKSHomogenizationModel(BaseEstimator):
         >>> model = MKSHomogenizationModel(prim_basis, reducer, linker)
         >>> X = np.array([[0, 1],
         ...               [1, 0]])
-        >>> X_stats = model._correlate(X, prim_basis, [], None)
+        >>> X_stats = model._correlate(X, [], None)
         >>> X_test = np.array([[[ 0, 0],
         ...                     [0.5, 0]],
         ...                    [[0, 1,],
@@ -353,9 +356,9 @@ class MKSHomogenizationModel(BaseEstimator):
         """
         if self.basis is None:
             raise AttributeError('basis must be specified')
-        X_stats = correlate(X, basis, periodic_axes=periodic_axes,
+        X_stats = correlate(X, self.basis, periodic_axes=periodic_axes,
                             confidence_index=confidence_index,
-                            correlations=self.correlations)
+                            correlations=self.correlations, n_jobs=self.n_jobs)
         return X_stats
 
     def _reduce_shape(self, X_stats):
@@ -413,8 +416,10 @@ class MKSHomogenizationModel(BaseEstimator):
         if not callable(getattr(self._linker, "score", None)):
             raise RuntimeError(
                 "property_linker does not have score() method.")
-        X_corr = self._correlate(X, self.basis, periodic_axes,
-                                 confidence_index)
-        X_reshaped = self._reduce_shape(X_corr)
+        if self.compute_correlations is True:
+            if periodic_axes is None:
+                periodic_axes = []
+            X = self._correlate(X, periodic_axes, confidence_index)
+        X_reshaped = self._reduce_shape(X)
         X_reduced = self.dimension_reducer.transform(X_reshaped)
         return self._linker.score(X_reduced, y)
