@@ -25,7 +25,7 @@ class _RealFFTBasis(_AbstractMicrostructureBasis):
                                           planner_effort='FFTW_ESTIMATE',
                                           avoid_copy=avoid_copy)().real
         else:
-            return self._fftmodule.irfftn(X, axes=self._axes).real
+            return self._fftmodule.irfftn(X, axes=self._axes, s=s).real
 
     def discretize(self, X):
         raise NotImplementedError
