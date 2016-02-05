@@ -1,8 +1,8 @@
 import numpy as np
-from .abstract import _AbstractMicrostructureBasis
+from .imag_ffts import _ImagFFTBasis
 
 
-class FourierBasis(_AbstractMicrostructureBasis):
+class FourierBasis(_ImagFFTBasis):
 
     r"""
     Discretize a continuous field into `deg` local states using complex

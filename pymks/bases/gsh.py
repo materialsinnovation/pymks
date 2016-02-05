@@ -2,10 +2,10 @@ import numpy as np
 import gsh_hex_tri_L0_16 as gsh_hex
 import gsh_cub_tri_L0_16 as gsh_cub
 import gsh_tri_tri_L0_13 as gsh_tri
-from .abstract import _AbstractMicrostructureBasis
+from .imag_ffts import _ImagFFTBasis
 
 
-class GSHBasis(_AbstractMicrostructureBasis):
+class GSHBasis(_ImagFFTBasis):
 
     r"""
     Discretize a continuous field into continuous local states using a

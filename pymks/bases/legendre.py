@@ -1,8 +1,8 @@
 import numpy as np
-from .imag_ffts import _ImagFFTBasis
+from .real_ffts import _RealFFTBasis
 
 
-class LegendreBasis(_ImagFFTBasis):
+class LegendreBasis(_RealFFTBasis):
 
     r"""
     Discretize a continuous field into `deg` local states using a
