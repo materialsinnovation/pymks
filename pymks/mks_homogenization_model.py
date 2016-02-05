@@ -179,7 +179,7 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
         >>> X_reshaped = X_stats.reshape((X_stats.shape[0], X_stats[0].size))
         >>> X_pca = reducer.fit_transform(X_reshaped - np.mean(X_reshaped,
         ...                               axis=1)[:, None])
-        >>> assert np.allclose(model.fit_data, X_pca)
+        >>> assert np.allclose(model.reduced_fit_data, X_pca)
 
         Now let's use the same method with spatial correlations instead of
         microtructures.
@@ -205,7 +205,7 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
         >>> X_reshaped = X_stats.reshape((X_stats.shape[0], X_stats[0].size))
         >>> X_pca = reducer.fit_transform(X_reshaped - np.mean(X_reshaped,
         ...                               axis=1)[:, None])
-        >>> assert np.allclose(model.fit_data, X_pca)
+        >>> assert np.allclose(model.reduced_fit_data, X_pca)
 
 
         """
