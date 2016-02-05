@@ -57,11 +57,11 @@ class FourierBasis(_ImagFFTBasis):
         """
         self.n_states = n_states
         if isinstance(self.n_states, int):
-            self.n_states = ((np.arange(self.n_states + 1) / 2)[1:] *
-                             (-1) ** np.arange(1, self.n_states + 1))
+            n_states = ((np.arange(self.n_states + 1) / 2)[1:] *
+                        (-1) ** np.arange(1, self.n_states + 1))
         if domain is None:
             domain = [0, 2. * np.pi]
-        self.domain = domain
+        super(FourierBasis, self).__init__(n_states=n_states, domain=domain)
 
     def discretize(self, X):
         """

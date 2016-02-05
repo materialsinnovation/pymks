@@ -47,7 +47,7 @@ class GSHBasis(_ImagFFTBasis):
     RuntimeError: invalid crystal symmetry
     """
 
-    def __init__(self, n_states=np.arange(15), domain=None):
+    def __init__(self, n_states=15, domain=None):
         """
         Instantiate a `Basis`
 
@@ -63,20 +63,18 @@ class GSHBasis(_ImagFFTBasis):
 
         self.n_states = n_states
         if isinstance(self.n_states, int):
-            self.n_states = np.arange(n_states)
+            n_states = np.arange(n_states)
         if domain in [None, 'triclinic']:
-            self.domain = 'triclinic'
             self._symmetry = gsh_tri
         elif domain in ['hexagonal']:
-            self.domain = 'hexagonal'
             self._symmetry = gsh_hex
         elif domain in ['cubic']:
-            self.domain = 'cubic'
             self._symmetry = gsh_cub
         else:
             raise RuntimeError("invalid crystal symmetry")
         full_indx = self._symmetry.gsh_basis_info()
         self.basis_indices = full_indx[self.n_states, :]
+        super(GSHBasis, self).__init__(n_states=n_states, domain=domain)
 
     def check(self, X):
         """Warns the user if Euler angles apear to be defined in degrees

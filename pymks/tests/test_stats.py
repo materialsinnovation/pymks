@@ -258,7 +258,7 @@ def test_normalization_rfftn():
     Nx = Ny = 5
     X_ = np.zeros((1, Nx, Ny, 1))
     prim_basis._axes = np.arange(X_.ndim - 2) + 1
-    prim_basis._axes_shape = (2 * Nx, Ny)
+    prim_basis._axes_shape = (2 * Nx, 2 * Ny)
     norm = _normalize(X_, prim_basis, None)
     assert norm.shape == (1, Nx, Ny, 1)
     assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
@@ -267,16 +267,47 @@ def test_normalization_rfftn():
 def test_normalization_fftn():
     """Test normalization with fftn
     """
-    from pymks import LegendreBasis
+    from pymks.bases import FourierBasis
     from pymks.stats import _normalize
-    l_basis = LegendreBasis()
+    f_basis = FourierBasis()
     Nx = Ny = 5
     X_ = np.zeros((1, Nx, Ny, 1))
-    l_basis._axes = np.arange(X_.ndim - 2) + 1
-    l_basis._axes_shape = (2 * Nx, 2 * Ny)
-    norm = _normalize(X_, l_basis, None)
+    f_basis._axes = np.arange(X_.ndim - 2) + 1
+    f_basis._axes_shape = (2 * Nx, 2 * Ny)
+    norm = _normalize(X_, f_basis, None)
     assert norm.shape == (1, Nx, Ny, 1)
     assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
 
+
+def test_gsh_basis_normalization():
+    from pymks.bases import GSHBasis
+    from pymks.stats import _normalize
+    gsh_basis = GSHBasis()
+    Nx = Ny = 5
+    X_ = np.zeros((1, Nx, Ny, 1))
+    gsh_basis._axes = np.arange(X_.ndim - 2) + 1
+    gsh_basis._axes_shape = (2 * Nx, 2 * Ny)
+    norm = _normalize(X_, gsh_basis, None)
+    assert norm.shape == (1, Nx, Ny, 1)
+    assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
+
+
+def test_stats_in_parallel():
+    import time
+    from pymks.bases import PrimitiveBasis
+    from pymks.stats import correlate
+    from pymks.datasets import make_microstructure
+    X = make_microstructure(n_samples=5, n_phases=3)
+    p_basis = PrimitiveBasis(5)
+    t = []
+    for i in range(1, 4):
+        t_start = time.time()
+        correlate(X, p_basis, n_jobs=i)
+        t.append(time.time() - t_start)
+    if p_basis._pyfftw:
+        assert t == sorted(t, reverse=True)
+    else:
+        pass
+
 if __name__ == '__main__':
-    test_mask_two_samples()
+    test_normalization_fftn()
