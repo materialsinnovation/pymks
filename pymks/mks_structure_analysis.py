@@ -20,6 +20,7 @@ class MKSStructureAnalysis(BaseEstimator):
             correlations used to fit the components.
         transformed_data: Reduced of spatial correlations.
 
+
     Below is an example of using MKSStructureAnalysis using FastICA.
 
     >>> from pymks.datasets import make_microstructure
