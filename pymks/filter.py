@@ -56,7 +56,7 @@ class Filter(object):
         Returns:
           convolution of X with the kernel
         """
-        FX = self.basis._fftn(X, avoid_copy=True)
+        FX = self.basis._fftn(X)
         if FX.shape[1:] != self._Fkernel.shape[1:]:
             raise RuntimeError("Dimensions of X are incorrect.")
         Fy = self._sum(FX * self._Fkernel)

@@ -66,7 +66,8 @@ class MKSLocalizationModel(LinearRegression):
         Args:
             basis (class): an instance of a bases class.
             n_states (int, optional): number of local states
-            n_jobs (int, optional): number of parallel jobs to run
+            n_jobs (int, optional): number of parallel jobs to run. only used
+                if pyfftw is install.
             lstsq_rcond (float, optional): rcond argument to scipy.linalg.lstsq
                 function. Defaults to 4 orders of magnitude above machine
                 epsilon.

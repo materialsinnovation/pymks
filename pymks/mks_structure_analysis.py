@@ -60,7 +60,8 @@ class MKSStructureAnalysis(BaseEstimator):
             store_correlations (boolean, optional): If true the computed
                 2-point statistics will be saved as an attributes
                 fit_correlations and transform_correlations.
-            n_jobs (int, optional): number of parallel jobs to run
+            n_jobs (int, optional): number of parallel jobs to run. only used
+                if pyfftw is install.
             mean_center (boolean, optional): If true the data will be mean
                 centered before dimensionality reduction is computed.
         """
@@ -215,7 +216,7 @@ class MKSStructureAnalysis(BaseEstimator):
         """Reshapes and reduces X"""
         self._store_correlations(X)
         X_reshaped = self._reduce_shape(X)
-        self.transform_data =  self.dimension_reducer.transform(X_reshaped)
+        self.transform_data = self.dimension_reducer.transform(X_reshaped)
         return self.transform_data
 
     def _fit_transform(self, X, y):
@@ -223,17 +224,18 @@ class MKSStructureAnalysis(BaseEstimator):
         if self.store_correlations:
             self.fit_correlations = X
         X_reshaped = self._reduce_shape(X)
-        self.reduced_fit_data = self.dimension_reducer.fit_transform(X_reshaped, y)
+        self.reduced_fit_data = self.dimension_reducer.fit_transform(
+            X_reshaped, y)
         return self.reduced_fit_data
 
     def _store_correlations(self, X):
         """store stats"""
         if self.store_correlations:
-              if hasattr(self, 'transform_correlations'):
-                  self.transform_correlations = np.concatenate(
+            if hasattr(self, 'transform_correlations'):
+                self.transform_correlations = np.concatenate(
                     (self.transform_correlations, X))
-              else:
-                  self.transform_correlations = X
+            else:
+                self.transform_correlations = X
 
     def _compute_stats(self, X, periodic_axes, confidence_index):
         """

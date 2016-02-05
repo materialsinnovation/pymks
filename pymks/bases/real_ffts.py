@@ -3,31 +3,51 @@ import numpy as np
 
 
 class _RealFFTBasis(_AbstractMicrostructureBasis):
+    """This class is used to make the bases that create real valued
+    microstructure functions use the real rFFT/irFFT algorithms and selects
+    the appropriate fft module depending on whether or not pyfftw is installed.
+    """
     def __init__(self, *args, **kwargs):
+        """
+        Instance of a basis
+        """
         super(_RealFFTBasis, self).__init__(*args, **kwargs)
 
-    def _fftn(self, X, n_jobs=1, avoid_copy=True):
+    def _fftn(self, X):
+        """Real rFFT algorithm
+
+        Args:
+            X: NDarray (n_samples, N_x, ...)
+
+        Returns:
+            Fourier transform of X
+        """
         if self._pyfftw:
             return self._fftmodule.rfftn(np.ascontiguousarray(X),
                                          axes=self._axes,
                                          threads=self._n_jobs,
                                          planner_effort='FFTW_ESTIMATE',
                                          overwrite_input=True,
-                                         avoid_copy=avoid_copy)()
+                                         avoid_copy=True)()
         else:
             return self._fftmodule.rfftn(X, axes=self._axes)
 
-    def _ifftn(self, X, n_jobs=1, avoid_copy=True):
+    def _ifftn(self, X):
+        """Real irFFT algorithm
+
+        Args:
+            X: NDarray (n_samples, N_x, ...)
+
+        Returns:
+            Inverse Fourier transform of X
+        """
         if self._pyfftw:
             return self._fftmodule.irfftn(np.ascontiguousarray(X),
                                           s=self._axes_shape,
                                           axes=self._axes,
                                           threads=self._n_jobs,
                                           planner_effort='FFTW_ESTIMATE',
-                                          avoid_copy=avoid_copy)().real
+                                          avoid_copy=True)().real
         else:
             return self._fftmodule.irfftn(X, axes=self._axes,
                                           s=self._axes_shape).real
-
-    def discretize(self, X):
-        raise NotImplementedError
