@@ -21,6 +21,7 @@ class _AbstractMicrostructureBasis(object):
         self.domain = domain
         self._pyfftw = self._module_exists('pyfftw')
         self._fftmodule = self._load_fftmodule()
+        self._n_jobs = 1
 
     def check(self, X):
         if (np.min(X) < self.domain[0]) or (np.max(X) > self.domain[1]):

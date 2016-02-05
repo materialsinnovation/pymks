@@ -10,7 +10,7 @@ class _RealFFTBasis(_AbstractMicrostructureBasis):
         if self._pyfftw:
             return self._fftmodule.rfftn(np.ascontiguousarray(X),
                                          axes=self._axes,
-                                         threads=n_jobs,
+                                         threads=self._n_jobs,
                                          planner_effort='FFTW_ESTIMATE',
                                          overwrite_input=True,
                                          avoid_copy=avoid_copy)()
@@ -22,11 +22,12 @@ class _RealFFTBasis(_AbstractMicrostructureBasis):
             return self._fftmodule.irfftn(np.ascontiguousarray(X),
                                           s=self._axes_shape,
                                           axes=self._axes,
-                                          threads=n_jobs,
+                                          threads=self._n_jobs,
                                           planner_effort='FFTW_ESTIMATE',
                                           avoid_copy=avoid_copy)().real
         else:
-            return self._fftmodule.irfftn(X, axes=self._axes, s=s).real
+            return self._fftmodule.irfftn(X, axes=self._axes,
+                                          s=self._axes_shape).real
 
     def discretize(self, X):
         raise NotImplementedError

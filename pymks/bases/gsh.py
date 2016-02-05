@@ -142,6 +142,7 @@ class GSHBasis(_AbstractMicrostructureBasis):
         >>> assert(np.allclose(np.squeeze(gsh_basis.discretize(X)), q(X)))
         """
         self.check(X)
+        self._select_axes(X)
         return self._symmetry.gsh_eval(X, self.n_states)
 
     def _reshape_feature(self, X, size):

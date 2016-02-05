@@ -6,22 +6,18 @@ class Filter(object):
     Wrapper class for convolution with a kernel and resizing of a kernel
     """
 
-    def __init__(self, Fkernel, basis, n_jobs=1):
+    def __init__(self, Fkernel, basis):
         """
         Instantiate a Filter.
 
         Args:
-            _Fkernel: an array representing a convolution kernel
+            Fkernel: an array representing a convolution kernel
             basis: an instance of a bases class.
-            axes_shape: The shape of the axes for which the FFTs are computed.
-                This is used to get the correct shape when using irfftn.
-            n_jobs: number of parallel jobs to run
 
 
         """
         self.basis = basis
         self._Fkernel = Fkernel
-        self._n_jobs = n_jobs
 
     def _frequency_2_real(self, copy=False):
         """
@@ -34,8 +30,7 @@ class Filter(object):
         Fkernel = self._Fkernel
         if copy:
             Fkernel = self._Fkernel.copy()
-        return np.fft.fftshift(self.basis._ifftn(Fkernel,
-                                                 n_jobs=self._n_jobs),
+        return np.fft.fftshift(self.basis._ifftn(Fkernel),
                                axes=self.basis._axes)
 
     def _real_2_frequency(self, kernel):
@@ -49,7 +44,7 @@ class Filter(object):
           an array in frequency space
         """
         return self.basis._fftn(np.fft.ifftshift(kernel,
-                                axes=self.basis._axes), n_jobs=self._n_jobs)
+                                axes=self.basis._axes))
 
     def convolve(self, X):
         """
@@ -61,7 +56,7 @@ class Filter(object):
         Returns:
           convolution of X with the kernel
         """
-        FX = self.basis._fftn(X, n_jobs=self._n_jobs, avoid_copy=True)
+        FX = self.basis._fftn(X, avoid_copy=True)
         if FX.shape[1:] != self._Fkernel.shape[1:]:
             raise RuntimeError("Dimensions of X are incorrect.")
         Fy = self._sum(FX * self._Fkernel)
@@ -121,7 +116,7 @@ class Correlation(Filter):
     >>> from pymks.bases import DiscreteIndicatorBasis
     >>> basis = DiscreteIndicatorBasis(n_states=n_states)
     >>> X_ = basis.discretize(X)
-    >>> filter_ = Correlation(X_, basis, 1)
+    >>> filter_ = Correlation(X_, basis)
     >>> X_auto = filter_.convolve(X_)
     >>> X_test = np.array([[[[3., 0.  ],
     ...                      [6., 3.],
@@ -144,7 +139,7 @@ class Correlation(Filter):
         Autocorrelations for microstructure X_
     """
 
-    def __init__(self, kernel, basis, n_jobs=1):
+    def __init__(self, kernel, basis):
         """
         Instantiate a Correlation.
 
@@ -159,9 +154,8 @@ class Correlation(Filter):
         self.basis = basis
         if self.basis._axes_shape > kernel.shape[1:-1]:
                 kernel = self._zero_pad(kernel, self.basis._axes_shape)
-        Fkernel = self.basis._fftn(kernel, n_jobs=n_jobs)
-        super(Correlation, self).__init__(np.conjugate(Fkernel), basis,
-                                          n_jobs=n_jobs)
+        Fkernel = self.basis._fftn(kernel)
+        super(Correlation, self).__init__(np.conjugate(Fkernel), basis)
 
     def convolve(self, X):
         """
@@ -175,7 +169,7 @@ class Correlation(Filter):
         """
         if X.shape[1:-1] < self.basis._axes_shape:
             X = self._zero_pad(X, self.basis._axes_shape)
-        FX = self.basis._fftn(X, n_jobs=self._n_jobs)
+        FX = self.basis._fftn(X)
         Fy = self._sum(FX * self._Fkernel)
         correlation = self.basis._ifftn(Fy)
         return np.fft.fftshift(correlation, axes=self.basis._axes)

@@ -25,7 +25,6 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
             correlations used to fit the model.
         reduced_predict_data: Low dimensionality representation of spatial
             correlations predicted by the model.
-        n_jobs: number of parallel jobs to run
 
     Below is an example of using MKSHomogenizationModel to predict (or
     classify) the type of microstructure using PCA and Logistic Regression.
@@ -107,7 +106,6 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
         self.compute_correlations = compute_correlations
         self.reduced_fit_data = None
         self.reduced_predict_data = None
-        self.n_jobs = n_jobs
         if self.compute_correlations:
             if basis is None:
                 raise RuntimeError(('a basis is need to compute spatial ') +
@@ -115,7 +113,7 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
         super(MKSHomogenizationModel,
               self).__init__(store_correlations=store_correlations,
                              dimension_reducer=dimension_reducer,
-                             correlations=correlations,
+                             correlations=correlations, n_jobs=n_jobs,
                              n_components=n_components, basis=basis,
                              mean_center=mean_center)
 

@@ -41,7 +41,7 @@ class MKSStructureAnalysis(BaseEstimator):
     """
 
     def __init__(self, basis, correlations=None, dimension_reducer=None,
-                 n_components=None, store_correlations=False,
+                 n_components=None, store_correlations=False, n_jobs=1,
                  mean_center=True):
         """
         Create an instance of a `MKSStructureAnalysis`.
@@ -60,6 +60,7 @@ class MKSStructureAnalysis(BaseEstimator):
             store_correlations (boolean, optional): If true the computed
                 2-point statistics will be saved as an attributes
                 fit_correlations and transform_correlations.
+            n_jobs (int, optional): number of parallel jobs to run
             mean_center (boolean, optional): If true the data will be mean
                 centered before dimensionality reduction is computed.
         """
@@ -68,6 +69,8 @@ class MKSStructureAnalysis(BaseEstimator):
         self.dimension_reducer = dimension_reducer
         self.store_correlations = store_correlations
         self.mean_center = mean_center
+        if basis is not None:
+            self.basis._n_jobs = n_jobs
         if self.dimension_reducer is None:
             self.dimension_reducer = RandomizedPCA(copy=False)
         if n_components is None:

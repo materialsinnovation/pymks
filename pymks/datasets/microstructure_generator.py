@@ -38,8 +38,7 @@ class MicrostructureGenerator(_BaseMicrostructureGenerator):
         X = np.random.random((self.n_samples,) + self.size)
         gaussian = fourier_gaussian(np.ones(self.grain_size),
                                     np.ones(len(self.size)))
-        filter_ = Filter(self._fftn(gaussian[None, ..., None]),
-                         self, 1)
+        filter_ = Filter(self._fftn(gaussian[None, ..., None]), self)
         filter_.resize(self.size)
         X_blur = filter_.convolve(X[..., None]).real
         return self._assign_phases(X_blur).astype(int)

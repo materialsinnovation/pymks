@@ -11,7 +11,7 @@ def test_frequency_2_real_and_back():
     p_basis._axes = (1, 2)
     p_basis._axes_shape = (3, 3)
     X_result = np.ones((1, 3, 3, 2)) * np.arange(1, 3)[None, None, None, :]
-    filter_ = Filter(X, p_basis, 1)
+    filter_ = Filter(X, p_basis)
     assert np.allclose(filter_._frequency_2_real(copy=True), X_result)
     assert np.allclose(filter_._real_2_frequency(X_result), X)
 

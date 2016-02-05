@@ -59,10 +59,8 @@ def test_resize_coeff():
     model = MKSRegressionModel(basis)
     big_model = MKSRegressionModel(basis)
     model.fit(X_delta, y_delta)
-    size = model.coef_
     big_model.fit(X_big_delta, y_big_delta)
     model.resize_coeff((resize * nx, resize * ny))
-    _resize = model.coef_
     assert np.allclose(model.coef_, big_model.coef_,
                        rtol=1e-2, atol=2.1e-3)
 

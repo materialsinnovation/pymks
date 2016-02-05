@@ -16,7 +16,6 @@ class MKSLocalizationModel(LinearRegression):
         n_states: Interger value for number of local states, if a basis
             is specified, n_states indicates the order of the polynomial.
         coef_: Array of values that are the influence coefficients.
-        n_jobs: number of parallel jobs to run
 
     >>> n_states = 2
     >>> n_spaces = 81
@@ -78,7 +77,7 @@ class MKSLocalizationModel(LinearRegression):
         if n_states is None:
             self.n_states = basis.n_states
         self.domain = basis.domain
-        self.n_jobs = n_jobs
+        self.basis._n_jobs = n_jobs
         self.lstsq_rcond = lstsq_rcond
         if self.lstsq_rcond is None:
             self.lstsq_rcond = np.finfo(float).eps*1e4
@@ -116,15 +115,15 @@ class MKSLocalizationModel(LinearRegression):
         self.basis._shape_check(X, y)  # call error check for shapes of X and y
 
         X_ = self.basis.discretize(X)
-        FX = self.basis._fftn(X_, n_jobs=self.n_jobs)
-        Fy = self.basis._fftn(y, n_jobs=self.n_jobs)
+        FX = self.basis._fftn(X_)
+        Fy = self.basis._fftn(y)
         Fkernel = np.zeros(FX.shape[1:], dtype=np.complex)
         s0 = (slice(None),)
         for ijk in np.ndindex(FX.shape[1:-1]):
             s1 = self.basis._select_slice(ijk, s0)
             Fkernel[ijk + s1] = lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk],
                                       self.lstsq_rcond)[0]
-        self._filter = Filter(Fkernel[None], self.basis, self.n_jobs)
+        self._filter = Filter(Fkernel[None], self.basis)
 
     @property
     def coef_(self):
@@ -194,7 +193,7 @@ class MKSLocalizationModel(LinearRegression):
         >>> coef_ = np.concatenate((coef_, np.ones_like(coef_)), axis=-1)
         >>> coef_ = np.fft.ifftshift(coef_, axes=(1, 2))
         >>> model._filter = Filter(np.fft.rfftn(coef_, axes=(1, 2)),
-        ...                        prim_basis, 1)
+        ...                        prim_basis)
 
         The coefficients can be reshaped by passing the new shape that
         coefficients should have.
