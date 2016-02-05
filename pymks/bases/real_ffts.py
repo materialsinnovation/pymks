@@ -17,9 +17,10 @@ class _RealFFTBasis(_AbstractMicrostructureBasis):
         else:
             return self._fftmodule.rfftn(X, axes=self._axes)
 
-    def _ifftn(self, X, s=None, n_jobs=1, avoid_copy=True):
+    def _ifftn(self, X, n_jobs=1, avoid_copy=True):
         if self._pyfftw:
-            return self._fftmodule.irfftn(np.ascontiguousarray(X), s=s,
+            return self._fftmodule.irfftn(np.ascontiguousarray(X),
+                                          s=self._axes_shape,
                                           axes=self._axes,
                                           threads=n_jobs,
                                           planner_effort='FFTW_ESTIMATE',

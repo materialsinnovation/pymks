@@ -5,6 +5,7 @@ from .mks_localization_model import MKSLocalizationModel
 from .bases.primitive import PrimitiveBasis
 from .bases.legendre import LegendreBasis
 from .mks_homogenization_model import MKSHomogenizationModel
+from .mks_structure_analysis import MKSStructureAnalysis
 MKSRegressionModel = MKSLocalizationModel
 DiscreteIndicatorBasis = PrimitiveBasis
 ContinuousIndicatorBasis = PrimitiveBasis
@@ -36,4 +37,5 @@ __all__ = ['__version__',
            'MKSLocalizationModel',
            'PrimitiveBasis',
            'LegendreBasis',
-           'MKSHomogenizationModel']
+           'MKSHomogenizationModel',
+           'MKSStructureAnalysis']

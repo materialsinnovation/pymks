@@ -56,13 +56,14 @@ def test_resize_coeff():
     X_delta, y_delta = get_delta_data(nx, ny)
     X_big_delta, y_big_delta = get_delta_data(resize * nx, resize * ny)
     basis = DiscreteIndicatorBasis(n_states=2)
-
     model = MKSRegressionModel(basis)
     big_model = MKSRegressionModel(basis)
     model.fit(X_delta, y_delta)
+    size = model.coef_
     big_model.fit(X_big_delta, y_big_delta)
     model.resize_coeff((resize * nx, resize * ny))
-    assert np.allclose(model.coeff, big_model.coeff,
+    _resize = model.coef_
+    assert np.allclose(model.coef_, big_model.coef_,
                        rtol=1e-2, atol=2.1e-3)
 
 
@@ -115,7 +116,7 @@ def test_coeff_stablity_with_irfftn():
     assert np.allclose(y_pred, y_test, rtol=1e-2, atol=6.1e-3)
     model.resize_coeff((resize * nx, resize * ny))
     for i in range(4):
-        model.coeff
+        model.coef_
     y_big_pred = model.predict(X_big_test)
     assert np.allclose(y_big_pred, y_big_test, rtol=1e-2, atol=6.1e-2)
 

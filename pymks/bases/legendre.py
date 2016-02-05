@@ -36,7 +36,7 @@ class LegendreBasis(_ImagFFTBasis):
 
     If the microstructure local state values fall outside of the specified
     domain they will no longer be mapped into the orthogonal domain of the
-    legendre polynomais.
+    legendre polynomials.
 
     >>> n_states = 2
     >>> X = np.array([-1, 1])
@@ -47,14 +47,6 @@ class LegendreBasis(_ImagFFTBasis):
     RuntimeError: X must be within the specified domain
 
     """
-
-    def _get_basis_slice(self, ijk, s0):
-        """
-        Helper method used to calibrate influence coefficients from in
-        mks_localization_model to account for redundancies from linearly
-        dependent local states.
-        """
-        return s0
 
     def discretize(self, X):
         """
@@ -78,10 +70,10 @@ class LegendreBasis(_ImagFFTBasis):
 
         """
         self.check(X)
-        self._axes = np.arange(X.ndim - 1) + 1
+        self._select_axes(X)
         leg = np.polynomial.legendre
         X_scaled = (2. * X - self.domain[0] - self.domain[1]) /\
                    (self.domain[1] - self.domain[0])
-        norm = (2. * np.arange(self.n_states) + 1) / 2.
-        X_Legendre = (leg.legval(X_scaled, np.eye(self.n_states) * norm))
+        norm = (2. * np.array(self.n_states) + 1) / 2.
+        X_Legendre = (leg.legval(X_scaled, np.eye(len(self.n_states)) * norm))
         return np.rollaxis(X_Legendre, 0, len(X_Legendre.shape))

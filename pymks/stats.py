@@ -50,12 +50,12 @@ def autocorrelate(X, basis, periodic_axes=[], n_jobs=1, confidence_index=None,
         correlations = _auto_correlations(basis.n_states)
     X_ = basis.discretize(X)
     X_ = _mask_X_(X_, confidence_index)
-    s = _Fkernel_shape(X_.shape, basis, periodic_axes)
-    auto = _correlate(X_, basis, s, correlations, n_jobs)
-    return auto / _normalize(X_, basis, s, confidence_index, n_jobs)
+    _Fkernel_shape(X_.shape, basis, periodic_axes)
+    auto = _correlate(X_, basis, correlations, n_jobs)
+    return auto / _normalize(X_, basis, confidence_index, n_jobs)
 
 
-def _correlate(X_, basis, s, correlations, n_jobs=1):
+def _correlate(X_, basis, correlations, n_jobs=1):
     """
     Helper function used to calculate the unnormalized correlation counts.
 
@@ -80,8 +80,7 @@ def _correlate(X_, basis, s, correlations, n_jobs=1):
     >>> prim_basis = PrimitiveBasis(n_states=3, domain=[0, 2])
     >>> X_ = prim_basis.discretize(X)
     >>> correlations = [(l, l) for l in range(3)]
-    >>> X_corr = _correlate(X_, prim_basis, X_.shape[1:-1],
-    ...                     correlations=correlations)
+    >>> X_corr = _correlate(X_, prim_basis, correlations=correlations)
     >>> X_result = np.array([[[[0, 0, 0],
     ...                        [0, 0, 2]],
     ...                       [[0, 0, 0],
@@ -95,7 +94,7 @@ def _correlate(X_, basis, s, correlations, n_jobs=1):
 
     l_0, l_1 = [l[0] for l in correlations], [l[1] for l in correlations]
     corr = Correlation(X_[..., l_0], basis,
-                       s, n_jobs=n_jobs).convolve(X_[..., l_1])
+                       n_jobs=n_jobs).convolve(X_[..., l_1])
     return _truncate(corr, X_.shape[:-1])
 
 
@@ -165,9 +164,9 @@ def crosscorrelate(X, basis, periodic_axes=None, n_jobs=1,
         correlations = _cross_correlations(basis.n_states)
     X_ = basis.discretize(X)
     X_ = _mask_X_(X_, confidence_index)
-    s = _Fkernel_shape(X_.shape, basis, periodic_axes)
-    cross = _correlate(X_, basis, s, correlations, n_jobs)
-    return cross / _normalize(X_, basis, s, confidence_index, n_jobs)
+    _Fkernel_shape(X_.shape, basis, periodic_axes)
+    cross = _correlate(X_, basis, correlations, n_jobs)
+    return cross / _normalize(X_, basis, confidence_index, n_jobs)
 
 
 def correlate(X, basis, periodic_axes=None, n_jobs=1,
@@ -216,9 +215,9 @@ def correlate(X, basis, periodic_axes=None, n_jobs=1,
         correlations = _auto_correlations(L) + _cross_correlations(L)
     X_ = basis.discretize(X)
     X_ = _mask_X_(X_, confidence_index)
-    s = _Fkernel_shape(X_.shape, basis, periodic_axes)
-    corr = _correlate(X_, basis, s, correlations, n_jobs)
-    return corr / _normalize(X_, basis, s, confidence_index, n_jobs)
+    _Fkernel_shape(X_.shape, basis, periodic_axes)
+    corr = _correlate(X_, basis, correlations, n_jobs)
+    return corr / _normalize(X_, basis, confidence_index, n_jobs)
 
 
 def _auto_correlations(n_states):
@@ -230,10 +229,10 @@ def _auto_correlations(n_states):
     Returns:
         list of tuples for autocorrelations
 
-    >>> l = _auto_correlations(3)
+    >>> l = _auto_correlations(np.arange(3))
     >>> assert l == [(0, 0), (1, 1), (2, 2)]
     """
-    local_states = range(n_states)
+    local_states = n_states
     return [(l, l) for l in local_states]
 
 
@@ -246,15 +245,15 @@ def _cross_correlations(n_states):
     Returns:
         list of tuples for crosscorrelations
 
-    >>> l = _cross_correlations(3)
+    >>> l = _cross_correlations(np.arange(3))
     >>> assert l == [(0, 1), (0, 2), (1, 2)]
     """
-    l = range(n_states)
+    l = n_states
     cross_corr = [[(l[i], l[j]) for j in l[1:][i:]] for i in l[:-1]]
     return [item for sublist in cross_corr for item in sublist]
 
 
-def _normalize(X_, basis, s, confidence_index, n_jobs):
+def _normalize(X_, basis, confidence_index, n_jobs):
     """
     Returns the normalization for the statistics
 
@@ -276,19 +275,20 @@ def _normalize(X_, basis, s, confidence_index, n_jobs):
 
     """
 
-    if s == X_.shape[1:-1] and confidence_index is None:
+    if basis._axes_shape == X_.shape[1:-1] and confidence_index is None:
         return float(np.prod(X_.shape[1:-1]))
     else:
         mask = confidence_index
         if mask is None:
             mask = np.ones(X_.shape[1:-1])[None]
-        corr = Correlation(mask[..., None], basis, s, n_jobs=n_jobs)
+        corr = Correlation(mask[..., None], basis, n_jobs=n_jobs)
         return _truncate(corr.convolve(mask[..., None]), X_.shape[:-1])
 
 
 def _Fkernel_shape(X_shape, basis, periodic_axes):
     """
-    Returns the shape of the kernel in Fourier space with non-periodic padding.
+    Assigns the shape of the kernel in Fourier space with non-periodic padding
+    to the basis.
 
     Args:
         `X_shape`: The shape of discretized microstructure function,
@@ -298,9 +298,6 @@ def _Fkernel_shape(X_shape, basis, periodic_axes):
         basis: an instance of a bases class
         periodic_axes: the axes of the array that are periodic
 
-    Returns:
-        shape of the new Fkernel array
-
     Example
 
     >>> Nx = Ny = 5
@@ -309,12 +306,12 @@ def _Fkernel_shape(X_shape, basis, periodic_axes):
     >>> from pymks import PrimitiveBasis
     >>> p_basis = PrimitiveBasis(2)
     >>> p_basis._axes = np.array([1, 2])
-    >>> assert (_Fkernel_shape(X_.shape, p_basis,
-    ...                        periodic_axes=periodic_axes) == (10, 5))
+    >>> _Fkernel_shape(X_.shape, p_basis, periodic_axes=periodic_axes)
+    >>> assert p_basis._axes_shape == (10, 5)
     """
     a = np.ones(len(basis._axes), dtype=float) * 2
     a[list(periodic_axes)] = 1
-    return tuple((np.array(X_shape)[basis._axes] * a).astype(int))
+    basis._axes_shape = tuple((np.array(X_shape)[basis._axes] * a).astype(int))
 
 
 def _truncate(a, shape):
@@ -331,17 +328,17 @@ def _truncate(a, shape):
 
     Example
 
-    >>> print _truncate(np.arange(10).reshape(1, 10, 1), (1, 5))[0, ..., 0]
+    >>> print(_truncate(np.arange(10).reshape(1, 10, 1), (1, 5))[0, ..., 0])
     [3 4 5 6 7]
-    >>> print _truncate(np.arange(9).reshape(1, 9, 1), (1, 5))[0, ..., 0]
+    >>> print(_truncate(np.arange(9).reshape(1, 9, 1), (1, 5))[0, ..., 0])
     [2 3 4 5 6]
-    >>> print _truncate(np.arange(10).reshape((1, 10, 1)), (1, 4))[0, ..., 0]
+    >>> print(_truncate(np.arange(10).reshape((1, 10, 1)), (1, 4))[0, ..., 0])
     [3 4 5 6]
-    >>> print _truncate(np.arange(9).reshape((1, 9, 1)), (1, 4))[0, ..., 0]
+    >>> print(_truncate(np.arange(9).reshape((1, 9, 1)), (1, 4))[0, ..., 0])
     [2 3 4 5]
 
     >>> a = np.arange(5 * 4).reshape((1, 5, 4, 1))
-    >>> print _truncate(a, shape=(1, 3, 2))[0, ..., 0]
+    >>> print(_truncate(a, shape=(1, 3, 2))[0, ..., 0])
     [[ 5  6]
      [ 9 10]
      [13 14]]
