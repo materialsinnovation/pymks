@@ -147,6 +147,26 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
         self._linker.set_params(poly__degree=value)
 
     @property
+    def coef_(self):
+        return self._linker.named_steps['connector'].coef_
+
+    @coef_.setter
+    def coef_(self, coef):
+        """Setter for the coefficients for property_linker.
+        """
+        self._linker.named_steps['connector'].coef_ = coef
+
+    @property
+    def intercept_(self):
+        return self._linker.named_steps['connector'].intercept_
+
+    @intercept_.setter
+    def intercept_(self, intercept):
+        """Setter for the intercept for property_linker.
+        """
+        self._linker.named_steps['connector'].intercept_ = intercept
+
+    @property
     def property_linker(self):
         return self._property_linker
 
