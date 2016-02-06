@@ -8,8 +8,10 @@ from .imag_ffts import _ImagFFTBasis
 class GSHBasis(_ImagFFTBasis):
 
     r"""
-    Discretize a continuous field into continuous local states using a
-    Generalized Spherical Harmonic (GSH) basis such that,
+    Discretize a continuous field made up three Euler angles (in radians) used
+    to represent crystal orientation into continuous local states using the
+    Generalized Spherical Harmonic (GSH) basis. This basis uses the following
+    equation to discretize the orientation field.
 
     .. math::
 
@@ -60,27 +62,29 @@ class GSHBasis(_ImagFFTBasis):
                 "triclinic" if no symmetry is desired (not specifying any
                 symmetry has the same effect)
         """
-
-        self.n_states = n_states
-        if isinstance(self.n_states, int):
+        if isinstance(n_states, int):
             n_states = np.arange(n_states)
-        if domain in [None, 'triclinic']:
+        if domain is None or domain == 'triclinic':
             self._symmetry = gsh_tri
-        elif domain in ['hexagonal']:
+            domain = 'triclinic'
+        elif domain == 'hexagonal':
             self._symmetry = gsh_hex
-        elif domain in ['cubic']:
+        elif domain == 'cubic':
             self._symmetry = gsh_cub
         else:
             raise RuntimeError("invalid crystal symmetry")
         full_indx = self._symmetry.gsh_basis_info()
-        self.basis_indices = full_indx[self.n_states, :]
         super(GSHBasis, self).__init__(n_states=n_states, domain=domain)
+        self.basis_indices = full_indx[self.n_states, :]
 
     def check(self, X):
         """Warns the user if Euler angles apear to be defined in degrees
         instead of radians"""
         if (np.min(X) < -90.) or (np.max(X) > 90.):
-            print "Warning: X may be defined in degrees instead of radians"
+            Warning("X may be defined in degrees instead of radians")
+        if X.shape[-1] != 3:
+            raise RuntimeError('X must have 3 angles (in radians) in the ' +
+                               'last dimention')
 
     def _shape_check(self, X, y):
         """
@@ -100,12 +104,12 @@ class GSHBasis(_ImagFFTBasis):
         """
         if not len(y.shape) > 1:
             raise RuntimeError("The shape of y is incorrect.")
-        if y.shape != X.shape[:-1]:
-            raise RuntimeError("X and y must have the same number of " +
-                               "samples and microstructure shape.")
         if X.shape[-1] != 3:
             raise RuntimeError("X must have 3 continuous local states " +
-                               "(euler angles)")
+                               "(euler angles in radians) in the last axis.")
+        if y.shape != X.shape[:-1]:
+            raise RuntimeError("The X and y must have the same number of " +
+                               "samples and microstructure shape.")
 
     def _pred_shape(self, X):
         """
@@ -122,7 +126,7 @@ class GSHBasis(_ImagFFTBasis):
             X (ND array): The microstructure, an `(n_samples, n_x, ..., 3)`
                 shaped array where `n_samples` is the number of samples,
                 `n_x` is the spatial discretization and the last dimension
-                contains the Bunge Euler angles.
+                contains the Bunge Euler angles in radians.
         Returns:
             Float valued field of of Generalized Spherical Harmonics
             coefficients.
@@ -140,10 +144,10 @@ class GSHBasis(_ImagFFTBasis):
         >>> assert(np.allclose(np.squeeze(gsh_basis.discretize(X)), q(X)))
         """
         self.check(X)
-        self._select_axes(X)
+        self._select_axes(X[..., 0])
         return self._symmetry.gsh_eval(X, self.n_states)
 
-    def _reshape_feature(self, X, size):
+    def _reshape_feature(self, X):
         """
         Helper function used to check the shape of the microstructure,
         and change to appropriate shape.
@@ -156,5 +160,5 @@ class GSHBasis(_ImagFFTBasis):
         Returns:
             microstructure with shape (n_samples, size)
         """
-        new_shape = (X.shape[0],) + size + (X.shape[-1],)
+        new_shape = (X.shape[0],) + self._axes_shape + (X.shape[-1],)
         return X.reshape(new_shape)

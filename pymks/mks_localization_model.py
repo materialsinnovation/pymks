@@ -169,7 +169,7 @@ class MKSLocalizationModel(LinearRegression):
         y_pred_shape = self.basis._pred_shape(X)
         X = self.basis._reshape_feature(X)
         X_ = self.basis.discretize(X)
-        return self._filter.convolve(X_).reshape(y_pred_shape)
+        return self._filter.convolve(X_).reshape(y_pred_shape).real
 
     def resize_coeff(self, size):
         """Scale the size of the coefficients and pad with zeros.
