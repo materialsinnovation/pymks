@@ -115,5 +115,31 @@ def test_set_correlations():
     assert model_prim.correlations == test_correlations
 
 
+def test_coef_setter():
+    from pymks import MKSHomogenizationModel
+    from pymks import PrimitiveBasis
+    p_basis = PrimitiveBasis(2)
+    model = MKSHomogenizationModel(basis=p_basis)
+    X = np.random.randint(2, size=(50, 10, 10))
+    y = np.random.randint(2, size=(50,))
+    model.fit(X, y)
+    coefs = model.coef_
+    model.coef_ = coefs * 2
+    assert np.allclose(model.coef_, coefs * 2)
+
+
+def test_intercept_setter():
+    from pymks import MKSHomogenizationModel
+    from pymks import PrimitiveBasis
+    p_basis = PrimitiveBasis(2)
+    model = MKSHomogenizationModel(basis=p_basis)
+    X = np.random.randint(2, size=(50, 10, 10))
+    y = np.random.randint(2, size=(50,))
+    model.fit(X, y)
+    intercept = model.intercept_
+    model.intercept_ = intercept * 2
+    assert np.allclose(model.intercept_, intercept * 2)
+
+
 if __name__ == '__main__':
     test_default_dimension_reducer()
