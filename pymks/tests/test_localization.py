@@ -119,5 +119,22 @@ def test_coeff_stablity_with_irfftn():
     assert np.allclose(y_big_pred, y_big_test, rtol=1e-2, atol=6.1e-2)
 
 
+def test_setting_kernel():
+    from pymks.datasets import make_elastic_FE_strain_delta
+    from pymks import MKSLocalizationModel
+    from pymks import PrimitiveBasis
+    elastic_modulus = (100, 130)
+    poissons_ratio = (0.3, 0.3)
+    X_delta, y = make_elastic_FE_strain_delta(size=(21, 21),
+                                              elastic_modulus=elastic_modulus,
+                                              poissons_ratio=poissons_ratio)
+    p_basis = PrimitiveBasis(2)
+    model = MKSLocalizationModel(basis=p_basis)
+    model.fit(X_delta, y)
+    coefs = model.coef_
+    model.resize_coeff((30, 30))
+    model.coef_ = coefs
+    assert np.allclose(model.predict(X_delta), y, atol=1e-4)
+
 if __name__ == '__main__':
     test_resize_coeff()
