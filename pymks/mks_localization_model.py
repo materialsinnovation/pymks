@@ -133,6 +133,13 @@ class MKSLocalizationModel(LinearRegression):
         """
         return self._filter._frequency_2_real(copy=True)[0]
 
+    @coef_.setter
+    def coef_(self, kernel):
+        """Setter for influence coefficients.
+        """
+        self._filter._Fkernel = self._filter._real_2_frequency(kernel[None])
+        self.basis._axes_shape = kernel.shape[:-1]
+
     def predict(self, X):
         """Predicts a new response from the microstructure function `X` with
         calibrated influence coefficients.
