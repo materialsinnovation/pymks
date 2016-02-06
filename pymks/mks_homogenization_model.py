@@ -25,6 +25,8 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
             correlations used to fit the model.
         reduced_predict_data: Low dimensionality representation of spatial
             correlations predicted by the model.
+        periodic_axes: axes that are periodic. (0, 2) would indicate that
+            axes x and z are periodic in a 3D microstrucure.
 
     Below is an example of using MKSHomogenizationModel to predict (or
     classify) the type of microstructure using PCA and Logistic Regression.
@@ -59,9 +61,9 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
     """
 
     def __init__(self, basis=None, dimension_reducer=None, n_components=None,
-                 property_linker=None, degree=1, correlations=None,
-                 compute_correlations=True, n_jobs=1, store_correlations=False,
-                 mean_center=True):
+                 property_linker=None, degree=1, periodic_axes=None,
+                 correlations=None, compute_correlations=True, n_jobs=1,
+                 store_correlations=False, mean_center=True):
         """
         Create an instance of a `MKSHomogenizationModel`.
 
@@ -76,6 +78,9 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
                 dimension_reducer
             degree (int, optional): degree of the polynomial used by
                 property_linker.
+            periodic_axes (list, optional): axes that are periodic. (0, 2)
+                would indicate that axes x and z are periodic in a 3D
+                microstrucure.
             correlations (list, optional): list of spatial correlations to
                 compute, default is the autocorrelation with the first local
                 state and all of its cross correlations. For example if basis
@@ -116,7 +121,8 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
                              dimension_reducer=dimension_reducer,
                              correlations=correlations, n_jobs=n_jobs,
                              n_components=n_components, basis=basis,
-                             mean_center=mean_center)
+                             mean_center=mean_center,
+                             periodic_axes=periodic_axes)
 
     @property
     def n_components(self):
@@ -151,8 +157,7 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
         self._property_linker = prop_linker
         self._linker.set_params(connector=prop_linker)
 
-    def fit(self, X, y, reduce_labels=None,
-            periodic_axes=None, confidence_index=None, size=None):
+    def fit(self, X, y, reduce_labels=None, confidence_index=None, size=None):
         """
         Fits data by calculating 2-point statistics from X, preforming
         dimension reduction using dimension_reducer, and fitting the reduced
@@ -165,9 +170,6 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
             y (1D array): The material property associated with `X`.
             reducer_labels (1D array, optional): label for X used during the
                 fit_transform method for the `dimension_reducer`.
-            periodic_axes (list, optional): axes that are periodic. (0, 2)
-                would indicate that axes x and z are periodic in a 3D
-                microstrucure.
             confidence_index (ND array, optional): array with same shape as X
                 used to assign a confidence value for each data point.
 
@@ -228,26 +230,21 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
 
         """
         if self.compute_correlations:
-            if periodic_axes is None:
-                periodic_axes = []
             if size is not None:
                 new_shape = (X.shape[0],) + size
                 X = X.reshape(new_shape)
-            X = self._compute_stats(X, periodic_axes, confidence_index)
+            X = self._compute_stats(X, confidence_index)
         X_reshape = self._reduce_shape(X)
         X_reduced = self._fit_transform(X_reshape, reduce_labels)
         self._linker.fit(X_reduced, y)
 
-    def predict(self, X, periodic_axes=None, confidence_index=None):
+    def predict(self, X, confidence_index=None):
         """Predicts macroscopic property for the microstructures `X`.
 
         Args:
             X (ND array): The microstructure, an `(n_samples, n_x, ...)`
                 shaped array where `n_samples` is the number of samples and
                 `n_x` is the spatial discretization.
-            periodic_axes (list, optional): axes that are periodic. (0, 2)
-                would indicate that axes x and z are periodic in a 3D
-                microstrucure.
             confidence_index (ND array, optional): array with same shape as X
                 used to assign a confidence value for each data point.
 
@@ -292,15 +289,13 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
             print self._linker.get_params()['connector']
             raise RuntimeError('fit() method must be run before predict().')
         if self.compute_correlations is True:
-            if periodic_axes is None:
-                periodic_axes = []
-            X = self._compute_stats(X, periodic_axes, confidence_index)
+            X = self._compute_stats(X, confidence_index)
 
         X_reduced = self._transform(X)
         self.reduced_predict_data = X_reduced
         return self._linker.predict(X_reduced)
 
-    def score(self, X, y, periodic_axes=None, confidence_index=None):
+    def score(self, X, y, confidence_index=None):
         """
         The score function for the MKSHomogenizationModel. It formats the
         data and uses the score method from the property_linker.
@@ -320,12 +315,10 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
              Score for MKSHomogenizationModel from the selected
              property_linker.
         """
-        if periodic_axes is None:
-            periodic_axes = []
         if not callable(getattr(self._linker, "score", None)):
             raise RuntimeError(
                 "property_linker does not have score() method.")
         if self.compute_correlations:
-            X = self._correlate(X, periodic_axes, confidence_index)
+            X = self._correlate(X, self.periodic_axes, confidence_index)
         X_reduced = self._transform(X)
         return self._linker.score(X_reduced, y)

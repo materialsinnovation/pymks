@@ -19,6 +19,9 @@ class MKSStructureAnalysis(BaseEstimator):
         reduced_fit_data: Low dimensionality representation of spatial
             correlations used to fit the components.
         transformed_data: Reduced of spatial correlations.
+        periodic_axes: axes that are periodic. (0, 2) would indicate that
+            axes x and z are periodic in a 3D microstrucure.
+
 
     Below is an example of using MKSStructureAnalysis using FastICA.
 
@@ -41,8 +44,8 @@ class MKSStructureAnalysis(BaseEstimator):
     """
 
     def __init__(self, basis, correlations=None, dimension_reducer=None,
-                 n_components=None, store_correlations=False, n_jobs=1,
-                 mean_center=True):
+                 n_components=None, periodic_axes=None,
+                 store_correlations=False, n_jobs=1, mean_center=True):
         """
         Create an instance of a `MKSStructureAnalysis`.
 
@@ -57,6 +60,9 @@ class MKSStructureAnalysis(BaseEstimator):
                 compute, default is the autocorrelation with the first local
                 state and all of its cross correlations. For example if basis
                 has n_states=3, correlation would be [(0, 0), (0, 1), (0, 2)]
+            periodic_axes (list, optional): axes that are periodic. (0, 2)
+                would indicate that axes x and z are periodic in a 3D
+                microstrucure.
             store_correlations (boolean, optional): If true the computed
                 2-point statistics will be saved as an attributes
                 fit_correlations and transform_correlations.
@@ -70,6 +76,7 @@ class MKSStructureAnalysis(BaseEstimator):
         self.dimension_reducer = dimension_reducer
         self.store_correlations = store_correlations
         self.mean_center = mean_center
+        self.periodic_axes = periodic_axes
         if basis is not None:
             self.basis._n_jobs = n_jobs
         if self.dimension_reducer is None:
@@ -100,8 +107,7 @@ class MKSStructureAnalysis(BaseEstimator):
         self._n_components = value
         self.dimension_reducer.n_components = value
 
-    def fit(self, X, reducer_labels=None, periodic_axes=None,
-            confidence_index=None):
+    def fit(self, X, reducer_labels=None, confidence_index=None):
         """Fits data by using the 2-point statistics for X to fits the
         components used in dimensionality reduction.
 
@@ -111,9 +117,6 @@ class MKSStructureAnalysis(BaseEstimator):
                 number of samples and `n_x` is the spatial discretization.
             reducer_labels (1D array, optional): label for X used during the
                 fit_transform method for the `dimension_reducer`.
-            periodic_axes (list, optional): axes that are periodic. (0, 2)
-                would indicate that axes x and z are periodic in a 3D
-                microstrucure.
             confidence_index (ND array, optional): array with same shape as X
                 used to assign a confidence value for each data point.
 
@@ -134,10 +137,10 @@ class MKSStructureAnalysis(BaseEstimator):
          [ 0.02886463 -0.43874233  0.49647159]
          [ 0.02886463  0.02886463 -0.17896069]]
         """
-        X_stats = self._compute_stats(X, periodic_axes, confidence_index)
+        X_stats = self._compute_stats(X, confidence_index)
         self._fit_transform(X_stats, reducer_labels)
 
-    def fit_transform(self, X, periodic_axes=None, confidence_index=None):
+    def fit_transform(self, X, confidence_index=None):
         """Fits data by using the 2-point statistics for X to fits the
         components used in dimensionality reduction and returns the reduction
         of the 2-point statistics for X.
@@ -147,10 +150,7 @@ class MKSStructureAnalysis(BaseEstimator):
                 `(n_samples, n_x, ...)` shaped array where `n_samples` is the
                 number of samples and `n_x` is the spatial discretization.
             reducer_labels (1D array, optional): label for X used during the
-                fit_transform method for the `dimension_reducer`.
-            periodic_axes (list, optional): axes that are periodic. (0, 2)
-                would indicate that axes x and z are periodic in a 3D
-                microstrucure.
+                fit_transform method for the `dimension_reducer`..
             confidence_index (ND array, optional): array with same shape as X
                 used to assign a confidence value for each data point.
 
@@ -172,10 +172,10 @@ class MKSStructureAnalysis(BaseEstimator):
         [[ 0.26731852]
          [-0.26731852]]
         """
-        X_stats = self._compute_stats(X, periodic_axes, confidence_index)
+        X_stats = self._compute_stats(X, confidence_index)
         return self._fit_transform(X_stats, None)
 
-    def transform(self, X, periodic_axes=None, confidence_index=None):
+    def transform(self, X, confidence_index=None):
         """Computes the 2-point statistics for X and applies dimensionality
         reduction.
 
@@ -183,9 +183,6 @@ class MKSStructureAnalysis(BaseEstimator):
             X (ND array): The microstructures or spatial correlations, a
                 `(n_samples, n_x, ...)` shaped array where `n_samples` is the
                 number of samples and `n_x` is the spatial discretization.
-            periodic_axes (list, optional): axes that are periodic. (0, 2)
-                would indicate that axes x and z are periodic in a 3D
-                microstrucure.
             confidence_index (ND array, optional): array with same shape as X
                 used to assign a confidence value for each data point.
 
@@ -209,7 +206,7 @@ class MKSStructureAnalysis(BaseEstimator):
         [[ 0.26731852]
          [-0.26731852]]
         """
-        X_stats = self._compute_stats(X, periodic_axes, confidence_index)
+        X_stats = self._compute_stats(X, confidence_index)
         return self._transform(X_stats)
 
     def _transform(self, X):
@@ -237,7 +234,7 @@ class MKSStructureAnalysis(BaseEstimator):
             else:
                 self.transform_correlations = X
 
-    def _compute_stats(self, X, periodic_axes, confidence_index):
+    def _compute_stats(self, X, confidence_index):
         """
         Helper function used to calculated 2-point statistics from `X` and
         reshape them appropriately for fit and predict methods.
@@ -246,9 +243,6 @@ class MKSStructureAnalysis(BaseEstimator):
             X (ND array): The microstructure, an `(n_samples, n_x, ...)`
                 shaped array where `n_samples` is the number of samples and
                 `n_x` is the spatial discretization..
-            periodic_axes (list, optional): axes that are periodic. (0, 2)
-                would indicate that axes x and z are periodic in a 3D
-                microstrucure.
             confidence_index (ND array, optional): array with same shape as X
                 used to assign a confidence value for each data point.
 
@@ -260,7 +254,7 @@ class MKSStructureAnalysis(BaseEstimator):
         """
         if self.basis is None:
             raise AttributeError('basis must be specified')
-        X_stats = correlate(X, self.basis, periodic_axes=periodic_axes,
+        X_stats = correlate(X, self.basis, periodic_axes=self.periodic_axes,
                             confidence_index=confidence_index,
                             correlations=self.correlations)
         return X_stats
