@@ -76,5 +76,18 @@ def test_reshape_X():
     X_test = np.concatenate((np.arange(-4, 5)[None], np.arange(-4, 5)[None]))
     assert np.allclose(anaylzer._reduce_shape(X), X_test)
 
+
+def test_set_components():
+    from pymks import MKSStructureAnalysis
+    from pymks import PrimitiveBasis
+    p_basis = PrimitiveBasis(2)
+    model = MKSStructureAnalysis(basis=p_basis)
+    X = np.random.randint(2, size=(50, 10, 10))
+    print X.shape
+    model.fit(X)
+    components = model.components_
+    model.components_ = components * 2
+    assert np.allclose(model.components_, components * 2)
+
 if __name__ == '__main__':
     test_set_correlations()
