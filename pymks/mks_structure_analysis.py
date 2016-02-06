@@ -18,9 +18,11 @@ class MKSStructureAnalysis(BaseEstimator):
         basis: instance of a basis class
         reduced_fit_data: Low dimensionality representation of spatial
             correlations used to fit the components.
-        transformed_data: Reduced of spatial correlations.
+        reduced_transformed_data: Reduced of spatial correlations.
         periodic_axes: axes that are periodic. (0, 2) would indicate that
             axes x and z are periodic in a 3D microstrucure.
+        transformed_correlations: spatial correlations transform into the Low
+            dimensional space.
 
 
     Below is an example of using MKSStructureAnalysis using FastICA.
@@ -102,10 +104,22 @@ class MKSStructureAnalysis(BaseEstimator):
 
     @n_components.setter
     def n_components(self, value):
-        """Setter for the number of components using by the dimension_reducer
+        """Setter for the number of components used by the dimension_reducer
         """
         self._n_components = value
         self.dimension_reducer.n_components = value
+
+    @property
+    def components_(self):
+        stats_shape = ((self.n_components,) + self._components_shape)
+        return self.dimension_reducer.components_.reshape(stats_shape)
+
+    @components_.setter
+    def components_(self, components):
+        """Setter for the components used by the dimension_reducer
+        """
+        self.dimension_reducer.components_ = components.reshape(
+            self._n_components, -1)
 
     def fit(self, X, reducer_labels=None, confidence_index=None):
         """Fits data by using the 2-point statistics for X to fits the
@@ -223,6 +237,7 @@ class MKSStructureAnalysis(BaseEstimator):
         X_reshaped = self._reduce_shape(X)
         self.reduced_fit_data = self.dimension_reducer.fit_transform(
             X_reshaped, y)
+        self._components_shape = X.shape[1:-2] + (X.shape[-1] * X.shape[-2],)
         return self.reduced_fit_data
 
     def _store_correlations(self, X):

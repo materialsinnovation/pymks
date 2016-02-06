@@ -27,6 +27,8 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
             correlations predicted by the model.
         periodic_axes: axes that are periodic. (0, 2) would indicate that
             axes x and z are periodic in a 3D microstrucure.
+        coef_: Array of values that are the coefficients.
+        intercept_: Value that are the intercept
 
     Below is an example of using MKSHomogenizationModel to predict (or
     classify) the type of microstructure using PCA and Logistic Regression.
