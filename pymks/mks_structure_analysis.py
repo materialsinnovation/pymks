@@ -25,6 +25,7 @@ class MKSStructureAnalysis(BaseEstimator):
             dimensional space.
 
 
+
     Below is an example of using MKSStructureAnalysis using FastICA.
 
     >>> from pymks.datasets import make_microstructure
