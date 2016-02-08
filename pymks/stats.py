@@ -7,18 +7,20 @@ point statistics.
 """
 
 
-def autocorrelate(X_, periodic_axes=[], confidence_index=None,
+def autocorrelate(X, basis, periodic_axes=[], n_jobs=1, confidence_index=None,
                   autocorrelations=None):
     """
     Computes the autocorrelation from a microstructure function.
 
     Args:
-        X_ (ND array): The discretized microstructure function, an
-            `(n_samples, n_x, ..., n_states)` shaped array
-            where `n_samples` is the number of samples, `n_x` is thes
-            patial discretization, and n_states is the number of local states.
+        X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+            shaped array where `n_samples` is the number of samples and
+            `n_x` is the spatial discretization.
+        basis (class): an instance of a bases class
         periodic_axes (list, optional): axes that are periodic. (0, 2) would
             indicate that axes x and z are periodic in a 3D microstrucure.
+        n_jobs (int, optional): number of parallel jobs to run. only used if
+            pyfftw is install.
         confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
         autocorrelations (list, optional): list of spatial autocorrelatiions to
@@ -27,7 +29,7 @@ def autocorrelate(X_, periodic_axes=[], confidence_index=None,
             all autocorrelations are computed.
 
     Returns:
-        Autocorrelations for microstructure function `X_`.
+        Autocorrelations for a microstructure.
 
     Non-periodic example
 
@@ -37,8 +39,7 @@ def autocorrelate(X_, periodic_axes=[], confidence_index=None,
     ...                [0, 0, 0]]])
     >>> from pymks.bases import PrimitiveBasis
     >>> prim_basis = PrimitiveBasis(n_states=n_states)
-    >>> X_ = prim_basis.discretize(X)
-    >>> X_auto = autocorrelate(X_, periodic_axes=(0, 1))
+    >>> X_auto = autocorrelate(X, prim_basis, periodic_axes=(0, 1))
     >>> X_test = np.array([[[0., 0., 0.],
     ...                   [0., 1./9, 0.],
     ...                   [0., 0., 0.]]])
@@ -47,14 +48,153 @@ def autocorrelate(X_, periodic_axes=[], confidence_index=None,
     if periodic_axes is None:
         periodic_axes = []
     if autocorrelations is None:
-        correlations = _auto_correlations(X_.shape[-1])
+        correlations = _auto_correlations(basis.n_states)
+    return _compute_stats(X, basis, correlations, confidence_index,
+                          periodic_axes, n_jobs)
+
+
+def crosscorrelate(X, basis, periodic_axes=None, n_jobs=1,
+                   confidence_index=None, crosscorrelations=None):
+    """
+    Computes the crosscorrelations from a microstructure function.
+
+    Args:
+        X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+            shaped array where `n_samples` is the number of samples and
+            `n_x` is the spatial discretization.s.
+        basis (class): an instance of a bases class
+        periodic_axes (list, optional): axes that are periodic. (0, 2) would
+            indicate that axes x and z are periodic in a 3D microstrucure.
+        n_jobs (int, optional): number of parallel jobs to run. only used if
+            pyfftw is install.
+        confidence_index (ND array, optional): array with same shape as X used
+            to assign a confidence value for each data point.
+        crosscorrelations (list, optional): list of cross-correlatiions to
+            be computed. For example [(0, 1), (0, 2)] computes the
+            cross-correlations with local states 0 and 1 as well as 0 and 2.
+            If no list is passed, all cross-correlations are computed.
+
+    Returns:
+        Crosscorelations for a microstructure.
+
+    Examples
+
+    Test for 2 states.
+
+    >>> n_states = 2
+    >>> X = np.array([[[0, 1, 0],
+    ...                [0, 1, 0],
+    ...                [0, 1, 0]]])
+    >>> from pymks.bases import PrimitiveBasis
+    >>> prim_basis = PrimitiveBasis(n_states=n_states)
+    >>> X_cross = crosscorrelate(X, prim_basis, periodic_axes=[0, 1])
+    >>> X_test = np.array([[[[1/3.], [0.], [1/3.]],
+    ...                     [[1/3.], [0.], [1/3.]],
+    ...                     [[1/3.], [0.], [1/3.]]]])
+    >>> assert(np.allclose(X_cross, X_test))
+
+    Test for 3 states
+
+    >>> n_states = 3
+    >>> prim_basis = PrimitiveBasis(n_states=n_states)
+    >>> assert(crosscorrelate(X, prim_basis,
+    ...        periodic_axes=[0, 1]).shape == (1, 3, 3, 3))
+
+    Test for 4 states
+
+    >>> n_states = 4
+    >>> prim_basis = PrimitiveBasis(n_states=n_states)
+    >>> assert(crosscorrelate(X, prim_basis,
+    ...        periodic_axes=[0, 1]).shape == (1, 3, 3, 6))
+
+    Test for 5 states
+
+    >>> n_states = 5
+    >>> prim_basis = PrimitiveBasis(n_states=n_states)
+    >>> assert(crosscorrelate(X, prim_basis,
+    ...        periodic_axes=[0, 1]).shape == (1, 3, 3, 10))
+    """
+    if periodic_axes is None:
+        periodic_axes = []
+    if crosscorrelations is None:
+        correlations = _cross_correlations(basis.n_states)
+    return _compute_stats(X, basis, correlations, confidence_index,
+                          periodic_axes, n_jobs)
+
+
+def correlate(X, basis, periodic_axes=None, n_jobs=1,
+              confidence_index=None, correlations=None):
+    """
+    Computes the autocorrelations and crosscorrelations from a microstructure
+    function.
+
+    Args:
+        X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+            shaped array where `n_samples` is the number of samples and
+            `n_x` is the spatial discretization.
+        basis (class): an instance of a bases class
+        periodic_axes (list, optional): axes that are periodic. (0, 2) would
+            indicate that axes x and z are periodic in a 3D microstrucure.
+        n_jobs (int, optional): number of parallel jobs to run. only used if
+            pyfftw is install.
+        confidence_index (ND array, optional): array with same shape as X used
+            to assign a confidence value for each data point.
+        correlations (list, optional): list of  spatial correlatiions to
+            be computed. For example [(0, 0), (1, 1), (0, 2)] computes the
+            autocorrelations with local states 0 and 1 as well as the
+            cross-correlation between 0 and 2. If no list is passed, all
+            spatial correlations are computed.
+
+    Returns:
+        Autocorrelations and crosscorrelations for a microstructure.
+
+    Example
+
+    >>> from pymks import PrimitiveBasis
+    >>> prim_basis = PrimitiveBasis(2, [0, 1])
+    >>>
+    >>> np.random.seed(0)
+    >>> X = np.random.randint(2, size=(1, 3))
+    >>> X_corr = correlate(X, prim_basis)
+    >>> X_result = np.array([[0, 0.5, 0],
+    ...                      [1 / 3., 2 / 3., 0],
+    ...                      [0, 0.5, 0.5]])
+    >>> assert np.allclose(X_corr, X_result)
+    """
+    if periodic_axes is None:
+        periodic_axes = []
+    if correlations is None:
+        L = basis.n_states
+        correlations = _auto_correlations(L) + _cross_correlations(L)
+    return _compute_stats(X, basis, correlations, confidence_index,
+                          periodic_axes, n_jobs)
+
+
+def _compute_stats(X, basis, correlations, confidence_index,
+                   periodic_axes, n_jobs):
+    """Helper function to compute statistics
+
+    Args:
+        X (ND array): The microstructure, an `(n_samples, n_x, ...)`
+            shaped array where `n_samples` is the number of samples and
+            `n_x` is the spatial discretization.
+        basis: an instance of a bases class
+        correlations: list of  spatial correlatiions to be computed.
+        confidence_index: array with same shape as X used to assign a
+            confidence value for each data point.
+        periodic_axes: axes that are periodic. (0, 2) would indicate that axes
+            and z are periodic in a 3D microstrucure.
+        n_jobs (int, optional): number of parallel jobs to run.
+    """
+    X_ = basis.discretize(X)
     X_ = _mask_X_(X_, confidence_index)
-    s = _Fkernel_shape(X_, periodic_axes)
-    auto = _correlate(X_, s, correlations)
-    return auto / _normalize(X_, s, confidence_index)
+    basis._n_jobs = n_jobs
+    _Fkernel_shape(X.shape, basis, periodic_axes)
+    _norm = _normalize(X.shape, basis, confidence_index)
+    return _correlate(X_, basis, correlations) / _norm
 
 
-def _correlate(X_, s, correlations):
+def _correlate(X_, basis, correlations):
     """
     Helper function used to calculate the unnormalized correlation counts.
 
@@ -63,7 +203,9 @@ def _correlate(X_, s, correlations):
             `(n_samples, n_x, ..., n_states)` shaped array
             where `n_samples` is the number of samples, `n_x` is thes
             patial discretization, and n_states is the number of local states.
-        s (tuple): shape of the Fkernel used for the convolution
+        basis (class): an instance of a bases class.
+        correlations (list): list of correlations to compute. `[(0, 0),
+            (1, 1)]`
 
     Returns:
         correlation counts for a given microstructure function
@@ -77,7 +219,7 @@ def _correlate(X_, s, correlations):
     >>> prim_basis = PrimitiveBasis(n_states=3, domain=[0, 2])
     >>> X_ = prim_basis.discretize(X)
     >>> correlations = [(l, l) for l in range(3)]
-    >>> X_corr = _correlate(X_, X_.shape[1:-1], correlations=correlations)
+    >>> X_corr = _correlate(X_, prim_basis, correlations=correlations)
     >>> X_result = np.array([[[[0, 0, 0],
     ...                        [0, 0, 2]],
     ...                       [[0, 0, 0],
@@ -88,130 +230,9 @@ def _correlate(X_, s, correlations):
     ...                        [2, 0, 2]]]])
     >>> assert np.allclose(X_result, X_corr)
     """
-
     l_0, l_1 = [l[0] for l in correlations], [l[1] for l in correlations]
-    corr = Correlation(X_[..., l_0], Fkernel_shape=s).convolve(X_[..., l_1])
+    corr = Correlation(X_[..., l_0], basis).convolve(X_[..., l_1])
     return _truncate(corr, X_.shape[:-1])
-
-
-def crosscorrelate(X_, periodic_axes=None, confidence_index=None,
-                   crosscorrelations=None):
-    """
-    Computes the crosscorrelations from a microstructure function.
-
-    Args:
-        X_ (ND array): The discretized microstructure function, an
-            `(n_samples, n_x, ..., n_states)` shaped array
-            where `n_samples` is the number of samples, `n_x` is thes
-            patial discretization, and n_states is the number of local states.
-        periodic_axes (list, optional): axes that are periodic. (0, 2) would
-            indicate that axes x and z are periodic in a 3D microstrucure.
-        confidence_index (ND array, optional): array with same shape as X used
-            to assign a confidence value for each data point.
-        crosscorrelations (list, optional): list of cross-correlatiions to
-            be computed. For example [(0, 1), (0, 2)] computes the
-            cross-correlations with local states 0 and 1 as well as 0 and 2.
-            If no list is passed, all cross-correlations are computed.
-
-    Returns:
-        Crosscorelations for microstructure function `X_`.
-
-    Examples
-
-    Test for 2 states.
-
-    >>> n_states = 2
-    >>> X = np.array([[[0, 1, 0],
-    ...                [0, 1, 0],
-    ...                [0, 1, 0]]])
-    >>> from pymks.bases import PrimitiveBasis
-    >>> prim_basis = PrimitiveBasis(n_states=n_states)
-    >>> X_ = prim_basis.discretize(X)
-    >>> X_cross = crosscorrelate(X_, periodic_axes=[0, 1])
-    >>> X_test = np.array([[[[1/3.], [0.], [1/3.]],
-    ...                     [[1/3.], [0.], [1/3.]],
-    ...                     [[1/3.], [0.], [1/3.]]]])
-    >>> assert(np.allclose(X_cross, X_test))
-
-    Test for 3 states
-
-    >>> n_states = 3
-    >>> prim_basis = PrimitiveBasis(n_states=n_states)
-    >>> X_ = prim_basis.discretize(X)
-    >>> assert(crosscorrelate(X_, periodic_axes=[0, 1]).shape == (1, 3, 3, 3))
-
-    Test for 4 states
-
-    >>> n_states = 4
-    >>> prim_basis = PrimitiveBasis(n_states=n_states)
-    >>> X_ = prim_basis.discretize(X)
-    >>> assert(crosscorrelate(X_, periodic_axes=[0, 1]).shape == (1, 3, 3, 6))
-
-    Test for 5 states
-
-    >>> n_states = 5
-    >>> prim_basis = PrimitiveBasis(n_states=n_states)
-    >>> X_ = prim_basis.discretize(X)
-    >>> assert(crosscorrelate(X_, periodic_axes=[0, 1]).shape == (1, 3, 3, 10))
-    """
-    if periodic_axes is None:
-        periodic_axes = []
-    if crosscorrelations is None:
-        correlations = _cross_correlations(X_.shape[-1])
-    X_ = _mask_X_(X_, confidence_index)
-    s = _Fkernel_shape(X_, periodic_axes)
-    cross = _correlate(X_, s, correlations)
-    return cross / _normalize(X_, s, confidence_index)
-
-
-def correlate(X_, periodic_axes=None,
-              confidence_index=None, correlations=None):
-    """
-    Computes the autocorrelations and crosscorrelations from a microstructure
-    function.
-
-    Args:
-        X_ (ND array): The discretized microstructure function, an
-            `(n_samples, n_x, ..., n_states)` shaped array
-            where `n_samples` is the number of samples, `n_x` is thes
-            patial discretization, and n_states is the number of local states.
-        periodic_axes (list, optional): axes that are periodic. (0, 2) would
-            indicate that axes x and z are periodic in a 3D microstrucure.
-        confidence_index (ND array, optional): array with same shape as X used
-            to assign a confidence value for each data point.
-        correlations (list, optional): list of  spatial correlatiions to
-            be computed. For example [(0, 0), (1, 1), (0, 2)] computes the
-            autocorrelations with local states 0 and 1 as well as the
-            cross-correlation between 0 and 2. If no list is passed, all
-            spatial correlations are computed.
-
-    Returns:
-        Autocorrelations and crosscorrelations for microstructure funciton
-        `X_`.
-
-    Example
-
-    >>> from pymks import PrimitiveBasis
-    >>> prim_basis = PrimitiveBasis(2, [0, 1])
-    >>>
-    >>> np.random.seed(0)
-    >>> X = np.random.randint(2, size=(1, 3))
-    >>> X_ = prim_basis.discretize(X)
-    >>> X_corr = correlate(X_)
-    >>> X_result = np.array([[0, 0.5, 0],
-    ...                      [1 / 3., 2 / 3., 0],
-    ...                      [0, 0.5, 0.5]])
-    >>> assert np.allclose(X_corr, X_result)
-    """
-    if periodic_axes is None:
-        periodic_axes = []
-    if correlations is None:
-        L = X_.shape[-1]
-        correlations = _auto_correlations(L) + _cross_correlations(L)
-    X_ = _mask_X_(X_, confidence_index)
-    s = _Fkernel_shape(X_, periodic_axes)
-    corr = _correlate(X_, s, correlations)
-    return corr / _normalize(X_, s, confidence_index)
 
 
 def _auto_correlations(n_states):
@@ -223,10 +244,10 @@ def _auto_correlations(n_states):
     Returns:
         list of tuples for autocorrelations
 
-    >>> l = _auto_correlations(3)
+    >>> l = _auto_correlations(np.arange(3))
     >>> assert l == [(0, 0), (1, 1), (2, 2)]
     """
-    local_states = list(range(int(n_states)))
+    local_states = n_states
     return [(l, l) for l in local_states]
 
 
@@ -239,15 +260,15 @@ def _cross_correlations(n_states):
     Returns:
         list of tuples for crosscorrelations
 
-    >>> l = _cross_correlations(3)
+    >>> l = _cross_correlations(np.arange(3))
     >>> assert l == [(0, 1), (0, 2), (1, 2)]
     """
-    l = list(range(int(n_states)))
+    l = n_states
     cross_corr = [[(l[i], l[j]) for j in l[1:][i:]] for i in l[:-1]]
     return [item for sublist in cross_corr for item in sublist]
 
 
-def _normalize(X_, s, confidence_index):
+def _normalize(X_shape, basis, confidence_index):
     """
     Returns the normalization for the statistics
 
@@ -258,59 +279,52 @@ def _normalize(X_, s, confidence_index):
             `(n_samples, n_x, ..., n_states)` shaped array
             where `n_samples` is the number of samples, `n_x` is thes
             patial discretization, and n_states is the number of local states.
-        _Fkernel_shape : the shape of the kernel is Fourier space (array)
-        confidence_index: array with same shape as X used to assign a
-            confidence value for each data point.
+        basis (class): an instance of a bases class
+        confidence_index (ND array, optional): array with same shape as X used
+            to assign a confidence value for each data point.
 
     Returns:
         Normalization
 
-    Example
-
-    >>> Nx = Ny = 5
-    >>> X_ = np.zeros((1, Nx, Ny, 1))
-    >>> _Fkernel_shape  = np.array((2 * Nx, Ny))
-    >>> norm =  _normalize(X_, _Fkernel_shape , None)
-    >>> assert norm.shape == (1, Nx, Ny, 1)
-    >>> assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
     """
 
-    if (s == X_.shape[1:-1]).all() and confidence_index is None:
-        return float(np.prod(X_.shape[1:-1]))
+    if basis._axes_shape == X_shape[1:] and confidence_index is None:
+        return float(np.prod(X_shape[1:]))
     else:
         mask = confidence_index
         if mask is None:
-            mask = np.ones(X_.shape[1:-1])[None]
-        corr = Correlation(mask[..., None], Fkernel_shape=s)
-        return _truncate(corr.convolve(mask[..., None]), X_.shape[:-1])
+            mask = np.ones(X_shape[1:])[None]
+        corr = Correlation(mask[..., None], basis)
+        return _truncate(corr.convolve(mask[..., None]), X_shape)
 
 
-def _Fkernel_shape(X_, periodic_axes):
+def _Fkernel_shape(X_shape, basis, periodic_axes):
     """
-    Returns the shape of the kernel in Fourier space with non-periodic padding.
+    Assigns the shape of the kernel in Fourier space with non-periodic padding
+    to the basis.
 
     Args:
-        `X_`: The discretized microstructure function, an
-            `(n_samples, n_x, ..., n_states)` shaped array
-            where `n_samples` is the number of samples, `n_x` is thes
-            patial discretization, and n_states is the number of local states.
+        `X_shape`: The shape of discretized microstructure function,
+            `(n_samples, n_x, ..., n_states)` where `n_samples` is the number
+            of samples, `n_x` is the spatial discretization, and n_states is
+            the number of local states.
+        basis: an instance of a bases class
         periodic_axes: the axes of the array that are periodic
-
-    Returns:
-        shape of the new Fkernel array
 
     Example
 
     >>> Nx = Ny = 5
     >>> X_ = np.zeros((1, Nx, Ny, 1))
     >>> periodic_axes = [1]
-    >>> assert (_Fkernel_shape(X_,
-    ...                        periodic_axes=periodic_axes) == [8, 5]).all()
+    >>> from pymks import PrimitiveBasis
+    >>> p_basis = PrimitiveBasis(2)
+    >>> p_basis._axes = np.array([1, 2])
+    >>> _Fkernel_shape(X_.shape, p_basis, periodic_axes=periodic_axes)
+    >>> assert p_basis._axes_shape == (10, 5)
     """
-    axes = np.arange(len(X_.shape) - 2) + 1
-    a = np.ones(len(axes), dtype=float) * 1.75
+    a = np.ones(len(basis._axes), dtype=float) * 2
     a[list(periodic_axes)] = 1
-    return (np.array(X_.shape)[axes] * a).astype(int)
+    basis._axes_shape = tuple((np.array(X_shape)[basis._axes] * a).astype(int))
 
 
 def _truncate(a, shape):

@@ -1,9 +1,7 @@
 import numpy as np
-from sklearn.linear_model import LinearRegression
 from .filter import Filter
-from .filter import _import_pyfftw
 from scipy.linalg import lstsq
-_import_pyfftw()
+from sklearn.linear_model import LinearRegression
 
 
 class MKSLocalizationModel(LinearRegression):
@@ -61,16 +59,18 @@ class MKSLocalizationModel(LinearRegression):
     >>> assert np.allclose(np.fft.fftshift(coef_, axes=(0,)), model.coef_)
     """
 
-    def __init__(self, basis, n_states=None, lstsq_rcond=None):
+    def __init__(self, basis, n_states=None, n_jobs=1, lstsq_rcond=None):
         """
         Instantiate a MKSLocalizationModel.
 
         Args:
             basis (class): an instance of a bases class.
             n_states (int, optional): number of local states
-            lstsq_rcond (float, optional): rcond argument to linalg.lstsq
-            function. Defaults to 4 orders of magnitude above machine
-            epsilon.
+            n_jobs (int, optional): number of parallel jobs to run. only used
+                if pyfftw is install.
+            lstsq_rcond (float, optional): rcond argument to scipy.linalg.lstsq
+                function. Defaults to 4 orders of magnitude above machine
+                epsilon.
 
         """
         self.basis = basis
@@ -78,8 +78,7 @@ class MKSLocalizationModel(LinearRegression):
         if n_states is None:
             self.n_states = basis.n_states
         self.domain = basis.domain
-        # any singular values not 4 orders of magnitude above machine epsilon
-        # are considered linearly dependent and discarded
+        self.basis._n_jobs = n_jobs
         self.lstsq_rcond = lstsq_rcond
         if self.lstsq_rcond is None:
             self.lstsq_rcond = np.finfo(float).eps*1e4
@@ -105,10 +104,10 @@ class MKSLocalizationModel(LinearRegression):
         >>> prim_basis = PrimitiveBasis(2, [0, 1])
         >>> model = MKSLocalizationModel(basis=prim_basis)
         >>> model.fit(X, y)
-        >>> assert np.allclose(model._filter.Fkernel, [[[ 0.5,  0.5],
-        ...                                             [  -2,    0]],
-        ...                                            [[-0.5,  0  ],
-        ...                                             [  -1,  0  ]]])
+        >>> assert np.allclose(model._filter._Fkernel, [[[ 0.5,  0.5],
+        ...                                              [  -2,    0]],
+        ...                                             [[-0.5,  0  ],
+        ...                                              [  -1,  0  ]]])
         """
         self.basis = self.basis.__class__(self.n_states, self.domain)
         if size is not None:
@@ -117,23 +116,29 @@ class MKSLocalizationModel(LinearRegression):
         self.basis._shape_check(X, y)  # call error check for shapes of X and y
 
         X_ = self.basis.discretize(X)
-        axes = np.arange(X_.ndim)[1:-1]
-        FX = np.fft.fftn(X_, axes=axes)
-        Fy = np.fft.fftn(y, axes=axes)
+        FX = self.basis._fftn(X_)
+        Fy = self.basis._fftn(y)
         Fkernel = np.zeros(FX.shape[1:], dtype=np.complex)
         s0 = (slice(None),)
-        for ijk in np.ndindex(X_.shape[1:-1]):
+        for ijk in np.ndindex(FX.shape[1:-1]):
             s1 = self.basis._select_slice(ijk, s0)
             Fkernel[ijk + s1] = lstsq(FX[s0 + ijk + s1], Fy[s0 + ijk],
                                       self.lstsq_rcond)[0]
-        self._filter = Filter(Fkernel[None])
+        self._filter = Filter(Fkernel[None], self.basis)
 
     @property
     def coef_(self):
         """Returns the coefficients in real space with origin shifted to the
         center.
         """
-        return self._filter._frequency_2_real()[0]
+        return self._filter._frequency_2_real(copy=True)[0]
+
+    @coef_.setter
+    def coef_(self, kernel):
+        """Setter for influence coefficients.
+        """
+        self._filter._Fkernel = self._filter._real_2_frequency(kernel[None])
+        self.basis._axes_shape = kernel.shape[:-1]
 
     def predict(self, X):
         """Predicts a new response from the microstructure function `X` with
@@ -169,9 +174,9 @@ class MKSLocalizationModel(LinearRegression):
         if not hasattr(self, '_filter'):
             raise AttributeError("fit() method must be run before predict().")
         y_pred_shape = self.basis._pred_shape(X)
-        X = self.basis._reshape_feature(X, self._filter.Fkernel.shape[1:-1])
+        X = self.basis._reshape_feature(X)
         X_ = self.basis.discretize(X)
-        return self._filter.convolve(X_).reshape(y_pred_shape)
+        return self._filter.convolve(X_).reshape(y_pred_shape).real
 
     def resize_coeff(self, size):
         """Scale the size of the coefficients and pad with zeros.
@@ -188,18 +193,21 @@ class MKSLocalizationModel(LinearRegression):
         coefficients.
 
         >>> from pymks.bases import PrimitiveBasis
-        >>> prim_basis = PrimitiveBasis(n_states=2)
+        >>> prim_basis = PrimitiveBasis(n_states=1)
+        >>> prim_basis._axes = np.array([1, 2])
+        >>> prim_basis._axes_shape = (5, 4)
         >>> model = MKSLocalizationModel(prim_basis)
-        >>> coef_ = np.arange(20).reshape((5, 4, 1))
-        >>> coef_ = np.concatenate((coef_ , np.ones_like(coef_)), axis=2)
-        >>> coef_ = np.fft.ifftshift(coef_, axes=(0, 1))
-        >>> model._filter = Filter(np.fft.fftn(coef_, axes=(0, 1))[None])
+        >>> coef_ = np.arange(20).reshape((1, 5, 4, 1))
+        >>> coef_ = np.concatenate((coef_, np.ones_like(coef_)), axis=-1)
+        >>> coef_ = np.fft.ifftshift(coef_, axes=(1, 2))
+        >>> model._filter = Filter(np.fft.rfftn(coef_, axes=(1, 2)),
+        ...                        prim_basis)
 
         The coefficients can be reshaped by passing the new shape that
         coefficients should have.
 
         >>> model.resize_coeff((10, 7))
-        >>> assert np.allclose(model.coef_[:,:,0],
+        >>> assert np.allclose(model.coef_[... ,0],
         ...                    [[0, 0, 0, 0, 0, 0, 0],
         ...                     [0, 0, 0, 0, 0, 0, 0],
         ...                     [0, 0, 0, 0, 0, 0, 0],

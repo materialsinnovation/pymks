@@ -1,8 +1,8 @@
 import numpy as np
-from .abstract import _AbstractMicrostructureBasis
+from .imag_ffts import _ImagFFTBasis
 
 
-class FourierBasis(_AbstractMicrostructureBasis):
+class FourierBasis(_ImagFFTBasis):
 
     r"""
     Discretize a continuous field into `deg` local states using complex
@@ -57,11 +57,11 @@ class FourierBasis(_AbstractMicrostructureBasis):
         """
         self.n_states = n_states
         if isinstance(self.n_states, int):
-            self.n_states = ((np.arange(self.n_states + 1) / 2)[1:] *
-                             (-1) ** np.arange(1, self.n_states + 1))
+            n_states = ((np.arange(self.n_states + 1) / 2)[1:] *
+                        (-1) ** np.arange(1, self.n_states + 1))
         if domain is None:
             domain = [0, 2. * np.pi]
-        self.domain = domain
+        super(FourierBasis, self).__init__(n_states=n_states, domain=domain)
 
     def discretize(self, X):
         """
@@ -86,6 +86,7 @@ class FourierBasis(_AbstractMicrostructureBasis):
         >>> assert(np.allclose(X_result, f_basis.discretize(X)))
 
         """
+        self._select_axes(X)
         X_scaled = 2. * np.pi * ((X.astype(float) - self.domain[0]) /
                                  (self.domain[1] - self.domain[0]))
         nones = ([None for i in X.shape])

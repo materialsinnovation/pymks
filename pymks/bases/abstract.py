@@ -19,10 +19,30 @@ class _AbstractMicrostructureBasis(object):
         if domain is None:
             domain = [0, max(self.n_states)]
         self.domain = domain
+        self._pyfftw = self._module_exists('pyfftw')
+        self._fftmodule = self._load_fftmodule()
+        self._n_jobs = 1
 
     def check(self, X):
         if (np.min(X) < self.domain[0]) or (np.max(X) > self.domain[1]):
             raise RuntimeError("X must be within the specified domain")
+
+    def _module_exists(self, module_name):
+        try:
+            __import__(module_name)
+        except ImportError:
+            return False
+        else:
+            return True
+
+    def _load_fftmodule(self):
+        if self._module_exists('pyfftw'):
+            import pyfftw.builders as fftmodule
+        elif self._module_exists('numpy.fft'):
+            import numpy.fft as fftmodule
+        else:
+            raise RuntimeError('numpy or pyfftw cannot be imported')
+        return fftmodule
 
     def discretize(self, X):
         raise NotImplementedError
@@ -48,18 +68,22 @@ class _AbstractMicrostructureBasis(object):
         """
         return s0
 
-    def _reshape_feature(self, X, size):
+    def _reshape_feature(self, X):
         """
         Helper function used to check the shape of the microstructure,
         and change to appropriate shape.
 
         Args:
             X: The microstructure, an `(n_samples, n_x, ...)` shaped array
-                where `n_samples` is the number of samples and `n_x` is thes
+                where `n_samples` is the number of samples and `n_x` is the
                 patial discretization.
 
         Returns:
             microstructure with shape (n_samples, size)
         """
-        new_shape = (X.shape[0],) + size
+        new_shape = (X.shape[0],) + self._axes_shape
         return X.reshape(new_shape)
+
+    def _select_axes(self, X):
+        self._axes = np.arange(X.ndim - 1) + 1
+        self._axes_shape = X[0].shape

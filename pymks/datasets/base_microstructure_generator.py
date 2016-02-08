@@ -1,7 +1,9 @@
 import numpy as np
+from ..bases.imag_ffts import _ImagFFTBasis
+# from ..bases.real_ffts import _RealFFTBasis
 
 
-class BaseMicrostructureGenerator(object):
+class _BaseMicrostructureGenerator(_ImagFFTBasis):
     def __init__(self, n_samples=1, size=(21, 21),
                  n_phases=2, grain_size=None, seed=3, volume_fraction=None,
                  percent_variance=None):
@@ -24,6 +26,8 @@ class BaseMicrostructureGenerator(object):
           n_samples number of a periodic random microstructure with size equal
           to size and with n_phases number of phases.
         """
+        self._axes = np.arange(len(size)) + 1
+        self._axes_shape = size
         self.n_samples = n_samples
         self.size = size
         self.n_phases = n_phases
@@ -47,6 +51,7 @@ class BaseMicrostructureGenerator(object):
             if max_frac > 1 or min_frac < 0:
                 raise RuntimeError(('percent_variance cannot extend' +
                                     'volume_fraction values beyond 0 or 1'))
+        super(_BaseMicrostructureGenerator, self).__init__()
 
     def generate(self):
         raise NotImplementedError

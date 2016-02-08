@@ -1,8 +1,8 @@
 import numpy as np
-from .abstract import _AbstractMicrostructureBasis
+from .real_ffts import _RealFFTBasis
 
 
-class LegendreBasis(_AbstractMicrostructureBasis):
+class LegendreBasis(_RealFFTBasis):
 
     r"""
     Discretize a continuous field into `deg` local states using a
@@ -70,6 +70,7 @@ class LegendreBasis(_AbstractMicrostructureBasis):
 
         """
         self.check(X)
+        self._select_axes(X)
         leg = np.polynomial.legendre
         X_scaled = (2. * X - self.domain[0] - self.domain[1]) /\
                    (self.domain[1] - self.domain[0])
