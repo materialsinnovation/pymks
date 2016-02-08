@@ -259,7 +259,7 @@ def test_normalization_rfftn():
     X_ = np.zeros((1, Nx, Ny, 1))
     prim_basis._axes = np.arange(X_.ndim - 2) + 1
     prim_basis._axes_shape = (2 * Nx, 2 * Ny)
-    norm = _normalize(X_, prim_basis, None)
+    norm = _normalize(X_.shape[:-1], prim_basis, None)
     assert norm.shape == (1, Nx, Ny, 1)
     assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
 
@@ -274,7 +274,7 @@ def test_normalization_fftn():
     X_ = np.zeros((1, Nx, Ny, 1))
     f_basis._axes = np.arange(X_.ndim - 2) + 1
     f_basis._axes_shape = (2 * Nx, 2 * Ny)
-    norm = _normalize(X_, f_basis, None)
+    norm = _normalize(X_.shape[:-1], f_basis, None)
     assert norm.shape == (1, Nx, Ny, 1)
     assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
 
@@ -287,7 +287,7 @@ def test_gsh_basis_normalization():
     X_ = np.zeros((1, Nx, Ny, 1))
     gsh_basis._axes = np.arange(X_.ndim - 2) + 1
     gsh_basis._axes_shape = (2 * Nx, 2 * Ny)
-    norm = _normalize(X_, gsh_basis, None)
+    norm = _normalize(X_.shape[:-1], gsh_basis, None)
     assert norm.shape == (1, Nx, Ny, 1)
     assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
 
