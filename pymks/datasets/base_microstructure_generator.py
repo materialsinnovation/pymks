@@ -1,5 +1,6 @@
 import numpy as np
 from ..bases.imag_ffts import _ImagFFTBasis
+# from ..bases.real_ffts import _RealFFTBasis
 
 
 class _BaseMicrostructureGenerator(_ImagFFTBasis):
@@ -26,6 +27,7 @@ class _BaseMicrostructureGenerator(_ImagFFTBasis):
           to size and with n_phases number of phases.
         """
         self._axes = np.arange(len(size)) + 1
+        self._axes_shape = size
         self.n_samples = n_samples
         self.size = size
         self.n_phases = n_phases

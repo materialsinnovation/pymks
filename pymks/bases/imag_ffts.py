@@ -48,6 +48,3 @@ class _ImagFFTBasis(_AbstractMicrostructureBasis):
                                          avoid_copy=True)()
         else:
             return self._fftmodule.ifftn(X, axes=self._axes)
-
-    def discretize(self, X):
-        raise NotImplementedError
