@@ -24,8 +24,12 @@ class Filter(object):
         Converts the kernel from frequency space to real space with
         the origin shifted to the center.
 
+        Args:
+            copy (boolean): indicates if _Fkernel should be copied. This is
+                used to make sure the influence cofficients remained unchanged.
+
         Returns:
-          an array in real space
+            an array in real space
         """
         Fkernel = self._Fkernel
         if copy:
@@ -87,6 +91,7 @@ class Filter(object):
 
         Args:
             kernel: real space array
+            size: The size of the zero padded array.
 
         Returns:
             Fourier transform of a zero padded kernel
@@ -146,9 +151,6 @@ class Correlation(Filter):
         Args:
             kernel: an array representing a convolution kernel
             basis: an instance of a bases class.
-            axes_shape: The shape of the axes for which the FFTs are computed.
-                This is used to get the correct shape when using irfftn.
-            n_jobs: number of parallel jobs to run
 
         """
         self.basis = basis
