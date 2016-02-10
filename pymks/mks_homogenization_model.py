@@ -341,6 +341,6 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
             raise RuntimeError(
                 "property_linker does not have score() method.")
         if self.compute_correlations:
-            X = self._correlate(X, self.periodic_axes, confidence_index)
+            X = self._compute_stats(X, self.periodic_axes, confidence_index)
         X_reduced = self._transform(X)
         return self._linker.score(X_reduced, y)
