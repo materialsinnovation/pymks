@@ -147,7 +147,7 @@ class GSHBasis(_ImagFFTBasis):
         self._select_axes(X[..., 0])
         return self._symmetry.gsh_eval(X, self.n_states)
 
-    def _reshape_feature(self, X):
+    def _reshape_feature(self, X, size):
         """
         Helper function used to check the shape of the microstructure,
         and change to appropriate shape.
@@ -156,9 +156,9 @@ class GSHBasis(_ImagFFTBasis):
             X: The microstructure, an `(n_samples, n_x, ...)` shaped array
                 where `n_samples` is the number of samples and `n_x` is thes
                 patial discretization.
+            size: the new size of the array
 
         Returns:
             microstructure with shape (n_samples, size)
         """
-        new_shape = (X.shape[0],) + self._axes_shape + (X.shape[-1],)
-        return X.reshape(new_shape)
+        return X.reshape((X.shape[0],) + size + (X.shape[-1],))

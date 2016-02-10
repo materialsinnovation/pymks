@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.base import BaseEstimator
 
 
 class _AbstractMicrostructureBasis(object):
@@ -20,7 +21,6 @@ class _AbstractMicrostructureBasis(object):
             domain = [0, max(self.n_states)]
         self.domain = domain
         self._pyfftw = self._module_exists('pyfftw')
-        self._fftmodule = self._load_fftmodule()
         self._n_jobs = 1
 
     def check(self, X):
@@ -34,15 +34,6 @@ class _AbstractMicrostructureBasis(object):
             return False
         else:
             return True
-
-    def _load_fftmodule(self):
-        if self._module_exists('pyfftw'):
-            import pyfftw.builders as fftmodule
-        elif self._module_exists('numpy.fft'):
-            import numpy.fft as fftmodule
-        else:
-            raise RuntimeError('numpy or pyfftw cannot be imported')
-        return fftmodule
 
     def discretize(self, X):
         raise NotImplementedError
@@ -68,7 +59,7 @@ class _AbstractMicrostructureBasis(object):
         """
         return s0
 
-    def _reshape_feature(self, X):
+    def _reshape_feature(self, X, size):
         """
         Helper function used to check the shape of the microstructure,
         and change to appropriate shape.
@@ -77,12 +68,12 @@ class _AbstractMicrostructureBasis(object):
             X: The microstructure, an `(n_samples, n_x, ...)` shaped array
                 where `n_samples` is the number of samples and `n_x` is the
                 patial discretization.
+            size: the new size of the array
 
         Returns:
             microstructure with shape (n_samples, size)
         """
-        new_shape = (X.shape[0],) + self._axes_shape
-        return X.reshape(new_shape)
+        return X.reshape((X.shape[0],) + size)
 
     def _select_axes(self, X):
         self._axes = np.arange(X.ndim - 1) + 1
