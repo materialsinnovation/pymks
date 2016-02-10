@@ -32,9 +32,9 @@ def _get_response_cmap():
     Returns:
         dictionary with colors and localizations on color bar.
     """
-    HighRGB = np.array([179,255,204]) / 255.
-    MediumRGB = np.array([28,137,63]) / 255.
-    LowRGB = np.array([11,53,24]) / 255.
+    HighRGB = np.array([179, 255, 204]) / 255.
+    MediumRGB = np.array([28, 137, 63]) / 255.
+    LowRGB = np.array([11, 53, 24]) / 255.
 
     cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
     return colors.LinearSegmentedColormap('coeff_cmap', cdict, 256)
@@ -192,8 +192,8 @@ def draw_microstructures(*microstructures):
     Draw microstructures
 
     Args:
-        microstructures (3D array): numpy array with dimensions (n_samples, x,
-            y)
+        microstructures (3D array): numpy array with dimensions
+            (n_samples, x, y)
     """
     cmap = _get_microstructure_cmap()
     titles = [' ' for s in np.arange(microstructures[0].shape[0])]
@@ -444,8 +444,9 @@ def draw_component_variance(variance):
     plt.show()
 
 
-def draw_components_scatter(datasets, labels, title=None, component_labels=None,
-                            view_angles=None, legend_outside=False, fig_size=None):
+def draw_components_scatter(datasets, labels, title=None,
+                            component_labels=None, view_angles=None,
+                            legend_outside=False, fig_size=None):
     """
     Visualize low dimensional representations of microstructures.
 
@@ -484,7 +485,7 @@ def draw_components_scatter(datasets, labels, title=None, component_labels=None,
 
 
 def draw_evolution(datasets, labels, title=None, component_labels=None,
-                            view_angles=None, legend_outside=False, fig_size=None):
+                   view_angles=None, legend_outside=False, fig_size=None):
     """
     Visualize low dimensional representations of microstructures.
 
@@ -513,8 +514,10 @@ def draw_evolution(datasets, labels, title=None, component_labels=None,
         raise RuntimeError('number of components and component_labels must'
                            ' have the same length')
     if n_components[-1] == 2:
-        _draw_components_evolution(datasets, labels, title, component_labels[:2],
+        _draw_components_evolution(datasets, labels,
+                                   title, component_labels[:2],
                                    legend_outside, fig_size)
+    else:
         raise RuntimeError("time and one component must be paired")
 
 
@@ -545,7 +548,6 @@ def _draw_components_2D(X, labels, title, component_labels,
     ax.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
     for label, pts, color in zip(labels, X, color_list):
         ax.plot(pts[:, 0], pts[:, 1], 'o', color=color, label=label)
-        data_labels = ['{0}'.format(i) for i in range(len(pts))]
         lg = plt.legend(loc=1, borderaxespad=0., fontsize=15)
     if legend_outside is not None:
         lg = plt.legend(bbox_to_anchor=(1.05, 1.0), loc=2,
@@ -553,6 +555,7 @@ def _draw_components_2D(X, labels, title, component_labels,
     lg.draggable()
     plt.title(title, fontsize=20)
     plt.show()
+
 
 def _draw_components_evolution(X, labels, title, component_labels,
                                legend_outside, fig_size):
@@ -581,7 +584,6 @@ def _draw_components_evolution(X, labels, title, component_labels,
     ax.set_ylim([y_min - y_epsilon, y_max + y_epsilon])
     for label, pts, color in zip(labels, X, color_list):
         ax.plot(pts[:, 0], pts[:, 1], 'o', color=color, label=label)
-        data_labels = ['{0}'.format(i) for i in range(len(pts))]
         lg = plt.legend(loc=1, borderaxespad=0., fontsize=15)
     if legend_outside is not None:
         lg = plt.legend(bbox_to_anchor=(1.05, 1.0), loc=2,
@@ -669,8 +671,8 @@ def draw_components(X_comp, fontsize=15, figsize=None):
         correlations (list, optional): correlation labels
     """
     cmap = _get_coeff_cmap()
-    titles = [r'Component $%s$'  % (ii + 1) for ii
-          in np.arange(X_comp.shape[0])]
+    titles = [r'Component $%s$' % (ii + 1) for ii
+              in np.arange(X_comp.shape[0])]
     _draw_fields(X_comp, cmap, fontsize, titles, figsize=figsize)
 
 
@@ -684,7 +686,7 @@ def draw_correlations(X_corr, correlations=None):
     """
     if correlations is None:
         n_cross = X_corr.shape[-1]
-        L = (np.sqrt(1 + 8 * n_cross) - 1).astype(int) / 2
+        L = range((np.sqrt(1 + 8 * n_cross) - 1).astype(int) / 2)
         correlations = _auto_correlations(L) + _cross_correlations(L)
     _draw_stats(X_corr, correlations=correlations)
 
@@ -729,8 +731,6 @@ def _draw_stats(X_, correlations=None):
     plt.close('all')
     X_cmap = _get_coeff_cmap()
     n_plots = len(correlations)
-    vmin = np.min(X_)
-    vmax = np.max(X_)
     x_loc, x_labels = _get_ticks_params(X_.shape[0])
     y_loc, y_labels = _get_ticks_params(X_.shape[1])
     fig, axs = plt.subplots(1, n_plots, figsize=(n_plots * 5, 5))
@@ -786,7 +786,8 @@ def _get_ticks_params(l):
     m = segments[np.argmin(l % segments)]
     n = int(max((l + 1) / m, 1))
     tick_loc = list(range(0, l + n, n))
-    tick_labels = list(range(int(round(- (l - 1) / 2)), int(round(int((l + 1) / 2 + n))), n))
+    tick_labels = list(range(int(round(- (l - 1) / 2)),
+                       int(round(int((l + 1) / 2 + n))), n))
     return tick_loc, tick_labels
 
 
@@ -870,4 +871,3 @@ def draw_learning_curves(estimator, X, y, ylim=None, cv=None, n_jobs=1,
 
     plt.legend(loc="best")
     plt.show()
-
