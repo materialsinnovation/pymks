@@ -174,7 +174,7 @@ class MKSLocalizationModel(LinearRegression):
         if not hasattr(self, '_filter'):
             raise AttributeError("fit() method must be run before predict().")
         y_pred_shape = self.basis._pred_shape(X)
-        X = self.basis._reshape_feature(X)
+        X = self.basis._reshape_feature(X, self.basis._axes_shape)
         X_ = self.basis.discretize(X)
         return self._filter.convolve(X_).reshape(y_pred_shape).real
 
