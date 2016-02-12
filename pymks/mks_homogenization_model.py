@@ -2,6 +2,7 @@ from mks_structure_analysis import MKSStructureAnalysis
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import Pipeline
+import numpy as np
 
 
 class MKSHomogenizationModel(MKSStructureAnalysis):
@@ -253,8 +254,7 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
         """
         if self.compute_correlations:
             if size is not None:
-                new_shape = (X.shape[0],) + size
-                X = X.reshape(new_shape)
+                X = self.basis._reshape_feature(X, size)
             X = self._compute_stats(X, confidence_index)
         X_reshape = self._reduce_shape(X)
         X_reduced = self._fit_transform(X_reshape, reduce_labels)
@@ -308,11 +308,17 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
 
         """
         if not hasattr(self._linker.get_params()['connector'], "coef_"):
-            print self._linker.get_params()['connector']
             raise RuntimeError('fit() method must be run before predict().')
+        _size = self.basis._axes_shape
+        if self.periodic_axes is None or len(self.periodic_axes) != len(_size):
+            _axes = range(len(_size))
+            if self.periodic_axes is not None:
+                [_axes.remove(a) for a in self.periodic_axes]
+            _size = np.ones(len(_size)) * _size
+            _size[_axes] *= .5
+        X = self.basis._reshape_feature(X, tuple(_size))
         if self.compute_correlations is True:
             X = self._compute_stats(X, confidence_index)
-
         X_reduced = self._transform(X)
         self.reduced_predict_data = X_reduced
         return self._linker.predict(X_reduced)
@@ -327,9 +333,6 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
                 shaped array where `n_samples` is the number of samples and
                 `n_x` is the spatial discretization.
             y (1D array): The material property associated with `X`.
-            periodic_axes (list, optional): axes that are periodic. (0, 2)
-                would indicate that axes x and z are periodic in a 3D
-                microstrucure.
             confidence_index (ND array, optional): array with same shape as X
                 used to assign a confidence value for each data point.
 
@@ -340,7 +343,8 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
         if not callable(getattr(self._linker, "score", None)):
             raise RuntimeError(
                 "property_linker does not have score() method.")
+        X = self.basis._reshape_feature(X, self.basis._axes_shape)
         if self.compute_correlations:
-            X = self._correlate(X, self.periodic_axes, confidence_index)
+            X = self._compute_stats(X, confidence_index)
         X_reduced = self._transform(X)
         return self._linker.score(X_reduced, y)

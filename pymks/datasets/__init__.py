@@ -329,7 +329,7 @@ def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
     if not isinstance(n_samples, (list, tuple, np.ndarray)):
         n_samples = (n_samples,)
     if volume_fraction is None:
-        volume_fraction = (None,)
+        volume_fraction = (None,) * len(n_samples)
     vf_0 = volume_fraction[0]
     if not isinstance(vf_0, (list, tuple, np.ndarray)) and vf_0 is not None:
         volume_fraction = (volume_fraction,)

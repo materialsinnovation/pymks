@@ -1,5 +1,9 @@
 from .abstract import _AbstractMicrostructureBasis
 import numpy as np
+try:
+    import pyfftw.builders as fftmodule
+except:
+    import numpy.fft as fftmodule
 
 
 class _RealFFTBasis(_AbstractMicrostructureBasis):
@@ -23,14 +27,12 @@ class _RealFFTBasis(_AbstractMicrostructureBasis):
             Fourier transform of X
         """
         if self._pyfftw:
-            return self._fftmodule.rfftn(np.ascontiguousarray(X),
-                                         axes=self._axes,
-                                         threads=self._n_jobs,
-                                         planner_effort='FFTW_ESTIMATE',
-                                         overwrite_input=True,
-                                         avoid_copy=True)()
+            return fftmodule.rfftn(np.ascontiguousarray(X),
+                                   axes=self._axes, threads=self._n_jobs,
+                                   planner_effort='FFTW_ESTIMATE',
+                                   overwrite_input=True, avoid_copy=True)()
         else:
-            return self._fftmodule.rfftn(X, axes=self._axes)
+            return fftmodule.rfftn(X, axes=self._axes)
 
     def _ifftn(self, X):
         """Real irFFT algorithm
@@ -42,12 +44,11 @@ class _RealFFTBasis(_AbstractMicrostructureBasis):
             Inverse Fourier transform of X
         """
         if self._pyfftw:
-            return self._fftmodule.irfftn(np.ascontiguousarray(X),
-                                          s=self._axes_shape,
-                                          axes=self._axes,
-                                          threads=self._n_jobs,
-                                          planner_effort='FFTW_ESTIMATE',
-                                          avoid_copy=True)().real
+            return fftmodule.irfftn(np.ascontiguousarray(X),
+                                    s=self._axes_shape, axes=self._axes,
+                                    threads=self._n_jobs,
+                                    planner_effort='FFTW_ESTIMATE',
+                                    avoid_copy=True)().real
         else:
-            return self._fftmodule.irfftn(X, axes=self._axes,
-                                          s=self._axes_shape).real
+            return fftmodule.irfftn(X, axes=self._axes,
+                                    s=self._axes_shape).real

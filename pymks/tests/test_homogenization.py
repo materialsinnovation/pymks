@@ -45,8 +45,6 @@ def test_stress():
         elastic_modulus=elastic_modulus, poissons_ratio=poissons_ratio,
         macro_strain=macro_strain, seed=8)
     y_result = model.predict(X_new)
-    print(np.round(y_result, decimals=2))
-    print(np.round(y_new, decimals=2))
     assert np.allclose(np.round(y_new, decimals=2),
                        np.round(y_result, decimals=2))
 
@@ -142,4 +140,4 @@ def test_intercept_setter():
 
 
 if __name__ == '__main__':
-    test_default_dimension_reducer()
+    test_stress()

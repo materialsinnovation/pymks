@@ -1,5 +1,9 @@
 from .abstract import _AbstractMicrostructureBasis
 import numpy as np
+try:
+    import pyfftw.builders as fftmodule
+except:
+    import numpy.fft as fftmodule
 
 
 class _ImagFFTBasis(_AbstractMicrostructureBasis):
@@ -23,13 +27,13 @@ class _ImagFFTBasis(_AbstractMicrostructureBasis):
             Fourier transform of X
         """
         if self._pyfftw:
-            return self._fftmodule.fftn(np.ascontiguousarray(X),
-                                        axes=self._axes, threads=self._n_jobs,
-                                        planner_effort='FFTW_ESTIMATE',
-                                        overwrite_input=True,
-                                        avoid_copy=True)()
+
+            return fftmodule.fftn(np.ascontiguousarray(X),
+                                  axes=self._axes, threads=self._n_jobs,
+                                  planner_effort='FFTW_ESTIMATE',
+                                  overwrite_input=True, avoid_copy=True)()
         else:
-            return self._fftmodule.fftn(X, axes=self._axes)
+            return fftmodule.fftn(X, axes=self._axes)
 
     def _ifftn(self, X):
         """Standard iFFT algorithm
@@ -41,10 +45,10 @@ class _ImagFFTBasis(_AbstractMicrostructureBasis):
             Inverse Fourier transform of X
         """
         if self._pyfftw:
-            return self._fftmodule.ifftn(np.ascontiguousarray(X),
-                                         axes=self._axes, threads=self._n_jobs,
-                                         planner_effort='FFTW_ESTIMATE',
-                                         overwrite_input=True,
-                                         avoid_copy=True)()
+            return fftmodule.ifftn(np.ascontiguousarray(X),
+                                   axes=self._axes, threads=self._n_jobs,
+                                   planner_effort='FFTW_ESTIMATE',
+                                   overwrite_input=True,
+                                   avoid_copy=True)()
         else:
-            return self._fftmodule.ifftn(X, axes=self._axes)
+            return fftmodule.ifftn(X, axes=self._axes)

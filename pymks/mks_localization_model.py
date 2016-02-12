@@ -111,10 +111,9 @@ class MKSLocalizationModel(LinearRegression):
         """
         self.basis = self.basis.__class__(self.n_states, self.domain)
         if size is not None:
-            y = self.basis._reshape_feature(y, size)
+            y = self.basis._reshape_localization_data(y, size)
             X = self.basis._reshape_feature(X, size)
-        self.basis._shape_check(X, y)  # call error check for shapes of X and y
-
+        self.basis._check_shape(X.shape, y.shape)
         X_ = self.basis.discretize(X)
         FX = self.basis._fftn(X_)
         Fy = self.basis._fftn(y)
@@ -173,10 +172,10 @@ class MKSLocalizationModel(LinearRegression):
 
         if not hasattr(self, '_filter'):
             raise AttributeError("fit() method must be run before predict().")
-        y_pred_shape = self.basis._pred_shape(X)
-        X = self.basis._reshape_feature(X)
+        _pred_shape = self.basis._pred_shape(X)
+        X = self.basis._reshape_feature(X, self.basis._axes_shape)
         X_ = self.basis.discretize(X)
-        return self._filter.convolve(X_).reshape(y_pred_shape).real
+        return self._filter.convolve(X_).reshape(_pred_shape).real
 
     def resize_coeff(self, size):
         """Scale the size of the coefficients and pad with zeros.

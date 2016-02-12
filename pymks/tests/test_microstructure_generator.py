@@ -36,8 +36,6 @@ def test_percent_variance():
     X = make_microstructure(n_samples=1, n_phases=3,
                             volume_fraction=(0.3, 0.2, 0.5),
                             percent_variance=.2)
-    print np.sum(X == 1) / float(X.size)
-    print np.sum(X == 2) / float(X.size)
     assert np.allclose(np.sum(X == 1) / float(X.size), 0.09, atol=1e-2)
     assert np.allclose(np.sum(X == 2) / float(X.size), 0.57, atol=1e-2)
 
