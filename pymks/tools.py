@@ -170,12 +170,12 @@ def draw_microstructure_strain(microstructure, strain):
     cmap = _get_response_cmap()
     fig = plt.figure(figsize=(8, 4))
     ax0 = plt.subplot(1, 2, 1)
-    ax0.imshow(microstructure.swapaxes(0, 1), cmap=_get_microstructure_cmap(),
+    ax0.imshow(microstructure, cmap=_get_microstructure_cmap(),
                interpolation='none')
     ax0.set_xticks(())
     ax0.set_yticks(())
     ax1 = plt.subplot(1, 2, 2)
-    im1 = ax1.imshow(strain.swapaxes(0, 1), cmap=cmap, interpolation='none')
+    im1 = ax1.imshow(strain, cmap=cmap, interpolation='none')
     ax1.set_xticks(())
     ax1.set_yticks(())
     ax1.set_title(r'$\mathbf{\varepsilon_{xx}}$', fontsize=25)
@@ -299,14 +299,14 @@ def _draw_fields(fields, field_cmap, fontsize, titles, figsize=None):
 
     if n_fields > 1:
         for field, ax, title in zip(fields, axs.flat, titles):
-            im = ax.imshow(field.swapaxes(0, 1),
+            im = ax.imshow(field,
                            cmap=field_cmap, interpolation='none',
                            vmin=vmin, vmax=vmax)
             ax.set_xticks(())
             ax.set_yticks(())
             ax.set_title(title, fontsize=fontsize)
     else:
-        im = axs.imshow(fields[0].swapaxes(0, 1), cmap=field_cmap,
+        im = axs.imshow(fields[0], cmap=field_cmap,
                         interpolation='none', vmin=vmin, vmax=vmax)
         axs.set_xticks(())
         axs.set_yticks(())
@@ -415,7 +415,7 @@ def draw_gridscores_matrix(grid_scores, params, score_label=None,
         ax.set_xlabel(x_label, fontsize=14)
         ax.set_ylabel(y_label, fontsize=14)
         ax.grid(False)
-        im = ax.imshow(np.swapaxes(matrix, 0, 1),
+        im = ax.imshow(matrix,
                        cmap=X_cmap, interpolation='none')
         ax.set_title(title, fontsize=22)
         divider = make_axes_locatable(ax)
@@ -742,8 +742,7 @@ def _draw_stats(X_, correlations=None):
         ax.set_xticklabels(x_labels, fontsize=12)
         ax.set_yticks(y_loc)
         ax.set_yticklabels(y_labels, fontsize=12)
-        im = ax.imshow(np.swapaxes(img, 0, 1), cmap=X_cmap,
-                       interpolation='none')
+        im = ax.imshow(img, cmap=X_cmap, interpolation='none')
         ax.set_title(r"Correlation $l = {0}$, $l' = {1}$".format(label[0],
                                                                  label[1]),
                      fontsize=15)
