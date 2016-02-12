@@ -1,5 +1,4 @@
 import numpy as np
-from sklearn.base import BaseEstimator
 
 
 class _AbstractMicrostructureBasis(object):
@@ -38,10 +37,10 @@ class _AbstractMicrostructureBasis(object):
     def discretize(self, X):
         raise NotImplementedError
 
-    def _shape_check(self, X, y):
-        if not len(y.shape) > 1:
+    def _check_shape(self, X_shape, y_shape):
+        if not len(y_shape) > 1:
             raise RuntimeError("The shape of y is incorrect.")
-        if y.shape != X.shape:
+        if y_shape != X_shape:
             raise RuntimeError("X and y must be the same shape.")
 
     def _pred_shape(self, X):
@@ -74,6 +73,22 @@ class _AbstractMicrostructureBasis(object):
             microstructure with shape (n_samples, size)
         """
         return X.reshape((X.shape[0],) + size)
+
+    def _reshape_localization_data(self, y, size):
+        """
+        Helper function used to check the shape of the microstructure,
+        and change to appropriate shape.
+
+        Args:
+            y: The localization fields, an `(n_samples, n_x, ...)` shaped array
+                where `n_samples` is the number of samples and `n_x` is thes
+                patial discretization.
+            size: the new size of the array
+
+        Returns:
+            Localization fields with shape (n_samples, size)
+        """
+        return y.reshape((y.shape[0],) + size)
 
     def _select_axes(self, X):
         self._axes = np.arange(X.ndim - 1) + 1
