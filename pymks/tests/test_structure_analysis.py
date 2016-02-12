@@ -6,10 +6,8 @@ def test_n_componets_from_reducer():
     from pymks import DiscreteIndicatorBasis
     from sklearn.manifold import LocallyLinearEmbedding
     reducer = LocallyLinearEmbedding(n_components=7)
-    print reducer.n_components
     dbasis = DiscreteIndicatorBasis(n_states=3, domain=[0, 2])
     model = MKSStructureAnalysis(dimension_reducer=reducer, basis=dbasis)
-    print model.n_components
     assert model.n_components == 7
 
 
@@ -75,6 +73,18 @@ def test_reshape_X():
     X = np.arange(18).reshape(2, 3, 3)
     X_test = np.concatenate((np.arange(-4, 5)[None], np.arange(-4, 5)[None]))
     assert np.allclose(anaylzer._reduce_shape(X), X_test)
+
+
+def test_set_components():
+    from pymks import MKSStructureAnalysis
+    from pymks import PrimitiveBasis
+    p_basis = PrimitiveBasis(2)
+    model = MKSStructureAnalysis(basis=p_basis)
+    X = np.random.randint(2, size=(50, 10, 10))
+    model.fit(X)
+    components = model.components_
+    model.components_ = components * 2
+    assert np.allclose(model.components_, components * 2)
 
 if __name__ == '__main__':
     test_set_correlations()

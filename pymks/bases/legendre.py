@@ -1,8 +1,8 @@
 import numpy as np
-from .abstract import _AbstractMicrostructureBasis
+from .real_ffts import _RealFFTBasis
 
 
-class LegendreBasis(_AbstractMicrostructureBasis):
+class LegendreBasis(_RealFFTBasis):
 
     r"""
     Discretize a continuous field into `deg` local states using a
@@ -10,7 +10,7 @@ class LegendreBasis(_AbstractMicrostructureBasis):
 
     .. math::
 
-       \frac{1}{\Delta} \int_s m(h, x) dx =
+       \frac{1}{\Delta x} \int_s m(h, x) dx =
        \sum_0^{L-1} m[l, s] P_l(h)
 
     where the :math:`P_l` are Legendre polynomials and the local state space
@@ -36,7 +36,7 @@ class LegendreBasis(_AbstractMicrostructureBasis):
 
     If the microstructure local state values fall outside of the specified
     domain they will no longer be mapped into the orthogonal domain of the
-    legendre polynomais.
+    legendre polynomials.
 
     >>> n_states = 2
     >>> X = np.array([-1, 1])
@@ -70,9 +70,10 @@ class LegendreBasis(_AbstractMicrostructureBasis):
 
         """
         self.check(X)
+        self._select_axes(X)
         leg = np.polynomial.legendre
         X_scaled = (2. * X - self.domain[0] - self.domain[1]) /\
                    (self.domain[1] - self.domain[0])
-        norm = (2. * np.arange(self.n_states) + 1) / 2.
-        X_Legendre = (leg.legval(X_scaled, np.eye(self.n_states) * norm))
+        norm = (2. * np.array(self.n_states) + 1) / 2.
+        X_Legendre = (leg.legval(X_scaled, np.eye(len(self.n_states)) * norm))
         return np.rollaxis(X_Legendre, 0, len(X_Legendre.shape))

@@ -40,15 +40,11 @@ def test_stress():
     model.fit(X, y)
     test_sample_size = 1
     n_samples = [test_sample_size] * len(grain_size)
-    X_new, y_new = make_elastic_stress_random(n_samples=n_samples,
-                                              size=size, grain_size=grain_size,
-                                              elastic_modulus=elastic_modulus,
-                                              poissons_ratio=poissons_ratio,
-                                              macro_strain=macro_strain,
-                                              seed=8)
+    X_new, y_new = make_elastic_stress_random(
+        n_samples=n_samples, size=size, grain_size=grain_size,
+        elastic_modulus=elastic_modulus, poissons_ratio=poissons_ratio,
+        macro_strain=macro_strain, seed=8)
     y_result = model.predict(X_new)
-    print np.round(y_result, decimals=2)
-    print np.round(y_new, decimals=2)
     assert np.allclose(np.round(y_new, decimals=2),
                        np.round(y_result, decimals=2))
 
@@ -117,5 +113,31 @@ def test_set_correlations():
     assert model_prim.correlations == test_correlations
 
 
+def test_coef_setter():
+    from pymks import MKSHomogenizationModel
+    from pymks import PrimitiveBasis
+    p_basis = PrimitiveBasis(2)
+    model = MKSHomogenizationModel(basis=p_basis)
+    X = np.random.randint(2, size=(50, 10, 10))
+    y = np.random.randint(2, size=(50,))
+    model.fit(X, y)
+    coefs = model.coef_
+    model.coef_ = coefs * 2
+    assert np.allclose(model.coef_, coefs * 2)
+
+
+def test_intercept_setter():
+    from pymks import MKSHomogenizationModel
+    from pymks import PrimitiveBasis
+    p_basis = PrimitiveBasis(2)
+    model = MKSHomogenizationModel(basis=p_basis)
+    X = np.random.randint(2, size=(50, 10, 10))
+    y = np.random.randint(2, size=(50,))
+    model.fit(X, y)
+    intercept = model.intercept_
+    model.intercept_ = intercept * 2
+    assert np.allclose(model.intercept_, intercept * 2)
+
+
 if __name__ == '__main__':
-    test_default_dimension_reducer()
+    test_stress()

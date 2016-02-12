@@ -4,4 +4,5 @@ Homogenization
 .. toctree::
    :maxdepth: 1
 
-   rst/stress_homogenization_2D.rst
+   rst/homogenization_stress_2D.rst
+   rst/homogenization_fiber_2D.rst

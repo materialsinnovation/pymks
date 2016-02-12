@@ -1,8 +1,8 @@
 import numpy as np
-from .abstract import _AbstractMicrostructureBasis
+from .imag_ffts import _ImagFFTBasis
 
 
-class FourierBasis(_AbstractMicrostructureBasis):
+class FourierBasis(_ImagFFTBasis):
 
     r"""
     Discretize a continuous field into `deg` local states using complex
@@ -10,10 +10,11 @@ class FourierBasis(_AbstractMicrostructureBasis):
 
     .. math::
 
-       \frac{1}{\Delta} \int_s m(h, x) dx =
+       \frac{1}{\Delta x} \int_s m(h, x) dx =
        \sum_{- L / 2}^{L / 2} m[l, s] exp(l*h*I)
 
     and the local state space :math:`H` is mapped into the orthogonal domain
+
     .. math::
 
        0 \le  H \le 2 \pi
@@ -44,6 +45,25 @@ class FourierBasis(_AbstractMicrostructureBasis):
     >>> assert np.allclose(X_result, four_basis.discretize(X))
     """
 
+    def __init__(self, n_states=5, domain=None):
+
+        r"""
+        Instantiate a `FourierBasis`
+
+        Args:
+            n_states (int, list): The number of local states, or list of local
+                states to be used.
+            domain (list, optional): indicate the range of expected values for
+                the microstructure, default is [0, 2\pi].
+        """
+        self.n_states = n_states
+        if isinstance(self.n_states, int):
+            n_states = ((np.arange(self.n_states + 1) // 2)[1:] *
+                        (-1) ** np.arange(1, self.n_states + 1))
+        if domain is None:
+            domain = [0, 2. * np.pi]
+        super(FourierBasis, self).__init__(n_states=n_states, domain=domain)
+
     def discretize(self, X):
         """
         Discretize `X`.
@@ -67,10 +87,10 @@ class FourierBasis(_AbstractMicrostructureBasis):
         >>> assert(np.allclose(X_result, f_basis.discretize(X)))
 
         """
+        self._select_axes(X)
         X_scaled = 2. * np.pi * ((X.astype(float) - self.domain[0]) /
                                  (self.domain[1] - self.domain[0]))
         nones = ([None for i in X.shape])
-        X_states = np.zeros(X_scaled.shape + (self.n_states,))
-        X_states[..., :] = ((np.arange(self.n_states + 1) / 2)[1:] *
-                            (-1) ** np.arange(1, self.n_states + 1))[nones]
+        X_states = np.zeros(X_scaled.shape + (len(self.n_states),))
+        X_states[..., :] = np.array(self.n_states)[nones]
         return np.exp(X_scaled[..., None] * X_states * 1j)
