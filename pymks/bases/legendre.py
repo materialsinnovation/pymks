@@ -10,7 +10,7 @@ class LegendreBasis(_RealFFTBasis):
 
     .. math::
 
-       \frac{1}{\Delta} \int_s m(h, x) dx =
+       \frac{1}{\Delta x} \int_s m(h, x) dx =
        \sum_0^{L-1} m[l, s] P_l(h)
 
     where the :math:`P_l` are Legendre polynomials and the local state space

@@ -2,11 +2,11 @@
 Meet PyMKS
 ==========
 
-In this short introduction, we will demonstrate the functionality of
-PyMKS to compute 2-point statistics in order to objectively quantify
-microstructures, predict effective properties using homogenization and
-predict local properties using localization. If you would like more
-technical details amount any of these methods please see the `theory
+In this short introduction, we will demonstrate the functionality in
+PyMKS. We will quantify microstructures using 2-point statistics,
+predict effective properties using homogenization and predict local
+properties using localization. If you would like more technical details
+about any of these methods please see the `theory
 section <THEORY.html>`__.
 
 .. code:: python
@@ -18,19 +18,22 @@ section <THEORY.html>`__.
     import numpy as np
     import matplotlib.pyplot as plt
 
+
 Quantify Microstructures using 2-Point Statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Lets make two dual phase microstructures with different morphologies.
+Lets make two dual-phase microstructures with different morphologies.
 
 .. code:: python
 
     from pymks.datasets import make_microstructure
     
+    
     X_1 = make_microstructure(n_samples=1, grain_size=(25, 25))
     X_2 = make_microstructure(n_samples=1, grain_size=(15, 95))
     
     X = np.concatenate((X_1, X_2))
+
 
 Throughout PyMKS ``X`` is used to represent microstructures. Now that we
 have made the two microstructures, lets take a look at them.
@@ -40,6 +43,7 @@ have made the two microstructures, lets take a look at them.
     from pymks.tools import draw_microstructures
     
     draw_microstructures(X)
+
 
 
 
@@ -58,9 +62,10 @@ function.
     from pymks import PrimitiveBasis
     from pymks.stats import correlate
     
-    prim_basis = PrimitiveBasis(n_states=2, domain=[0, 1])
-    X_ = prim_basis.discretize(X)
-    X_corr = correlate(X_, periodic_axes=[0, 1])
+    
+    p_basis = PrimitiveBasis(n_states=2, domain=[0, 1])
+    X_corr = correlate(X, p_basis, periodic_axes=[0, 1])
+
 
 Let's take a look at the two autocorrelations and the cross-correlation
 for these two microstructures.
@@ -72,6 +77,7 @@ for these two microstructures.
     print X_corr[0].shape
     
     draw_correlations(X_corr[0])
+
 
 
 .. parsed-literal::
@@ -89,6 +95,7 @@ for these two microstructures.
 
 
 
+
 .. image:: intro_files/intro_10_0.png
 
 
@@ -99,7 +106,7 @@ Predict Homogenized Properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In this section of the intro, we are going to predict the effective
-stiffness for two phase microstructures using the
+stiffness for two-phase microstructures using the
 ``MKSHomogenizationModel``, but we could have chosen any other effective
 material property.
 
@@ -111,15 +118,17 @@ types of microstructures, totaling to 600 microstructures.
 
     from pymks.datasets import make_elastic_stress_random
     
+    
     grain_size = [(47, 6), (4, 49), (14, 14)]
     n_samples = [200, 200, 200]
     
     X_train, y_train = make_elastic_stress_random(n_samples=n_samples, size=(51, 51),
                                                   grain_size=grain_size, seed=0)
 
+
 Once again, ``X_train`` is our microstructures. Throughout PyMKS ``y``
-is used as either the prpoerty or the field we would like to predict. In
-this case ``y_train`` is the effective stress values for ``X_train``.
+is used as either the property, or the field we would like to predict.
+In this case ``y_train`` is the effective stress values for ``X_train``.
 Let's look at one of each of the three different types of
 microstructures.
 
@@ -129,10 +138,11 @@ microstructures.
 
 
 
+
 .. image:: intro_files/intro_16_0.png
 
 
-The ``MKSHomogenizationModel`` uses 2-point statistics, so we need
+The ``MKSHomogenizationModel`` uses 2-point statistics, so we need to
 provide a discretization method for the microstructures by providing a
 basis function. We will also specify which correlations we want.
 
@@ -140,15 +150,18 @@ basis function. We will also specify which correlations we want.
 
     from pymks import MKSHomogenizationModel
     
-    prim_basis = PrimitiveBasis(n_states=2, domain=[0, 1])
-    homogenize_model = MKSHomogenizationModel(basis=prim_basis,
+    
+    p_basis = PrimitiveBasis(n_states=2, domain=[0, 1])
+    homogenize_model = MKSHomogenizationModel(basis=p_basis, periodic_axes=[0, 1],
                                               correlations=[(0, 0), (1, 1), (0, 1)])
+
 
 Let's fit our model with the data we created.
 
 .. code:: python
 
-    homogenize_model.fit(X_train, y_train, periodic_axes=[0, 1])
+    homogenize_model.fit(X_train, y_train)
+
 
 Now let's make some new data to see how good our model is.
 
@@ -158,23 +171,28 @@ Now let's make some new data to see how good our model is.
     X_test, y_test = make_elastic_stress_random(n_samples=n_samples, size=(51, 51),
                                                 grain_size=grain_size, seed=100)
 
+
 We will try and predict the effective stress of our ``X_test``
 microstructures.
 
 .. code:: python
 
-    y_pred = homogenize_model.predict(X_test, periodic_axes=[0, 1])
+    y_pred = homogenize_model.predict(X_test)
+
 
 The ``MKSHomogenizationModel`` generates low dimensional representations
 of microstructures and regression methods to predict effective
-properties. Take a look at the low dimensional representations.
+properties. Take a look at the low-dimensional representations.
 
 .. code:: python
 
-    from pymks.tools import draw_components
+    from pymks.tools import draw_components_scatter
     
-    draw_components([homogenize_model.reduced_fit_data, homogenize_model.reduced_predict_data], 
-                    ['Training Data', 'Testing Data'])
+    
+    draw_components_scatter([homogenize_model.reduced_fit_data[:,:2],
+                             homogenize_model.reduced_predict_data[:,:2]], 
+                            ['Training Data', 'Test Data'])
+
 
 
 
@@ -188,11 +206,12 @@ Now let's look at a goodness of fit plot for our
 
     from pymks.tools import draw_goodness_of_fit
     
-    fit_data = np.array([y_train, 
-                         homogenize_model.predict(X_train, periodic_axes=[0, 1])])
+    
+    fit_data = np.array([y_train, homogenize_model.predict(X_train)])
     pred_data = np.array([y_test, y_pred])
     
-    draw_goodness_of_fit(fit_data, pred_data, ['Training Data', 'Testing Data'])
+    draw_goodness_of_fit(fit_data, pred_data, ['Training Data', 'Test Data'])
+
 
 
 
@@ -217,18 +236,22 @@ First we need some data, so let's make some.
 
     from pymks.datasets import make_elastic_FE_strain_delta
     
+    
     X_delta, y_delta = make_elastic_FE_strain_delta()
 
+
 Once again, ``X_delta`` is our microstructures and ``y_delta`` is our
-local strain fields. We need to discretize the microstructure again so
+local strain fields. We need to discretize the microstructure again, so
 we will also use the same basis function.
 
 .. code:: python
 
     from pymks import MKSLocalizationModel
     
-    prim_basis = PrimitiveBasis(n_states=2)
-    localize_model = MKSLocalizationModel(basis=prim_basis)
+    
+    p_basis = PrimitiveBasis(n_states=2)
+    localize_model = MKSLocalizationModel(basis=p_basis)
+
 
 Let's use the data to fit our ``MKSLocalizationModel``.
 
@@ -236,15 +259,18 @@ Let's use the data to fit our ``MKSLocalizationModel``.
 
     localize_model.fit(X_delta, y_delta)
 
+
 Now that we have fit our model, we will create a random microstructure
-and compute its local strain field using finite element analysis. We
+and compute its local strain field, using finite element analysis. We
 will then try and reproduce the same strain field with our model.
 
 .. code:: python
 
     from pymks.datasets import make_elastic_FE_strain_random
     
+    
     X_test, y_test = make_elastic_FE_strain_random()
+
 
 Let's look at the microstructure and its local strain field.
 
@@ -252,7 +278,9 @@ Let's look at the microstructure and its local strain field.
 
     from pymks.tools import draw_microstructure_strain
     
+    
     draw_microstructure_strain(X_test[0], y_test[0])
+
 
 
 
@@ -266,9 +294,9 @@ and compare the predicted and computed local strain field.
 
     from pymks.tools import draw_strains_compare
     
-    
     y_pred = localize_model.predict(X_test)
     draw_strains_compare(y_test[0], y_pred[0])
+
 
 
 

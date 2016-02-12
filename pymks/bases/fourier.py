@@ -10,10 +10,11 @@ class FourierBasis(_ImagFFTBasis):
 
     .. math::
 
-       \frac{1}{\Delta} \int_s m(h, x) dx =
+       \frac{1}{\Delta x} \int_s m(h, x) dx =
        \sum_{- L / 2}^{L / 2} m[l, s] exp(l*h*I)
 
     and the local state space :math:`H` is mapped into the orthogonal domain
+
     .. math::
 
        0 \le  H \le 2 \pi

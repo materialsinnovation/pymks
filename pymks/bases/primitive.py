@@ -24,9 +24,9 @@ class PrimitiveBasis(_RealFFTBasis):
     A microstructure function discretized with this basis is subject to the
     following constraint
 
-    ..math::
+    .. math::
 
-        \sum_{l=0}^L m[l, s] = 1
+       \sum_{l=0}^L m[l, s] = 1
 
     which is equivalent of saying that every location is filled with some
     configuration of local states.

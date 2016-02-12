@@ -15,7 +15,7 @@ class GSHBasis(_ImagFFTBasis):
 
     .. math::
 
-       \frac{1}{\Delta} \int_s m(g, x) dx =
+       \frac{1}{\Delta x} \int_s m(g, x) dx =
        \sum_{l, m, n} m[l, \tilde{m}, n, s] T_l^{\tilde{m}n}(g)
 
     where the :math:`T_l^{\tilde{m}n}` are GSH basis functions and the

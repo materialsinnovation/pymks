@@ -1,17 +1,22 @@
 Microstructure Bases
 ====================
 
-DiscreteIndicatorBasis
-----------------------
-.. autoclass:: pymks.bases.DiscreteIndicatorBasis
-   :members:
-
-ContinuousIndicatorBasis
+PrimitiveBasis
 ------------------------
-.. autoclass:: pymks.bases.ContinuousIndicatorBasis
+.. autoclass:: pymks.bases.PrimitiveBasis
    :members:
 
 LegendreBasis
 -------------
 .. autoclass:: pymks.bases.LegendreBasis
+   :members:
+
+FourierBasis
+-------------
+.. autoclass:: pymks.bases.FourierBasis
+   :members:
+
+GSHBasis
+-------------
+.. autoclass:: pymks.bases.GSHBasis
    :members:
