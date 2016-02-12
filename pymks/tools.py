@@ -76,11 +76,11 @@ def _grid_matrix_cmap():
     Returns:
         dictionary with colors and localizations on color bar.
     """
-    HighRGB = np.array([255, 255, 255]) / 255.
-    MediumRGB = np.array([150, 150, 150]) / 255.
+    HighRGB = np.array([229, 229, 229]) / 255.
+    MediumRGB = np.array([114.5, 114.5, 114.5]) / 255.
     LowRGB = np.array([0, 0, 0]) / 255.
     cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
-    return colors.LinearSegmentedColormap('diff_cmap', cdict, 256)
+    return colors.LinearSegmentedColormap('grid_cmap', cdict, 256)
 
 
 def _set_cdict(HighRGB, MediumRGB, LowRGB):
