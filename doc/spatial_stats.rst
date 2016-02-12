@@ -4,4 +4,5 @@
 .. toctree::
    :maxdepth: 1
 
-   rst/checker_board.rst
+   rst/stats_checker_board.rst
+   rst/stats_steel.rst

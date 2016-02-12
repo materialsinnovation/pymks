@@ -1,8 +1,8 @@
 import numpy as np
-from .base_microstructure_generator import BaseMicrostructureGenerator
+from .base_microstructure_generator import _BaseMicrostructureGenerator
 
 
-class SphericalMicrostructureGenerator(BaseMicrostructureGenerator):
+class SphericalMicrostructureGenerator(_BaseMicrostructureGenerator):
 
     """
     Generates n_samples number of a periodic random spherical

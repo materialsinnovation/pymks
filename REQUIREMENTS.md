@@ -26,6 +26,7 @@ Packages Required to Run Tests and Examples
  - pytz==2015.4
  - pyzmq==14.6.0
  - setuptools==17.0
+ - scikit-image==0.11.3
  - sfepy==2015.1
  - six==1.9.0
  - sympy==0.7.6

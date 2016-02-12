@@ -4,6 +4,7 @@ from nose.tools import nottest
 from .mks_localization_model import MKSLocalizationModel
 from .bases.primitive import PrimitiveBasis
 from .bases.legendre import LegendreBasis
+from .mks_structure_analysis import MKSStructureAnalysis
 from .mks_homogenization_model import MKSHomogenizationModel
 MKSRegressionModel = MKSLocalizationModel
 DiscreteIndicatorBasis = PrimitiveBasis
@@ -36,4 +37,5 @@ __all__ = ['__version__',
            'MKSLocalizationModel',
            'PrimitiveBasis',
            'LegendreBasis',
-           'MKSHomogenizationModel']
+           'MKSHomogenizationModel',
+           'MKSStructureAnalysis']
