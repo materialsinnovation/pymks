@@ -6,10 +6,8 @@ def test_n_componets_from_reducer():
     from pymks import DiscreteIndicatorBasis
     from sklearn.manifold import LocallyLinearEmbedding
     reducer = LocallyLinearEmbedding(n_components=7)
-    print reducer.n_components
     dbasis = DiscreteIndicatorBasis(n_states=3, domain=[0, 2])
     model = MKSStructureAnalysis(dimension_reducer=reducer, basis=dbasis)
-    print model.n_components
     assert model.n_components == 7
 
 
@@ -83,7 +81,6 @@ def test_set_components():
     p_basis = PrimitiveBasis(2)
     model = MKSStructureAnalysis(basis=p_basis)
     X = np.random.randint(2, size=(50, 10, 10))
-    print X.shape
     model.fit(X)
     components = model.components_
     model.components_ = components * 2

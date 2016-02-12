@@ -7060,7 +7060,7 @@ def gsh_eval(X, Bvec):
 
 if __name__ == '__main__':
     X = np.zeros([2, 3])
-    phi1 = np.array([0.1,0.2])
+    phi1 = np.array([0.1, 0.2])
     X[:, 0] = phi1
     phi = np.array([0.0, 0.4])
     X[:, 1] = phi
@@ -7068,15 +7068,7 @@ if __name__ == '__main__':
     X[:, 2] = phi2
 
     indxvec = gsh_basis_info()
-    print indxvec
 
     lte2 = indxvec[:, 0] <= 2
-    print lte2
 
     Bvec = np.arange(indxvec.shape[0])[lte2]
-    print Bvec
-
-    out_tvalues = gsh_eval(X, Bvec)
-    print out_tvalues
-    print out_tvalues.shape
-

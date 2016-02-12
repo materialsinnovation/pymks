@@ -1,7 +1,10 @@
 import numpy as np
-import gsh_hex_tri_L0_16 as gsh_hex
-import gsh_cub_tri_L0_16 as gsh_cub
-import gsh_tri_tri_L0_13 as gsh_tri
+from .gsh_functions import hex_eval
+from .gsh_functions import cub_eval
+from .gsh_functions import tri_eval
+from .gsh_functions import hex_basis_info
+from .gsh_functions import cub_basis_info
+from .gsh_functions import tri_basis_info
 from .imag_ffts import _ImagFFTBasis
 
 
@@ -15,7 +18,7 @@ class GSHBasis(_ImagFFTBasis):
 
     .. math::
 
-       \frac{1}{\Delta} \int_s m(g, x) dx =
+       \frac{1}{\Delta x} \int_s m(g, x) dx =
        \sum_{l, m, n} m[l, \tilde{m}, n, s] T_l^{\tilde{m}n}(g)
 
     where the :math:`T_l^{\tilde{m}n}` are GSH basis functions and the
@@ -38,7 +41,8 @@ class GSHBasis(_ImagFFTBasis):
 
     If you select an invalid crystal symmetry PyMKS will give an error
 
-    >>> gsh_basis = GSHBasis(n_states=[3], domain='squishy') # doctest: +ELLIPSIS
+    >>> gsh_basis = GSHBasis(n_states=[3], domain='squishy')
+    ... # doctest: +ELLIPSIS
     Traceback (most recent call last):
     ...
     RuntimeError: invalid crystal symmetry
@@ -172,11 +176,11 @@ class GSHBasis(_ImagFFTBasis):
         a specific crystal symmetry.
         """
         if self.domain == 'triclinic':
-            return gsh_tri.gsh_basis_info()
+            return tri_basis_info()
         elif self.domain == 'hexagonal':
-            return gsh_hex.gsh_basis_info()
+            return hex_basis_info()
         elif self.domain == 'cubic':
-            return gsh_cub.gsh_basis_info()
+            return cub_basis_info()
 
     def _gsh_eval(self, X):
         """
@@ -192,8 +196,8 @@ class GSHBasis(_ImagFFTBasis):
             coefficients.
         """
         if self.domain == 'triclinic':
-            return gsh_tri.gsh_eval(X, self.n_states)
+            return tri_eval(X, self.n_states)
         elif self.domain == 'hexagonal':
-            return gsh_hex.gsh_eval(X, self.n_states)
+            return hex_eval(X, self.n_states)
         elif self.domain == 'cubic':
-            return gsh_cub.gsh_eval(X, self.n_states)
+            return cub_eval(X, self.n_states)

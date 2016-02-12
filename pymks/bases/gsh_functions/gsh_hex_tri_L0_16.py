@@ -7393,15 +7393,10 @@ if __name__ == '__main__':
     X[:, 2] = phi2
 
     indxvec = gsh_basis_info()
-    print indxvec
 
     lte2 = indxvec[:, 0] <= 2
-    print lte2
 
     Bvec = np.arange(indxvec.shape[0])[lte2]
-    print Bvec
 
     out_tvalues = gsh_eval(X, Bvec)
-    print out_tvalues
-    print out_tvalues.shape
 

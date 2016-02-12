@@ -11,11 +11,6 @@ class _RealFFTBasis(_AbstractMicrostructureBasis):
     microstructure functions use the real rFFT/irFFT algorithms and selects
     the appropriate fft module depending on whether or not pyfftw is installed.
     """
-    def __init__(self, *args, **kwargs):
-        """
-        Instance of a basis
-        """
-        super(_RealFFTBasis, self).__init__(*args, **kwargs)
 
     def _fftn(self, X):
         """Real rFFT algorithm

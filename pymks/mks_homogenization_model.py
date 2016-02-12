@@ -1,4 +1,4 @@
-from mks_structure_analysis import MKSStructureAnalysis
+from .mks_structure_analysis import MKSStructureAnalysis
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import Pipeline

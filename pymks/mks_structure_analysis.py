@@ -6,7 +6,7 @@ from sklearn.decomposition import RandomizedPCA
 
 class MKSStructureAnalysis(BaseEstimator):
     """
-    `MKSStructureAnalysis` computes the 2-point statistics for a for a set of
+    `MKSStructureAnalysis` computes the 2-point statistics for a set of
     microstructures and does dimensionality reduction. It can be used to
     evaluate the selection of spatial correlations and look at clustering of
     2-point statistics.

@@ -11,11 +11,6 @@ class _ImagFFTBasis(_AbstractMicrostructureBasis):
     microstructure functions use the standard FFT/iFFT algorithms and selects
     the appropriate fft module depending on whether or not pyfftw is installed.
     """
-    def __init__(self, *args, **kwargs):
-        """
-        Instance of a basis
-        """
-        super(_ImagFFTBasis, self).__init__(*args, **kwargs)
 
     def _fftn(self, X):
         """Standard FFT algorithm
