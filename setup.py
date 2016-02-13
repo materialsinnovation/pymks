@@ -41,7 +41,7 @@ def getVersion(version, release=True):
         return version + '-dev.' + _git_version
 
 setup(name='pymks',
-      version=getVersion('0.3.0', release=True),
+      version=getVersion('0.3.1', release=False),
       description='Materials Knowledge Systems in Python (PyMKS)',
       author='David Brough, Daniel Wheeler',
       author_email='david.brough.0416@gmail.com',
