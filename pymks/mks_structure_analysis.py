@@ -62,7 +62,10 @@ class MKSStructureAnalysis(BaseEstimator):
             correlations (list, optional): list of spatial correlations to
                 compute, default is the autocorrelation with the first local
                 state and all of its cross correlations. For example if basis
-                has n_states=3, correlation would be [(0, 0), (0, 1), (0, 2)]
+                has basis.n_states=3, correlation would be [(0, 0), (0, 1),
+                (0, 2)]. If n_states=[0, 2, 4], the default correlations would
+                still be [(0, 0), (0, 1), (0, 2)] corresponding to 0th, 1st
+                and 2nd states in n_states.
             periodic_axes (list, optional): axes that are periodic. (0, 2)
                 would indicate that axes x and z are periodic in a 3D
                 microstrucure.
@@ -90,7 +93,8 @@ class MKSStructureAnalysis(BaseEstimator):
             n_components = 5
         self.n_components = n_components
         if self.correlations is None and basis is not None:
-            self.correlations = [(0, l) for l in self.basis.n_states]
+            correlations = [(0, l) for l in range(len(self.basis.n_states))]
+            self.correlations = correlations
         if not callable(getattr(self.dimension_reducer,
                                 "fit_transform", None)):
             raise RuntimeError(
