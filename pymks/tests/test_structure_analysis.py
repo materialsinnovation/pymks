@@ -70,7 +70,7 @@ def test_reshape_X():
     from pymks import MKSStructureAnalysis
     from pymks import PrimitiveBasis
     anaylzer = MKSStructureAnalysis(basis=PrimitiveBasis())
-    X = np.arange(18).reshape(2, 3, 3)
+    X = np.arange(0,18,1,dtype='float64').reshape(2, 3, 3)
     X_test = np.concatenate((np.arange(-4, 5)[None], np.arange(-4, 5)[None]))
     assert np.allclose(anaylzer._reduce_shape(X), X_test)
 
