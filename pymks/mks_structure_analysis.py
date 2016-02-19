@@ -299,5 +299,6 @@ class MKSStructureAnalysis(BaseEstimator):
         """
         X_reshaped = X_stats.reshape((X_stats.shape[0], X_stats[0].size))
         if self.mean_center:
-            X_reshaped -= np.mean(X_reshaped, axis=1)[:, None]
+            X_reshaped -= np.mean(X_reshaped,
+                                  axis=1)[:, None].astype(X_reshaped.dtype)
         return X_reshaped
