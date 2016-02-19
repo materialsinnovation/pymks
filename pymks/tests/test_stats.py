@@ -335,5 +335,24 @@ def test_autocorrelate_with_specific_correlations():
     assert np.allclose(X_auto[0, ..., 1], X_result_1)
 
 
+def test_crosscorrelate_with_specific_correlations():
+    from pymks.stats import crosscorrelate
+    from pymks import PrimitiveBasis
+    X = np.array([[[0, 0, 0, 0],
+                   [0, 1, 0, 0],
+                   [0, 0, 2, 0],
+                   [0, 0, 0, 0],
+                   [0, 0, 0, 0]]])
+    crosscorrelations = [(1, 2)]
+    p_basis = PrimitiveBasis(n_states=3)
+    X_cross = crosscorrelate(X, p_basis, crosscorrelations=crosscorrelations)
+    X_result = np.array([[0., 0., 0., 0.],
+                         [0., 0., 0., 0.],
+                         [0., 0., 0., 0.],
+                         [0., 0., 0., 1 / 12.],
+                         [0., 0., 0., 0.]])
+    assert np.allclose(X_cross[0, ..., 0], X_result)
+
+
 if __name__ == '__main__':
     test_mask_two_samples()
