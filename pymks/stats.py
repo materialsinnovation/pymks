@@ -23,7 +23,7 @@ def autocorrelate(X, basis, periodic_axes=[], n_jobs=1, confidence_index=None,
             pyfftw is install.
         confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
-        autocorrelations (list, optional): list of spatial autocorrelatiions to
+        autocorrelations (list, optional): list of spatial autocorrelations to
             be computed corresponding to the states in basis.n_states. For
             example, if basis.n_states=[0, 2], then autocorrelations=[(0, 0),
             (2, 2)] computes the autocorrelations for the states 0 and 2. If
@@ -73,7 +73,7 @@ def crosscorrelate(X, basis, periodic_axes=None, n_jobs=1,
             pyfftw is install.
         confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
-        crosscorrelations (list, optional): list of cross-correlatiions to
+        crosscorrelations (list, optional): list of cross-correlations to
             be computed corresponding to the states in basis.n_states. For
             example if basis.n_states=[2, 4, 6] then crosscorrelations=[(2, 4),
             (2, 6)] computes the cross-correlations with local states 2 and 4
@@ -148,7 +148,7 @@ def correlate(X, basis, periodic_axes=None, n_jobs=1,
             pyfftw is install.
         confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
-        correlations (list, optional): list of  spatial correlatiions to
+        correlations (list, optional): list of  spatial _check_shapes to
             be computed corresponding to the states in basis.n_states. For
             example, it n_states=[0, 2, 5] [(0, 0), (2, 2), (0, 5)] computes
             the autocorrelations with local states 0 and 2 as well as the
@@ -192,7 +192,7 @@ def _compute_stats(X, basis, correlations, confidence_index,
             shaped array where `n_samples` is the number of samples and
             `n_x` is the spatial discretization.
         basis: an instance of a bases class
-        correlations: list of  spatial correlatiions to be computed.
+        correlations: list of  spatial correlations to be computed.
         confidence_index: array with same shape as X used to assign a
             confidence value for each data point.
         periodic_axes: axes that are periodic. (0, 2) would indicate that axes
@@ -415,6 +415,21 @@ def _mask_X_(X_, confidence_index):
 
 
 def _correlations_to_indices(correlations, basis):
-    l_0 = tuple([list(basis.n_states).index(_l[0]) for _l in correlations])
-    l_1 = tuple([list(basis.n_states).index(_l[1]) for _l in correlations])
+    """
+    Helper function to select correct indices given the local state values in
+    basis.n_states.
+
+    Args:
+        correlations: list of correlations to be computed
+        basis: an instance of a basis class.
+
+    Returns:
+        list of correlations in terms of indices
+    """
+    try:
+        l_0 = tuple([list(basis.n_states).index(_l[0]) for _l in correlations])
+        l_1 = tuple([list(basis.n_states).index(_l[1]) for _l in correlations])
+    except ValueError as ve:
+        raise ValueError('correlations value ' + ve.message[0] +
+                         ' is not in basis.n_states')
     return (l_0, l_1)
