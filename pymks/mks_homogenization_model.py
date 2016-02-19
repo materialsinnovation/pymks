@@ -313,13 +313,7 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
         """
         if not hasattr(self._linker.get_params()['connector'], "coef_"):
             raise RuntimeError('fit() method must be run before predict().')
-        _size = self.basis._axes_shape
-        if self.periodic_axes is None or len(self.periodic_axes) != len(_size):
-            _axes = range(len(_size))
-            if self.periodic_axes is not None:
-                [_axes.remove(a) for a in self.periodic_axes]
-            _size = np.ones(len(_size)) * _size
-            _size[_axes] *= .5
+        _size = self._size_axes(self.basis)
         X = self.basis._reshape_feature(X, tuple(_size))
         if self.compute_correlations is True:
             X = self._compute_stats(X, confidence_index)
@@ -347,8 +341,22 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
         if not callable(getattr(self._linker, "score", None)):
             raise RuntimeError(
                 "property_linker does not have score() method.")
-        X = self.basis._reshape_feature(X, self.basis._axes_shape)
+        _size = self._size_axes(self.basis)
+        X = self.basis._reshape_feature(X, _size)
         if self.compute_correlations:
             X = self._compute_stats(X, confidence_index)
         X_reduced = self._transform(X)
         return self._linker.score(X_reduced, y)
+
+    def _size_axes(self, basis):
+        """Helper function used to get the correct size of the axes when using
+        for both periodic and non-periodic axes.
+        """
+        _size = self.basis._axes_shape
+        if self.periodic_axes is None or len(self.periodic_axes) != len(_size):
+            _axes = range(len(_size))
+            if self.periodic_axes is not None:
+                [_axes.remove(a) for a in self.periodic_axes]
+            _size = np.ones(len(_size)) * _size
+            _size[_axes] *= .5
+        return tuple(_size)
