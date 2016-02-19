@@ -406,7 +406,7 @@ def draw_gridscores_matrix(grid_scores, params, score_label=None,
     y_label = param_labels[1]
     plot_title = [score_label, 'Standard Deviation']
     for ax, label, matrix, title in zip(axs, param_labels,
-                                        np.swapaxes(matrices, -1, -2),
+                                        matrices,
                                         plot_title):
         ax.set_xticklabels(param_range_0, fontsize=12)
         ax.set_yticklabels(param_range_1, fontsize=12)
