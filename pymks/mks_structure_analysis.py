@@ -239,7 +239,7 @@ class MKSStructureAnalysis(BaseEstimator):
     def _fit_transform(self, X, y):
         """Reshapes X and uses it to compute the components"""
         if self.store_correlations:
-            self.fit_correlations = X
+            self.fit_correlations = X.copy()
         X_reshaped = self._reduce_shape(X)
         self.reduced_fit_data = self.dimension_reducer.fit_transform(
             X_reshaped, y)
@@ -251,9 +251,9 @@ class MKSStructureAnalysis(BaseEstimator):
         if self.store_correlations:
             if hasattr(self, 'transform_correlations'):
                 self.transform_correlations = np.concatenate(
-                    (self.transform_correlations, X))
+                    (self.transform_correlations, X.copy()))
             else:
-                self.transform_correlations = X
+                self.transform_correlations = X.copy()
 
     def _compute_stats(self, X, confidence_index):
         """
