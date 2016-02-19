@@ -335,7 +335,5 @@ def test_autocorrelate_with_specific_correlations():
     assert np.allclose(X_auto[0, ..., 1], X_result_1)
 
 
-
-
 if __name__ == '__main__':
-    test_normalization_fftn()
+    test_mask_two_samples()
