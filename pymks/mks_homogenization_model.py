@@ -87,7 +87,11 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
             correlations (list, optional): list of spatial correlations to
                 compute, default is the autocorrelation with the first local
                 state and all of its cross correlations. For example if basis
-                has n_states=3, correlation would be [(0, 0), (0, 1), (0, 2)]
+                has basis.n_states=3, correlation would be [(0, 0), (0, 1),
+                (0, 2)]. If n_states=[0, 2, 4], the default correlations are
+                [(0, 0), (0, 2), (0, 4)] corresponding to the autocorrelations
+                for the 0th local state, and the cross correlations with the 0
+                and 2 as well as 0 and 4.
             compute_correlations (boolean, optional): If false spatial
                 correlations will not be calculated as part of the fit and
                 predict methods. The spatial correlations can be passed as `X`

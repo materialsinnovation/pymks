@@ -63,9 +63,10 @@ class MKSStructureAnalysis(BaseEstimator):
                 compute, default is the autocorrelation with the first local
                 state and all of its cross correlations. For example if basis
                 has basis.n_states=3, correlation would be [(0, 0), (0, 1),
-                (0, 2)]. If n_states=[0, 2, 4], the default correlations would
-                still be [(0, 0), (0, 1), (0, 2)] corresponding to 0th, 1st
-                and 2nd states in n_states.
+                (0, 2)]. If n_states=[0, 2, 4], the default correlations are
+                [(0, 0), (0, 2), (0, 4)] corresponding to the autocorrelations
+                for the 0th local state, and the cross correlations with the 0
+                and 2 as well as 0 and 4.
             periodic_axes (list, optional): axes that are periodic. (0, 2)
                 would indicate that axes x and z are periodic in a 3D
                 microstrucure.

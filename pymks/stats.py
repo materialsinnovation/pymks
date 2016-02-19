@@ -26,7 +26,7 @@ def autocorrelate(X, basis, periodic_axes=[], n_jobs=1, confidence_index=None,
         autocorrelations (list, optional): list of spatial autocorrelatiions to
             be computed corresponding to the states in basis.n_states. For
             example, if basis.n_states=[0, 2], then autocorrelations=[(0, 0),
-            (1, 1)] computes the autocorrelations for the states 0 and 2. If
+            (2, 2)] computes the autocorrelations for the states 0 and 2. If
             no list is passed, all autocorrelations in basis.n_states are
             computed.
 
@@ -75,8 +75,8 @@ def crosscorrelate(X, basis, periodic_axes=None, n_jobs=1,
             to assign a confidence value for each data point.
         crosscorrelations (list, optional): list of cross-correlatiions to
             be computed corresponding to the states in basis.n_states. For
-            example if basis.n_states=[2, 4, 6] then crosscorrelations=[(0, 1),
-            (0, 2)] computes the cross-correlations with local states 2 and 4
+            example if basis.n_states=[2, 4, 6] then crosscorrelations=[(2, 4),
+            (2, 6)] computes the cross-correlations with local states 2 and 4
             as well as 2 and 6. If no list is passed, all cross-correlations
             in basis.n_states are computed.
 
@@ -150,7 +150,7 @@ def correlate(X, basis, periodic_axes=None, n_jobs=1,
             to assign a confidence value for each data point.
         correlations (list, optional): list of  spatial correlatiions to
             be computed corresponding to the states in basis.n_states. For
-            example, it n_states=[0, 2, 5] [(0, 0), (1, 1), (0, 2)] computes
+            example, it n_states=[0, 2, 5] [(0, 0), (2, 2), (0, 5)] computes
             the autocorrelations with local states 0 and 2 as well as the
             cross-correlation between 0 and 5. If no list is passed, all
             spatial correlations are computed.
