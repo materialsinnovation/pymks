@@ -62,7 +62,11 @@ class MKSStructureAnalysis(BaseEstimator):
             correlations (list, optional): list of spatial correlations to
                 compute, default is the autocorrelation with the first local
                 state and all of its cross correlations. For example if basis
-                has n_states=3, correlation would be [(0, 0), (0, 1), (0, 2)]
+                has basis.n_states=3, correlation would be [(0, 0), (0, 1),
+                (0, 2)]. If n_states=[0, 2, 4], the default correlations are
+                [(0, 0), (0, 2), (0, 4)] corresponding to the autocorrelations
+                for the 0th local state, and the cross correlations with the 0
+                and 2 as well as 0 and 4.
             periodic_axes (list, optional): axes that are periodic. (0, 2)
                 would indicate that axes x and z are periodic in a 3D
                 microstrucure.
@@ -90,7 +94,8 @@ class MKSStructureAnalysis(BaseEstimator):
             n_components = 5
         self.n_components = n_components
         if self.correlations is None and basis is not None:
-            self.correlations = [(0, l) for l in self.basis.n_states]
+            correlations = [(0, l) for l in range(len(self.basis.n_states))]
+            self.correlations = correlations
         if not callable(getattr(self.dimension_reducer,
                                 "fit_transform", None)):
             raise RuntimeError(
@@ -234,7 +239,7 @@ class MKSStructureAnalysis(BaseEstimator):
     def _fit_transform(self, X, y):
         """Reshapes X and uses it to compute the components"""
         if self.store_correlations:
-            self.fit_correlations = X
+            self.fit_correlations = X.copy()
         X_reshaped = self._reduce_shape(X)
         self.reduced_fit_data = self.dimension_reducer.fit_transform(
             X_reshaped, y)
@@ -246,9 +251,9 @@ class MKSStructureAnalysis(BaseEstimator):
         if self.store_correlations:
             if hasattr(self, 'transform_correlations'):
                 self.transform_correlations = np.concatenate(
-                    (self.transform_correlations, X))
+                    (self.transform_correlations, X.copy()))
             else:
-                self.transform_correlations = X
+                self.transform_correlations = X.copy()
 
     def _compute_stats(self, X, confidence_index):
         """
@@ -294,5 +299,6 @@ class MKSStructureAnalysis(BaseEstimator):
         """
         X_reshaped = X_stats.reshape((X_stats.shape[0], X_stats[0].size))
         if self.mean_center:
-            X_reshaped -= np.mean(X_reshaped, axis=1)[:, None]
+            X_reshaped -= np.mean(X_reshaped,
+                                  axis=1)[:, None].astype(X_reshaped.dtype)
         return X_reshaped
