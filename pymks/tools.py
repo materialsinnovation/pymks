@@ -549,7 +549,7 @@ def _draw_components_2D(X, labels, title, component_labels,
     for label, pts, color in zip(labels, X, color_list):
         ax.plot(pts[:, 0], pts[:, 1], 'o', color=color, label=label)
         lg = plt.legend(loc=1, borderaxespad=0., fontsize=15)
-    if legend_outside is not None:
+    if legend_outside is not False:
         lg = plt.legend(bbox_to_anchor=(1.05, 1.0), loc=2,
                         borderaxespad=0., fontsize=15)
     lg.draggable()
