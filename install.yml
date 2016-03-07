@@ -1,0 +1,32 @@
+---
+- name: playbook to install PyMKS
+  hosts: 127.0.0.1
+  connection: local
+  vars:
+    local_path: "{{ lookup('env', 'HOME') }}"
+    pymks_path: "{{ local_path }}/pymks"
+    sfepy_path: "{{ local_path }}/sfepy"
+
+  tasks:
+
+    - name: clone sfepy
+      git:
+        repo: https://github.com/sfepy/sfepy.git
+        dest: "{{ sfepy_path}}"
+        version: master
+
+    - name: install sfepy
+      command: python setup.py install
+      args:
+        chdir: "{{ sfepy_path }}"
+
+    - name: clone pymks
+      git:
+        repo: https://github.com/materialsinnovation/pymks.git
+        dest: "{{ pymks_path }}"
+        version: develop
+
+    - name: install pymks
+      command: python setup.py install
+      args:
+        chdir: "{{ pymks_path }}"
