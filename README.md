@@ -1,5 +1,7 @@
 # Overview
 
+[![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo/wd15/pymks)
+
 ### MKS
 
 The Materials Knowledge Systems (MKS) is a novel data science approach
@@ -43,5 +45,3 @@ examples contributions are welcome.
 
 Please feel free to ask open-ended questions about PyMKS on the
 <pymks-general@googlegroups.com> list.
-
-
