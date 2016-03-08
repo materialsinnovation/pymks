@@ -1,4 +1,14 @@
 # Installation
+
+## Conda
+
+Conda is the easiest way to install PyMKS. To install use
+
+    $ conda config --add channels wd15
+    $ conda install pymks
+
+## Pip
+
 The following steps outline the necessary requirements for a successful installation of PyMKS.
 
 Use pip,
