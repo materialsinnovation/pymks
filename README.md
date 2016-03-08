@@ -1,6 +1,6 @@
 # Overview
 
-[![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo/wd15/pymks)
+[![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo/materialsinnovation/pymks)
 
 ### MKS
 
@@ -49,5 +49,5 @@ Please feel free to ask open-ended questions about PyMKS on the
 ## Binder
 
 There are a number of
-[live example notebooks on Binder](http://mybinder.org/repo/wd15/pymks)
+[live example notebooks on Binder](http://mybinder.org/repo/materialsinnovation/pymks)
 to help you get started with PyMKS.
