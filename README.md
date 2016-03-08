@@ -51,3 +51,9 @@ Please feel free to ask open-ended questions about PyMKS on the
 There are a number of
 [live example notebooks on Binder](http://mybinder.org/repo/materialsinnovation/pymks)
 to help you get started with PyMKS.
+
+## Docker
+
+The [Dockerfile](Dockerfile) is for Binder, but can be used
+locally. See [ADMINISTRATA.md](ADMINISTRATA.md) for more details. The
+official PyMKS instance is at https://hub.docker.com/r/wd15/pymks/.
