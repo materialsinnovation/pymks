@@ -45,3 +45,9 @@ examples contributions are welcome.
 
 Please feel free to ask open-ended questions about PyMKS on the
 <pymks-general@googlegroups.com> list.
+
+## Binder
+
+There are a number of
+[live example notebooks on Binder](http://mybinder.org/repo/wd15/pymks)
+to help you get started with PyMKS.
