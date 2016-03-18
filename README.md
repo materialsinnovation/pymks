@@ -1,5 +1,7 @@
 # Overview
 
+[![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo/materialsinnovation/pymks)
+
 ### MKS
 
 The Materials Knowledge Systems (MKS) is a novel data science approach
@@ -44,4 +46,14 @@ examples contributions are welcome.
 Please feel free to ask open-ended questions about PyMKS on the
 <pymks-general@googlegroups.com> list.
 
+## Binder
 
+There are a number of
+[live example notebooks on Binder](http://mybinder.org/repo/materialsinnovation/pymks)
+to help you get started with PyMKS.
+
+## Docker
+
+The [Dockerfile](Dockerfile) is for Binder, but can be used
+locally. See [ADMINISTRATA.md](ADMINISTRATA.md) for more details. The
+official PyMKS instance is at https://hub.docker.com/r/wd15/pymks/.
