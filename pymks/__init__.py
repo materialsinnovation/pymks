@@ -48,6 +48,14 @@ def module_exists(module_name):
         return False
 
 def skip_sfepy(func):
+    """Decorator to skip sfepy tests.
+
+    Args:
+      func: function to decorate
+
+    Returns:
+      wrapped function
+    """
     from functools import wraps
     import unittest
     @wraps(func)
