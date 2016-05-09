@@ -1,7 +1,9 @@
 import numpy as np
 from test import get_delta_data, get_random_data
+from pymks import skip_sfepy
 
 
+@skip_sfepy
 def test_MKS_elastic_delta():
     from pymks import MKSRegressionModel
     from pymks.bases import DiscreteIndicatorBasis
@@ -14,6 +16,7 @@ def test_MKS_elastic_delta():
     assert np.allclose(y_pred, y_test, rtol=1e-3, atol=1e-3)
 
 
+@skip_sfepy
 def test_MKS_elastic_random():
     from pymks import MKSRegressionModel
     from pymks.bases import DiscreteIndicatorBasis
@@ -27,6 +30,7 @@ def test_MKS_elastic_random():
     assert np.allclose(y_pred, y_test, rtol=1e-2, atol=6.1e-3)
 
 
+@skip_sfepy
 def test_resize_pred():
     from pymks import MKSRegressionModel
     from pymks.bases import DiscreteIndicatorBasis
@@ -47,6 +51,8 @@ def test_resize_pred():
     assert np.allclose(y_big_pred, y_big_test, rtol=1e-2, atol=6.1e-2)
 
 
+
+@skip_sfepy
 def test_resize_coeff():
     from pymks import MKSRegressionModel
     from pymks.bases import DiscreteIndicatorBasis
@@ -65,6 +71,7 @@ def test_resize_coeff():
                        rtol=1e-2, atol=2.1e-3)
 
 
+@skip_sfepy
 def test_multiphase_FE_strain():
     from pymks import MKSRegressionModel
     from pymks.datasets import make_elastic_FE_strain_delta
@@ -97,6 +104,7 @@ def test_multiphase_FE_strain():
                        rtol=1e-2, atol=6.1e-3)
 
 
+@skip_sfepy
 def test_coeff_stablity_with_irfftn():
     from pymks import MKSRegressionModel
     from pymks.bases import DiscreteIndicatorBasis
@@ -119,6 +127,7 @@ def test_coeff_stablity_with_irfftn():
     assert np.allclose(y_big_pred, y_big_test, rtol=1e-2, atol=6.1e-2)
 
 
+@skip_sfepy
 def test_setting_kernel():
     from pymks.datasets import make_elastic_FE_strain_delta
     from pymks import MKSLocalizationModel

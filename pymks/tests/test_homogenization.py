@@ -1,5 +1,5 @@
 import numpy as np
-
+from pymks import skip_sfepy
 
 def test_n_componets_from_reducer():
     from pymks import MKSHomogenizationModel, DiscreteIndicatorBasis
@@ -20,6 +20,7 @@ def test_n_components_with_reducer():
     assert model.n_components == 9
 
 
+@skip_sfepy
 def test_stress():
     from pymks.datasets import make_elastic_stress_random
     from pymks import MKSHomogenizationModel, DiscreteIndicatorBasis
