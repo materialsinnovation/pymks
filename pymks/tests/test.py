@@ -1,6 +1,7 @@
 import numpy as np
+from pymks import skip_sfepy
 
-
+@skip_sfepy
 def test_elastic_FE_simulation_3D():
     from pymks.datasets.elastic_FE_simulation import ElasticFESimulation
     nx = 5
@@ -14,7 +15,7 @@ def test_elastic_FE_simulation_3D():
     assert np.allclose([np.mean(model.strain[0, ..., i]) for i in range(6)],
                        solution)
 
-
+@skip_sfepy
 def test_elastic_FE_simulation_3D_BCs():
     from pymks.datasets.elastic_FE_simulation import ElasticFESimulation
     np.random.seed(8)

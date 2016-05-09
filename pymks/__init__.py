@@ -30,6 +30,40 @@ def get_version():
 
     return version
 
+def module_exists(module_name):
+    """Check if module is installable.
+
+    Args:
+      module_name: the name of the module.
+
+    Returns:
+      True if exists and available, False otherwise.
+
+    """
+    import imp
+    try:
+        imp.find_module(module_name)
+        return True
+    except ImportError:
+        return False
+
+def skip_sfepy(func):
+    """Decorator to skip sfepy tests.
+
+    Args:
+      func: function to decorate
+
+    Returns:
+      wrapped function
+    """
+    from functools import wraps
+    import unittest
+    @wraps(func)
+    @unittest.skipIf(not module_exists("sfepy"), "Sfepy not available")
+    def wrapper(*args, **kwargs):
+        func(*args, **kwargs)
+    return wrapper
+
 __version__ = get_version()
 
 __all__ = ['__version__',
