@@ -65,8 +65,8 @@ a:focus {
 
 /*START OF Change to code reference text in documentation */
 code {
-    font-size: 90%;
-    color: #762a83;
+    font-size: 100%;
+    color: #1f78b4;
 }
 
 /* START OF Change for code blocks*/

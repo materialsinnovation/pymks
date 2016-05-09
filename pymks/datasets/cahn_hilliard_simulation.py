@@ -1,9 +1,8 @@
 import numpy as np
-from ..filter import _import_pyfftw
-_import_pyfftw()
+from ..bases.imag_ffts import _ImagFFTBasis
 
 
-class CahnHilliardSimulation(object):
+class CahnHilliardSimulation(_ImagFFTBasis):
     r"""
     Solve the `Cahn-Hilliard equation
     <https://en.wikipedia.org/wiki/Cahn-Hilliard_equation>`__ for
@@ -76,6 +75,7 @@ class CahnHilliardSimulation(object):
         self.dx = dx
         self.dt = dt
         self.gamma = gamma
+        super(CahnHilliardSimulation, self).__init__()
 
     def run(self, X):
         r"""
@@ -106,9 +106,9 @@ class CahnHilliardSimulation(object):
         i_ = np.indices(X.shape[1:])
         ksq = np.sum(k[i_] ** 2, axis=0)[None]
 
-        axes = np.arange(len(X.shape) - 1) + 1
-        FX = np.fft.fftn(X, axes=axes)
-        FX3 = np.fft.fftn(X ** 3, axes=axes)
+        self._axes = np.arange(len(X.shape) - 1) + 1
+        FX = self._fftn(X)
+        FX3 = self._fftn(X ** 3)
 
         a1 = 3.
         a2 = 0.
@@ -117,4 +117,4 @@ class CahnHilliardSimulation(object):
         dt = self.dt
 
         Fy = (FX * (1 + dt * explicit) - ksq * dt * FX3) / (1 - dt * implicit)
-        self.response = np.fft.ifftn(Fy, axes=axes).real
+        self.response = self._ifftn(Fy).real

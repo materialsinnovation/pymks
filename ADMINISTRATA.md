@@ -66,3 +66,36 @@ Run tests before comitting. Use the following template:
 #
 #   * What side effects does this change have?
 ```
+
+## Docker
+
+The [Dockerfile](Dockerfile) is for Binder, but can be used
+locally. To install Docker go to
+https://docs.docker.com/engine/installation/ and install for your OS.
+Start up the deamon.
+
+    $ sudo service docker run
+
+To run this PyMKS instance first pull the instance from Dockerhub
+
+    $ docker pull docker.io/wd15/pymks
+
+and then run the instance with
+
+    $ docker run -i -p 8888:8888 -t wd15/pymks:latest
+
+and then launch the notebook server
+
+    $ ipython notebook --no-browser
+
+and view the notebooks in the browser
+[http://localhost:8888](http://localhost:8888).
+
+### Build the Docker instance
+
+    $ docker build --no-cache -t wd15/pymks:latest .
+
+in the base PyMKS directory. To push the instance use
+
+    $ docker login
+    $ docker push docker.io/wd15/pymks:latest
