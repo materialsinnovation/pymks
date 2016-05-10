@@ -23,10 +23,12 @@ def autocorrelate(X, basis, periodic_axes=[], n_jobs=1, confidence_index=None,
             pyfftw is install.
         confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
-        autocorrelations (list, optional): list of spatial autocorrelatiions to
-            be computed. For example [(0, 0), (1, 1)] computes the
-            autocorrelations with local states 0 and 1. If no list is passed,
-            all autocorrelations are computed.
+        autocorrelations (list, optional): list of spatial autocorrelations to
+            be computed corresponding to the states in basis.n_states. For
+            example, if basis.n_states=[0, 2], then autocorrelations=[(0, 0),
+            (2, 2)] computes the autocorrelations for the states 0 and 2. If
+            no list is passed, all autocorrelations in basis.n_states are
+            computed.
 
     Returns:
         Autocorrelations for a microstructure.
@@ -48,8 +50,10 @@ def autocorrelate(X, basis, periodic_axes=[], n_jobs=1, confidence_index=None,
     if periodic_axes is None:
         periodic_axes = []
     if autocorrelations is None:
-        correlations = _auto_correlations(basis.n_states)
-    return _compute_stats(X, basis, correlations, confidence_index,
+        autocorrelations = _auto_correlations(basis.n_states)
+    else:
+        autocorrelations = _correlations_to_indices(autocorrelations, basis)
+    return _compute_stats(X, basis, autocorrelations, confidence_index,
                           periodic_axes, n_jobs)
 
 
@@ -69,10 +73,12 @@ def crosscorrelate(X, basis, periodic_axes=None, n_jobs=1,
             pyfftw is install.
         confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
-        crosscorrelations (list, optional): list of cross-correlatiions to
-            be computed. For example [(0, 1), (0, 2)] computes the
-            cross-correlations with local states 0 and 1 as well as 0 and 2.
-            If no list is passed, all cross-correlations are computed.
+        crosscorrelations (list, optional): list of cross-correlations to
+            be computed corresponding to the states in basis.n_states. For
+            example if basis.n_states=[2, 4, 6] then crosscorrelations=[(2, 4),
+            (2, 6)] computes the cross-correlations with local states 2 and 4
+            as well as 2 and 6. If no list is passed, all cross-correlations
+            in basis.n_states are computed.
 
     Returns:
         Crosscorelations for a microstructure.
@@ -117,8 +123,11 @@ def crosscorrelate(X, basis, periodic_axes=None, n_jobs=1,
     if periodic_axes is None:
         periodic_axes = []
     if crosscorrelations is None:
-        correlations = _cross_correlations(basis.n_states)
-    return _compute_stats(X, basis, correlations, confidence_index,
+        crosscorrelations = _cross_correlations(basis.n_states)
+    else:
+        crosscorrelations = _correlations_to_indices(crosscorrelations,
+                                                     basis)
+    return _compute_stats(X, basis, crosscorrelations, confidence_index,
                           periodic_axes, n_jobs)
 
 
@@ -139,10 +148,11 @@ def correlate(X, basis, periodic_axes=None, n_jobs=1,
             pyfftw is install.
         confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
-        correlations (list, optional): list of  spatial correlatiions to
-            be computed. For example [(0, 0), (1, 1), (0, 2)] computes the
-            autocorrelations with local states 0 and 1 as well as the
-            cross-correlation between 0 and 2. If no list is passed, all
+        correlations (list, optional): list of  spatial _check_shapes to
+            be computed corresponding to the states in basis.n_states. For
+            example, it n_states=[0, 2, 5] [(0, 0), (2, 2), (0, 5)] computes
+            the autocorrelations with local states 0 and 2 as well as the
+            cross-correlation between 0 and 5. If no list is passed, all
             spatial correlations are computed.
 
     Returns:
@@ -165,7 +175,10 @@ def correlate(X, basis, periodic_axes=None, n_jobs=1,
         periodic_axes = []
     if correlations is None:
         L = basis.n_states
-        correlations = _auto_correlations(L) + _cross_correlations(L)
+        _auto, _cross = _auto_correlations(L), _cross_correlations(L)
+        correlations = (_auto[0] + _cross[0], _auto[1] + _cross[1])
+    else:
+        correlations = _correlations_to_indices(correlations, basis)
     return _compute_stats(X, basis, correlations, confidence_index,
                           periodic_axes, n_jobs)
 
@@ -179,13 +192,16 @@ def _compute_stats(X, basis, correlations, confidence_index,
             shaped array where `n_samples` is the number of samples and
             `n_x` is the spatial discretization.
         basis: an instance of a bases class
-        correlations: list of  spatial correlatiions to be computed.
+        correlations: list of  spatial correlations to be computed.
         confidence_index: array with same shape as X used to assign a
             confidence value for each data point.
         periodic_axes: axes that are periodic. (0, 2) would indicate that axes
             and z are periodic in a 3D microstrucure.
         n_jobs (int, optional): number of parallel jobs to run.
     """
+    if max(max(correlations)) > len(basis.n_states) + 1:
+        raise ValueError(('values in correlations are larger than') +
+                         ('the length of basis.n_states'))
     X_ = basis.discretize(X)
     X_ = _mask_X_(X_, confidence_index)
     basis._n_jobs = n_jobs
@@ -218,7 +234,7 @@ def _correlate(X_, basis, correlations):
     ...                         size=(2, 2), grain_size=(2, 2), seed=99)
     >>> prim_basis = PrimitiveBasis(n_states=3, domain=[0, 2])
     >>> X_ = prim_basis.discretize(X)
-    >>> correlations = [(l, l) for l in range(3)]
+    >>> correlations = (tuple(prim_basis.n_states), tuple(prim_basis.n_states))
     >>> X_corr = _correlate(X_, prim_basis, correlations=correlations)
     >>> X_result = np.array([[[[0, 0, 0],
     ...                        [0, 0, 2]],
@@ -230,8 +246,8 @@ def _correlate(X_, basis, correlations):
     ...                        [2, 0, 2]]]])
     >>> assert np.allclose(X_result, X_corr)
     """
-    l_0, l_1 = [l[0] for l in correlations], [l[1] for l in correlations]
-    corr = Correlation(X_[..., l_0], basis).convolve(X_[..., l_1])
+    corr = Correlation(X_[..., correlations[0]],
+                       basis).convolve(X_[..., correlations[1]])
     return _truncate(corr, X_.shape[:-1])
 
 
@@ -245,10 +261,9 @@ def _auto_correlations(n_states):
         list of tuples for autocorrelations
 
     >>> l = _auto_correlations(np.arange(3))
-    >>> assert l == [(0, 0), (1, 1), (2, 2)]
+    >>> assert l == ((0, 1, 2), (0, 1, 2))
     """
-    local_states = n_states
-    return [(l, l) for l in local_states]
+    return tuple(n_states), tuple(n_states)
 
 
 def _cross_correlations(n_states):
@@ -261,11 +276,14 @@ def _cross_correlations(n_states):
         list of tuples for crosscorrelations
 
     >>> l = _cross_correlations(np.arange(3))
-    >>> assert l == [(0, 1), (0, 2), (1, 2)]
+    >>> assert l == ((0, 0, 1), (1, 2, 2))
     """
-    l = n_states
+    l = range(len(n_states))
     cross_corr = [[(l[i], l[j]) for j in l[1:][i:]] for i in l[:-1]]
-    return [item for sublist in cross_corr for item in sublist]
+    flat_corr = [item for sublist in cross_corr for item in sublist]
+    l_0 = tuple([_l[0] for _l in flat_corr])
+    l_1 = tuple([_l[1] for _l in flat_corr])
+    return l_0, l_1
 
 
 def _normalize(X_shape, basis, confidence_index):
@@ -394,3 +412,24 @@ def _mask_X_(X_, confidence_index):
             raise RuntimeError('confidence_index does not match shape of X')
         X_ = X_ * confidence_index[..., None]
     return X_
+
+
+def _correlations_to_indices(correlations, basis):
+    """
+    Helper function to select correct indices given the local state values in
+    basis.n_states.
+
+    Args:
+        correlations: list of correlations to be computed
+        basis: an instance of a basis class.
+
+    Returns:
+        list of correlations in terms of indices
+    """
+    try:
+        l_0 = tuple([list(basis.n_states).index(_l[0]) for _l in correlations])
+        l_1 = tuple([list(basis.n_states).index(_l[1]) for _l in correlations])
+    except ValueError as ve:
+        raise ValueError('correlations value ' + ve.message[0] +
+                         ' is not in basis.n_states')
+    return (l_0, l_1)

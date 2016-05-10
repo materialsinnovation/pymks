@@ -1,0 +1,25 @@
+---
+package:
+  name: sfepy
+  version: 2016.1
+
+source:
+  git_url: https://github.com/sfepy/sfepy.git
+  git_rev: release_2016.1
+
+build:
+  number: 1
+
+requirements:
+  build:
+    - python
+    - anaconda
+    - cython
+
+  run:
+    - python
+    - anaconda
+    - pyparsing
+
+about:
+  home: http://sfepy.org

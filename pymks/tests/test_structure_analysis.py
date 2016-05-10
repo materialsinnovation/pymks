@@ -70,7 +70,7 @@ def test_reshape_X():
     from pymks import MKSStructureAnalysis
     from pymks import PrimitiveBasis
     anaylzer = MKSStructureAnalysis(basis=PrimitiveBasis())
-    X = np.arange(18).reshape(2, 3, 3)
+    X = np.arange(18, dtype='float64').reshape(2, 3, 3)
     X_test = np.concatenate((np.arange(-4, 5)[None], np.arange(-4, 5)[None]))
     assert np.allclose(anaylzer._reduce_shape(X), X_test)
 
@@ -86,5 +86,27 @@ def test_set_components():
     model.components_ = components * 2
     assert np.allclose(model.components_, components * 2)
 
+
+def test_store_correlations():
+    from pymks import MKSStructureAnalysis
+    from pymks import PrimitiveBasis
+    from pymks.stats import correlate
+    p_basis = PrimitiveBasis(2)
+    model = MKSStructureAnalysis(basis=p_basis, store_correlations=True)
+    X = np.random.randint(2, size=(2, 4, 4))
+    model.fit(X)
+    X = correlate(X, p_basis, correlations=[(0, 0), (0, 1)])
+    assert np.allclose(X, model.fit_correlations)
+    X_0 = np.random.randint(2, size=(2, 4, 4))
+    model.transform(X_0)
+    X_corr_0 = correlate(X_0, p_basis, correlations=[(0, 0), (0, 1)])
+    assert np.allclose(X_corr_0, model.transform_correlations)
+    X_1 = np.random.randint(2, size=(2, 4, 4))
+    model.transform(X_1)
+    X_corr_1 = correlate(X_1, p_basis, correlations=[(0, 0), (0, 1)])
+    X_corr_ = np.concatenate((X_corr_0, X_corr_1))
+    assert np.allclose(X_corr_, model.transform_correlations)
+
+
 if __name__ == '__main__':
-    test_set_correlations()
+    test_store_correlations()

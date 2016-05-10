@@ -297,17 +297,62 @@ def test_stats_in_parallel():
     from pymks.bases import PrimitiveBasis
     from pymks.stats import correlate
     from pymks.datasets import make_microstructure
-    X = make_microstructure(n_samples=5, n_phases=3)
     p_basis = PrimitiveBasis(5)
-    t = []
-    for i in range(1, 4):
-        t_start = time.time()
-        correlate(X, p_basis, n_jobs=i)
-        t.append(time.time() - t_start)
     if p_basis._pyfftw:
-        assert t == sorted(t, reverse=True)
+        X = make_microstructure(n_samples=5, n_phases=3)
+        t = []
+        for i in range(1, 4):
+            t_start = time.time()
+            correlate(X, p_basis, n_jobs=i)
+            t.append(time.time() - t_start)
+            assert t == sorted(t, reverse=True)
     else:
         pass
 
+
+def test_autocorrelate_with_specific_correlations():
+    from pymks.stats import autocorrelate
+    from pymks import PrimitiveBasis
+    X = np.array([[[1, 0, 1, 1],
+                   [1, 0, 1, 1],
+                   [0, 0, 2, 0],
+                   [0, 0, 0, 0],
+                   [0, 0, 0, 0]]])
+    autocorrelations = [(0, 0), (2, 2)]
+    p_basis = PrimitiveBasis(n_states=3)
+    X_auto = autocorrelate(X, p_basis, autocorrelations=autocorrelations)
+    X_result_0 = np.array([[2 / 3., 1 / 3., 5 / 12., 4 / 9.],
+                           [5 / 8., 5 / 12., 9 / 16., 1 / 2.],
+                           [1 / 2., 7 / 15., 13 / 20., 7 / 15.],
+                           [3 / 8., 1 / 2., 9 / 16., 5 / 12.],
+                           [1 / 6., 4 / 9., 5 / 12., 1 / 3.]])
+    assert np.allclose(X_auto[0, ..., 0], X_result_0)
+    X_result_1 = np.array([[0., 0., 0., 0.],
+                           [0., 0., 0., 0.],
+                           [0., 0., 0.05, 0.],
+                           [0., 0., 0., 0.],
+                           [0., 0., 0., 0.]])
+    assert np.allclose(X_auto[0, ..., 1], X_result_1)
+
+
+def test_crosscorrelate_with_specific_correlations():
+    from pymks.stats import crosscorrelate
+    from pymks import PrimitiveBasis
+    X = np.array([[[0, 0, 0, 0],
+                   [0, 1, 0, 0],
+                   [0, 0, 2, 0],
+                   [0, 0, 0, 0],
+                   [0, 0, 0, 0]]])
+    crosscorrelations = [(1, 2)]
+    p_basis = PrimitiveBasis(n_states=3)
+    X_cross = crosscorrelate(X, p_basis, crosscorrelations=crosscorrelations)
+    X_result = np.array([[0., 0., 0., 0.],
+                         [0., 0., 0., 0.],
+                         [0., 0., 0., 0.],
+                         [0., 0., 0., 1 / 12.],
+                         [0., 0., 0., 0.]])
+    assert np.allclose(X_cross[0, ..., 0], X_result)
+
+
 if __name__ == '__main__':
-    test_normalization_fftn()
+    test_mask_two_samples()
