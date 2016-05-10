@@ -33,17 +33,6 @@ def make_elastic_FE_strain_delta(elastic_modulus=(100, 150),
     Returns:
         tuple containing delta microstructures and their strain fields
 
-    Example
-
-    >>> elastic_modulus = (1., 2.)
-    >>> poissons_ratio = (0.3, 0.3)
-    >>> X, y = make_elastic_FE_strain_delta(elastic_modulus=elastic_modulus,
-    ...                                     poissons_ratio=poissons_ratio,
-    ...                                     size=(5, 5))
-
-    `X` is the delta microstructures, and `y` is the
-    strain response fields.
-
     """
     from .elastic_FE_simulation import ElasticFESimulation
 
@@ -125,18 +114,6 @@ def make_elastic_FE_strain_random(n_samples=1, elastic_modulus=(100, 150),
 
     Returns:
          tuple containing delta microstructures and their strain fields
-
-    Example
-
-    >>> elastic_modulus = (1., 2.)
-    >>> poissons_ratio = (0.3, 0.3)
-    >>> X, y = make_elastic_FE_strain_random(n_samples=1,
-    ...                                      elastic_modulus=elastic_modulus,
-    ...                                      poissons_ratio=poissons_ratio,
-    ...                                      size=(5, 5))
-
-    `X` is the delta microstructures, and `y` is the
-    strain response fields.
 
     """
     from .elastic_FE_simulation import ElasticFESimulation
@@ -297,31 +274,6 @@ def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
     Returns:
         array of microstructures with dimensions (n_samples, n_x, ...) and
         effective stress values
-
-    Example
-
-    >>> X, y = make_elastic_stress_random(n_samples=1, elastic_modulus=(1, 1),
-    ...                                   poissons_ratio=(1, 1),
-    ...                                   grain_size=(3, 3), macro_strain=1.0)
-    >>> assert np.allclose(y, np.ones(y.shape))
-    >>> X, y = make_elastic_stress_random(n_samples=1, grain_size=(1, 1),
-    ...                                   elastic_modulus=(100, 200),
-    ...                                   size=(2, 2), poissons_ratio=(1, 3),
-    ...                                   macro_strain=1., seed=3)
-    >>> X_result = np.array([[[1, 1],
-    ...                       [0, 1]]])
-    >>> assert np.allclose(X, X_result)
-    >>> assert float(np.round(y, decimals=5)[0]) == 228.74696
-    >>> X, y = make_elastic_stress_random(n_samples=1, grain_size=(1, 1, 1),
-    ...                                   elastic_modulus=(100, 200),
-    ...                                   poissons_ratio=(1, 3),  seed=3,
-    ...                                   macro_strain=1., size=(2, 2, 2))
-    >>> X_result = np.array([[[1, 1],
-    ...                       [0, 0]],
-    ...                      [[1, 1],
-    ...                       [0, 0]]])
-    >>> assert np.allclose(X, X_result)
-    >>> assert np.round(y[0]).astype(int) == 150
 
     """
     if not isinstance(grain_size[0], (list, tuple, np.ndarray)):
