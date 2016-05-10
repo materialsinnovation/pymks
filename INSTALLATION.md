@@ -62,6 +62,16 @@ for more details.
 
 ## [PyFFTW][pyfftw]
 
+### With Conda
+
+Use
+
+    $ conda install -c richli pyfftw
+
+which will install both FFTW and PyFFTW.
+
+### Without Conda
+
 If installed, PyMKS will use [PyFFTW][pyfftw] to
 compute FFTs instead of [Numpy][numpy]. As long as [Numpy][numpy] is
 not using [Intel MKL][MKL], [PyFFTW][pyfftw] should improve the

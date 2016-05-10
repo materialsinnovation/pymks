@@ -1,6 +1,6 @@
 Use
 
-    $ conda build -c wd15 -c richli .
+    $ conda build -c wd15 .
 
 to build and
 
