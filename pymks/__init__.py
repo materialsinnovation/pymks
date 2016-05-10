@@ -15,7 +15,7 @@ def test():
     """
     import pytest
     path = os.path.split(__file__)[0]
-    pytest.main(args=[path, '--doctest-modules'])
+    pytest.main(args=[path, '--doctest-modules', '-r s'])
 
 
 def get_version():
