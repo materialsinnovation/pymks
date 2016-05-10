@@ -26,7 +26,15 @@ Both [Scipy](http://www.scipy.org/) and [Numpy][numpy]
 
 ## Testing
 
-The package [Pytest](https://pytest.org) is required for testing only.
+The package [Pytest](https://pytest.org) is required for testing only. Use
+
+    $ py.test
+
+in the base directory or
+
+    $ python -c "import pymks; pymks.test()"
+
+to run all the tests.
 
 ## Examples
 
