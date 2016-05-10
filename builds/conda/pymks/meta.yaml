@@ -17,8 +17,6 @@ requirements:
     - sfepy
     - pytest
     - scikit-learn
-    - fftw
-    - pyfftw
 
   run:
     - python
@@ -26,8 +24,6 @@ requirements:
     - sfepy
     - pytest
     - scikit-learn
-    - fftw
-    - pyfftw
 
 about:
   home: http://pymks.org
