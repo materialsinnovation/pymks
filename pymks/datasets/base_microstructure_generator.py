@@ -1,6 +1,5 @@
-import numpy as np
 from ..bases.imag_ffts import _ImagFFTBasis
-# from ..bases.real_ffts import _RealFFTBasis
+import numpy as np
 
 
 class _BaseMicrostructureGenerator(_ImagFFTBasis):

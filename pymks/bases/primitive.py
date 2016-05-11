@@ -1,5 +1,5 @@
-import numpy as np
 from .real_ffts import _RealFFTBasis
+import numpy as np
 
 
 class PrimitiveBasis(_RealFFTBasis):

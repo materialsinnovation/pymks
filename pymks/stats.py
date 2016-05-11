@@ -1,5 +1,5 @@
-import numpy as np
 from .filter import Correlation
+import numpy as np
 
 """
 The stats functions take in a microstructure function and returns its two

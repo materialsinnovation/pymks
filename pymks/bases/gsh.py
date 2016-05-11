@@ -1,4 +1,3 @@
-import numpy as np
 from .gsh_functions import hex_eval
 from .gsh_functions import cub_eval
 from .gsh_functions import tri_eval
@@ -6,6 +5,7 @@ from .gsh_functions import hex_basis_info
 from .gsh_functions import cub_basis_info
 from .gsh_functions import tri_basis_info
 from .imag_ffts import _ImagFFTBasis
+import numpy as np
 
 
 class GSHBasis(_ImagFFTBasis):

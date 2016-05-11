@@ -1,5 +1,5 @@
-import numpy as np
 from .base_microstructure_generator import _BaseMicrostructureGenerator
+import numpy as np
 
 
 class SphericalMicrostructureGenerator(_BaseMicrostructureGenerator):

@@ -1,7 +1,7 @@
-import numpy as np
 from ..filter import Filter
 from scipy.ndimage.fourier import fourier_gaussian
 from .base_microstructure_generator import _BaseMicrostructureGenerator
+import numpy as np
 
 
 class MicrostructureGenerator(_BaseMicrostructureGenerator):
