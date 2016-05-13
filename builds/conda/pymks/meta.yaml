@@ -1,11 +1,11 @@
 ---
 package:
   name: pymks
-  version: "0.3.1_dev.5d6f321e"
+  version: "0.3.1_dev.a3757c72"
 
 source:
   git_url: https://github.com/materialsinnovation/pymks.git
-  git_rev: 5d6f321e
+  git_rev: a3757c72
 
 build:
   number: 1
@@ -15,11 +15,15 @@ requirements:
     - python
     - anaconda
     - sfepy
+    - pytest
+    - scikit-learn
 
   run:
     - python
     - anaconda
     - sfepy
+    - pytest
+    - scikit-learn
 
 about:
   home: http://pymks.org

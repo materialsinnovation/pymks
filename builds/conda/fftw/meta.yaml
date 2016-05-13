@@ -1,0 +1,24 @@
+# Credits to jeanconn for the package https://binstar.org/jeanconn/fftw
+# richli used it for inspiration for https://binstar.org/richli/fftw
+package:
+  name: fftw
+  version: "3.3.4"
+
+source:
+    fn: fftw-3.3.4.tar.gz
+    url: http://www.fftw.org/fftw-3.3.4.tar.gz
+    md5: 2edab8c06b24feeb3b82bbb3ebf3e7b3
+
+requirements:
+  build:
+    - system
+    - chrpath
+
+about:
+  home: http://fftw.org
+  license: GNU General Public License (GPL)
+  summary: 'The fastest Fourier transform in the west.'
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml
