@@ -1,5 +1,5 @@
-import numpy as np
 from .filter import Correlation
+import numpy as np
 
 """
 The stats functions take in a microstructure function and returns its two
@@ -206,7 +206,7 @@ def _compute_stats(X, basis, correlations, confidence_index,
     X_ = _mask_X_(X_, confidence_index)
     basis._n_jobs = n_jobs
     _Fkernel_shape(X.shape, basis, periodic_axes)
-    _norm = _normalize(X.shape, basis, confidence_index)
+    _norm = _normalize(X_.shape, basis, confidence_index)
     return _correlate(X_, basis, correlations) / _norm
 
 
@@ -311,7 +311,7 @@ def _normalize(X_shape, basis, confidence_index):
     else:
         mask = confidence_index
         if mask is None:
-            mask = np.ones(X_shape[1:])[None]
+            mask = np.ones(X_shape[1:-1])[None]
         corr = Correlation(mask[..., None], basis)
         return _truncate(corr.convolve(mask[..., None]), X_shape)
 

@@ -1,3 +1,7 @@
+try:
+    import pyfftw
+except:
+    pass
 import numpy as np
 
 

@@ -1,5 +1,5 @@
-import numpy as np
 from .imag_ffts import _ImagFFTBasis
+import numpy as np
 
 
 class FourierBasis(_ImagFFTBasis):
