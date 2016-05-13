@@ -1,0 +1,34 @@
+---
+language: python
+env:
+  - SFEPY_VERSION=0 USE_FFTW=0 PYTHON_VERSION=3
+  - SFEPY_VERSION=release_2016.2 USE_FFTW=1 PYTHON_VERSION=2
+  - SFEPY_VERSION=master USE_FFTW=0 PYTHON_VERSION=2
+install:
+  - sudo apt-get update
+  # We do this conditionally because it saves us some downloading if the
+  # version is the same.
+  - if [[ "$PYTHON_VERSION" == "2" ]]; then
+      wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+    else
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+    fi
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  # Useful for debugging any issues with conda
+  - conda info -a
+  - conda create -q -y -n test-environment python="$PYTHON_VERSION"
+  - source activate test-environment
+  - conda install -q -y -n test-environment numpy scipy pytest scikit-learn matplotlib
+  - if [[ "$USE_FFTW" -eq 1 ]]; then
+      conda install -q -y -n test-environment -c wd15 pyfftw;
+    fi
+  - if [[ "$SFEPY_VERSION" -ne 0 ]]; then
+      pip install git+https://github.com/sfepy/sfepy.git@"$SFEPY_VERSION";
+    fi
+  - pip install .
+script:
+  py.test
