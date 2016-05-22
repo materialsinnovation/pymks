@@ -22,7 +22,7 @@ and then run the tests.
 ## Scipy Stack
 
 Both [Scipy](http://www.scipy.org/) and [Numpy][numpy]
-[Scikit-learn](http://scikit-learn.org) are required.
+as well as [Scikit-learn](http://scikit-learn.org) are required.
 
 ## Testing
 

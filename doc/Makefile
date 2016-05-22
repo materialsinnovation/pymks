@@ -37,7 +37,7 @@ $(RST_DIR)/%.rst: $(MARKDOWN_DIR)/%.md
 
 $(RST_DIR)/%.rst: $(NOTEBOOK_DIR)/%.ipynb
 	mkdir -p $(RST_DIR)
-	cd $(RST_DIR); ipython nbconvert --to rst ../$<
+	cd $(RST_DIR); jupyter nbconvert --to rst ../$<
 
 html: $(RST) $(NOTEBOOKS_RST) *.rst
 	@cp rst/intro.rst ./
