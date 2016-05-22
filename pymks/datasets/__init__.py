@@ -1,7 +1,7 @@
-import numpy as np
 from .cahn_hilliard_simulation import CahnHilliardSimulation
 from .microstructure_generator import MicrostructureGenerator
 from pymks import DiscreteIndicatorBasis, MKSRegressionModel
+import numpy as np
 
 __all__ = ['make_delta_microstructures', 'make_elastic_FE_strain_delta',
            'make_elastic_FE_strain_random', 'make_cahn_hilliard',

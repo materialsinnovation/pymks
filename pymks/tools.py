@@ -1,5 +1,10 @@
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    import pytest
+    pytest.importorskip('matplotlib')
+    raise
 import matplotlib.colors as colors
-import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from sklearn.learning_curve import learning_curve
@@ -585,7 +590,7 @@ def _draw_components_evolution(X, labels, title, component_labels,
     for label, pts, color in zip(labels, X, color_list):
         ax.plot(pts[:, 0], pts[:, 1], 'o', color=color, label=label)
         lg = plt.legend(loc=1, borderaxespad=0., fontsize=15)
-    if legend_outside is not None:
+    if legend_outside:
         lg = plt.legend(bbox_to_anchor=(1.05, 1.0), loc=2,
                         borderaxespad=0., fontsize=15)
     lg.draggable()
@@ -687,7 +692,8 @@ def draw_correlations(X_corr, correlations=None):
     if correlations is None:
         n_cross = X_corr.shape[-1]
         L = range((np.sqrt(1 + 8 * n_cross) - 1).astype(int) / 2)
-        correlations = _auto_correlations(L) + _cross_correlations(L)
+        correlations = zip(*list(_auto_correlations(L)))
+        correlations += zip(*list(_cross_correlations(L)))
     _draw_stats(X_corr, correlations=correlations)
 
 
@@ -701,7 +707,7 @@ def draw_autocorrelations(X_auto, autocorrelations=None):
     """
     if autocorrelations is None:
         n_states = X_auto.shape[-1]
-        autocorrelations = _auto_correlations(n_states)
+        autocorrelations = zip(*list(_auto_correlations(n_states)))
     _draw_stats(X_auto, correlations=autocorrelations)
 
 
@@ -715,8 +721,8 @@ def draw_crosscorrelations(X_cross, crosscorrelations=None):
     """
     if crosscorrelations is None:
         n_cross = X_cross.shape[-1]
-        n_states = (np.sqrt(1 + 8 * n_cross) + 1).astype(int) / 2
-        crosscorrelations = _cross_correlations(n_states)
+        n_states = (np.sqrt(1 + 8 * n_cross) + 1).astype(int) // 2
+        crosscorrelations = zip(*list(_cross_correlations(n_states)))
     _draw_stats(X_cross, correlations=crosscorrelations)
 
 
@@ -773,10 +779,6 @@ def _draw_stats(X_, correlations=None):
 
 def _get_ticks_params(l):
     """Get tick locations and labels for spatial correlation plots.
-
-    >>> l = 4
-    >>> result = ([0, 1, 2, 3, 4], [-2, -1, 0, 1, 2])
-    >>> assert result == _get_ticks_params(l)
 
     Args:
         l: shape of array along the axis
