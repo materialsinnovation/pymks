@@ -249,3 +249,6 @@ misc
 #Sphinx
 doc/rst
 doc/_build
+
+#pytest
+.cache

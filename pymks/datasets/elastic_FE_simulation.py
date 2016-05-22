@@ -1,3 +1,10 @@
+try:
+    import sfepy
+except ImportError:
+    import pytest
+    pytest.importorskip('sfepy')
+    raise
+
 import numpy as np
 from sfepy.base.goptions import goptions
 from sfepy.discrete.fem import Field

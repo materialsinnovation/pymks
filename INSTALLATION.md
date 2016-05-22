@@ -4,7 +4,7 @@
 
 Conda is the easiest way to install PyMKS. To install use
 
-    $ conda config --add channels wd15
+    $ conda config --add channels pymks
     $ conda install pymks
 
 ## Pip
@@ -21,9 +21,20 @@ and then run the tests.
 
 ## Scipy Stack
 
-The packages [Nosetests](https://nose.readthedocs.org/en/latest/),
-[Scipy](http://www.scipy.org/), [Numpy][numpy], and
-[Scikit-learn](http://scikit-learn.org) are all required.
+Both [Scipy](http://www.scipy.org/) and [Numpy][numpy]
+as well as [Scikit-learn](http://scikit-learn.org) are required.
+
+## Testing
+
+The package [Pytest](https://pytest.org) is required for testing only. Use
+
+    $ py.test
+
+in the base directory or
+
+    $ python -c "import pymks; pymks.test()"
+
+to run all the tests.
 
 ## Examples
 

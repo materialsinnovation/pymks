@@ -17,6 +17,11 @@ body {
     font-weight: bold;
 }
 
+/*PyMKS Test*/
+.navbar-brand > img {
+    display: inline;
+}
+
 /* Version Number */
 .navbar-default .navbar-text {
     font-size:      18px;

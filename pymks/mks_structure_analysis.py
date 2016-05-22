@@ -1,7 +1,7 @@
-import numpy as np
 from pymks.stats import correlate
 from sklearn.base import BaseEstimator
 from sklearn.decomposition import RandomizedPCA
+import numpy as np
 
 
 class MKSStructureAnalysis(BaseEstimator):

@@ -1,5 +1,5 @@
-import numpy as np
 from ..bases.imag_ffts import _ImagFFTBasis
+import numpy as np
 
 
 class CahnHilliardSimulation(_ImagFFTBasis):

@@ -1,7 +1,7 @@
-import numpy as np
 from ..filter import Filter
 from scipy.ndimage.fourier import fourier_gaussian
 from .base_microstructure_generator import _BaseMicrostructureGenerator
+import numpy as np
 
 
 class MicrostructureGenerator(_BaseMicrostructureGenerator):
@@ -12,13 +12,14 @@ class MicrostructureGenerator(_BaseMicrostructureGenerator):
     shape of the grains.
 
     >>> n_samples, n_phases = 1, 2
-    >>> size = (3, 3)
+    >>> size = (4, 4)
     >>> generator = MicrostructureGenerator(n_samples, size,
     ...                                      n_phases, seed=10)
     >>> X = generator.generate()
-    >>> X_test = np.array([[[1, 0, 1],
-    ...                     [1, 1, 0],
-    ...                     [0, 1, 0]]])
+    >>> X_test = np.array([[[1, 0, 1, 1],
+    ...                     [1, 0, 0, 1],
+    ...                     [0, 0, 1, 1],
+    ...                     [0, 1, 1, 1]]])
     >>> assert(np.allclose(X, X_test))
 
     """
@@ -36,7 +37,8 @@ class MicrostructureGenerator(_BaseMicrostructureGenerator):
                                " not equal.")
 
         X = np.random.random((self.n_samples,) + self.size)
-        gaussian = fourier_gaussian(np.ones(self.grain_size),
+        _gaussian_size = np.around(self.grain_size).astype(int)
+        gaussian = fourier_gaussian(np.ones(_gaussian_size),
                                     np.ones(len(self.size)))
         filter_ = Filter(self._fftn(gaussian[None, ..., None]), self)
         filter_.resize(self.size)
@@ -69,6 +71,8 @@ class MicrostructureGenerator(_BaseMicrostructureGenerator):
             seg_ind = np.floor((v_cum + per_diff) * X_sort.shape[1])
             seg_values = np.concatenate([x[list(i)][None]
                                          for i, x in zip(seg_ind, X_sort)])
-            X_bool = X_blur[..., None] > seg_values[:, None, None, :]
+            new_axes = [None for i in X_blur[0].shape]
+            seg_slices = [slice(None)] + new_axes + [slice(None)]
+            X_bool = X_blur[..., None] > seg_values[seg_slices]
             X_phases = np.sum(X_bool, axis=-1)
         return X_phases

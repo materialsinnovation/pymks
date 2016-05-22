@@ -1,9 +1,9 @@
 from .abstract import _AbstractMicrostructureBasis
-import numpy as np
 try:
     import pyfftw.builders as fftmodule
 except:
     import numpy.fft as fftmodule
+import numpy as np
 
 
 class _RealFFTBasis(_AbstractMicrostructureBasis):

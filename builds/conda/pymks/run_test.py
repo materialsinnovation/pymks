@@ -1,0 +1,2 @@
+import pymks
+pymks.test()
