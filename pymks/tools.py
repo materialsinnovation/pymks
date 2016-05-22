@@ -1,5 +1,10 @@
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    import pytest
+    pytest.importorskip('matplotlib')
+    raise
 import matplotlib.colors as colors
-import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from sklearn.learning_curve import learning_curve
@@ -774,10 +779,6 @@ def _draw_stats(X_, correlations=None):
 
 def _get_ticks_params(l):
     """Get tick locations and labels for spatial correlation plots.
-
-    >>> l = 4
-    >>> result = ([0, 1, 2, 3, 4], [-2, -1, 0, 1, 2])
-    >>> assert result == _get_ticks_params(l)
 
     Args:
         l: shape of array along the axis
