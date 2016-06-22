@@ -285,6 +285,7 @@ def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
     vf_0 = volume_fraction[0]
     if not isinstance(vf_0, (list, tuple, np.ndarray)) and vf_0 is not None:
         volume_fraction = (volume_fraction,)
+        np.random.seed(seed)
     if not isinstance(size, (list, tuple, np.ndarray)) or len(size) > 3:
         raise RuntimeError('size must have length of 2 or 3')
     [RuntimeError('dimensions of size and grain_size are not the same.')
@@ -294,8 +295,10 @@ def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
          for volume_frac in volume_fraction
          if len(elastic_modulus) != len(volume_frac)]
     if len(elastic_modulus) != len(poissons_ratio):
-        raise RuntimeError('length of elastic_modulus and poissons_ratio are \
-                           not the same.')
+        raise RuntimeError('length of elastic_modulus and poissons_ratio are' \
+                           'not the same.')
+    np.random.seed(seed)
+    seed = np.random.randint(100, size=(len(volume_fraction),))
     X_cal, y_cal = make_elastic_FE_strain_delta(elastic_modulus,
                                                 poissons_ratio, size,
                                                 macro_strain)
@@ -305,10 +308,10 @@ def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
     model.fit(X_cal, y_cal)
     X = np.concatenate([make_microstructure(n_samples=sample, size=size,
                                             n_phases=n_states,
-                                            grain_size=gs, seed=seed,
+                                            grain_size=gs, seed=s,
                                             volume_fraction=vf,
                                             percent_variance=percent_variance)
-                        for vf, gs, sample in zip(volume_fraction,
+                        for vf, s, gs, sample in zip(volume_fraction, seed,
                                                   grain_size, n_samples)])
     X_ = basis.discretize(X)
     index = tuple([None for i in range(len(size) + 1)]) + (slice(None),)
