@@ -14,7 +14,9 @@ import numpy as np
 import warnings
 
 warnings.filterwarnings("ignore")
-plt.style.library['ggplot']['text.color'] = '#555555'
+plt.style.library['ggplot']['xtick.color'] = '#000000'
+plt.style.library['ggplot']['ytick.color'] = '#000000'
+plt.style.library['ggplot']['axes.labelcolor'] = '#000000'
 plt.style.use('ggplot')
 
 

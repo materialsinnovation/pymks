@@ -29,18 +29,18 @@ def test_make_elastic_stress_randome():
     X, y = make_elastic_stress_random(n_samples=1, grain_size=(1, 1),
                                       elastic_modulus=(100, 200),
                                       size=(2, 2), poissons_ratio=(1, 3),
-                                      macro_strain=1., seed=3)
+                                      macro_strain=1., seed=4)
     X_result = np.array([[[1, 1],
                           [0, 1]]])
-    assert np.allclose(X, X_result)
     assert float(np.round(y, decimals=5)[0]) == 228.74696
+    assert np.allclose(X, X_result)
     X, y = make_elastic_stress_random(n_samples=1, grain_size=(1, 1, 1),
                                       elastic_modulus=(100, 200),
-                                      poissons_ratio=(1, 3),  seed=3,
+                                      poissons_ratio=(1, 3),  seed=5,
                                       macro_strain=1., size=(2, 2, 2))
     X_result = np.array([[[1, 1],
-                          [0, 0]],
+                          [1, 0]],
                          [[1, 1],
                           [0, 0]]])
     assert np.allclose(X, X_result)
-    assert np.round(y[0]).astype(int) == 150
+    assert y.astype(int) == 145
