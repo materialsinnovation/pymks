@@ -194,17 +194,21 @@ def draw_microstructure_strain(microstructure, strain):
     plt.show()
 
 
-def draw_microstructures(*microstructures):
+def draw_microstructures(microstructures, labels=None, figsize=None):
     """
     Draw microstructures
 
     Args:
         microstructures (3D array): numpy array with dimensions
             (n_samples, x, y)
+        labels (list, str, optional): titles for strain fields
+        figsize (tuple, optional): specifies the number of images in each
+            direction.
     """
     cmap = _get_microstructure_cmap()
-    titles = [' ' for s in np.arange(microstructures[0].shape[0])]
-    _draw_fields(microstructures[0], cmap, 10, titles)
+    if labels is None:
+        labels = [' ' for s in np.arange(microstructures.shape[0])]
+    _draw_fields(microstructures, cmap, 15, labels, figsize=figsize)
 
 
 def draw_strains(strains, labels=None, fontsize=15):
@@ -288,6 +292,7 @@ def _draw_fields(fields, field_cmap, fontsize, titles, figsize=None):
         field_cmap - color map for plot
         fontsize - font size for titles and color bar text
         titles - titles for plot
+        figsize - controls the number of images in each direction
     """
     plt.close('all')
     vmin = np.min(fields)
@@ -324,8 +329,8 @@ def _draw_fields(fields, field_cmap, fontsize, titles, figsize=None):
     cbar_ax.tick_params(labelsize=cbar_font)
     cbar_ax.yaxis.set_offset_position('right')
     fig.colorbar(im, cax=cbar_ax)
-    plt.tight_layout()
     plt.rc('font', **{'size': str(cbar_font)})
+    plt.tight_layout()
     plt.show()
 
 
@@ -405,7 +410,7 @@ def draw_gridscores_matrix(grid_scores, params, score_label=None,
     param_range_0 = grid_scores.param_grid[params[0]]
     param_range_1 = grid_scores.param_grid[params[1]]
     mat_size = (len(param_range_1), len(param_range_0))
-    fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+    fig, axs = plt.subplots(2, 1, figsize=(10, 5))
     matrices = np.concatenate((np.array(means).reshape(mat_size)[None],
                                np.array(stddev).reshape(mat_size)[None]))
     X_cmap = _grid_matrix_cmap()
@@ -430,6 +435,7 @@ def draw_gridscores_matrix(grid_scores, params, score_label=None,
         cbar = plt.colorbar(im, cax=cbar_ax)
         cbar.ax.tick_params(labelsize=12)
         fig.subplots_adjust(right=1.2)
+    plt.tight_layout()
     plt.show()
 
 
