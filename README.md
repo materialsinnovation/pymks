@@ -70,18 +70,19 @@ introduction to how to use PyMKS is outlined below and example cases can
 be found [in the examples section](EXAMPLES.html). Both code and
 examples contributions are welcome.
 
-### Mailing List
+### Documentations
+
+Start with the [PyMKS examples](./index.ipynb), especially the
+[introductory example](notebooks/intro.ipynb).
+
+### Other
+
+#### Mailing List
 
 Please feel free to ask open-ended questions about PyMKS on the
 <pymks-general@googlegroups.com> list.
 
-## Binder
-
-There are a number of
-[live example notebooks on Binder](http://mybinder.org/repo/materialsinnovation/pymks)
-to help you get started with PyMKS.
-
-## Docker
+#### Docker
 
 The [Dockerfile](Dockerfile) is for Binder, but can be used
 locally. See [ADMINISTRATA.md](ADMINISTRATA.md) for more details. The

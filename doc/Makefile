@@ -46,3 +46,7 @@ html: $(RST) $(NOTEBOOKS_RST) *.rst
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
+api: API.rst
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	@echo
+	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
