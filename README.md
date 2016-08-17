@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://rawgit.com/usnistgov/corr/master/corr-view/frontend/images/logo.svg"
+    <img src="doc/pymks_logo.ico"
          height="240"
          alt="CoRR logo"
          class="inline">
@@ -10,12 +10,12 @@
         <img src="http://mybinder.org/badge.svg"
              alt="Binder">
     </a>
-    <a href="https://gitter.im/pymks/Lobb">
-        <img src="https://img.shields.io/gitter/room/gitterHQ/gitter.sv"
+    <a href="https://gitter.im/pymks/Lobby">
+        <img src="https://img.shields.io/gitter/room/gitterHQ/gitter.svg"
              alt="Gitter Chat">
     </a>
     <a href="https://travis-ci.org/materialsinnovation/pymks">
-        <img src="https://img.shields.io/gitter/room/gitterHQ/gitter.sv"
+        <img src="https://travis-ci.org/materialsinnovation/pymks"
              alt="Travis CI">
     </a>
 </p>
