@@ -1,6 +1,24 @@
-# Overview
+<p align="center">
+    <img src="https://rawgit.com/usnistgov/corr/master/corr-view/frontend/images/logo.svg"
+         height="240"
+         alt="CoRR logo"
+         class="inline">
+</p>
 
-[![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo/materialsinnovation/pymks)
+<p align="center">
+    <a href="http://mybinder.org/repo/materialsinnovation/pymks">
+        <img src="http://mybinder.org/badge.svg"
+             alt="Binder">
+    </a>
+    <a href="https://gitter.im/pymks/Lobb">
+        <img src="https://img.shields.io/gitter/room/gitterHQ/gitter.sv"
+             alt="Gitter Chat">
+    </a>
+    <a href="https://travis-ci.org/materialsinnovation/pymks">
+        <img src="https://img.shields.io/gitter/room/gitterHQ/gitter.sv"
+             alt="Travis CI">
+    </a>
+</p>
 
 ### MKS
 
