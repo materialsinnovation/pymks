@@ -15,7 +15,7 @@
              alt="Gitter Chat">
     </a>
     <a href="https://travis-ci.org/materialsinnovation/pymks">
-        <img src="https://travis-ci.org/materialsinnovation/pymks"
+        <img src="https://api.travis-ci.org/materialsinnovation/pymks.svg"
              alt="Travis CI">
     </a>
 </p>
