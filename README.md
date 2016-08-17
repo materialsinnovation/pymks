@@ -23,6 +23,12 @@ The Materials Knowledge System in Python.
         <img src="https://api.travis-ci.org/materialsinnovation/pymks.svg"
              alt="Travis CI">
     </a>
+    <a href="https://pypi.python.org/pypi/pymks/0.3.1">
+        <img src="https://badge.fury.io/py/pymks.svg" alt="PyPI version" height="18">
+    </a>
+       <a href="LICENSE.md">
+        <img src="https://img.shields.io/badge/license-mit-blue.svg" alt="License" height="18">
+    </a>
 </p>
 
 ### MKS
