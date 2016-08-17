@@ -5,6 +5,11 @@
          class="inline">
 </p>
 
+
+<p align="center"><sup><strong>
+The Materials Knowledge System in Python.
+</strong></sup></p>
+
 <p align="center">
     <a href="http://mybinder.org/repo/materialsinnovation/pymks" target="_blank">
         <img src="http://mybinder.org/badge.svg"
