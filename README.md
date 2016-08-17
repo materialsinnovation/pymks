@@ -6,15 +6,15 @@
 </p>
 
 <p align="center">
-    <a href="http://mybinder.org/repo/materialsinnovation/pymks">
+    <a href="http://mybinder.org/repo/materialsinnovation/pymks" target="_blank">
         <img src="http://mybinder.org/badge.svg"
              alt="Binder">
     </a>
-    <a href="https://gitter.im/pymks/Lobby">
+    <a href="https://gitter.im/pymks/Lobby" target="_blank">
         <img src="https://img.shields.io/gitter/room/gitterHQ/gitter.svg"
              alt="Gitter Chat">
     </a>
-    <a href="https://travis-ci.org/materialsinnovation/pymks">
+    <a href="https://travis-ci.org/materialsinnovation/pymks" target="_blank">
         <img src="https://api.travis-ci.org/materialsinnovation/pymks.svg"
              alt="Travis CI">
     </a>
