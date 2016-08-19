@@ -39,9 +39,7 @@ $(RST_DIR)/%.rst: $(NOTEBOOK_DIR)/%.ipynb
 	mkdir -p $(RST_DIR)
 	cd $(RST_DIR); jupyter nbconvert --to rst ../$<
 
-html: $(RST) $(NOTEBOOKS_RST) *.rst
-	@cp rst/intro.rst ./
-	@cp -r rst/intro_files ./
+html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."

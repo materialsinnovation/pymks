@@ -1,34 +1,28 @@
-<p align="center">
-    <img src="doc/pymks_logo.ico"
-         height="240"
-         alt="CoRR logo"
-         class="inline">
-</p>
-
+![PyMKS Logo](http://github.com/wd15/pymks/doc/pymks_logo.ico)
 
 <p align="center"><sup><strong>
 The Materials Knowledge System in Python.
 </strong></sup></p>
 
 <p align="center">
-    <a href="http://mybinder.org/repo/materialsinnovation/pymks" target="_blank">
-        <img src="http://mybinder.org/badge.svg"
-             alt="Binder">
-    </a>
-    <a href="https://gitter.im/pymks/Lobby" target="_blank">
-        <img src="https://img.shields.io/gitter/room/gitterHQ/gitter.svg"
-             alt="Gitter Chat">
-    </a>
-    <a href="https://travis-ci.org/materialsinnovation/pymks" target="_blank">
-        <img src="https://api.travis-ci.org/materialsinnovation/pymks.svg"
-             alt="Travis CI">
-    </a>
-    <a href="https://pypi.python.org/pypi/pymks/0.3.1">
-        <img src="https://badge.fury.io/py/pymks.svg" alt="PyPI version" height="18">
-    </a>
-       <a href="LICENSE.md">
-        <img src="https://img.shields.io/badge/license-mit-blue.svg" alt="License" height="18">
-    </a>
+<a href="http://mybinder.org/repo/materialsinnovation/pymks" target="_blank">
+<img src="http://mybinder.org/badge.svg"
+alt="Binder">
+</a>
+<a href="https://gitter.im/pymks/Lobby" target="_blank">
+<img src="https://img.shields.io/gitter/room/gitterHQ/gitter.svg"
+alt="Gitter Chat">
+</a>
+<a href="https://travis-ci.org/materialsinnovation/pymks" target="_blank">
+<img src="https://api.travis-ci.org/materialsinnovation/pymks.svg"
+alt="Travis CI">
+</a>
+<a href="https://pypi.python.org/pypi/pymks/0.3.1">
+<img src="https://badge.fury.io/py/pymks.svg" alt="PyPI version" height="18">
+</a>
+<a href="LICENSE.md">
+<img src="https://img.shields.io/badge/license-mit-blue.svg" alt="License" height="18">
+</a>
 </p>
 
 ### MKS

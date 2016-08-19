@@ -29,19 +29,19 @@ sys.path.insert(0, os.path.abspath('..'))
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.mathjax',
-              'sphinxcontrib.napoleon']
+              'sphinxcontrib.napoleon',
+              'nbsphinx']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
 # The suffix of source filenames.
-source_suffix = '.rst'
 
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = 'contents'
 
 # General information about the project.
 project = u'pymks'
@@ -69,7 +69,7 @@ release = pymks.__version__
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build']
+exclude_patterns = ['_build', '**.ipynb_checkpoints']
 autoclass_content = 'both'
 
 # The reST default role (used for this markup: `text`) to use for all documents.
@@ -254,6 +254,7 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
+
 # Documents to append as an appendix to all manuals.
 #texinfo_appendices = []
 
@@ -262,3 +263,18 @@ texinfo_documents = [
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 #texinfo_show_urls = 'footnote'
+
+
+from recommonmark.parser import CommonMarkParser
+# from recommonmark.transform import AutoStructify
+source_parsers = {'.md' : CommonMarkParser}
+source_suffix = ['.rst', '.md']
+
+# github_doc_root = ''
+
+# def setup(app):
+#     app.add_config_value('recommonmark_config', {
+#             'url_resolver': lambda url: github_doc_root + url,
+#             'auto_toc_tree_section': 'Contents',
+#             }, True)
+#     app.add_transform(AutoStructify)
