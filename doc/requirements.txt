@@ -1,3 +1,4 @@
 sphinx_bootstrap_theme
 numpy
 scipy
+scikit-learn
