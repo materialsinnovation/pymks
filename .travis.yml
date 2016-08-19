@@ -29,6 +29,7 @@ install:
   - if [[ "$SFEPY_VERSION" -ne 0 ]]; then
       pip install git+https://github.com/sfepy/sfepy.git@"$SFEPY_VERSION";
     fi
+  - pip install pylint
   - pip install .
 script:
   - py.test
