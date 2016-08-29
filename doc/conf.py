@@ -281,5 +281,7 @@ github_doc_root = ''
 
 import shutil, os
 
-os.makedirs('rst')
+rst_directory = 'rst'
+if not os.path.exists(rst_directory):
+    os.makedirs('rst')
 shutil.copyfile('../README.md', 'rst/README.md')
