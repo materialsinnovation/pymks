@@ -7,13 +7,11 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+
 .. toctree::
    :hidden:
+   :maxdepth: 0
 
-   rst/README.md
-   intro.rst
-   support.rst
    THEORY.rst
-   ../CREDITS.md
-   ../LICENSE.md
-   ../CITATION.md
+   rst/LICENSE.md
+   rst/CITATION.md

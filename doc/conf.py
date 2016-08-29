@@ -115,7 +115,7 @@ html_theme_options = {
     ],
     'navbar_pagenav': False,
     'navbar_sidebarrel': False,
-    'globaltoc_depth': 2,
+    'globaltoc_depth': 1,
     'source_link_position': '',
     'bootswatch_theme': 'cosmo'
 }
@@ -284,4 +284,8 @@ import shutil, os
 rst_directory = 'rst'
 if not os.path.exists(rst_directory):
     os.makedirs('rst')
-shutil.copyfile('../README.md', 'rst/README.md')
+
+markdown_files = ['README.md', 'INSTALLATION.md', 'LICENSE.md', 'CITATION.md']
+for markdown_file in markdown_files:
+    shutil.copyfile(os.path.join('..', markdown_file),
+                    os.path.join(rst_directory, markdown_file))
