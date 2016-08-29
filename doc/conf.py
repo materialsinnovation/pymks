@@ -266,15 +266,21 @@ texinfo_documents = [
 
 
 from recommonmark.parser import CommonMarkParser
-# from recommonmark.transform import AutoStructify
+from recommonmark.transform import AutoStructify
+
 source_parsers = {'.md' : CommonMarkParser}
 source_suffix = ['.rst', '.md']
 
-# github_doc_root = ''
+github_doc_root = ''
 
-# def setup(app):
-#     app.add_config_value('recommonmark_config', {
-#             'url_resolver': lambda url: github_doc_root + url,
-#             'auto_toc_tree_section': 'Contents',
-#             }, True)
-#     app.add_transform(AutoStructify)
+def setup(app):
+    app.add_config_value('recommonmark_config', {
+            'url_resolver': lambda url: github_doc_root + url,
+            'auto_toc_tree_section': 'Contents',
+            }, True)
+    app.add_transform(AutoStructify)
+
+import shutil, os
+
+os.makedirs('rst')
+shutil.copyfile('../README.md', 'rst/README.md')

@@ -1,8 +1,14 @@
-![PyMKS Logo](http://github.com/wd15/pymks/doc/pymks_logo.ico)
+<p align="center">
+    <img src="https://raw.githubusercontent.com/materialsinnovation/pymks/master/doc/pymks_logo.ico"
+         height="240"
+         alt="CoRR logo"
+         class="inline">
+</p>
 
-<p align="center"><sup><strong>
-The Materials Knowledge System in Python.
+<h1> <p align="center"><sup><strong>
+PYMKS &ndash; The Materials Knowledge System in Python
 </strong></sup></p>
+</h1>
 
 <p align="center">
 <a href="http://mybinder.org/repo/materialsinnovation/pymks" target="_blank">
@@ -64,20 +70,36 @@ introduction to how to use PyMKS is outlined below and example cases can
 be found [in the examples section](EXAMPLES.html). Both code and
 examples contributions are welcome.
 
-### Documentations
+### Documentation
 
 Start with the [PyMKS examples](./index.ipynb), especially the
 [introductory example](notebooks/intro.ipynb).
 
-### Other
+### Feedback
 
 #### Mailing List
 
 Please feel free to ask open-ended questions about PyMKS on the
 <pymks-general@googlegroups.com> list.
 
-#### Docker
+#### Docker Image
 
 The [Dockerfile](Dockerfile) is for Binder, but can be used
 locally. See [ADMINISTRATA.md](ADMINISTRATA.md) for more details. The
 official PyMKS instance is at https://hub.docker.com/r/wd15/pymks/.
+
+#### Gitter
+
+For immediate help, please feel free to participate on
+[Gitter](https://gitter.im/pymks/Lobby).
+
+### Financial Support
+
+Financial support for the development of PyMKS is provided by the
+[Georgia Tech Institute of Materials](http://materials.gatech.edu/),
+the
+[National Institute of Standards and Technology](http://www.nist.gov/mml/msed/index.cfm),
+the
+[Air Force Office of Scientific Research](http://www.wpafb.af.mil/AFRL/afosr/),
+the [Office of Naval Research](http://www.onr.navy.mil/) and the
+[National Science Foundation](http://www.nsf.gov/).
