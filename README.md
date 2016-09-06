@@ -67,7 +67,7 @@ object-oriented set of tools and examples, written in Python, that
 provide high-level access to the MKS framework for rapid creation and
 analysis of structure-property-processing relationships. A short
 introduction to how to use PyMKS is outlined below and example cases can
-be found [in the examples section](EXAMPLES.html). Both code and
+be found [in the examples section](./index.ipynb). Both code and
 examples contributions are welcome.
 
 ### Documentation

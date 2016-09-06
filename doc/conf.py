@@ -265,19 +265,31 @@ texinfo_documents = [
 #texinfo_show_urls = 'footnote'
 
 from recommonmark.parser import CommonMarkParser
-# from recommonmark.transform import AutoStructify
+from recommonmark.transform import AutoStructify
 
 source_parsers = {'.md' : CommonMarkParser}
 source_suffix = ['.rst', '.md']
 
-github_doc_root = ''
+def url_resolver(url):
+    """Resolve url for both documentation and Github online.
 
-# def setup(app):
-#     app.add_config_value('recommonmark_config', {
-#             'url_resolver': lambda url: github_doc_root + url,
-#             'auto_toc_tree_section': 'Contents',
-#             }, True)
-#     app.add_transform(AutoStructify)
+    If the url is an IPython notebook links to the correct path.
+
+    Args:
+      url: the path to the link (not always a full url)
+
+    Returns:
+      a local url to either the documentation or the Github
+
+    """
+    return url
+
+def setup(app):
+    app.add_config_value('recommonmark_config', {
+            'url_resolver': url_resolver,
+            'auto_toc_tree_section': 'Contents',
+            }, True)
+    app.add_transform(AutoStructify)
 
 import shutil, os
 
