@@ -291,13 +291,27 @@ def setup(app):
             }, True)
     app.add_transform(AutoStructify)
 
-import shutil, os
+import shutil, os, glob
 
 rst_directory = 'rst'
-if not os.path.exists(rst_directory):
-    os.makedirs('rst')
+notebook_directory = os.path.join(rst_directory, 'notebooks')
 
-markdown_files = ['README.md', 'INSTALLATION.md', 'LICENSE.md', 'CITATION.md']
-for markdown_file in markdown_files:
-    shutil.copyfile(os.path.join('..', markdown_file),
-                    os.path.join(rst_directory, markdown_file))
+for directory in [rst_directory, notebook_directory]:
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+files_to_copy = (
+    'README.md',
+    'INSTALLATION.md',
+    'LICENSE.md',
+    'CITATION.md',
+    'index.ipynb',
+    'notebooks/*.ipynb'
+)
+
+for fpath in files_to_copy:
+    for fpath_glob in glob.glob(os.path.join('..', fpath)):
+        fpath_glob_ = '/'.join(fpath_glob.split('/')[1:])
+        shutil.copy(fpath_glob, os.path.join(rst_directory, fpath_glob_))
+
+

@@ -11,7 +11,10 @@
 .. toctree::
    :hidden:
    :maxdepth: 0
+   :glob:
 
    THEORY.rst
-   rst/LICENSE.md
-   rst/CITATION.md
+   md/LICENSE.md
+   md/CITATION.md
+   rst/*.ipynb
+   rst/notebooks/*.ipynb
