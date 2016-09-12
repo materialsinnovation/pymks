@@ -1,12 +1,12 @@
 <p align="center">
     <img src="https://raw.githubusercontent.com/materialsinnovation/pymks/master/doc/pymks_logo.ico"
          height="240"
-         alt="CoRR logo"
+         alt="PyMKS logo"
          class="inline">
 </p>
 
 <h1> <p align="center"><sup><strong>
-PYMKS &ndash; The Materials Knowledge System in Python
+PyMKS &ndash; The Materials Knowledge System in Python
 </strong></sup></p>
 </h1>
 
@@ -26,7 +26,7 @@ alt="Travis CI">
 <a href="https://pypi.python.org/pypi/pymks/0.3.1">
 <img src="https://badge.fury.io/py/pymks.svg" alt="PyPI version" height="18">
 </a>
-<a href="LICENSE.md">
+<a href="https://github.com/materialsinnovation/pymks/blob/master/LICENSE.md">
 <img src="https://img.shields.io/badge/license-mit-blue.svg" alt="License" height="18">
 </a>
 </p>
@@ -79,14 +79,9 @@ Start with the [PyMKS examples](./index.ipynb), especially the
 
 #### Mailing List
 
-Please feel free to ask open-ended questions about PyMKS on the
-<pymks-general@googlegroups.com> list.
-
-#### Docker Image
-
-The [Dockerfile](Dockerfile) is for Binder, but can be used
-locally. See [ADMINISTRATA.md](ADMINISTRATA.md) for more details. The
-official PyMKS instance is at https://hub.docker.com/r/wd15/pymks/.
+Please feel free to ask open-ended questions about PyMKS on the <a
+href="mailto:pymks-general@googlegroups.com">pymks-general@googlegroups.com</a>
+list.
 
 #### Gitter
 
