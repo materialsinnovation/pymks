@@ -282,7 +282,10 @@ def url_resolver(url):
       a local url to either the documentation or the Github
 
     """
-    return url
+    if url[-6:] == '.ipynb':
+        return url[4:-6] + '.html'
+    else:
+        return url
 
 def setup(app):
     app.add_config_value('recommonmark_config', {
@@ -313,5 +316,3 @@ for fpath in files_to_copy:
     for fpath_glob in glob.glob(os.path.join('..', fpath)):
         fpath_glob_ = '/'.join(fpath_glob.split('/')[1:])
         shutil.copy(fpath_glob, os.path.join(rst_directory, fpath_glob_))
-
-
