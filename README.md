@@ -77,7 +77,7 @@ Start with the [PyMKS examples](./index.ipynb), especially the
 
 ## Feedback
 
-#### Mailing List
+##### Mailing List
 
 Please feel free to ask open-ended questions about PyMKS on the <a
 href="mailto:pymks-general@googlegroups.com">pymks-general@googlegroups.com</a>
