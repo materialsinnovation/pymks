@@ -1,6 +1,6 @@
 <p align="center">
 <img src="https://raw.githubusercontent.com/wd15/pymks/938637ed732ba09f38e93ccc21e9c1c8fdc88f94/doc/pymks_logo.ico"
-     height="240"
+     height="100"
      alt="PyMKS logo"
      class="inline">
 </p>
@@ -60,7 +60,7 @@ See these references for further reading:
    Thesis (PhD, Materials engineering)--Drexel University, 2011,
    [doi:1860/4057](http://dx.doi.org/1860/4057).
 
-### PyMKS
+## PyMKS
 
 The Materials Knowledge Materials in Python (PyMKS) framework is an
 object-oriented set of tools and examples, written in Python, that
@@ -70,12 +70,12 @@ introduction to how to use PyMKS is outlined below and example cases can
 be found [in the examples section](./index.ipynb). Both code and
 examples contributions are welcome.
 
-### Documentation
+## Documentation
 
 Start with the [PyMKS examples](./index.ipynb), especially the
 [introductory example](notebooks/intro.ipynb).
 
-### Feedback
+## Feedback
 
 #### Mailing List
 
@@ -83,12 +83,12 @@ Please feel free to ask open-ended questions about PyMKS on the <a
 href="mailto:pymks-general@googlegroups.com">pymks-general@googlegroups.com</a>
 list.
 
-#### Gitter
+##### Gitter
 
 For immediate help, please feel free to participate on
 [Gitter](https://gitter.im/pymks/Lobby).
 
-### Financial Support
+## Financial Support
 
 Financial support for the development of PyMKS is provided by the
 [Georgia Tech Institute of Materials](http://materials.gatech.edu/),
@@ -98,3 +98,11 @@ the
 [Air Force Office of Scientific Research](http://www.wpafb.af.mil/AFRL/afosr/),
 the [Office of Naval Research](http://www.onr.navy.mil/) and the
 [National Science Foundation](http://www.nsf.gov/).
+
+## License
+
+See the [license](./LICENSE.md).
+
+## Citing
+
+See [CITATION.md](./CITATION.md).

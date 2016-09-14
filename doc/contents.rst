@@ -7,14 +7,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-
 .. toctree::
    :hidden:
    :maxdepth: 0
    :glob:
 
-   THEORY.rst
-   md/LICENSE.md
-   md/CITATION.md
    rst/*.ipynb
    rst/notebooks/*.ipynb

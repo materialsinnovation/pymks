@@ -109,9 +109,10 @@ html_theme_options = {
     'navbar_site_name': "More",
     'navbar_links': [
         ("Installation", "rst/INSTALLATION.html", True),
-        ("Examples", "EXAMPLES.html", True),
+        ("Examples", "rst/index.html", True),
         ("API", "API.html", True),
         ("Github", "https://github.com/materialsinnovation/pymks/", True),
+        ("Theory", "THEORY.html", True),
     ],
     'navbar_pagenav': False,
     'navbar_sidebarrel': False,
