@@ -99,3 +99,6 @@ in the base PyMKS directory. To push the instance use
 
     $ docker login
     $ docker push docker.io/wd15/pymks:latest
+
+The official PyMKS instance is at
+[https://hub.docker.com/r/wd15/pymks/](https://hub.docker.com/r/wd15/pymks/).
