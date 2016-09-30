@@ -23,7 +23,7 @@ alt="Gitter Chat">
 <img src="https://api.travis-ci.org/materialsinnovation/pymks.svg"
 alt="Travis CI">
 </a>
-<a href="https://pypi.python.org/pypi/pymks/0.3.1">
+<a href="https://pypi.python.org/pypi/pymks">
 <img src="https://badge.fury.io/py/pymks.svg" alt="PyPI version" height="18">
 </a>
 <a href="https://github.com/materialsinnovation/pymks/blob/master/LICENSE.md">
