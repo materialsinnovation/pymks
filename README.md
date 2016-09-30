@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://raw.githubusercontent.com/wd15/pymks/938637ed732ba09f38e93ccc21e9c1c8fdc88f94/doc/pymks_logo.ico"
+<img src="https://raw.githubusercontent.com/materialsinnovation/pymks/master/doc/pymks_logo.ico"
      height="100"
      alt="PyMKS logo"
      class="inline">
