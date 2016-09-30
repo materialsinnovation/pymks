@@ -29,19 +29,19 @@ sys.path.insert(0, os.path.abspath('..'))
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.mathjax',
-              'sphinxcontrib.napoleon']
+              'sphinxcontrib.napoleon',
+              'nbsphinx']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
 # The suffix of source filenames.
-source_suffix = '.rst'
 
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = 'contents'
 
 # General information about the project.
 project = u'pymks'
@@ -69,7 +69,7 @@ release = pymks.__version__
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build']
+exclude_patterns = ['_build', '**.ipynb_checkpoints']
 autoclass_content = 'both'
 
 # The reST default role (used for this markup: `text`) to use for all documents.
@@ -109,13 +109,14 @@ html_theme_options = {
     'navbar_site_name': "More",
     'navbar_links': [
         ("Installation", "rst/INSTALLATION.html", True),
-        ("Examples", "EXAMPLES.html", True),
+        ("Examples", "rst/index.html", True),
         ("API", "API.html", True),
         ("Github", "https://github.com/materialsinnovation/pymks/", True),
+        ("Theory", "THEORY.html", True),
     ],
     'navbar_pagenav': False,
     'navbar_sidebarrel': False,
-    'globaltoc_depth': 2,
+    'globaltoc_depth': 1,
     'source_link_position': '',
     'bootswatch_theme': 'cosmo'
 }
@@ -132,7 +133,7 @@ html_short_title = "PyMKS"
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = 'pymks_logo.png'
+html_logo = 'pymks_logo.svg'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -254,6 +255,7 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
+
 # Documents to append as an appendix to all manuals.
 #texinfo_appendices = []
 
@@ -262,3 +264,56 @@ texinfo_documents = [
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 #texinfo_show_urls = 'footnote'
+
+from recommonmark.parser import CommonMarkParser
+from recommonmark.transform import AutoStructify
+
+source_parsers = {'.md' : CommonMarkParser}
+source_suffix = ['.rst', '.md']
+
+def url_resolver(url):
+    """Resolve url for both documentation and Github online.
+
+    If the url is an IPython notebook links to the correct path.
+
+    Args:
+      url: the path to the link (not always a full url)
+
+    Returns:
+      a local url to either the documentation or the Github
+
+    """
+    if url[-6:] == '.ipynb':
+        return url[4:-6] + '.html'
+    else:
+        return url
+
+def setup(app):
+    app.add_config_value('recommonmark_config', {
+            'url_resolver': url_resolver,
+            'auto_toc_tree_section': 'Contents',
+            }, True)
+    app.add_transform(AutoStructify)
+
+import shutil, os, glob
+
+rst_directory = 'rst'
+notebook_directory = os.path.join(rst_directory, 'notebooks')
+
+for directory in [rst_directory, notebook_directory]:
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+files_to_copy = (
+    'README.md',
+    'INSTALLATION.md',
+    'LICENSE.md',
+    'CITATION.md',
+    'index.ipynb',
+    'notebooks/*.ipynb'
+)
+
+for fpath in files_to_copy:
+    for fpath_glob in glob.glob(os.path.join('..', fpath)):
+        fpath_glob_ = '/'.join(fpath_glob.split('/')[1:])
+        shutil.copy(fpath_glob, os.path.join(rst_directory, fpath_glob_))

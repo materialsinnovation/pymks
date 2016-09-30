@@ -66,9 +66,8 @@ class MicrostructureGenerator(_BaseMicrostructureGenerator):
             seg_shape = (len(X_sort), len(v_cum))
             per_diff = (2 * np.random.random(seg_shape) -
                         1) * np.array(self.percent_variance)
-            if -np.sum(per_diff) < self.percent_variance:
-                per_diff -= np.sum(per_diff) / len(self.volume_fraction)
-            seg_ind = np.floor((v_cum + per_diff) * X_sort.shape[1])
+            seg_ind = np.floor((v_cum + per_diff) *
+                               X_sort.shape[1]).astype(int)
             seg_values = np.concatenate([x[list(i)][None]
                                          for i, x in zip(seg_ind, X_sort)])
             new_axes = [None for i in X_blur[0].shape]

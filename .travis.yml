@@ -22,13 +22,15 @@ install:
   - conda info -a
   - conda create -q -y -n test-environment python="$PYTHON_VERSION"
   - source activate test-environment
-  - conda install -q -y -n test-environment numpy scipy pytest scikit-learn matplotlib
+  - conda install -q -y -n test-environment numpy scipy pytest scikit-learn matplotlib pytest-cov
   - if [[ "$USE_FFTW" -eq 1 ]]; then
       conda install -q -y -n test-environment -c wd15 pyfftw;
     fi
   - if [[ "$SFEPY_VERSION" -ne 0 ]]; then
       pip install git+https://github.com/sfepy/sfepy.git@"$SFEPY_VERSION";
     fi
+  - pip install pylint
   - pip install .
 script:
-  py.test
+  - py.test
+  - pylint pymks
