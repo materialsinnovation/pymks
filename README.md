@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://raw.githubusercontent.com/wd15/pymks/938637ed732ba09f38e93ccc21e9c1c8fdc88f94/doc/pymks_logo.ico"
+<img src="https://raw.githubusercontent.com/materialsinnovation/pymks/master/doc/pymks_logo.ico"
      height="100"
      alt="PyMKS logo"
      class="inline">
@@ -23,7 +23,7 @@ alt="Gitter Chat">
 <img src="https://api.travis-ci.org/materialsinnovation/pymks.svg"
 alt="Travis CI">
 </a>
-<a href="https://pypi.python.org/pypi/pymks/0.3.1">
+<a href="https://pypi.python.org/pypi/pymks">
 <img src="https://badge.fury.io/py/pymks.svg" alt="PyPI version" height="18">
 </a>
 <a href="https://github.com/materialsinnovation/pymks/blob/master/LICENSE.md">
