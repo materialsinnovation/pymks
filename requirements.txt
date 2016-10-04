@@ -5,3 +5,4 @@ pytest
 matplotlib
 pytest-cov
 pylint
+jupyter
