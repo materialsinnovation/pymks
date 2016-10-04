@@ -69,9 +69,10 @@ The Materials Knowledge Materials in Python (PyMKS) framework is an
 object-oriented set of tools and examples, written in Python, that
 provide high-level access to the MKS framework for rapid creation and
 analysis of structure-property-processing relationships. A short
-introduction to how to use PyMKS is outlined below and example cases can
-be found [in the examples section](./index.ipynb). Both code and
-examples contributions are welcome.
+introduction on how to use PyMKS is outlined in the
+[introductory example](notebooks/intro.ipynb) and example cases can be
+found [in the examples section](./index.ipynb). Both code and examples
+contributions are welcome.
 
 ## Documentation
 
@@ -82,8 +83,8 @@ Start with the [PyMKS examples](./index.ipynb), especially the
 
 ##### Mailing List
 
-Please feel free to ask open-ended questions about PyMKS on the <a
-href="mailto:pymks-general@googlegroups.com">pymks-general@googlegroups.com</a>
+Please feel free to ask open-ended questions about PyMKS on the
+[pymks-general@googlegroups.com](https://groups.google.com/forum/#!forum/pymks-general)
 list.
 
 ##### Gitter
