@@ -61,7 +61,7 @@ def make_version():
             import warnings
             warnings.warn("Could not run ``git describe``")
     elif os.path.exists('pymks.egg-info'):
-        from corrcli import get_version
+        from pymks import get_version
         version = get_version()
 
     return version
