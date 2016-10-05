@@ -1,5 +1,5 @@
 try:
-    import pyfftw # pylint: disable=import_error
+    import pyfftw # pylint: disable=import-error
 except:
     pass
 import numpy as np
