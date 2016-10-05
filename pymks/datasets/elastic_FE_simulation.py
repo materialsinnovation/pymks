@@ -149,7 +149,7 @@ class ElasticFESimulation(object):
         ...                               poissons_ratio=(1., 1., 1.))
         >>> lame = lame0, lame1, lame2 = -0.5, -1., -1.5
         >>> mu = mu0, mu1, mu2 = 1. / 6, 1. / 3, 1. / 2
-        >>> lm = zip(lame, mu)
+        >>> lm = list(zip(lame, mu))
         >>> X2D_property = np.array([[lm[0], lm[1], lm[2], lm[1]],
         ...                          [lm[2], lm[1], lm[0], lm[0]],
         ...                          [lm[1], lm[0], lm[2], lm[2]]])

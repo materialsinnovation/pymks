@@ -1,8 +1,18 @@
+## packages for using pymks
 scipy
 numpy
 scikit-learn
-pytest
 matplotlib
+
+## packages for testing pymks
+pytest
 pytest-cov
 pylint
+
+## packages for running the examples
 jupyter
+
+## packages required for sfepy
+sympy
+cython
+tables
