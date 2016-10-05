@@ -3,7 +3,6 @@
 import subprocess
 from setuptools import setup, find_packages
 import os
-from pip.req import parse_requirements
 
 
 def make_version():
@@ -67,21 +66,6 @@ def make_version():
     return version
 
 
-def get_requirements(filepath):
-    """Get the requirements from a pip requirements file
-
-    Args:
-      filepatn: the requirements file path
-
-    Returns:
-      a of requirements, e.g. ['django==1.5.1', 'mezzanine==1.4.6']
-
-    """
-    # parse_requirements() returns generator of pip.req.InstallRequirement objects
-    install_reqs = parse_requirements(filepath)
-    return [str(ir.req) for ir in install_reqs]
-
-
 setup(name='pymks',
       version=make_version(),
       description='Materials Knowledge Systems in Python (PyMKS)',
@@ -90,4 +74,4 @@ setup(name='pymks',
       url='http://pymks.org',
       packages=find_packages(),
       package_data={'': ['tests/*.py']},
-      install_requires=get_requirements('requirements.txt'))
+      install_requires=['scipy', 'numpy', 'scikit-learn', 'matplotlib'])
