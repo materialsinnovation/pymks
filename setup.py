@@ -66,6 +66,19 @@ def make_version():
 
     return version
 
+def read_split(filename):
+    """Read a file line by line.
+
+    Args:
+      filename: the name of the file
+
+    Returns:
+      a list of line strings in the file
+    """
+    with open(filename) as fpointer:
+        required = fpointer.read().splitlines()
+    return required
+
 setup(name='pymks',
       version=make_version(),
       description='Materials Knowledge Systems in Python (PyMKS)',
@@ -74,4 +87,4 @@ setup(name='pymks',
       url='http://pymks.org',
       packages=find_packages(),
       package_data={'': ['tests/*.py']},
-      )
+      install_requires=read_split('requirements.txt'))
