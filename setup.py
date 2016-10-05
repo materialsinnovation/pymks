@@ -5,7 +5,6 @@ from setuptools import setup, find_packages
 import os
 
 
-
 def make_version():
     """Generates a version number using `git describe`.
 
@@ -66,18 +65,6 @@ def make_version():
 
     return version
 
-def read_split(filename):
-    """Read a file line by line.
-
-    Args:
-      filename: the name of the file
-
-    Returns:
-      a list of line strings in the file
-    """
-    with open(filename) as fpointer:
-        required = fpointer.read().splitlines()
-    return required
 
 setup(name='pymks',
       version=make_version(),
@@ -87,4 +74,4 @@ setup(name='pymks',
       url='http://pymks.org',
       packages=find_packages(),
       package_data={'': ['tests/*.py']},
-      install_requires=read_split('requirements.txt'))
+      install_requires=['scipy', 'numpy', 'scikit-learn', 'matplotlib'])
