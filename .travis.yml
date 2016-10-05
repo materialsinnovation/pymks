@@ -28,10 +28,10 @@ install:
       conda install -q -y -n test-environment -c wd15 pyfftw;
     fi
   - if [[ "$USE_SFEPY" -eq 1 ]]; then
-      git clone https://github.com/sfepy/sfepy.git ~/sfepy
-      cd ~/sfepy
-      python setup.py install
-      cd $TRAVIS_BUILD_DIR
+      git clone https://github.com/sfepy/sfepy.git ~/sfepy;
+      cd ~/sfepy;
+      python setup.py install;
+      cd $TRAVIS_BUILD_DIR;
     fi
   - pip install pylint
   - pip install .
