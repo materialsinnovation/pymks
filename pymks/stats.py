@@ -430,6 +430,6 @@ def _correlations_to_indices(correlations, basis):
         l_0 = tuple([list(basis.n_states).index(_l[0]) for _l in correlations])
         l_1 = tuple([list(basis.n_states).index(_l[1]) for _l in correlations])
     except ValueError as ve:
-        raise ValueError('correlations value ' + ve.message[0] +
+        raise ValueError('correlations value ' + str(ve) +
                          ' is not in basis.n_states')
     return (l_0, l_1)

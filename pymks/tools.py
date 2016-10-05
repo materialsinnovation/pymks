@@ -809,7 +809,7 @@ def _get_colorbar_ticks(X_, n_ticks):
            (n_samples, x,  y, local_state_correlation)
     """
     tick_range = np.linspace(np.min(X_), np.max(X_), n_ticks)
-    return tick_range.astype(float)
+    return tick_range.astype(float) # pylint: disable=no-member
 
 
 def draw_learning_curves(estimator, X, y, ylim=None, cv=None, n_jobs=1,

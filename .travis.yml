@@ -23,7 +23,7 @@ install:
   - conda create -q -y -n test-environment python="$PYTHON_VERSION"
   - source activate test-environment
   - conda install -q -y -n test-environment numpy scipy pytest scikit-learn matplotlib pytest-cov
-  - conda install -q -y -n test-environment sympy cython tables
+  - conda install -q -y -n test-environment sympy cython pytables
   - if [[ "$USE_FFTW" -eq 1 ]]; then
       conda install -q -y -n test-environment -c wd15 pyfftw;
     fi
@@ -34,4 +34,4 @@ install:
   - pip install .
 script:
   - py.test
-  - pylint pymks
+  - pylint --extension-pkg-whitelist=numpy pymks
