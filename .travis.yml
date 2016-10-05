@@ -1,9 +1,9 @@
 ---
 language: python
 env:
-  - SFEPY_VERSION=release_2016.3 USE_FFTW=0 PYTHON_VERSION=3
-  - SFEPY_VERSION=release_2016.3 USE_FFTW=1 PYTHON_VERSION=2
-  - SFEPY_VERSION=master USE_FFTW=0 PYTHON_VERSION=2
+  - SFEPY_VERSION=release_2016.3 USE_SFEPY=1 USE_FFTW=0 PYTHON_VERSION=3
+  - SFEPY_VERSION=release_2016.3 USE_SFEPY=1 USE_FFTW=1 PYTHON_VERSION=2
+  - SFEPY_VERSION=master USE_SFEPY=1 USE_FFTW=0 PYTHON_VERSION=2
 install:
   - sudo apt-get update
   # We do this conditionally because it saves us some downloading if the
@@ -27,7 +27,7 @@ install:
   - if [[ "$USE_FFTW" -eq 1 ]]; then
       conda install -q -y -n test-environment -c wd15 pyfftw;
     fi
-  - if [[ "$SFEPY_VERSION" -ne 0 ]]; then
+  - if [[ "$USE_SFEPY" -eq 1 ]]; then
       pip install git+https://github.com/sfepy/sfepy.git@"$SFEPY_VERSION";
     fi
   - pip install pylint
