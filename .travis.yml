@@ -37,4 +37,5 @@ install:
   - pip install .
 script:
   - py.test
+after_success:
   - pylint --extension-pkg-whitelist=numpy pymks
