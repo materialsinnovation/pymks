@@ -1,11 +1,13 @@
----
+{% set version = "2016.3" %}
+{% set name = "sfepy" %}
+
 package:
-  name: sfepy
-  version: 2016.1
+  name: {{ name }}
+  version: {{ version }}
 
 source:
-  git_url: https://github.com/sfepy/sfepy.git
-  git_rev: release_2016.1
+  git_url: https://github.com/{{ name }}/{{ name }}.git
+  git_rev: release_{{ version }}
 
 build:
   number: 1
@@ -15,11 +17,16 @@ requirements:
     - python
     - anaconda
     - cython
+    - sympy
+    - pytables
 
   run:
     - python
     - anaconda
     - pyparsing
+    - sympy
+    - cython
+    - pytables
 
 about:
-  home: http://sfepy.org
+  home: http://{{ name }}.org

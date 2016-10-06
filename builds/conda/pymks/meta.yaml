@@ -1,11 +1,13 @@
----
+{% set version = "0.3.3.dev17+g817dc61" %}
+{% set name = "pymks" %}
+
 package:
-  name: pymks
-  version: "0.3.1"
+  name: {{ name }}
+  version: {{ version }}
 
 source:
-  git_url: https://github.com/materialsinnovation/pymks.git
-  git_rev: a3757c72
+  git_url: https://github.com/materialsinnovation/{{ name }}.git
+  git_rev: 817dc61
 
 build:
   number: 1
@@ -14,16 +16,25 @@ requirements:
   build:
     - python
     - anaconda
-    - sfepy
     - pytest
     - scikit-learn
+    - pytest-cov
+    - pylint
+    - cython
+    - sympy
+    - pytables
 
   run:
     - python
     - anaconda
-    - sfepy
     - pytest
     - scikit-learn
+    - pytest-cov
+    - pylint
+    - cython
+    - sympy
+    - pytables
+    - pyparsing
 
 about:
-  home: http://pymks.org
+  home: http://{{ name }}.org
