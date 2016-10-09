@@ -1,13 +1,14 @@
 {% set name = "pymks" %}
-{% set version = load_setup_py_data().version %}
+{% set version = "0.3.3.dev20+g050b7a8" %}
+{% set github_org = "wd15" %}
 
 package:
   name: {{ name }}
   version: {{ version }}
 
 source:
-  git_url: https://github.com/materialsinnovation/{{ name }}.git
-  git_rev: 817dc61
+  git_url: https://github.com/{{ github_org }}/{{ name }}.git
+  git_rev: 050b7a8
 
 build:
   number: 1
