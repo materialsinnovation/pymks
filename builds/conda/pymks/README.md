@@ -6,8 +6,9 @@ Remember to change the `version` and `git_rev`.
 
 To build and upload use,
 
+    $ conda install -n root conda-build
     $ conda update -n root conda-build
-    $ conda clean --lock
-    $ conda clean --all
-    $ conda build --python=3.5
-    $ anaconda upload -u pymks -c pymks /home/wd15/anaconda/conda-bld/linux-64/pymks-0.3.3.dev17+g817dc61-py35_1.tar.bz2
+    $ conda clean --lock # can help when can't build
+    $ conda clean --all # can help when can't build
+    $ conda build --python=3.5 .
+    $ anaconda upload -u pymks -c pymks /home/wd15/anaconda/conda-bld/linux-64/pymks-X.Y.Z.tar.bz2
