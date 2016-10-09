@@ -35,6 +35,7 @@ requirements:
     - sympy
     - pytables
     - pyparsing
+    - matplotlib
 
 about:
   home: http://{{ name }}.org
