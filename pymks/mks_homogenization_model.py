@@ -96,8 +96,8 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
                 correlations will not be calculated as part of the fit and
                 predict methods. The spatial correlations can be passed as `X`
                 to both methods, default is True.
-            n_jobs (int, optional): number of parallel jobs to run. only used
-                if pyfftw is install.
+            n_jobs (int, optional): number of parallel jobs to run, only used
+                if pyfftw is installed.
             store_correlations (boolean, optional): indicate if spatial
                 correlations should be stored
             mean_center (boolean, optional): If true the data will be mean

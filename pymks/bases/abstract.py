@@ -1,7 +1,3 @@
-try:
-    import pyfftw # pylint: disable=import-error
-except:
-    pass
 import numpy as np
 
 
@@ -23,7 +19,6 @@ class _AbstractMicrostructureBasis(object):
         if domain is None:
             domain = [0, max(self.n_states)]
         self.domain = domain
-        self._pyfftw = self._module_exists('pyfftw')
         self._n_jobs = 1
 
     def check(self, X):

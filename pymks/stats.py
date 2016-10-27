@@ -19,8 +19,8 @@ def autocorrelate(X, basis, periodic_axes=[], n_jobs=1, confidence_index=None,
         basis (class): an instance of a bases class
         periodic_axes (list, optional): axes that are periodic. (0, 2) would
             indicate that axes x and z are periodic in a 3D microstrucure.
-        n_jobs (int, optional): number of parallel jobs to run. only used if
-            pyfftw is install.
+        n_jobs (int, optional): number of parallel jobs to run, only used if
+            pyfftw is installed.
         confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
         autocorrelations (list, optional): list of spatial autocorrelations to
@@ -69,8 +69,8 @@ def crosscorrelate(X, basis, periodic_axes=None, n_jobs=1,
         basis (class): an instance of a bases class
         periodic_axes (list, optional): axes that are periodic. (0, 2) would
             indicate that axes x and z are periodic in a 3D microstrucure.
-        n_jobs (int, optional): number of parallel jobs to run. only used if
-            pyfftw is install.
+        n_jobs (int, optional): number of parallel jobs to run, only used if
+            pyfftw is installed.
         confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
         crosscorrelations (list, optional): list of cross-correlations to
@@ -144,8 +144,8 @@ def correlate(X, basis, periodic_axes=None, n_jobs=1,
         basis (class): an instance of a bases class
         periodic_axes (list, optional): axes that are periodic. (0, 2) would
             indicate that axes x and z are periodic in a 3D microstrucure.
-        n_jobs (int, optional): number of parallel jobs to run. only used if
-            pyfftw is install.
+        n_jobs (int, optional): number of parallel jobs to run, only used if
+            pyfftw is installed.
         confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
         correlations (list, optional): list of  spatial _check_shapes to
