@@ -5,23 +5,22 @@ Provide a consistent interface for `rfftn`, `irfftn`, `fftn` and
 that are not used by Numpy's fft module, for example, to call `rfftn`
 with PyFFTW,
 
-rfft(np.ascontiguousarray(data),
-     axes=axes,
-     threads=threads,
-     overwrite_input=True,
-     planner_effort='FFTW_ESTIMATE',
-     avoid_copy=True)
+    rfft(np.ascontiguousarray(data),
+         axes=axes,
+         threads=threads,
+         overwrite_input=True,
+         planner_effort='FFTW_ESTIMATE',
+         avoid_copy=True)
 
 while using Numpy, it is just
 
-rfft(data,
-     axes=axes,
-     threads=threads)
+    rfft(data,
+         axes=axes,)
 
 Furthermore, this module takes care of the logic for selecting whether
-to use PyFFTW. If `PYMKS_USE_FFTW` is set in the environment or set to
+to use PyFFTW. If `PYMKS_USE_FFTW` is set in the environment and set to
 a positive value then PyFFTW will be used. If `PYMKS_USE_FFTW` is not
-set, then he following section in `setup.cfg` is used,
+set, then the following section in `setup.cfg` is used,
 
 [pymks]
 use-fftw = true
