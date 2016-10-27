@@ -64,17 +64,28 @@ for more details.
 
 ## [PyFFTW][pyfftw]
 
-If installed, PyMKS will use [PyFFTW][pyfftw] to
-compute FFTs instead of [Numpy][numpy]. As long as [Numpy][numpy] is
-not using [Intel MKL][MKL], [PyFFTW][pyfftw] should improve the
-performance of PyMKS.
+
+PyMKS can use [PyFFTW][pyfftw] to compute FFTs instead of
+[Numpy][numpy]. As long as [Numpy][numpy] is not using
+[Intel MKL][MKL], [PyFFTW][pyfftw] should improve the performance of
+PyMKS. To use [PyFFTW][pyfftw], either set the environment variable
+
+    $ export PYMKS_USE_FFTW=1
+
+or set
+
+    [pymks]
+    use-fftw = true
+
+in `setup.cfg` before installation.
 
 To install [PyFFTW][pyfftw] use pip
 
     $ pip install pyfftw
 
-See the [PyFFTW installation instructions](https://github.com/hgomersall/pyFFTW#installation)
- for more details.
+See the
+[PyFFTW installation instructions](https://github.com/hgomersall/pyFFTW#installation)
+for more details.
 
 ## Installation on Windows
 
