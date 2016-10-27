@@ -25,14 +25,6 @@ class _AbstractMicrostructureBasis(object):
         if (np.min(X) < self.domain[0]) or (np.max(X) > self.domain[1]):
             raise RuntimeError("X must be within the specified domain")
 
-    def _module_exists(self, module_name):
-        try:
-            __import__(module_name)
-        except ImportError:
-            return False
-        else:
-            return True
-
     def discretize(self, X):
         raise NotImplementedError
 
