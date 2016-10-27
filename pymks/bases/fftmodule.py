@@ -156,7 +156,7 @@ def arg_wrap(fft_func, **extra_args):
             kwargs.update(extra_args)
             return fft_func(np.ascontiguousarray(data), axes=axes, **kwargs)()
         else:
-            kwargs.pop('threads')
+            kwargs.pop('threads', None)
             return fft_func(data, axes=axes, **kwargs)
     return wrapper
 
