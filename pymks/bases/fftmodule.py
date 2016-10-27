@@ -111,21 +111,6 @@ def choose_fftmodule():
 
 FFTMODULE = choose_fftmodule()
 
-# def arg_wrap(fft_func, **extra_kwargs):
-#     """Return a wrapper function for Numpy's fft and PyFFTW.
-
-#     Args:
-#       fft_func: rfftn, irfftn, fftn ifftn from either numpy.fft or
-#         pymks.builders
-#       extra_kwargs: extra_args that are not default, useful for
-#         passing the over_write_input=True argument as it is not
-#         consistent for pyfftw.
-
-#     Returns:
-#       the wrapper function
-#     """
-#     using_pyfftw = FFTMODULE.__name__.split('.')[0] == 'pyfftw'
-
 def arg_wrap(fft_func, **extra_args):
     """Decorator to add kwargs based on fft suite.
 
