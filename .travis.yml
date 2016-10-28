@@ -33,7 +33,7 @@ install:
       python setup.py install;
       cd $TRAVIS_BUILD_DIR;
     fi
-  - pip install pylint
+  - pip install pylint configparser
   - pip install .
 script:
   - py.test
