@@ -11,7 +11,8 @@ Conda is the easiest way to install PyMKS. To install use
 
 ## Pip
 
-The following steps outline the necessary requirements for a successful installation of PyMKS.
+The following steps outline the necessary requirements for a
+successful installation of PyMKS.
 
 Use pip,
 
@@ -23,8 +24,10 @@ and then run the tests.
 
 ## Scipy Stack
 
-Both [Scipy](http://www.scipy.org/) and [Numpy][numpy]
-as well as [Scikit-learn](http://scikit-learn.org) are required.
+Both [Scipy](http://www.scipy.org/) and [Numpy][numpy] as well as
+[Scikit-learn](http://scikit-learn.org) are required. See the
+[requirements](./requirement.txt) for a full listing of PyMKS
+dependencies.
 
 ## Testing
 

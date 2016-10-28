@@ -3,6 +3,7 @@ scipy
 numpy
 scikit-learn
 matplotlib
+configparser
 
 ## packages for testing pymks
 pytest
