@@ -86,6 +86,10 @@ To install [PyFFTW][pyfftw] use pip
 
     $ pip install pyfftw
 
+or the Conda-Forge Conda channel,
+
+    $ conda install -c conda-forge pyfftw
+
 See the
 [PyFFTW installation instructions](https://github.com/hgomersall/pyFFTW#installation)
 for more details.
