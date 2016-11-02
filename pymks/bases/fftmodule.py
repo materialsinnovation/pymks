@@ -81,6 +81,7 @@ def import_pyfftw():
     Returns:
       the pyfftw.builders module
     """
+    raise RuntimeError("Using PyFFTW!")
     import pyfftw.builders as pyfftw_fft
     return pyfftw_fft
 
