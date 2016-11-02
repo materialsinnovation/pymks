@@ -26,7 +26,7 @@ install:
   - conda install -q -y -n test-environment numpy scipy pytest scikit-learn matplotlib pytest-cov
   - conda install -q -y -n test-environment sympy cython pytables
   - if [[ "$PYMKS_USE_FFTW" -eq 1 ]]; then
-      conda install -q -y -n test-environment -c wd15 pyfftw;
+      conda install -q -y -n test-environment -c conda-forge pyfftw;
     fi
   - if [[ "$USE_SFEPY" -eq 1 ]]; then
       git clone https://github.com/sfepy/sfepy.git ~/sfepy;
