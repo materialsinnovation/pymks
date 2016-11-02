@@ -2,7 +2,7 @@ try:
     import pyfftw
     ## ensure that pyfftw is always imported before numpy to avoid
     ## https://github.com/materialsinnovation/pymks/issues/304
-except ImportError:
+except:
     pass
 
 import os
