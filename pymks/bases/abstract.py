@@ -1,7 +1,3 @@
-try:
-    import pyfftw # pylint: disable=import-error
-except:
-    pass
 import numpy as np
 
 
@@ -23,20 +19,11 @@ class _AbstractMicrostructureBasis(object):
         if domain is None:
             domain = [0, max(self.n_states)]
         self.domain = domain
-        self._pyfftw = self._module_exists('pyfftw')
         self._n_jobs = 1
 
     def check(self, X):
         if (np.min(X) < self.domain[0]) or (np.max(X) > self.domain[1]):
             raise RuntimeError("X must be within the specified domain")
-
-    def _module_exists(self, module_name):
-        try:
-            __import__(module_name)
-        except ImportError:
-            return False
-        else:
-            return True
 
     def discretize(self, X):
         raise NotImplementedError

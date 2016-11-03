@@ -1,3 +1,10 @@
+try:
+    import pyfftw
+    ## ensure that pyfftw is always imported before numpy to avoid
+    ## https://github.com/materialsinnovation/pymks/issues/304
+except:
+    pass
+
 import os
 from .mks_localization_model import MKSLocalizationModel
 from .bases.primitive import PrimitiveBasis

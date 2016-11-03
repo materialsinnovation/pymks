@@ -293,21 +293,15 @@ def test_gsh_basis_normalization():
 
 
 def test_stats_in_parallel():
-    import time
     from pymks.bases import PrimitiveBasis
     from pymks.stats import correlate
     from pymks.datasets import make_microstructure
     p_basis = PrimitiveBasis(5)
-    if p_basis._pyfftw:
-        X = make_microstructure(n_samples=5, n_phases=3)
-        t = []
-        for i in range(1, 4):
-            t_start = time.time()
-            correlate(X, p_basis, n_jobs=i)
-            t.append(time.time() - t_start)
-            assert t == sorted(t, reverse=True)
-    else:
-        pass
+    X = make_microstructure(n_samples=5, n_phases=3)
+    X_corr_actual = correlate(X, p_basis)
+    for i in range(1, 4):
+        X_corr_test = correlate(X, p_basis, n_jobs=i)
+        assert np.allclose(X_corr_actual, X_corr_test)
 
 
 def test_autocorrelate_with_specific_correlations():

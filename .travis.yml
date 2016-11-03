@@ -1,9 +1,10 @@
 ---
 language: python
 env:
-  - SFEPY_VERSION=release_2016.3 USE_SFEPY=1 USE_FFTW=0 PYTHON_VERSION=3
-  - SFEPY_VERSION=release_2016.3 USE_SFEPY=1 USE_FFTW=0 PYTHON_VERSION=2
-  - SFEPY_VERSION=master USE_SFEPY=1 USE_FFTW=0 PYTHON_VERSION=2
+  - SFEPY_VERSION=release_2016.3 USE_SFEPY=1 PYMKS_USE_FFTW=1 PYTHON_VERSION=3
+  - SFEPY_VERSION=release_2016.3 USE_SFEPY=1 PYMKS_USE_FFTW=0 PYTHON_VERSION=3
+  - SFEPY_VERSION=release_2016.3 USE_SFEPY=1 PYMKS_USE_FFTW=1 PYTHON_VERSION=2
+  - SFEPY_VERSION=release_2016.3 USE_SFEPY=1 PYMKS_USE_FFTW=0 PYTHON_VERSION=2
 install:
   - sudo apt-get update
   # We do this conditionally because it saves us some downloading if the
@@ -24,8 +25,8 @@ install:
   - source activate test-environment
   - conda install -q -y -n test-environment numpy scipy pytest scikit-learn matplotlib pytest-cov
   - conda install -q -y -n test-environment sympy cython pytables
-  - if [[ "$USE_FFTW" -eq 1 ]]; then
-      conda install -q -y -n test-environment -c wd15 pyfftw;
+  - if [[ "$PYMKS_USE_FFTW" -eq 1 ]]; then
+      conda install -q -y -n test-environment -c conda-forge pyfftw;
     fi
   - if [[ "$USE_SFEPY" -eq 1 ]]; then
       git clone https://github.com/sfepy/sfepy.git ~/sfepy;
@@ -33,7 +34,7 @@ install:
       python setup.py install;
       cd $TRAVIS_BUILD_DIR;
     fi
-  - pip install pylint
+  - pip install pylint configparser
   - pip install .
 script:
   - py.test

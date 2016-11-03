@@ -24,6 +24,7 @@ requirements:
     - cython
     - sympy
     - pytables
+    - configparser
 
   run:
     - python
@@ -37,6 +38,7 @@ requirements:
     - pytables
     - pyparsing
     - matplotlib
+    - configparser
 
 about:
   home: http://{{ name }}.org

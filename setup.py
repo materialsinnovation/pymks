@@ -74,4 +74,5 @@ setup(name='pymks',
       url='http://pymks.org',
       packages=find_packages(),
       package_data={'': ['tests/*.py']},
-      install_requires=['scipy', 'numpy', 'scikit-learn', 'matplotlib'])
+      install_requires=['scipy', 'numpy', 'scikit-learn', 'matplotlib', 'configparser'],
+      data_files=['setup.cfg'])
