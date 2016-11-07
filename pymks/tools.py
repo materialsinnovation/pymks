@@ -699,9 +699,9 @@ def draw_correlations(X_corr, correlations=None):
     """
     if correlations is None:
         n_cross = X_corr.shape[-1]
-        L = range((np.sqrt(1 + 8 * n_cross) - 1).astype(int) / 2)
-        correlations = zip(*list(_auto_correlations(L)))
-        correlations += zip(*list(_cross_correlations(L)))
+        L = range(int((np.sqrt(1 + 8 * n_cross) - 1) / 2))
+        correlations = list(zip(*list(_auto_correlations(L))))
+        correlations += list(zip(*list(_cross_correlations(L))))
     _draw_stats(X_corr, correlations=correlations)
 
 
