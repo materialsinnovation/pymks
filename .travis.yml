@@ -35,6 +35,7 @@ install:
       cd $TRAVIS_BUILD_DIR;
     fi
   - pip install pylint configparser nbval
+  - unset VIRTUAL_ENV
   - pip install .
 script:
   - py.test
