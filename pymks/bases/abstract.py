@@ -13,7 +13,7 @@ class _AbstractMicrostructureBasis(object):
             domain (list, optional): indicate the range of expected values for
                 the microstructure, default is [0, n_states - 1].
         """
-        if hasattr(n_states, '__len__') and len(n_states) > 1:
+        if hasattr(n_states, '__len__') and len(n_states) > 0:
             self.n_states = n_states
         else:
             self.n_states = np.arange(n_states)
