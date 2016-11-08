@@ -38,5 +38,6 @@ install:
   - pip install .
 script:
   - py.test
+  - py.test notebooks/ --nbval --sanitize-with notebooks/sanitize.cfg
 after_success:
   - pylint --extension-pkg-whitelist=numpy pymks
