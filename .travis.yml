@@ -36,7 +36,8 @@ install:
     fi
   - pip install pylint configparser nbval
   - pip install .
+  - export NBS=notebooks/*.ipynb
 script:
-  - 'py.test --doctest-modules --ignore=setup.py -r s --cov=pymks --cov-report term-missing --nbval notebooks/*.ipynb --sanitize-with notebooks/sanitize.cfg pymks'
+  - py.test --doctest-modules --ignore=setup.py -r s --cov=pymks --cov-report term-missing --nbval $NBS --sanitize-with notebooks/sanitize.cfg pymks
 after_success:
   - pylint --extension-pkg-whitelist=numpy pymks
