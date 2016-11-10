@@ -24,7 +24,7 @@ install:
   - conda create -q -y -n test-environment python="$PYTHON_VERSION"
   - source activate test-environment
   - conda install -q -y -n test-environment numpy scipy pytest scikit-learn matplotlib pytest-cov
-  - conda install -q -y -n test-environment sympy cython pytables
+  - conda install -q -y -n test-environment sympy cython pytables jupyter
   - if [[ "$PYMKS_USE_FFTW" -eq 1 ]]; then
       conda install -q -y -n test-environment -c conda-forge pyfftw;
     fi
@@ -34,7 +34,8 @@ install:
       python setup.py install;
       cd $TRAVIS_BUILD_DIR;
     fi
-  - pip install pylint configparser
+  - pip install pylint configparser nbval
+  - unset VIRTUAL_ENV
   - pip install .
 script:
   - py.test

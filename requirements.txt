@@ -9,6 +9,7 @@ configparser
 pytest
 pytest-cov
 pylint
+nbval
 
 ## packages for running the examples
 jupyter
