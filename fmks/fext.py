@@ -1,7 +1,8 @@
 from abc import ABCMeta, abstractmethod
 from typing import TypeVar, Generic, Callable
+import numpy as np
 
-from toolz.curried import curry, compose, map, pipe
+from toolz.curried import curry, compose, map, pipe, pluck
 
 A = TypeVar('A')
 B = TypeVar('B')
@@ -67,3 +68,10 @@ def fmap(func: Callable[[A], B], item: Functor[A]) -> Functor[B]:
 
 makeio = IO
 makerandom = Random
+
+@curry
+def array_from_tuple(data, shape, dtype):
+    arr = np.zeros(shape, dtype=dtype)
+    for slice_, value in data:
+        arr[slice_] = value
+    return arr
