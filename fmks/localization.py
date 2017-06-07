@@ -3,6 +3,10 @@ import numpy as np
 
 from .fext import curry, pipe, array_from_tuple, map
 
+fft = curry(np.fft.fft)
+
+ifft = curry(np.fft.ifft)
+
 fftn = curry(np.fft.rfftn)
 
 ifftn = curry(np.fft.irfftn)
@@ -54,6 +58,7 @@ def predict(x_data, coeff, basis):
 def ini_axes(arr):
     return np.arange(arr.ndim - 1)
 
+@curry
 def coeff_to_real(coeff, new_shape):
     return pipe(
         coeff,
