@@ -51,39 +51,3 @@ def test():
 
 if __name__ == '__main__':
     test()
-#     >>> n_states = 2
-#     >>> n_spaces = 81
-#     >>> n_samples = 400
-
-#     Define a filter function.
-
-
-#     Use the filter function to construct some coefficients.
-
-#     >>> coef_ = np.linspace(1, 0, n_states)[None,:] * filter(np.linspace(0, 20,
-#     ...                                                      n_spaces))[:,None]
-#     >>> Fcoef_ = np.fft.fft(coef_, axis=0)
-
-#     Make some test samples.
-
-#     >>> np.random.seed(2)
-#     >>> X = np.random.random((n_samples, n_spaces))
-
-#     Construct a response with the `Fcoef_`.
-
-#     >>> H = np.linspace(0, 1, n_states)
-#     >>> X_ = np.maximum(1 - abs(X[:,:,None] - H) / (H[1] - H[0]), 0)
-#     >>> FX = np.fft.fft(X_, axis=1)
-#     >>> Fy = np.sum(Fcoef_[None] * FX, axis=-1)
-#     >>> y = np.fft.ifft(Fy, axis=1).real
-# t
-    # Use the `MKSLocalizationModel` to reconstruct the coefficients
-
-    # >>> from .bases import PrimitiveBasis
-    # >>> prim_basis = PrimitiveBasis(n_states, [0, 1])
-    # >>> model = MKSLocalizationModel(basis=prim_basis)
-    # >>> model.fit(X, y)
-
-    # Check the result
-
-    # >>> assert np.allclose(np.fft.fftshift(coef_, axes=(0,)), model.coef_)
