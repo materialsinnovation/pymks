@@ -12,7 +12,7 @@ primarily using the [Toolz](http://toolz.readthedocs.io) library.
 import os
 
 
-def test(): # pragma: no cover
+def test():  # pragma: no cover
     r"""
     Run all the doctests available.
     """
@@ -24,6 +24,7 @@ def test(): # pragma: no cover
                       '-r s',
                       '--cov=fmks'])
 
+
 def get_version() -> str:
     """Get the version of the code from egg_info.
 
@@ -33,11 +34,13 @@ def get_version() -> str:
     from pkg_resources import get_distribution, DistributionNotFound
 
     try:
-        version = get_distribution(__name__.split('.')[0]).version # pylint: disable=no-member
-    except DistributionNotFound: # pragma: no cover
+        # pylint: disable=no-member
+        version = get_distribution(__name__.split('.')[0]).version
+    except DistributionNotFound:  # pragma: no cover
         version = "unknown, try running `python setup.py egg_info`"
 
     return version
+
 
 __version__ = get_version()
 

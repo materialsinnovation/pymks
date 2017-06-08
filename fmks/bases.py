@@ -83,6 +83,7 @@ def _discretize(x_data: np.ndarray, states: np.ndarray) -> np.ndarray:
     """
     return 1 - (abs(x_data[..., None] - states)) / (states[1] - states[0])
 
+
 @curry
 def discretize(x_data: np.ndarray,
                n_state: int,
@@ -104,6 +105,7 @@ def discretize(x_data: np.ndarray,
                     np.linspace(min_, max_, n_state)),
         0)
 
+
 def redundancy(ijk: tuple) -> tuple:
     """Used in localization to remove redundant slices
 
@@ -116,6 +118,7 @@ def redundancy(ijk: tuple) -> tuple:
     if np.all(np.array(ijk) == 0):
         return (slice(None),)
     return (slice(-1),)
+
 
 @curry
 def primitive_basis(x_data: np.ndarray,
