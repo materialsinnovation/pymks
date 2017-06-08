@@ -86,8 +86,8 @@ def _discretize(x_data: np.ndarray, states: np.ndarray) -> np.ndarray:
 @curry
 def discretize(x_data: np.ndarray,
                n_state: int,
-               min_: float=0.0,
-               max_: float=1.0) -> np.ndarray:
+               min_: float = 0.0,
+               max_: float = 1.0) -> np.ndarray:
     """Primitive discretization of a microstructure.
 
     Args:
@@ -115,14 +115,13 @@ def redundancy(ijk: tuple) -> tuple:
     """
     if np.all(np.array(ijk) == 0):
         return (slice(None),)
-    else:
-        return (slice(-1),)
+    return (slice(-1),)
 
 @curry
 def primitive_basis(x_data: np.ndarray,
                     n_state: int,
-                    min_: float=0.0,
-                    max_: float=1.0) -> Tuple[np.ndarray, Callable]:
+                    min_: float = 0.0,
+                    max_: float = 1.0) -> Tuple[np.ndarray, Callable]:
     """Primitive discretization of a microstucture
 
     Args:
