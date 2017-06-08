@@ -23,3 +23,4 @@ install:
   - pip install .
 script:
   - py.test
+  - pylint --extension-pkg-whitelist=numpy fmks

@@ -1,0 +1,2 @@
+[run]
+omit = fmks/fext.py

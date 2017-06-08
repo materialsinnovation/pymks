@@ -1,7 +1,18 @@
+"""fMKS - functional matierals knowledge system.
+
+See https://github.com/wd15/fmks
+
+fMKS is a functional version of [PyMKS](https://pymks.org) currently
+under development. The purpose of the project is to prototype a
+parallel implementation of MKS using functional programming in Python
+primarily using the [Toolz](http://toolz.readthedocs.io) library.
+
+"""
+
 import os
 
 
-def test():
+def test(): # pragma: no cover
     r"""
     Run all the doctests available.
     """
@@ -13,7 +24,7 @@ def test():
                       '-r s',
                       '--cov=fmks'])
 
-def get_version():
+def get_version() -> str:
     """Get the version of the code from egg_info.
 
     Returns:

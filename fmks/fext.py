@@ -1,8 +1,10 @@
+# pylint: skip-file
+# pragma: no-cover
 from abc import ABCMeta, abstractmethod
 from typing import TypeVar, Generic, Callable
 import numpy as np
 
-from toolz.curried import curry, compose, map, pipe, pluck
+from toolz.curried import curry, compose, map, pipe, pluck, juxt, identity, do
 
 A = TypeVar('A')
 B = TypeVar('B')
@@ -63,7 +65,10 @@ class Random(Generic[A], Functor[A]):
 
 @curry
 def fmap(func: Callable[[A], B], item: Functor[A]) -> Functor[B]:
-    return item.fmap(func)
+    if hasattr(item, 'fmap'):
+        return item.fmap(func)
+    else:
+        return map(func, item)
 
 
 makeio = IO
@@ -75,3 +80,16 @@ def array_from_tuple(data, shape, dtype):
     for slice_, value in data:
         arr[slice_] = value
     return arr
+
+def tlam(func, args):
+    return func(*args)
+
+fft = curry(np.fft.fft)
+
+ifft = curry(np.fft.ifft)
+
+fftn = curry(np.fft.rfftn)
+
+ifftn = curry(np.fft.irfftn)
+
+fftshift = curry(np.fft.fftshift)

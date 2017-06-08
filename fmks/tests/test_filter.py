@@ -1,7 +1,6 @@
 import numpy as np
 
-from fmks.fext import pipe
-from fmks.localization import fft, ifft
+from fmks.fext import pipe, fft, ifft
 from fmks.localization import fit, coeff_to_real
 from fmks.bases import primitive_basis
 
@@ -48,6 +47,3 @@ def compare(n_sample, n_space, n_state):
 
 def test():
     assert compare(400, 81, 2)
-
-if __name__ == '__main__':
-    test()
