@@ -51,4 +51,4 @@ See these references for further reading:
 fMKS is a functional version of [PyMKS](https://pymks.org) currently
 under development. The purpose of the project is to prototype a
 parallel implementation of MKS using functional programming in Python
-primarily using the Toolz[http://toolz.readthedocs.io] library.
+primarily using the [Toolz](http://toolz.readthedocs.io) library.
