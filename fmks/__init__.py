@@ -5,10 +5,13 @@ def test():
     r"""
     Run all the doctests available.
     """
-    import fmks
+    import pytest
     path = os.path.split(__file__)[0]
-    fmks.main(args=[path, '--doctest-modules', '-r s'])
-
+    pytest.main(args=[path,
+                      '--doctest-modules',
+                      '--ignore=setup.py ',
+                      '-r s',
+                      '--cov=fmks'])
 
 def get_version():
     """Get the version of the code from egg_info.
