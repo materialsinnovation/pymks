@@ -34,7 +34,7 @@ def mks_fcoeff(x_data, n_space, n_state):
 def mks_coeff(x_data, n_space, n_state):
     return pipe(
         mks_fcoeff(x_data, n_space, n_state),
-        coeff_to_real(new_shape=(18,))
+        coeff_to_real(new_shape=(n_space,))
     )
 
 def calc_coeff(n_space, n_state):
@@ -49,6 +49,8 @@ def compare(n_sample, n_space, n_state):
 def test():
     assert compare(400, 81, 2)
 
+if __name__ == '__main__':
+    test()
 #     >>> n_states = 2
 #     >>> n_spaces = 81
 #     >>> n_samples = 400
