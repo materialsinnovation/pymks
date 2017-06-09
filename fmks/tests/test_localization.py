@@ -1,17 +1,23 @@
-from fmks.bases import primitive_basis
+"""Test the localization model.
+"""
+
 import numpy as np
+from fmks.bases import primitive_basis
 from fmks.localization import fit
 
 
-def get_x():
+def _get_x():
     return np.linspace(0, 1, 4).reshape((1, 2, 2))
 
 
 def test():
-    assert np.allclose(fit(get_x(),
-                           get_x().swapaxes(1, 2),
+    """Very simple example.
+    """
+    assert np.allclose(fit(_get_x(),
+                           _get_x().swapaxes(1, 2),
+                           # pylint: disable=no-value-for-parameter
                            primitive_basis(n_state=2)),
-                       [[[0.5,  0.5],
-                         [-2,   0]],
+                       [[[0.5, 0.5],
+                         [-2, 0]],
                         [[-0.5, 0],
-                         [-1,   0]]])
+                         [-1, 0]]])
