@@ -18,7 +18,7 @@ install:
   - conda install -q -y -n test-environment sympy cython pytables jupyter
   - conda install -q -y -n test-environment -c conda-forge pyfftw
   - conda install -q -y -n test-environment -c conda-forge sfepy=2017.2
-  - pip install pylint nbval
+  - pip install pylint nbval flake8
   - unset VIRTUAL_ENV
   - pip install .
 script:
