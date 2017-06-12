@@ -1,6 +1,7 @@
 """Test the primitive basis.
 """
 
+import pytest
 import numpy as np
 from fmks.bases import discretize
 from fmks.fext import pipe
@@ -26,30 +27,26 @@ def test_local():
     assert _compare(np.random.random((2, 5, 3, 2)), 10)
 
 
-    # >>> n_states = 10
-    # >>> np.random.seed(4)
-    # >>> X = np.random.random((2, 5, 3, 2))
-    # >>> X_ = PrimitiveBasis(n_states, [0, 1]).transform(X)
-    # >>> H = np.linspace(0, 1, n_states)
-    # >>> Xtest = np.sum(X_ * H[None,None,None,:], axis=-1)
-    # >>> assert np.allclose(X, Xtest)
+def test_local_min_max():
+    """Local state example with varying min and max.
 
-    # Here is an example where the local state space domain is between `[-1, 1]`.
+    An example where the local state space domain is between `[-1,
+    1]`.
+    """
+    basis = discretize(n_state=3, min_=-1)  # pylint: disable= no-value-for-parameter
+    assert np.allclose(
+        basis(np.array([-1, 0, 1, 0.5])),
+        [[1, 0, 0], [0, 1, 0], [0, 0, 1], [0, 0.5, 0.5]]
+    )
 
-    # >>> n_states = 3
-    # >>> X = np.array([-1, 0, 1, 0.5])
-    # >>> X_test = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [0, 0.5, 0.5]]
-    # >>> X_ = PrimitiveBasis(n_states, [-1, 1]).transform(X)
-    # >>> assert np.allclose(X_, X_test)
+def test_error():
+    """Test data outside the bounds
 
-    # If the local state values in the microstructure are outside of the domain
-    # they can no longer be represented by two primitive basis functions and
-    # violates constraint above.
-
-    # >>> n_states = 2
-    # >>> X = np.array([-1, 1])
-    # >>> prim_basis = PrimitiveBasis(n_states, domain=[0, 1])
-    # >>> prim_basis.transform(X)
-    # Traceback (most recent call last):
-    # ...
-    # RuntimeError: x_raw must be within the specified domain
+    If the local state values in the microstructure are outside of the
+    domain they are remapped inside of the domain
+    """
+    basis = discretize(n_state=2)
+    assert np.allclose(
+        basis(np.array([-1, 1])),
+        [[1, 0], [0, 1]]
+    )

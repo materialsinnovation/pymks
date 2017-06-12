@@ -63,6 +63,9 @@ class Random(Generic[A], Functor[A]):
     def __str__(self) -> str:
         return 'Random({value})'.format(value=self._action())
 
+
+
+
 @curry
 def fmap(func: Callable[[A], B], item: Functor[A]) -> Functor[B]:
     if hasattr(item, 'fmap'):
@@ -93,3 +96,5 @@ fftn = curry(np.fft.rfftn)
 ifftn = curry(np.fft.irfftn)
 
 fftshift = curry(np.fft.fftshift)
+
+allclose = curry(np.allclose)

@@ -84,6 +84,9 @@ def _discretize(x_data: np.ndarray, states: np.ndarray) -> np.ndarray:
     return 1 - (abs(x_data[..., None] - states)) / (states[1] - states[0])
 
 
+def _minmax(data, min_, max_):
+    return np.minimum(np.maximum(data, min_), max_)
+
 @curry
 def discretize(x_data: np.ndarray,
                n_state: int,
@@ -101,9 +104,10 @@ def discretize(x_data: np.ndarray,
       the discretized microstructure
     """
     return np.maximum(
-        _discretize(x_data,
+        _discretize(_minmax(x_data, min_, max_),
                     np.linspace(min_, max_, n_state)),
-        0)
+        0
+    )
 
 
 def redundancy(ijk: tuple) -> tuple:

@@ -6,12 +6,17 @@ System in Fourier Space.
 Example:
 
 >>> from fmks.bases import primitive_basis
+>>> from fmks.fext import allclose
 
->>> X = np.linspace(0, 1, 4).reshape((1, 2, 2))
->>> y = X.swapaxes(1, 2)
 >>> basis = primitive_basis(n_state=2)
->>> coeff = fit(X, y, basis)
->>> assert np.allclose(y, predict(X, coeff, basis))
+
+>>> x_data = lambda: np.linspace(0, 1, 4).reshape((1, 2, 2))
+>>> y_data = lambda: x_data().swapaxes(1, 2)
+>>> assert pipe(
+...     fit(x_data(), y_data(), basis),
+...     predict(x_data(), basis=basis),
+...     allclose(y_data())
+... )
 
 """
 
@@ -57,7 +62,7 @@ def _fit_disc(y_data, x_data, redundancy_func):
 
 @curry
 def fit(x_data, y_data, basis):
-    """Calculate the MKS influence coefficents.
+    """Calculate the MKS influence coefficients.
 
     Args:
       x_data: the mircrostructure data
