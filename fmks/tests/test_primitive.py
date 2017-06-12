@@ -1,7 +1,6 @@
 """Test the primitive basis.
 """
 
-import pytest
 import numpy as np
 from fmks.bases import discretize
 from fmks.fext import pipe
@@ -33,11 +32,13 @@ def test_local_min_max():
     An example where the local state space domain is between `[-1,
     1]`.
     """
-    basis = discretize(n_state=3, min_=-1)  # pylint: disable= no-value-for-parameter
+    # pylint: disable= no-value-for-parameter
+    basis = discretize(n_state=3, min_=-1)
     assert np.allclose(
         basis(np.array([-1, 0, 1, 0.5])),
         [[1, 0, 0], [0, 1, 0], [0, 0, 1], [0, 0.5, 0.5]]
     )
+
 
 def test_error():
     """Test data outside the bounds
@@ -50,3 +51,18 @@ def test_error():
         basis(np.array([-1, 1])),
         [[1, 0], [0, 1]]
     )
+
+
+def test_many_local_states():
+    """Test with many local states
+    """
+    def x_data():
+        np.random.seed(3)
+        return np.random.random((2, 5, 3))
+
+    def _test_data(n_state):
+        basis = discretize(n_state=n_state)
+        states = lambda: np.linspace(0, 1, n_state)[None, None, None, :]
+        return np.sum(basis(x_data()) * states(), axis=-1)
+
+    assert np.allclose(x_data(), _test_data(10))
