@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 from typing import TypeVar, Generic, Callable
 import numpy as np
 
-from toolz.curried import curry, compose, map, pipe, pluck, juxt, identity, do
+from toolz.curried import curry, compose, map, pipe, pluck, juxt, identity, do, iterate
 
 A = TypeVar('A')
 B = TypeVar('B')
@@ -98,3 +98,10 @@ ifftn = curry(np.fft.irfftn)
 fftshift = curry(np.fft.fftshift)
 
 allclose = curry(np.allclose)
+
+@curry
+def iterate_times(func, times, value):
+    iter_ = iterate(func, value)
+    for _ in range(times):
+        next(iter_)
+    return next(iter_)

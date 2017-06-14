@@ -1,3 +1,62 @@
+r"""Solve the `Cahn-Hilliard equation to generate data.
+
+Solve the Cahn-Hilliard equation,
+<https://en.wikipedia.org/wiki/Cahn-Hilliard_equation>`__, for
+multiple samples in arbitrary dimensions. The concentration varies
+from -1 to 1. The equation is given by
+
+.. math::
+
+   \dot{\phi} = \nabla^2 \left( \phi^3 -
+                                \phi \right) - \gamma \nabla^4 \phi
+
+The discretiztion scheme used here is from `Chang and Rutenberg
+<http://dx.doi.org/10.1103/PhysRevE.72.055701>`__. The scheme is a
+semi-implicit discretization in time and is given by
+
+.. math::
+
+   \phi_{t+\Delta t}
+   + \left(1 - a_1\right) \Delta t \nabla^2 \phi_{t+\Delta t}
+   + \left(1 - a_2\right) \Delta t \gamma \nabla^4 \phi_{t+\Delta t}
+   = \phi_t
+   - \Delta t \nabla^2 \left(a_1 \phi_t + a_2
+                             \gamma \nabla^2 \phi_t - \phi_t^3 \right)
+
+where :math:`a_1=3` and :math:`a_2=0`.
+
+In 1D.
+
+>>> np.random.seed(99)
+>>> solve = solve_cahn_hilliard(gamma=4.)
+>>> assert pipe(
+...     0.1 * (2 * np.random.random((2, 100)) - 1),
+...     iterate_times(solve, 10000),
+...     lambda phi: max(phi.flat) > 2e-3) and (min(phi.flat) < -2e-3
+... )
+
+# In 2D.
+
+# >>> N = 101
+# >>> phi = 0.01 * (2 * np.random.random((2, N, N)) - 1)
+# >>> ch = CahnHilliardSimulation(gamma=4.)
+# >>> for i in range(100):
+# ...     ch.run(phi)
+# ...     phi[:] = ch.response
+# >>> assert (max(phi.flat) > 0.001) and (min(phi.flat) < -0.001)
+
+# In 3D.
+
+# >>> phi = 0.01 * (2 * np.random.random((2, N, N, N)) - 1)
+# >>> ch = CahnHilliardSimulation(gamma=4.)
+# >>> for i in range(10):
+# ...     ch.run(phi)
+# ...     phi[:] = ch.response
+
+# >>> assert (max(phi.flat) > 0.0005) and (min(phi.flat) < -0.0005)
+
+"""
+
 import numpy as np
 from fmks.fext import ifftn, fftn, curry
 
@@ -24,7 +83,7 @@ def _f_response(x_data, dt, gamma, ksq, a1=3., a2=0.):
     return (FX() * (1 + dt_() * explicit()) - dt_() * FX3()) / (1 - dt_() * implicit())
 
 @curry
-def cahn_hilliard_run(x_data, dx, dt, gamma):
+def solve_cahn_hilliard(x_data, dx=0.25, dt=0.001, gamma=4.):
     return ifftn(_f_response(_check(x_data),
                              dt,
                              gamma,
