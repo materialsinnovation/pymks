@@ -91,9 +91,13 @@ fft = curry(np.fft.fft)
 
 ifft = curry(np.fft.ifft)
 
-fftn = curry(np.fft.rfftn)
+fftn = curry(np.fft.fftn)
 
-ifftn = curry(np.fft.irfftn)
+rfftn = curry(np.fft.rfftn)
+
+ifftn = curry(np.fft.ifftn)
+
+irfftn = curry(np.fft.irfftn)
 
 fftshift = curry(np.fft.fftshift)
 

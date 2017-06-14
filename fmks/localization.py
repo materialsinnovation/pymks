@@ -25,7 +25,7 @@ from scipy.linalg import lstsq
 import numpy as np
 
 from .fext import curry, pipe, array_from_tuple, fmap
-from .fext import fftshift, fftn, ifftn
+from .fext import fftshift, rfftn, irfftn
 
 
 @curry
@@ -55,7 +55,7 @@ def _fit_disc(y_data, x_data, redundancy_func):
     return pipe(
         [x_data, y_data],
         # pylint: disable=no-value-for-parameter
-        fmap(fftn(axes=_faxes(x_data))),
+        fmap(rfftn(axes=_faxes(x_data))),
         lambda x: _fit_fourier(*x, redundancy_func)
     )
 
@@ -79,9 +79,9 @@ def fit(x_data, y_data, basis):
 @curry
 def _predict_disc(x_data, coeff):
     return pipe(
-        fftn(x_data, axes=_faxes(x_data)),
+        rfftn(x_data, axes=_faxes(x_data)),
         lambda x: np.sum(x * coeff[None], axis=-1),
-        ifftn(axes=_faxes(x_data), s=x_data.shape[1:-1])
+        irfftn(axes=_faxes(x_data), s=x_data.shape[1:-1])
     ).real
 
 
@@ -117,6 +117,6 @@ def coeff_to_real(coeff, new_shape):
     """
     return pipe(
         coeff,
-        ifftn(axes=_ini_axes(coeff), s=new_shape),
+        irfftn(axes=_ini_axes(coeff), s=new_shape),
         fftshift(axes=_ini_axes(coeff))
     )
