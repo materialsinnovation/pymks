@@ -39,14 +39,12 @@ def _response(x_data, n_space, n_state):
 def _mks_fcoeff(x_data, n_space, n_state):
     return fit(x_data,
                _response(x_data, n_space, n_state),
-               # pylint: disable=no-value-for-parameter
                primitive_basis(n_state=n_state))
 
 
 def _mks_coeff(x_data, n_space, n_state):
     return pipe(
         _mks_fcoeff(x_data, n_space, n_state),
-        # pylint: disable=no-value-for-parameter
         coeff_to_real(new_shape=(n_space,))
     )
 

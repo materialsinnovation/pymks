@@ -23,5 +23,5 @@ install:
   - pip install .
 script:
   - py.test
-  - pylint --extension-pkg-whitelist=numpy fmks fmks/tests
+  - pylint --rcfile=.pylintrc fmks fmks/tests
   - flake8 --exclude=fmks/fext.py fmks fmks/tests

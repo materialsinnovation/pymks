@@ -59,37 +59,67 @@ where :math:`a_1=3` and :math:`a_2=0`.
 import numpy as np
 from fmks.fext import ifftn, fftn, curry, pipe, juxt, identity, iterate_times
 
-def _k_space(size, dx):
+
+def _k_space(size, spacing):
     size1 = lambda: (size // 2) if (size % 2 == 0) else (size - 1) // 2
     size2 = lambda: size1() if (size % 2 == 0) else size1() + 1
     k = lambda: np.concatenate((
         np.arange(size)[:size2()],
         (np.arange(size) - size1())[:size1()]
     ))
-    return k() * 2 * np.pi / (dx * size)
+    return k() * 2 * np.pi / (spacing * size)
 
-def _calc_ksq(x_data, dx):
-    i_ = lambda: np.indices(x_data.shape[1:])
-    return np.sum(_k_space(x_data.shape[1], dx)[i_()] ** 2, axis=0)[None]
+
+def _calc_ksq(x_data, spacing):
+    indices = lambda: np.indices(x_data.shape[1:])
+    return np.sum(_k_space(x_data.shape[1], spacing)[indices()] ** 2,
+                  axis=0)[None]
+
 
 def _axes(x_data):
     return np.arange(len(x_data.shape) - 1) + 1
 
-def _f_response(x_data, dt, gamma, ksq, a1=3., a2=0.):
-    FX = lambda: fftn(x_data, axes=_axes(x_data))
-    FX3 = lambda: fftn(x_data ** 3, axes=_axes(x_data))
-    explicit = lambda: a1 - gamma * a2 * ksq
-    implicit = lambda: (1 - gamma * ksq) - explicit()
-    dt_ = lambda: dt * ksq
-    return (FX() * (1 + dt_() * explicit()) - dt_() * FX3()) / (1 - dt_() * implicit())
+
+def _explicit(gamma, ksq, param_a1=3., param_a2=0.):
+    return param_a1 - gamma * param_a2 * ksq
+
+
+def _f_response(x_data, delta_t, gamma, ksq):
+    fx_data = lambda: fftn(x_data, axes=_axes(x_data))
+    fx3_data = lambda: fftn(x_data ** 3, axes=_axes(x_data))
+    implicit = lambda: (1 - gamma * ksq) - _explicit(gamma, ksq)
+    delta_t_ksq = lambda: delta_t * ksq
+    numerator = lambda: fx_data() * \
+        (1 + delta_t_ksq() * _explicit(gamma, ksq)) - \
+        delta_t_ksq() * fx3_data()
+    return numerator() / (1 - delta_t_ksq() * implicit())
 
 
 @curry
-def solve_cahn_hilliard(x_data, dx=0.25, dt=0.001, gamma=4.):
+def solve_cahn_hilliard(x_data, spacing=0.25, delta_t=0.001, gamma=4.):
+    """Solve the Cahn-Hilliard equation for one step.
+
+    Advance multiple microstuctures in time with the Cahn-Hilliard
+    equation.
+
+    Args:
+      x_data: the initial microstucture
+      spacing: the grid spacing
+      delta_t: the time step size
+      gamma: Cahn-Hilliard parameter
+
+    Returns:
+      an updated microsturcture
+
+
+    Raises:
+      RuntimeError if domain is not square
+
+    """
     return ifftn(_f_response(_check(x_data),
-                             dt,
+                             delta_t,
                              gamma,
-                             _calc_ksq(x_data, dx)),
+                             _calc_ksq(x_data, spacing)),
                  axes=_axes(x_data)).real
 
 
@@ -115,31 +145,41 @@ def _check(x_data):
         raise RuntimeError("X must represent a square domain")
     return x_data
 
-def generate_cahn_hilliard_data(n_sample, size, dx=0.25, width=1., dt=0.001, n_steps=1):
+
+def generate_cahn_hilliard_data(shape,
+                                spacing=0.25,
+                                width=1.,
+                                delta_t=0.001,
+                                n_steps=1):
     """Generate microstructures and responses for Cahn-Hilliard.
 
     Interface to generate random concentration fields and their
-    evolution to be used for the fit method in the localizatoin
+    evolution to be used for the fit method in the localization
     regression model.
 
     Args:
-      n_sample: number of microstructure samples
-      size: size of the microstructure
-      dx: grid spacing
-      dt: time step size
+      shape: the shape of the microstructures where the first index is
+        the number of samples
+      spacing: grid spacing
       width: interface width between phases.
+      delta_t: time step size
       n_steps: number of time steps used
 
     Returns:
       Tuple containing the microstructures and responses.
 
+    Raises:
+      RuntimeError if domain is not square
+
     Example
 
-    >>> X, y = generate_cahn_hilliard_data(1, (6, 6))
+    >>> X, y = generate_cahn_hilliard_data((1, 6, 6))
 
     """
-    solve = solve_cahn_hilliard(dx=dx, dt=dt, gamma=width**2)
+    solve = solve_cahn_hilliard(spacing=spacing,
+                                delta_t=delta_t,
+                                gamma=width**2)
     return pipe(
-        2 * np.random.random((n_sample,) + size) - 1,
+        2 * np.random.random(shape) - 1,
         juxt(identity, iterate_times(solve, n_steps))
     )

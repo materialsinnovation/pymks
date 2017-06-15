@@ -37,7 +37,6 @@ def _lstsq_slice(fx_data, fy_data, redundancy_func, ijk):
 
 
 def _fit_fourier(fx_data, fy_data, redundancy_func):
-    # pylint: disable=no-value-for-parameter
     lstsq_ijk = _lstsq_slice(fx_data, fy_data, redundancy_func)
     return pipe(
         fmap(lstsq_ijk, np.ndindex(fx_data.shape[1:-1])),
@@ -54,7 +53,6 @@ def _faxes(arr):
 def _fit_disc(y_data, x_data, redundancy_func):
     return pipe(
         [x_data, y_data],
-        # pylint: disable=no-value-for-parameter
         fmap(rfftn(axes=_faxes(x_data))),
         lambda x: _fit_fourier(*x, redundancy_func)
     )

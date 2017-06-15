@@ -16,7 +16,6 @@ def test_local():
     np.random.seed(4)
 
     def _compare(x_raw, n_state):
-        # pylint: disable= no-value-for-parameter
         basis = discretize(n_state=n_state)
         return pipe(
             np.linspace(0, 1, n_state),
@@ -32,7 +31,6 @@ def test_local_min_max():
     An example where the local state space domain is between `[-1,
     1]`.
     """
-    # pylint: disable= no-value-for-parameter
     basis = discretize(n_state=3, min_=-1)
     assert np.allclose(
         basis(np.array([-1, 0, 1, 0.5])),
@@ -56,13 +54,13 @@ def test_error():
 def test_many_local_states():
     """Test with many local states
     """
-    def x_data():
+    def _x_data():
         np.random.seed(3)
         return np.random.random((2, 5, 3))
 
     def _test_data(n_state):
         basis = discretize(n_state=n_state)
         states = lambda: np.linspace(0, 1, n_state)[None, None, None, :]
-        return np.sum(basis(x_data()) * states(), axis=-1)
+        return np.sum(basis(_x_data()) * states(), axis=-1)
 
-    assert np.allclose(x_data(), _test_data(10))
+    assert np.allclose(_x_data(), _test_data(10))

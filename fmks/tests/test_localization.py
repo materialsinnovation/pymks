@@ -15,7 +15,6 @@ def test():
     """
     assert np.allclose(fit(_get_x(),
                            _get_x().swapaxes(1, 2),
-                           # pylint: disable=no-value-for-parameter
                            primitive_basis(n_state=2)),
                        [[[0.5, 0.5],
                          [-2, 0]],
