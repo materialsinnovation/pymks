@@ -3,8 +3,9 @@
 from abc import ABCMeta, abstractmethod
 from typing import TypeVar, Generic, Callable
 import numpy as np
+import dask.array as da
 
-from toolz.curried import curry, compose, map, pipe, pluck, juxt, identity, do, iterate
+from toolz.curried import curry, compose, map, pipe, pluck, juxt, identity, do, iterate, memoize
 
 A = TypeVar('A')
 B = TypeVar('B')
@@ -102,6 +103,10 @@ irfftn = curry(np.fft.irfftn)
 fftshift = curry(np.fft.fftshift)
 
 allclose = curry(np.allclose)
+
+daifftn = curry(da.fft.ifftn)
+
+dafftn = curry(da.fft.fftn)
 
 @curry
 def iterate_times(func, times, value):
