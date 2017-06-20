@@ -25,42 +25,39 @@ semi-implicit discretization in time and is given by
 
 where :math:`a_1=3` and :math:`a_2=0`.
 
->>> from fmks.fext import pipe, iterate_times
+>>> from fmks.fext import pipe, da_iterate, map_blocks
 
->>> np.random.seed(99)
->>> solve = solve_cahn_hilliard(gamma=4.)
+>>> solve = map_blocks(solve_cahn_hilliard(gamma=1., delta_t=1.))
 
->>> def tester(data, min_, max_, steps):
+>>> def tester(shape, min_, max_, steps):
 ...     return pipe(
-...         data,
-...         iterate_times(solve, steps),
-...         lambda x: x.flatten(),
-...         lambda x: max(x) > max_ and min(x) < min_
+...         0.01 * (2 * da.random.random(shape, chunks=shape) - 1),
+...         da_iterate(solve, steps),
+...         lambda x: da.max(x) > max_ and da.min(x) < min_
 ...     )
 
 1D
->>>
->>> assert tester(0.01 * (2 * da.random.random((2, 100), chunks=(2, 100)) - 1),
-...              -2e-3, 2e-3, 10000)
+
+>>> da.random.seed(101)
+>>> assert tester((2, 100), -0.9, 0.9, 100)
 
 2D
 
->>> assert tester(0.01 * (2 * da.random.random((2, 101, 101), chunks=(2, 101, 101)) - 1),
-...               -0.001, 0.001, 100)
+>>> da.random.seed(101)
+>>> assert tester((2, 101, 101), -0.9, 0.9, 100)
 
 3D
 
->>> assert tester(0.01 * (2 * da.random.random((2, 101, 101, 101), chunks=(2, 101, 101, 101) - 1),
-...               -0.0005, 0.0005, 10)
-
+>>> da.random.seed(101)
+>>> assert tester((2, 101, 101, 101), -5e-4, 5e-4, 10)
 
 """
 
 import dask.array as da
 import numpy as np
-from fmks.fext import curry, pipe, juxt, identity, iterate_times, memoize
-from fmks.fext import daifftn as ifftn
-from fmks.fext import dafftn as fftn
+from fmks.fext import curry, pipe, juxt, identity, memoize, da_iterate
+from fmks.fext import ifftn
+from fmks.fext import fftn
 
 
 def _k_space(size):
@@ -94,10 +91,9 @@ def _f_response(x_data, delta_t, gamma, ksq):
     implicit = lambda: (1 - gamma * ksq) - _explicit(gamma, ksq)
     delta_t_ksq = lambda: delta_t * ksq
     numerator = lambda: fx_data() * \
-        (1 + delta_t_ksq() * _explicit(gamma, ksq)) - \
+       (1 + delta_t_ksq() * _explicit(gamma, ksq)) - \
         delta_t_ksq() * fx3_data()
-    out = numerator() / (1 - delta_t_ksq() * implicit())
-    return out
+    return numerator() / (1 - delta_t_ksq() * implicit())
 
 
 @curry
@@ -121,12 +117,11 @@ def solve_cahn_hilliard(x_data, spacing=0.25, delta_t=0.001, gamma=1.):
       RuntimeError if domain is not square
 
     """
-    out = ifftn(_f_response(_check(x_data),
+    return ifftn(_f_response(_check(x_data),
                              delta_t,
                              gamma,
                              _calc_ksq(x_data, spacing)),
-                 axes=_axes(x_data))
-    return out.real
+                 axes=_axes(x_data)).real
 
 
 def _check(x_data):
@@ -153,7 +148,7 @@ def _check(x_data):
 
 
 def generate_cahn_hilliard_data(shape,
-                                chunks=1,
+                                chunks=(),
                                 spacing=0.25,
                                 width=1.,
                                 delta_t=0.001,
@@ -167,6 +162,7 @@ def generate_cahn_hilliard_data(shape,
     Args:
       shape: the shape of the microstructures where the first index is
         the number of samples
+      chunks: the number of sample chunks
       spacing: grid spacing
       width: interface width between phases.
       delta_t: time step size
@@ -187,6 +183,6 @@ def generate_cahn_hilliard_data(shape,
                                 delta_t=delta_t,
                                 gamma=width**2)
     return pipe(
-        2 * da.random.random(shape, chunks=(chunks,) + shape[1:]) - 1,
-        juxt(identity, iterate_times(solve, n_steps))
+        2 * da.random.random(shape, chunks=chunks or shape) - 1,
+        juxt(identity, da_iterate(solve, n_steps))
     )
