@@ -3,7 +3,7 @@
 
 import numpy as np
 from fmks.bases import discretize
-from fmks.fext import pipe
+from toolz import pipe
 
 
 def test_local():

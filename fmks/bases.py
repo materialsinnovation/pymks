@@ -51,7 +51,7 @@ mapped into local state space, which results in an array of shape
 For example, if a cell has a label of 2, its local state will be
 `[0, 0, 1]`. The local state can only have values of 0 or 1.
 
->>> from fmks.fext import pipe
+>>> from toolz import pipe
 >>> assert pipe(
 ...     x_data,
 ...     discretize(n_state=3, max_=2),
@@ -62,7 +62,7 @@ For example, if a cell has a label of 2, its local state will be
 from typing import Callable, Tuple
 
 import numpy as np
-from .fext import curry
+from .func import curry
 
 
 def _discretize(x_data: 'np.ndarray[float]',
@@ -85,7 +85,9 @@ def _discretize(x_data: 'np.ndarray[float]',
     return 1 - (abs(x_data[..., None] - states)) / (states[1] - states[0])
 
 
-def _minmax(data: 'np.ndarray[float]', min_: float, max_: float) -> 'np.ndarray[float]':
+def _minmax(data: 'np.ndarray[float]',
+            min_: float,
+            max_: float) -> 'np.ndarray[float]':
     return np.minimum(np.maximum(data, min_), max_)
 
 

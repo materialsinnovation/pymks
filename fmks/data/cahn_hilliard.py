@@ -25,7 +25,8 @@ semi-implicit discretization in time and is given by
 
 where :math:`a_1=3` and :math:`a_2=0`.
 
->>> from fmks.fext import pipe, da_iterate, map_blocks
+>>> from toolz import pipe
+>>> from fmks.func import da_iterate, map_blocks
 
 >>> solve = map_blocks(solve_cahn_hilliard(gamma=1., delta_t=1.))
 
@@ -55,9 +56,10 @@ where :math:`a_1=3` and :math:`a_2=0`.
 
 import dask.array as da
 import numpy as np
-from fmks.fext import curry, pipe, juxt, identity, memoize, da_iterate
-from fmks.fext import ifftn
-from fmks.fext import fftn
+from toolz.curried import pipe, juxt, identity, memoize
+from fmks.func import curry, da_iterate
+from fmks.func import ifftn
+from fmks.func import fftn
 
 
 def _k_space(size):
@@ -73,9 +75,9 @@ def _calc_ksq_(shape):
     return np.sum(_k_space(shape[0])[indices()] ** 2, axis=0)[None]
 
 
-def _calc_ksq(x_data, spacing):
+def _calc_ksq(x_data, delta_x):
     return _calc_ksq_(x_data.shape[1:]) * \
-        (2 * np.pi / (spacing * x_data.shape[1]))**2
+        (2 * np.pi / (delta_x * x_data.shape[1]))**2
 
 
 def _axes(x_data):
@@ -98,7 +100,7 @@ def _f_response(x_data, delta_t, gamma, ksq):
 
 
 @curry
-def solve_cahn_hilliard(x_data, spacing=0.25, delta_t=0.001, gamma=1.):
+def solve_cahn_hilliard(x_data, delta_x=0.25, delta_t=0.001, gamma=1.):
     """Solve the Cahn-Hilliard equation for one step.
 
     Advance multiple microstuctures in time with the Cahn-Hilliard
@@ -106,7 +108,7 @@ def solve_cahn_hilliard(x_data, spacing=0.25, delta_t=0.001, gamma=1.):
 
     Args:
       x_data: the initial microstucture
-      spacing: the grid spacing
+      delta_x: the grid spacing
       delta_t: the time step size
       gamma: Cahn-Hilliard parameter
 
@@ -121,7 +123,7 @@ def solve_cahn_hilliard(x_data, spacing=0.25, delta_t=0.001, gamma=1.):
     return ifftn(_f_response(_check(x_data),
                              delta_t,
                              gamma,
-                             _calc_ksq(x_data, spacing)),
+                             _calc_ksq(x_data, delta_x)),
                  axes=_axes(x_data)).real
 
 
