@@ -65,7 +65,8 @@ import numpy as np
 from .fext import curry
 
 
-def _discretize(x_data: np.ndarray, states: np.ndarray) -> np.ndarray:
+def _discretize(x_data: 'np.ndarray[float]',
+                states: 'np.ndarray[float]') -> 'np.ndarray[float]':
     """Helper function for primitive discretization.
 
     Args:
@@ -84,15 +85,15 @@ def _discretize(x_data: np.ndarray, states: np.ndarray) -> np.ndarray:
     return 1 - (abs(x_data[..., None] - states)) / (states[1] - states[0])
 
 
-def _minmax(data, min_, max_):
+def _minmax(data: 'np.ndarray[float]', min_: float, max_: float) -> 'np.ndarray[float]':
     return np.minimum(np.maximum(data, min_), max_)
 
 
 @curry
-def discretize(x_data: np.ndarray,
+def discretize(x_data: 'np.ndarray[float]',
                n_state: int,
                min_: float = 0.0,
-               max_: float = 1.0) -> np.ndarray:
+               max_: float = 1.0) -> 'np.ndarray[float]':
     """Primitive discretization of a microstructure.
 
     Args:
@@ -111,7 +112,7 @@ def discretize(x_data: np.ndarray,
     )
 
 
-def redundancy(ijk: tuple) -> tuple:
+def redundancy(ijk: Tuple[int, ...]) -> Tuple[slice]:
     """Used in localization to remove redundant slices
 
     Args:
@@ -126,10 +127,10 @@ def redundancy(ijk: tuple) -> tuple:
 
 
 @curry
-def primitive_basis(x_data: np.ndarray,
+def primitive_basis(x_data: 'np.ndarray[float]',
                     n_state: int,
                     min_: float = 0.0,
-                    max_: float = 1.0) -> Tuple[np.ndarray, Callable]:
+                    max_: float = 1.0) -> Tuple['np.ndarray[float]', Callable]:
     """Primitive discretization of a microstucture
 
     Args:
