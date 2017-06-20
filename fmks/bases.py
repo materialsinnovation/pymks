@@ -87,6 +87,7 @@ def _discretize(x_data: np.ndarray, states: np.ndarray) -> np.ndarray:
 def _minmax(data, min_, max_):
     return np.minimum(np.maximum(data, min_), max_)
 
+
 @curry
 def discretize(x_data: np.ndarray,
                n_state: int,

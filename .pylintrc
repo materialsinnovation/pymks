@@ -1,0 +1,5 @@
+[MASTER]
+extension-pkg-whitelist=numpy
+
+[MESSAGES CONTROL]
+disable=no-value-for-parameter
