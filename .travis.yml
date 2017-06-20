@@ -15,7 +15,7 @@ install:
   - conda create -q -y -n test-environment python=3.5
   - source activate test-environment
   - conda install -q -y -n test-environment numpy scipy pytest scikit-learn matplotlib pytest-cov
-  - conda install -q -y -n test-environment sympy cython pytables jupyter dask
+  - conda install -q -y -n test-environment sympy cython pytables jupyter dask h5py
   - conda install -q -y -n test-environment -c conda-forge pyfftw
   - conda install -q -y -n test-environment -c conda-forge sfepy=2017.2
   - pip install pylint nbval flake8
