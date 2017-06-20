@@ -74,7 +74,8 @@ def _calc_ksq_(shape):
 
 
 def _calc_ksq(x_data, spacing):
-    return _calc_ksq_(x_data.shape[1:]) * (2 * np.pi / (spacing * x_data.shape[1]))**2
+    return _calc_ksq_(x_data.shape[1:]) * \
+        (2 * np.pi / (spacing * x_data.shape[1]))**2
 
 
 def _axes(x_data):
@@ -91,7 +92,7 @@ def _f_response(x_data, delta_t, gamma, ksq):
     implicit = lambda: (1 - gamma * ksq) - _explicit(gamma, ksq)
     delta_t_ksq = lambda: delta_t * ksq
     numerator = lambda: fx_data() * \
-       (1 + delta_t_ksq() * _explicit(gamma, ksq)) - \
+        (1 + delta_t_ksq() * _explicit(gamma, ksq)) - \
         delta_t_ksq() * fx3_data()
     return numerator() / (1 - delta_t_ksq() * implicit())
 
@@ -149,10 +150,9 @@ def _check(x_data):
 
 def generate_cahn_hilliard_data(shape,
                                 chunks=(),
-                                spacing=0.25,
-                                width=1.,
-                                delta_t=0.001,
-                                n_steps=1):
+                                n_steps=1,
+                                **kwargs):
+
     """Generate microstructures and responses for Cahn-Hilliard.
 
     Interface to generate random concentration fields and their
@@ -163,10 +163,8 @@ def generate_cahn_hilliard_data(shape,
       shape: the shape of the microstructures where the first index is
         the number of samples
       chunks: the number of sample chunks
-      spacing: grid spacing
-      width: interface width between phases.
-      delta_t: time step size
       n_steps: number of time steps used
+      **kwargs: parameters for CH model
 
     Returns:
       Tuple containing the microstructures and responses.
@@ -179,9 +177,8 @@ def generate_cahn_hilliard_data(shape,
     >>> X, y = generate_cahn_hilliard_data((1, 6, 6))
 
     """
-    solve = solve_cahn_hilliard(spacing=spacing,
-                                delta_t=delta_t,
-                                gamma=width**2)
+    solve = solve_cahn_hilliard(**kwargs)
+
     return pipe(
         2 * da.random.random(shape, chunks=chunks or shape) - 1,
         juxt(identity, da_iterate(solve, n_steps))
