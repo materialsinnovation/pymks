@@ -59,18 +59,17 @@ For example, if a cell has a label of 2, its local state will be
 
 """
 
-from typing import Callable, Tuple
-
+import dask.array as da
 import numpy as np
 from .func import curry
 
 
-def _discretize(x_data: 'np.ndarray[float]',
-                states: 'np.ndarray[float]') -> 'np.ndarray[float]':
+
+def discretize_nomax(data, states):
     """Helper function for primitive discretization.
 
     Args:
-      x_data: the data to discretize
+      data: the data to discretize
       states: a sequence of local states
 
     Returns:
@@ -78,24 +77,34 @@ def _discretize(x_data: 'np.ndarray[float]',
 
     Example:
 
-    >>> _discretize(np.array([[0, 1]]), np.array([0., 0.5, 1.0]))
+    >>> discretize_nomax(np.array([[0, 1]]), np.array([0., 0.5, 1.0]))
     array([[[ 1.,  0., -1.],
             [-1.,  0.,  1.]]])
+
+    >>> discretize_nomax(da.linspace(0, 1, 9, chunks=(3,)),
+    ...             da.linspace(0, 1, 6, chunks=(2,)))
+    dask.array<sub, shape=(9, 6), dtype=float64, chunksize=(3, 2)>
+
     """
-    return 1 - (abs(x_data[..., None] - states)) / (states[1] - states[0])
+    return 1 - (abs(data[..., None] - states)) / (states[1] - states[0])
 
 
-def _minmax(data: 'np.ndarray[float]',
-            min_: float,
-            max_: float) -> 'np.ndarray[float]':
-    return np.minimum(np.maximum(data, min_), max_)
+# def minmax(data, min_, max_):
+#     """Bound the values in an array by min_ and max_.
+
+#     Args:
+#       data: the data to
+#       min_: min value
+
+
+#     >>>
+
+#     """
+#     return da.minimum(da.maximum(data, min_), max_)
 
 
 @curry
-def discretize(x_data: 'np.ndarray[float]',
-               n_state: int,
-               min_: float = 0.0,
-               max_: float = 1.0) -> 'np.ndarray[float]':
+def discretize(x_data, n_state, min_=0.0, max_=1.0, chunks=()):
     """Primitive discretization of a microstructure.
 
     Args:
@@ -106,15 +115,19 @@ def discretize(x_data: 'np.ndarray[float]',
 
     Returns:
       the discretized microstructure
+
+    >>> discretize(da.random.random((12, 9), chunks=(3, 9)), 3, chunks=(1,)).chunks
+    ((3, 3, 3, 3), (9,), (1, 1, 1))
+
     """
-    return np.maximum(
-        _discretize(_minmax(x_data, min_, max_),
-                    np.linspace(min_, max_, n_state)),
+    return da.maximum(
+        discretize_nomax(da.clip(x_data, min_, max_),
+                         da.linspace(min_, max_, n_state, chunks=chunks or (n_state,))),
         0
     )
 
 
-def redundancy(ijk: Tuple[int, ...]) -> Tuple[slice]:
+def redundancy(ijk):
     """Used in localization to remove redundant slices
 
     Args:
@@ -129,10 +142,7 @@ def redundancy(ijk: Tuple[int, ...]) -> Tuple[slice]:
 
 
 @curry
-def primitive_basis(x_data: 'np.ndarray[float]',
-                    n_state: int,
-                    min_: float = 0.0,
-                    max_: float = 1.0) -> Tuple['np.ndarray[float]', Callable]:
+def primitive_basis(x_data, n_state, min_=0.0, max_=1.0, chunks=()):
     """Primitive discretization of a microstucture
 
     Args:
@@ -145,5 +155,5 @@ def primitive_basis(x_data: 'np.ndarray[float]',
       a tuple, the first entry is the discretized data, other entries
       are functions required for localization
     """
-    return (discretize(x_data, n_state, min_=min_, max_=max_),
+    return (discretize(x_data, n_state, min_=min_, max_=max_, chunks=chunks),
             redundancy)
