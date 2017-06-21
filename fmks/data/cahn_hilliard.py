@@ -25,15 +25,12 @@ semi-implicit discretization in time and is given by
 
 where :math:`a_1=3` and :math:`a_2=0`.
 
->>> from toolz import pipe
->>> from fmks.func import da_iterate, map_blocks
-
->>> solve = map_blocks(solve_cahn_hilliard(gamma=1., delta_t=1.))
+>>> solve = solve_cahn_hilliard(gamma=1., delta_t=1.)
 
 >>> def tester(shape, min_, max_, steps):
 ...     return pipe(
 ...         0.01 * (2 * da.random.random(shape, chunks=shape) - 1),
-...         da_iterate(solve, steps),
+...         map_blocks(iterate_times(solve, steps)),
 ...         lambda x: da.max(x) > max_ and da.min(x) < min_
 ...     )
 
@@ -57,9 +54,7 @@ where :math:`a_1=3` and :math:`a_2=0`.
 import dask.array as da
 import numpy as np
 from toolz.curried import pipe, juxt, identity, memoize
-from fmks.func import curry, da_iterate
-from fmks.func import ifftn
-from fmks.func import fftn
+from ..func import curry, map_blocks, ifftn, fftn, iterate_times
 
 
 def _k_space(size):
@@ -164,7 +159,7 @@ def generate_cahn_hilliard_data(shape,
     Args:
       shape: the shape of the microstructures where the first index is
         the number of samples
-      chunks: the number of sample chunks
+      chunks: chunks argument to make the Dast array
       n_steps: number of time steps used
       **kwargs: parameters for CH model
 
@@ -176,12 +171,14 @@ def generate_cahn_hilliard_data(shape,
 
     Example
 
-    >>> X, y = generate_cahn_hilliard_data((1, 6, 6))
+    >>> x_data, y_data = generate_cahn_hilliard_data((1, 6, 6))
+    >>> print(y_data.chunks)
+    ((1,), (6,), (6,))
 
     """
     solve = solve_cahn_hilliard(**kwargs)
 
     return pipe(
         2 * da.random.random(shape, chunks=chunks or shape) - 1,
-        juxt(identity, da_iterate(solve, n_steps))
+        juxt(identity, map_blocks(iterate_times(solve, n_steps)))
     )
