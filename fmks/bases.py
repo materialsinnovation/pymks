@@ -64,7 +64,6 @@ import numpy as np
 from .func import curry
 
 
-
 def discretize_nomax(data, states):
     """Helper function for primitive discretization.
 
@@ -116,13 +115,27 @@ def discretize(x_data, n_state, min_=0.0, max_=1.0, chunks=()):
     Returns:
       the discretized microstructure
 
-    >>> discretize(da.random.random((12, 9), chunks=(3, 9)), 3, chunks=(1,)).chunks
+    >>> discretize(da.random.random((12, 9), chunks=(3, 9)),
+    ...            3,
+    ...            chunks=(1,)).chunks
     ((3, 3, 3, 3), (9,), (1, 1, 1))
 
+    >>> discretize(np.array([[0, 1], [0.5, 0.5]]), 3, chunks=(1,)).chunks
+    ((2,), (2,), (1, 1, 1))
+
+    >>> discretize(np.array([[0, 1], [0.5, 0.5]]), 3, chunks=(1,)).compute()
+    array([[[ 1.,  0.,  0.],
+            [ 0.,  0.,  1.]],
+    <BLANKLINE>
+           [[ 0.,  1.,  0.],
+            [ 0.,  1.,  0.]]])
     """
     return da.maximum(
         discretize_nomax(da.clip(x_data, min_, max_),
-                         da.linspace(min_, max_, n_state, chunks=chunks or (n_state,))),
+                         da.linspace(min_,
+                                     max_,
+                                     n_state,
+                                     chunks=chunks or (n_state,))),
         0
     )
 
