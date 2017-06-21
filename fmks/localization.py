@@ -6,7 +6,7 @@ System in Fourier Space.
 Example:
 
 >>> from fmks.bases import primitive_basis
->>> from fmks.fext import allclose
+>>> from fmks.func import allclose
 
 >>> basis = primitive_basis(n_state=2)
 
@@ -24,8 +24,10 @@ Example:
 from scipy.linalg import lstsq
 import numpy as np
 
-from .fext import curry, pipe, array_from_tuple, fmap
-from .fext import fftshift, rfftn, irfftn
+from toolz.curried import pipe
+from toolz.curried import map as fmap
+from .func import curry, array_from_tuple
+from .func import fftshift, rfftn, irfftn
 
 
 @curry
