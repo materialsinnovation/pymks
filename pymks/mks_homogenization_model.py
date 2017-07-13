@@ -357,6 +357,6 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
             _axes = list(range(len(_size)))
             if self.periodic_axes is not None:
                 [_axes.remove(a) for a in self.periodic_axes]
-            _size = np.ones(len(_size)) * _size
-            _size[_axes] *= .5
+            _size = np.ones(len(_size), dtype=int) * _size
+            _size[_axes] = _size[_axes] // 2
         return tuple(_size)

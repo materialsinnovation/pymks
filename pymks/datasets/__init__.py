@@ -84,7 +84,7 @@ def make_delta_microstructures(n_phases=2, size=(21, 21)):
 
     """
     shape = (n_phases, n_phases) + size
-    center = tuple((np.array(size) - 1) / 2)
+    center = tuple((np.array(size) - 1) // 2)
     X = np.zeros(shape=shape, dtype=int)
     X[:] = np.arange(n_phases)[(slice(None), None) + (None,) * len(size)]
     X[(slice(None), slice(None)) + center] = np.arange(n_phases)
