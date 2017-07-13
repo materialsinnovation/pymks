@@ -479,9 +479,9 @@ def draw_components_scatter(datasets, labels, title=None,
     plt.close('all')
     if title is None:
         title = 'Low Dimensional Representation'
-    n_components = np.array(datasets[0][-1].shape)
+    n_components = np.array(datasets[0][-1].shape, dtype=int)
     if component_labels is None:
-        component_labels = range(1, n_components + 1)
+        component_labels = range(1, n_components[0] + 1)
     if len(datasets) != len(labels):
         raise RuntimeError('datasets and labels must have the same length')
     if n_components != len(component_labels):
