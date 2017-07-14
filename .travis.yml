@@ -38,6 +38,10 @@ install:
   - unset VIRTUAL_ENV
   - pip install .
 script:
-  - py.test
+  - if [[ "$PYTHON_VERSION" == "2" ]]; then
+      py.test pymks;
+    else
+      py.test;
+    fi
 after_success:
   - #pylint --extension-pkg-whitelist=numpy pymks
