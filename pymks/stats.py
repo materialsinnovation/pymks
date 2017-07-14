@@ -384,7 +384,7 @@ def _truncate(a, shape):
     new_shape = a_shape.copy()
     new_shape[:n] = shape
     diff_shape = a_shape - new_shape
-    index0 = (diff_shape + (diff_shape % 2) * (new_shape % 2)) / 2
+    index0 = (diff_shape + (diff_shape % 2) * (new_shape % 2)) // 2
     index1 = index0 + new_shape
     multi_slice = tuple(slice(index0[ii], index1[ii]) for ii in range(n))
     return a[multi_slice]

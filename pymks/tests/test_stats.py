@@ -261,7 +261,7 @@ def test_normalization_rfftn():
     prim_basis._axes_shape = (2 * Nx, 2 * Ny)
     norm = _normalize(X_.shape, prim_basis, None)
     assert norm.shape == (1, Nx, Ny, 1)
-    assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
+    assert np.allclose(norm[0, Nx // 2, Ny // 2, 0], 25)
 
 
 def test_normalization_fftn():
@@ -276,7 +276,7 @@ def test_normalization_fftn():
     f_basis._axes_shape = (2 * Nx, 2 * Ny)
     norm = _normalize(X_.shape, f_basis, None)
     assert norm.shape == (1, Nx, Ny, 1)
-    assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
+    assert np.allclose(norm[0, Nx // 2, Ny // 2, 0], 25)
 
 
 def test_gsh_basis_normalization():
@@ -289,7 +289,7 @@ def test_gsh_basis_normalization():
     gsh_basis._axes_shape = (2 * Nx, 2 * Ny)
     norm = _normalize(X_.shape, gsh_basis, None)
     assert norm.shape == (1, Nx, Ny, 1)
-    assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
+    assert np.allclose(norm[0, Nx // 2, Ny // 2, 0], 25)
 
 
 def test_stats_in_parallel():
