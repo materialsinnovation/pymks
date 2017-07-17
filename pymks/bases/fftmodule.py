@@ -44,7 +44,10 @@ def config_use_pyfftw():
     Returns:
       boolean value based on `use-fftw` in setup.cfg
     """
-    config_string = resource_string('pymks', '../setup.cfg').decode('utf-8')
+    try:
+        config_string = resource_string('pymks', '../setup.cfg').decode('utf-8')
+    except FileNotFoundError:
+        return False
     parser = configparser.ConfigParser()
     parser.read_string(config_string)
     if parser.has_option('pymks', 'use-fftw'):
