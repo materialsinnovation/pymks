@@ -1,3 +1,4 @@
+sphinx
 sphinx_bootstrap_theme
 numpy
 scipy
