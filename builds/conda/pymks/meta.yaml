@@ -1,5 +1,5 @@
 {% set name = "pymks" %}
-{% set version = "0.3.3.dev20+g050b7a8" %}
+{% set version = "0.3.3.dev59+g0ca00e2" %}
 {% set github_org = "wd15" %}
 
 package:
@@ -8,37 +8,25 @@ package:
 
 source:
   git_url: https://github.com/{{ github_org }}/{{ name }}.git
-  git_rev: 050b7a8
+  git_rev: 0ca00e2
 
 build:
-  number: 1
+  number: 5
+  script: python setup.py install --single-version-externally-managed --record record.txt
 
 requirements:
   build:
     - python
-    - anaconda
-    - pytest
-    - scikit-learn
-    - pytest-cov
-    - pylint
-    - cython
-    - sympy
-    - pytables
-    - configparser
 
   run:
     - python
-    - anaconda
-    - pytest
+    - numpy
+    - scipy
     - scikit-learn
+    - pytest
     - pytest-cov
-    - pylint
-    - cython
-    - sympy
-    - pytables
-    - pyparsing
-    - matplotlib
-    - configparser
+    - nbval
+    - sfepy
 
 about:
   home: http://{{ name }}.org
