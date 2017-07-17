@@ -19,8 +19,8 @@ def autocorrelate(X, basis, periodic_axes=[], n_jobs=1, confidence_index=None,
         basis (class): an instance of a bases class
         periodic_axes (list, optional): axes that are periodic. (0, 2) would
             indicate that axes x and z are periodic in a 3D microstrucure.
-        n_jobs (int, optional): number of parallel jobs to run. only used if
-            pyfftw is install.
+        n_jobs (int, optional): number of parallel jobs to run, only used if
+            pyfftw is installed.
         confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
         autocorrelations (list, optional): list of spatial autocorrelations to
@@ -69,8 +69,8 @@ def crosscorrelate(X, basis, periodic_axes=None, n_jobs=1,
         basis (class): an instance of a bases class
         periodic_axes (list, optional): axes that are periodic. (0, 2) would
             indicate that axes x and z are periodic in a 3D microstrucure.
-        n_jobs (int, optional): number of parallel jobs to run. only used if
-            pyfftw is install.
+        n_jobs (int, optional): number of parallel jobs to run, only used if
+            pyfftw is installed.
         confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
         crosscorrelations (list, optional): list of cross-correlations to
@@ -144,8 +144,8 @@ def correlate(X, basis, periodic_axes=None, n_jobs=1,
         basis (class): an instance of a bases class
         periodic_axes (list, optional): axes that are periodic. (0, 2) would
             indicate that axes x and z are periodic in a 3D microstrucure.
-        n_jobs (int, optional): number of parallel jobs to run. only used if
-            pyfftw is install.
+        n_jobs (int, optional): number of parallel jobs to run, only used if
+            pyfftw is installed.
         confidence_index (ND array, optional): array with same shape as X used
             to assign a confidence value for each data point.
         correlations (list, optional): list of  spatial _check_shapes to
@@ -384,7 +384,7 @@ def _truncate(a, shape):
     new_shape = a_shape.copy()
     new_shape[:n] = shape
     diff_shape = a_shape - new_shape
-    index0 = (diff_shape + (diff_shape % 2) * (new_shape % 2)) / 2
+    index0 = (diff_shape + (diff_shape % 2) * (new_shape % 2)) // 2
     index1 = index0 + new_shape
     multi_slice = tuple(slice(index0[ii], index1[ii]) for ii in range(n))
     return a[multi_slice]
@@ -430,6 +430,6 @@ def _correlations_to_indices(correlations, basis):
         l_0 = tuple([list(basis.n_states).index(_l[0]) for _l in correlations])
         l_1 = tuple([list(basis.n_states).index(_l[1]) for _l in correlations])
     except ValueError as ve:
-        raise ValueError('correlations value ' + ve.message[0] +
+        raise ValueError('correlations value ' + str(ve) +
                          ' is not in basis.n_states')
     return (l_0, l_1)

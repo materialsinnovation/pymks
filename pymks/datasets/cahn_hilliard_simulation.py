@@ -94,10 +94,10 @@ class CahnHilliardSimulation(_ImagFFTBasis):
         k = np.arange(N)
 
         if N % 2 == 0:
-            N1 = N / 2
+            N1 = N // 2
             N2 = N1
         else:
-            N1 = (N - 1) / 2
+            N1 = (N - 1) // 2
             N2 = N1 + 1
 
         k[N2:] = (k - N1)[:N1]

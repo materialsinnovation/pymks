@@ -137,4 +137,4 @@ def test_setting_kernel():
     assert np.allclose(model.predict(X_delta), y, atol=1e-4)
 
 if __name__ == '__main__':
-    test_resize_coeff()
+    test_MKS_elastic_delta()

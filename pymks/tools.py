@@ -479,9 +479,9 @@ def draw_components_scatter(datasets, labels, title=None,
     plt.close('all')
     if title is None:
         title = 'Low Dimensional Representation'
-    n_components = np.array(datasets[0][-1].shape)
+    n_components = np.array(datasets[0][-1].shape, dtype=int)
     if component_labels is None:
-        component_labels = range(1, n_components + 1)
+        component_labels = range(1, n_components[0] + 1)
     if len(datasets) != len(labels):
         raise RuntimeError('datasets and labels must have the same length')
     if n_components != len(component_labels):
@@ -699,9 +699,9 @@ def draw_correlations(X_corr, correlations=None):
     """
     if correlations is None:
         n_cross = X_corr.shape[-1]
-        L = range((np.sqrt(1 + 8 * n_cross) - 1).astype(int) / 2)
-        correlations = zip(*list(_auto_correlations(L)))
-        correlations += zip(*list(_cross_correlations(L)))
+        L = range(int((np.sqrt(1 + 8 * n_cross) - 1) / 2))
+        correlations = list(zip(*list(_auto_correlations(L))))
+        correlations += list(zip(*list(_cross_correlations(L))))
     _draw_stats(X_corr, correlations=correlations)
 
 
@@ -809,7 +809,7 @@ def _get_colorbar_ticks(X_, n_ticks):
            (n_samples, x,  y, local_state_correlation)
     """
     tick_range = np.linspace(np.min(X_), np.max(X_), n_ticks)
-    return tick_range.astype(float)
+    return tick_range.astype(float) # pylint: disable=no-member
 
 
 def draw_learning_curves(estimator, X, y, ylim=None, cv=None, n_jobs=1,

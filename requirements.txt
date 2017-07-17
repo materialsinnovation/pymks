@@ -1,0 +1,20 @@
+## packages for using pymks
+scipy
+numpy
+scikit-learn
+matplotlib
+configparser
+
+## packages for testing pymks
+pytest
+pytest-cov
+pylint
+nbval
+
+## packages for running the examples
+jupyter
+
+## packages required for sfepy
+sympy
+cython
+tables

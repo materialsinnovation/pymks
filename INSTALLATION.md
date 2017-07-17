@@ -1,5 +1,7 @@
 # Installation
 
+PyMKS works fully in both Python 2 and 3.
+
 ## Conda
 
 Conda is the easiest way to install PyMKS. To install use
@@ -9,7 +11,8 @@ Conda is the easiest way to install PyMKS. To install use
 
 ## Pip
 
-The following steps outline the necessary requirements for a successful installation of PyMKS.
+The following steps outline the necessary requirements for a
+successful installation of PyMKS.
 
 Use pip,
 
@@ -21,8 +24,10 @@ and then run the tests.
 
 ## Scipy Stack
 
-Both [Scipy](http://www.scipy.org/) and [Numpy][numpy]
-as well as [Scikit-learn](http://scikit-learn.org) are required.
+Both [Scipy](http://www.scipy.org/) and [Numpy][numpy] as well as
+[Scikit-learn](http://scikit-learn.org) are required. See the
+[requirements](./requirement.txt) for a full listing of PyMKS
+dependencies.
 
 ## Testing
 
@@ -62,36 +67,56 @@ for more details.
 
 ## [PyFFTW][pyfftw]
 
-If installed, PyMKS will use [PyFFTW][pyfftw] to
-compute FFTs instead of [Numpy][numpy]. As long as [Numpy][numpy] is
-not using [Intel MKL][MKL], [PyFFTW][pyfftw] should improve the
-performance of PyMKS.
+
+PyMKS can use [PyFFTW][pyfftw] to compute FFTs instead of
+[Numpy][numpy]. As long as [Numpy][numpy] is not using
+[Intel MKL][MKL], [PyFFTW][pyfftw] should improve the performance of
+PyMKS. To use [PyFFTW][pyfftw], either set the environment variable
+
+    $ export PYMKS_USE_FFTW=1
+
+or set
+
+    [pymks]
+    use-fftw = true
+
+in `setup.cfg` before installation.
 
 To install [PyFFTW][pyfftw] use pip
 
     $ pip install pyfftw
 
-See the [PyFFTW installation instructions](https://github.com/hgomersall/pyFFTW#installation)
- for more details.
+or the Conda-Forge Conda channel,
+
+    $ conda install -c conda-forge pyfftw
+
+See the
+[PyFFTW installation instructions](https://github.com/hgomersall/pyFFTW#installation)
+for more details.
 
 ## Installation on Windows
 
-We recommend you download and install the [Anaconda Python Distribution](http://continuum.io/downloads)
-for Python 2.7 (x64) and then download and install PyMKS, using the [windows installer](https://github.com/materialsinnovation/pymks/releases/download/version-0_2_1/PyMKS-x64-anaconda27.exe).
+We recommend you download and install the
+[Anaconda Python Distribution](http://continuum.io/downloads) for
+Python 2.7 (x64) and then download and install PyMKS, using the
+[windows installer](https://github.com/materialsinnovation/pymks/releases/download/version-0_2_1/PyMKS-x64-anaconda27.exe).
 
 ## Installation on Mac OS X
 
-We recommend you download and install the [Anaconda Python Distribution](http://continuum.io/downloads)
-for Python 2.7 (x64). Once Anaconda has been installed, follow the above procedures to install SfePy.
-Finally, install PyMKS using `pip` as described above.
+We recommend you download and install the
+[Anaconda Python Distribution](http://continuum.io/downloads) for
+Python 2.7 (x64). Once Anaconda has been installed, follow the above
+procedures to install SfePy.  Finally, install PyMKS using `pip` as
+described above.
 
 ## Installation with Anaconda
 
-The [Anaconda Python Distributionn](https://store.continuum.io/cshop/anaconda/)
+The
+[Anaconda Python Distributionn](https://store.continuum.io/cshop/anaconda/)
 contains all of the required packages outside of [SfePy][sfepy] and
 works on multiple platforms. [Download][conda] and
-[install](http://docs.continuum.io/anaconda/install.html) Anaconda, and
-use your terminal or shell to install PyMKS using pip.
+[install](http://docs.continuum.io/anaconda/install.html) Anaconda,
+and use your terminal or shell to install PyMKS using pip.
 
 ## Requirements
 
@@ -99,7 +124,7 @@ The [REQUIREMENTS.md](REQUIREMENTS.html) file has a list of required
 packages in a Python environment used to run tests and examples
 for the current release of PyMKS.
 
-#Installation Issues
+# Installation Issues
 
 Please send questions and issues about installation of PyMKS to the
 [pymks-general@googlegroups.com](mailto:pymks-general@googlegroups.com)

@@ -5,7 +5,6 @@ from setuptools import setup, find_packages
 import os
 
 
-
 def make_version():
     """Generates a version number using `git describe`.
 
@@ -66,6 +65,7 @@ def make_version():
 
     return version
 
+
 setup(name='pymks',
       version=make_version(),
       description='Materials Knowledge Systems in Python (PyMKS)',
@@ -74,4 +74,5 @@ setup(name='pymks',
       url='http://pymks.org',
       packages=find_packages(),
       package_data={'': ['tests/*.py']},
-      )
+      install_requires=[],
+      data_files=['setup.cfg'])
