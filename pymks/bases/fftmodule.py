@@ -45,6 +45,10 @@ def config_use_pyfftw():
       boolean value based on `use-fftw` in setup.cfg
     """
     try:
+        FileNotFoundError
+    except NameError:
+        FileNotFoundError = IOError
+    try:
         config_string = resource_string('pymks', '../setup.cfg').decode('utf-8')
     except FileNotFoundError:
         return False
