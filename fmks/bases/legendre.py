@@ -20,24 +20,12 @@ using the `domain` key work argument.
 ...    return np.rollaxis(tmp, 0, 3)
 >>> domain = [0., 0.5]
 >>> chunks = (1,)
->>> basis = legendre_basis(domain, n_states, chunks)
->>> assert(np.allclose(basis.discretize(X), P(X)))
-If the microstructure local state values fall outside of the specified
-domain they will no longer be mapped into the orthogonal domain of the
-legendre polynomials.
->>> n_states = 2
->>> X = np.array([-1, 1])
->>> leg_basis = LegendreBasis(n_states, domain=[0, 1])
->>> leg_basis.discretize(X)
-Traceback (most recent call last):
-...
-RuntimeError: X must be within the specified domain
+>>> assert(np.allclose(legendre_basis(X, domain, n_states, chunks)[0].compute(), P(X)))
 """
 
 import numpy as np
 import numpy.polynomial.legendre as leg
 import dask.array as da
-from func import curry
 
 
 def scaled_x(X, domain):
@@ -71,7 +59,7 @@ def discretize(X, domain=[-1,1], n_states=np.arange(2), chunks=()):
 def is_in_domain(X, domain):
     return ((np.min(X) < domain[0]) or (np.max(X) > domain[1]))
 
-@curry
+
 def legendre_basis(X, domain=[-1,1], n_states=2, chunks=(1,)):
     return (da.asarray(discretize(np.asarray(X), domain,
 	np.arange(n_states))).rechunk(chunks=X.shape+chunks),

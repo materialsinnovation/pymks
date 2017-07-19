@@ -61,7 +61,7 @@ For example, if a cell has a label of 2, its local state will be
 
 import dask.array as da
 import numpy as np
-from func import curry
+from .func import curry
 
 
 def discretize_nomax(data, states):
