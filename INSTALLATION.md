@@ -1,6 +1,7 @@
 # Installation
 
-PyMKS works fully in both Python 2 and 3.
+PyMKS is a pure Python package and is fully tested in both Python 2
+and 3.
 
 ## Conda
 
@@ -12,8 +13,9 @@ This will install all the requirements necessary to use PyMKS.
 
     $ python -c "import pymks; pymks.test()"
 
-See, https://www.continuum.io/downloads for more details on installing
-and using Conda.
+See,
+[https://www.continuum.io/downloads](https://www.continuum.io/downloads)
+for more details on installing and using Conda.
 
 ## Pip
 
@@ -22,15 +24,14 @@ Use,
     $ pip install pymks
 
 to install from [PyPI](https://pypi.org/). Further requirements listed
-in the [requirements](./requirement.txt) are necessary to use PyMKS
+in the [requirements][requirements] file are necessary to use PyMKS
 when installed using Pip.
 
 ## Scipy Stack
 
 Both [Scipy](http://www.scipy.org/) and [Numpy][numpy] as well as
 [Scikit-learn](http://scikit-learn.org) are required. See the
-[requirements](./requirement.txt) for a full listing of PyMKS
-dependencies.
+[requirements][requirements] for a full listing of PyMKS dependencies.
 
 ## Testing
 
@@ -49,8 +50,8 @@ Jupyter and Matplotlib are both required.
 
 PyMKS can be used without [SfePy][sfepy], but many of the tests and
 examples require [SfePy][sfepy] to generate the sample data so it is a
-good idea to install it. It will be automatically installed with a
-Conda installation.
+good idea to install it. [Sfepy][Sfepy] will install automatically
+with a Conda installation of PyMKS.
 
 To install [SfePy][sfepy] manually, use
 
@@ -85,12 +86,6 @@ See the
 [PyFFTW installation instructions](https://github.com/hgomersall/pyFFTW#installation)
 for more details.
 
-## Requirements
-
-The [REQUIREMENTS.md](REQUIREMENTS.html) file has a list of required
-packages in a Python environment used to run tests and examples
-for the current release of PyMKS.
-
 # Installation Issues
 
 Please send questions and issues about installation of PyMKS to the
@@ -102,3 +97,4 @@ list.
 [MKL]: https://software.intel.com/en-us/articles/numpyscipy-with-intel-mkl
 [pyfftw]: http://hgomersall.github.io/pyFFTW/
 [conda]: http://continuum.io/downloads
+[requirements]: https://raw.githubusercontent.com/materialsinnovation/pymks/master/requirements.txt

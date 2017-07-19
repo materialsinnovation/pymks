@@ -14,7 +14,8 @@ nbval
 ## packages for running the examples
 jupyter
 
-## packages required for sfepy
+## Packages required by Sfepy. Sfepy itself must be installed using
+## Conda or from source, there is no Pip installation.
 sympy
 cython
 tables
