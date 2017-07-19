@@ -2,7 +2,7 @@
 """
 
 import numpy as np
-from fmks.bases import primitive_basis
+from fmks.bases.primitive import primitive_basis
 from fmks.localization import fit
 
 
