@@ -20,7 +20,10 @@ using the `domain` key work argument.
 ...    return np.rollaxis(tmp, 0, 3)
 >>> domain = [0., 0.5]
 >>> chunks = (1,)
->>> assert(np.allclose(legendre_basis(X, n_state, domain, chunks)[0].compute(), P(X)))
+>>> assert(np.allclose(legendre_basis(X,
+...                    n_state,
+...                    domain,
+...                    chunks)[0].compute(), P(X)))
 """
 
 import numpy as np
@@ -28,21 +31,25 @@ import numpy.polynomial.legendre as leg
 import dask.array as da
 from ..func import curry
 
+
 @curry
 def scaled_data(data, domain):
     """Sclaes data to range between -1.0 and 1.0"""
-    return (2.*data-domain[0]-domain[1])/(domain[1]-domain[0])
+    return (2. * data - domain[0] - domain[1]) / (domain[1] - domain[0])
+
 
 @curry
 def norm(n_state):
     """returns normalized local states"""
-    return (2.*np.array(n_state)+1)/2.
+    return (2. * np.array(n_state) + 1) / 2.
+
 
 @curry
 def coeff(n_state):
     """returns coefficients for input as parameters to legendre value a
     calculations"""
-    return np.eye(len(n_state))*norm(n_state)
+    return np.eye(len(n_state)) * norm(n_state)
+
 
 @curry
 def leg_data(data, domain, n_state):
@@ -52,17 +59,16 @@ def leg_data(data, domain, n_state):
     return leg.legval(scaled_data(data, domain),
                       coeff(n_state))
 
+
 @curry
 def rollaxis_(data):
     """
-
     Args:
      data (ND Array): Discretized microstructure with discretization along
      first axis
 
     returns (ND Array): Discretized microstructure with discretization along
     the last axis
-
     """
     return np.rollaxis(data, 0, len(data.shape))
 
@@ -80,6 +86,7 @@ def redundancy(ijk):
     if np.all(np.array(ijk) == 0):
         return (slice(-1),)
     return (slice(-1),)
+
 
 @curry
 def discretize(data, n_state=np.arange(2), domain=(0, 1)):
@@ -126,6 +133,6 @@ def legendre_basis(x_data, n_state=2, domain=(0, 1), chunks=(1,)):
     """
     return (da.asarray(discretize(np.asarray(x_data),
                                   np.arange(n_state),
-                                  domain)
-                      ).rechunk(chunks=x_data.shape+chunks),
+                                  domain)).rechunk(chunks=x_data.shape +
+                                                   chunks),
             redundancy)
