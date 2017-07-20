@@ -8,8 +8,8 @@ fMKS &ndash; Functional Materials Knowledge System
 <img src="https://img.shields.io/gitter/room/gitterHQ/gitter.svg"
 alt="Gitter Chat">
 </a>
-<a href="https://travis-ci.org/wd15/fmks" target="_blank">
-<img src="https://api.travis-ci.org/wd15/fmks.svg"
+<a href="https://travis-ci.org/auag92/fmks" target="_blank">
+<img src="https://api.travis-ci.org/auag92/fmks.svg"
 alt="Travis CI">
 </a>
 <a href="https://github.com/wd15/fmks/blob/master/LICENSE.md">
