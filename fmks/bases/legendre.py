@@ -46,13 +46,24 @@ def coeff(n_state):
 
 @curry
 def leg_data(data, domain, n_state):
-    """computes legendre expansion for the data"""
+    """Computes legendre expansion for each data point in the
+    input data matrix.
+    """
     return leg.legval(scaled_data(data, domain),
                       coeff(n_state))
 
 @curry
 def rollaxis_(data):
-    """shifts the discretised axis to the back of the stack"""
+    """
+
+    Args:
+     data (ND Array): Discretized microstructure with discretization along
+     first axis
+
+    returns (ND Array): Discretized microstructure with discretization along
+    the last axis
+
+    """
     return np.rollaxis(data, 0, len(data.shape))
 
 
@@ -64,7 +75,7 @@ def redundancy(ijk):
       ijk: the current index
 
     Returns:
-      the redundant slice, (slice(-1),) when no redundancies
+      the redundant slice, or (slice(-1),) when no redundancies
     """
     if np.all(np.array(ijk) == 0):
         return (slice(-1),)
@@ -72,13 +83,47 @@ def redundancy(ijk):
 
 @curry
 def discretize(data, n_state=np.arange(2), domain=(0, 1)):
-    """descretizes the data"""
+    """legendre discretization of a microstructure.
+
+    Args:
+        x_data (ND array) : The microstructure as an `(n_samples, n_x, ...)`
+            shaped array where `n_samples` is the number of samples and
+            `n_x` is the spatial discretization.
+        n_state (ND array)    : rangle of local states.
+        domain  (float tuple) : the minimum and maximum range for local states
+
+    Returns:
+        Float valued field of of Legendre polynomial coefficients as a
+        numpy array.
+    """
     return rollaxis_(leg_data(data, domain, n_state))
 
 
 @curry
 def legendre_basis(x_data, n_state=2, domain=(0, 1), chunks=(1,)):
-    """the user accessible api"""
+    """legendre discretization of a microstructure.
+
+    Args:
+        x_data (ND array) : The microstructure as an `(n_samples, n_x, ...)`
+            shaped array where `n_samples` is the number of samples and
+            `n_x` is the spatial discretization.
+        n_state (float)       : the number of local states
+        domain  (float tuple) : the minimum and maximum range for local states
+
+    Returns:
+        Float valued field of of Legendre polynomial coefficients as a chunked
+        dask array.
+
+    >>> X = np.array([[-1, 1],
+    ...               [0, -1]])
+    >>> leg_basis = legendre_basis(n_state=3, domain=(-1, 1))
+    >>> def p(x):
+    ...    polys = np.array((np.ones_like(x), x, (3.*x**2 - 1.) / 2.))
+    ...    tmp = (2. * np.arange(3)[:, None, None] + 1.) / 2. * polys
+    ...    return np.rollaxis(tmp, 0, 3)
+    >>> assert(np.allclose(leg_basis(X)[0].compute(), p(X)))
+
+    """
     return (da.asarray(discretize(np.asarray(x_data),
                                   np.arange(n_state),
                                   domain)
