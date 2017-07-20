@@ -6,6 +6,7 @@ System in Fourier Space.
 Example:
 
 >>> from fmks.bases.primitive import primitive_basis
+>>> from fmks.bases.legendre import legendre_basis
 >>> from fmks.func import allclose
 
 >>> basis = primitive_basis(n_state=2)
@@ -17,7 +18,6 @@ Example:
 ...     predict(x_data(), basis=basis),
 ...     allclose(y_data())
 ... )
-
 """
 
 

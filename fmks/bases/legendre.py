@@ -10,7 +10,7 @@ where the :math:`P_l` are Legendre polynomials and the local state space
    -1 \le  H \le 1
 The mapping of :math:`H` into the domain is done automatically in PyMKS by
 using the `domain` key work argument.
->>> n_states = 3
+>>> n_state = 3
 >>> X = np.array([[0.25, 0.1],
 ...               [0.5, 0.25]])
 >>> def P(x):
@@ -20,47 +20,67 @@ using the `domain` key work argument.
 ...    return np.rollaxis(tmp, 0, 3)
 >>> domain = [0., 0.5]
 >>> chunks = (1,)
->>> assert(np.allclose(legendre_basis(X, domain, n_states, chunks)[0].compute(), P(X)))
+>>> assert(np.allclose(legendre_basis(X, n_state, domain, chunks)[0].compute(), P(X)))
 """
 
 import numpy as np
 import numpy.polynomial.legendre as leg
 import dask.array as da
+from ..func import curry
 
+@curry
+def scaled_data(data, domain):
+    """Sclaes data to range between -1.0 and 1.0"""
+    return (2.*data-domain[0]-domain[1])/(domain[1]-domain[0])
 
-def scaled_x(X, domain):
-    return ((2.*X-domain[0]-domain[1])/(domain[1]-domain[0]))
+@curry
+def norm(n_state):
+    """returns normalized local states"""
+    return (2.*np.array(n_state)+1)/2.
 
+@curry
+def coeff(n_state):
+    """returns coefficients for input as parameters to legendre value a
+    calculations"""
+    return np.eye(len(n_state))*norm(n_state)
 
-def norm(n_states):
-    return (2.*np.array(n_states)+1)/2.
+@curry
+def leg_data(data, domain, n_state):
+    """computes legendre expansion for the data"""
+    return leg.legval(scaled_data(data, domain),
+                      coeff(n_state))
 
-
-def coeff(n_states):
-    return np.eye(len(n_states))*norm(n_states)
-
-
-def leg_x(X, domain, n_states):
-     return (leg.legval(scaled_x(X, domain), coeff(n_states)))
-
-
-def rollaxis_(X):
-    return np.rollaxis(X, 0, len(X.shape))
+@curry
+def rollaxis_(data):
+    """shifts the discretised axis to the back of the stack"""
+    return np.rollaxis(data, 0, len(data.shape))
 
 
 def redundancy(ijk):
+    """Used in localization to remove redundant slices in
+    case of primitive basis function. Not used elsewhere.
+
+    Args:
+      ijk: the current index
+
+    Returns:
+      the redundant slice, (slice(-1),) when no redundancies
+    """
+    if np.all(np.array(ijk) == 0):
+        return (slice(-1),)
     return (slice(-1),)
 
-
-def discretize(X, domain=[-1,1], n_states=np.arange(2), chunks=()):
-        return rollaxis_(leg_x(X, domain, n_states))
-
-
-def is_in_domain(X, domain):
-    return ((np.min(X) < domain[0]) or (np.max(X) > domain[1]))
+@curry
+def discretize(data, n_state=np.arange(2), domain=(0, 1)):
+    """descretizes the data"""
+    return rollaxis_(leg_data(data, domain, n_state))
 
 
-def legendre_basis(X, domain=[-1,1], n_states=2, chunks=(1,)):
-    return (da.asarray(discretize(np.asarray(X), domain,
-	np.arange(n_states))).rechunk(chunks=X.shape+chunks),
-	redundancy)
+@curry
+def legendre_basis(x_data, n_state=2, domain=(0, 1), chunks=(1,)):
+    """the user accessible api"""
+    return (da.asarray(discretize(np.asarray(x_data),
+                                  np.arange(n_state),
+                                  domain)
+                      ).rechunk(chunks=x_data.shape+chunks),
+            redundancy)
