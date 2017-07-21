@@ -39,16 +39,10 @@ def scaled_data(data, domain):
 
 
 @curry
-def norm(n_state):
-    """returns normalized local states"""
-    return (2. * np.array(n_state) + 1) / 2.
-
-
-@curry
 def coeff(n_state):
     """returns coefficients for input as parameters to legendre value a
     calculations"""
-    return np.eye(len(n_state)) * norm(n_state)
+    return np.eye(len(n_state)) * (np.array(n_state) + 0.5)
 
 
 @curry
@@ -73,19 +67,17 @@ def rollaxis_(data):
     return np.rollaxis(data, 0, len(data.shape))
 
 
-def redundancy(ijk):
-    """Used in localization to remove redundant slices in
-    case of primitive basis function. Not used elsewhere.
-
-    Args:
-      ijk: the current index
-
-    Returns:
-      the redundant slice, or (slice(-1),) when no redundancies
-    """
-    if np.all(np.array(ijk) == 0):
-        return (slice(-1),)
-    return (slice(-1),)
+# def redundancy(ijk):
+#     """Used in localization to remove redundant slices in
+#     case of primitive basis function. Not used elsewhere.
+#
+#     Args:
+#       ijk: the current index
+#
+#     Returns:
+#       the redundant slice, or (slice(-1),) when no redundancies
+#     """
+#     return (slice(-1),)
 
 
 @curry
@@ -129,10 +121,24 @@ def legendre_basis(x_data, n_state=2, domain=(0, 1), chunks=(1,)):
     ...    tmp = (2. * np.arange(3)[:, None, None] + 1.) / 2. * polys
     ...    return np.rollaxis(tmp, 0, 3)
     >>> assert(np.allclose(leg_basis(X)[0].compute(), p(X)))
-
+    >>> np.random.seed(3)
+    >>> X = np.random.random((1, 3, 3))
+    >>> leg_basis = legendre_basis(n_state=2, domain=(0, 1))
+    >>> X_ = leg_basis(X)[0].compute()
+    >>> FX = np.fft.fftn(X_, axes=(1, 2))
+    >>> FXtest = np.array([[[[4.50000000+0.j, -0.79735949+0.],
+    ...                      [0.00000000+0.j, -1.00887157-1.48005289j],
+    ...                      [0.00000000+0.j, -1.00887157+1.48005289j]],
+    ...                     [[0.00000000+0.j, 0.62300683-4.97732233j],
+    ...                      [0.00000000+0.j, 1.09318216+0.10131035j],
+    ...                      [0.00000000+0.j, 0.37713401+1.87334545j]],
+    ...                     [[0.00000000+0.j, 0.62300683+4.97732233j],
+    ...                      [0.00000000+0.j, 0.37713401-1.87334545j],
+    ...                      [0.00000000+0.j, 1.09318216-0.10131035j]]]])
+    >>> assert np.allclose(FX, FXtest)
     """
     return (da.asarray(discretize(np.asarray(x_data),
                                   np.arange(n_state),
                                   domain)).rechunk(chunks=x_data.shape +
                                                    chunks),
-            redundancy)
+            lambda x: slice(-1))
