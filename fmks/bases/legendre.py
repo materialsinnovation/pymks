@@ -112,7 +112,7 @@ def legendre_basis(x_data, n_state=2, domain=(0, 1), chunks=(1,)):
     Returns:
         Float valued field of of Legendre polynomial coefficients as a chunked
         dask array.
-
+    >>> # test1
     >>> X = np.array([[-1, 1],
     ...               [0, -1]])
     >>> leg_basis = legendre_basis(n_state=3, domain=(-1, 1))
@@ -121,6 +121,7 @@ def legendre_basis(x_data, n_state=2, domain=(0, 1), chunks=(1,)):
     ...    tmp = (2. * np.arange(3)[:, None, None] + 1.) / 2. * polys
     ...    return np.rollaxis(tmp, 0, 3)
     >>> assert(np.allclose(leg_basis(X)[0].compute(), p(X)))
+    >>> # test 2
     >>> np.random.seed(3)
     >>> X = np.random.random((1, 3, 3))
     >>> leg_basis = legendre_basis(n_state=2, domain=(0, 1))
