@@ -64,20 +64,10 @@ def rollaxis_(data):
     returns (ND Array): Discretized microstructure with discretization along
     the last axis
     """
-    return np.rollaxis(data, 0, len(data.shape))
-
-
-# def redundancy(ijk):
-#     """Used in localization to remove redundant slices in
-#     case of primitive basis function. Not used elsewhere.
-#
-#     Args:
-#       ijk: the current index
-#
-#     Returns:
-#       the redundant slice, or (slice(-1),) when no redundancies
-#     """
-#     return (slice(-1),)
+    # return np.rollaxis(data, 0, len(data.shape))
+    for i in range(len(data.shape)-1):
+        data = np.swapaxes(data, i, i+1)
+    return data
 
 
 @curry
