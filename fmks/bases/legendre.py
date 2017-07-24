@@ -29,6 +29,7 @@ using the `domain` key work argument.
 import numpy as np
 import numpy.polynomial.legendre as leg
 import dask.array as da
+from toolz.curried import pipe
 from ..func import curry
 
 
@@ -39,39 +40,22 @@ def scaled_data(data, domain):
 
 
 @curry
-def coeff(n_state):
+def coeff(states):
     """returns coefficients for input as parameters to legendre value a
     calculations"""
-    return np.eye(len(n_state)) * (n_state + 0.5)
+    return np.eye(len(states)) * (states + 0.5)
 
 
 @curry
-def leg_data(data, domain, n_state):
+def leg_data(data, coeff_):
     """Computes legendre expansion for each data point in the
     input data matrix.
     """
-    return leg.legval(scaled_data(data, domain),
-                      coeff(n_state))
+    return leg.legval(data, coeff_)
 
 
 @curry
-def rollaxis_(data):
-    """
-    Args:
-     data (ND Array): Discretized microstructure with discretization along
-     first axis
-
-    returns (ND Array): Discretized microstructure with discretization along
-    the last axis
-    """
-    # return np.rollaxis(data, 0, len(data.shape))
-    for i in range(len(data.shape)-1):
-        data = np.swapaxes(data, i, i+1)
-    return data
-
-
-@curry
-def discretize(data, n_state=np.arange(2), domain=(0, 1)):
+def discretize(data, states=np.arange(2), domain=(0, 1)):
     """legendre discretization of a microstructure.
 
     Args:
@@ -85,7 +69,9 @@ def discretize(data, n_state=np.arange(2), domain=(0, 1)):
         Float valued field of of Legendre polynomial coefficients as a
         numpy array.
     """
-    return rollaxis_(leg_data(data, domain, n_state))
+    return pipe(data[..., None],
+                scaled_data(domain=domain),
+                leg_data(coeff_=coeff(states)))
 
 
 @curry
@@ -102,7 +88,7 @@ def legendre_basis(x_data, n_state=2, domain=(0, 1), chunks=(1,)):
     Returns:
         Float valued field of of Legendre polynomial coefficients as a chunked
         dask array.
-    >>> # test1
+    >>> # test1def discretize(data, n_state=np.arange(2), domain=(0, 1)):
     >>> X = np.array([[-1, 1],
     ...               [0, -1]])
     >>> leg_basis = legendre_basis(n_state=3, domain=(-1, 1))
@@ -128,8 +114,8 @@ def legendre_basis(x_data, n_state=2, domain=(0, 1), chunks=(1,)):
     ...                      [0.00000000+0.j, 1.09318216-0.10131035j]]]])
     >>> assert np.allclose(FX, FXtest)
     """
-    return (da.asarray(discretize(np.asarray(x_data),
-                                  np.arange(n_state),
-                                  domain)).rechunk(chunks=x_data.shape +
-                                                   chunks),
+    return (discretize(da.from_array(x_data,
+                                     chunks=chunks + x_data.shape[1:]),
+                       np.arange(n_state),
+                       domain),
             lambda x: slice(-1))
