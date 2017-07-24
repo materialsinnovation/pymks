@@ -42,7 +42,7 @@ def scaled_data(data, domain):
 def coeff(n_state):
     """returns coefficients for input as parameters to legendre value a
     calculations"""
-    return np.eye(len(n_state)) * (np.array(n_state) + 0.5)
+    return np.eye(len(n_state)) * (n_state + 0.5)
 
 
 @curry
