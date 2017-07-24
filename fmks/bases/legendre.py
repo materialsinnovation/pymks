@@ -118,4 +118,4 @@ def legendre_basis(x_data, n_state=2, domain=(0, 1), chunks=(1,)):
                                      chunks=chunks + x_data.shape[1:]),
                        np.arange(n_state),
                        domain),
-            lambda x: slice(-1))
+            lambda x: (slice(-1),))
