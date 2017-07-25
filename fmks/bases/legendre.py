@@ -1,6 +1,8 @@
 r"""
-Discretize a continuous field into local states using a
-Legendre polynomial basis such that,
+Legendre basis for microstructure discretization.
+
+Discretize the microstructure function into `n_states` local states
+such that:
 
 .. math::
    \frac{1}{\Delta x} \int_s m(h, x) dx =
@@ -11,7 +13,24 @@ where the :math:`P_l` are Legendre polynomials and the local state space
 
 .. math::
    -1 \le  H \le 1
+
+Example.
+
+Here is an example with 4 local states in a microstructure.
+
+>>> data = 2 * np.random.random((1, 3, 3)) - 1
+>>> assert(data.shape == (1, 3, 3))
+
+The when a microstructure is discretized, the different local states are
+mapped into local state space, which results in an array of shape
+`(n_samples, n_x, n_y, n_states)`, where `n_states=4` in this case.
+
+>>> from toolz import pipe
+>>> data_ = pipe(data, legendre_basis(n_state=4, domain=(-1,1)))
+>>> assert(data_[0].shape == (1, 3, 3, 4))
+
 """
+
 
 import numpy as np
 import numpy.polynomial.legendre as leg
