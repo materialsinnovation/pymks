@@ -1,69 +1,61 @@
 # Installation
 
-PyMKS works fully in both Python 2 and 3.
+PyMKS is a pure Python package and is fully tested in both Python 2
+and 3.
 
 ## Conda
 
-Conda is the easiest way to install PyMKS. To install use
+[Conda][conda] is the easiest way to install PyMKS. To install use
 
-    $ conda config --add channels pymks
-    $ conda install pymks
+    $ conda install -c pymks pymks
+
+This will install all the requirements necessary to use PyMKS.
+
+    $ python -c "import pymks; pymks.test()"
+
+See,
+[https://www.continuum.io/downloads](https://www.continuum.io/downloads)
+for more details on installing and using Conda.
 
 ## Pip
 
-The following steps outline the necessary requirements for a
-successful installation of PyMKS.
-
-Use pip,
+Use,
 
     $ pip install pymks
 
-and then run the tests.
-
-    $ python -c "import pymks; pymks.test()"
+to install from [PyPI](https://pypi.org/). Further requirements listed
+in the [requirements][requirements] file are necessary to use PyMKS
+when installed using Pip.
 
 ## Scipy Stack
 
 Both [Scipy](http://www.scipy.org/) and [Numpy][numpy] as well as
 [Scikit-learn](http://scikit-learn.org) are required. See the
-[requirements](./requirement.txt) for a full listing of PyMKS
-dependencies.
+[requirements][requirements] for a full listing of PyMKS dependencies.
 
 ## Testing
 
-The package [Pytest](https://pytest.org) is required for testing only. Use
-
-    $ py.test
-
-in the base directory or
+To test use,
 
     $ python -c "import pymks; pymks.test()"
 
-to run all the tests.
+to run all the tests with an installed version of PyMKS.
 
 ## Examples
 
 To use the interactive examples from the `notebooks/` directory,
-IPython and Matplotlib are both required.
+Jupyter and Matplotlib are both required.
 
 ## [SfePy][sfepy]
 
 PyMKS can be used without [SfePy][sfepy], but many of the tests and
 examples require [SfePy][sfepy] to generate the sample data so it is a
-good idea to install it.
+good idea to install it. [Sfepy][Sfepy] will install automatically
+with a Conda installation of PyMKS.
 
-To install [SfePy][sfepy], first clone with
+To install [SfePy][sfepy] manually, use
 
-    $ git clone git://github.com/sfepy/sfepy.git
-
-and then install with
-
-    $ cd sfepy
-    $ python setup.py install
-
-See the
-[SfePy installation instructions](http://sfepy.org/doc-devel/installation.html)
-for more details.
+    $ conda -c conda-forge install sfepy
 
 ## [PyFFTW][pyfftw]
 
@@ -94,36 +86,6 @@ See the
 [PyFFTW installation instructions](https://github.com/hgomersall/pyFFTW#installation)
 for more details.
 
-## Installation on Windows
-
-We recommend you download and install the
-[Anaconda Python Distribution](http://continuum.io/downloads) for
-Python 2.7 (x64) and then download and install PyMKS, using the
-[windows installer](https://github.com/materialsinnovation/pymks/releases/download/version-0_2_1/PyMKS-x64-anaconda27.exe).
-
-## Installation on Mac OS X
-
-We recommend you download and install the
-[Anaconda Python Distribution](http://continuum.io/downloads) for
-Python 2.7 (x64). Once Anaconda has been installed, follow the above
-procedures to install SfePy.  Finally, install PyMKS using `pip` as
-described above.
-
-## Installation with Anaconda
-
-The
-[Anaconda Python Distributionn](https://store.continuum.io/cshop/anaconda/)
-contains all of the required packages outside of [SfePy][sfepy] and
-works on multiple platforms. [Download][conda] and
-[install](http://docs.continuum.io/anaconda/install.html) Anaconda,
-and use your terminal or shell to install PyMKS using pip.
-
-## Requirements
-
-The [REQUIREMENTS.md](REQUIREMENTS.html) file has a list of required
-packages in a Python environment used to run tests and examples
-for the current release of PyMKS.
-
 # Installation Issues
 
 Please send questions and issues about installation of PyMKS to the
@@ -134,5 +96,5 @@ list.
 [numpy]: http://www.scipy.org/
 [MKL]: https://software.intel.com/en-us/articles/numpyscipy-with-intel-mkl
 [pyfftw]: http://hgomersall.github.io/pyFFTW/
-[chris]: http://www.lfd.uci.edu/~gohlke/pythonlibs/#scikit-learn
 [conda]: http://continuum.io/downloads
+[requirements]: https://raw.githubusercontent.com/materialsinnovation/pymks/master/requirements.txt

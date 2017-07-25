@@ -3,6 +3,7 @@
 import subprocess
 from setuptools import setup, find_packages
 import os
+from pkg_resources import get_distribution, DistributionNotFound
 
 
 def make_version():
@@ -60,8 +61,10 @@ def make_version():
             import warnings
             warnings.warn("Could not run ``git describe``")
     elif os.path.exists('pymks.egg-info'):
-        from pymks import get_version
-        version = get_version()
+        try:
+            version = get_distribution(__name__.split('.')[0]).version # pylint: disable=no-member
+        except DistributionNotFound: # pragma: no cover
+            version = "unknown, try running `python setup.py egg_info`"
 
     return version
 
