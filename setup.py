@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 import os
 
 
-def make_version():
+def make_version(package_name):
     """Generates a version number using `git describe`.
 
     Returns:
@@ -62,15 +62,18 @@ def make_version():
     elif os.path.exists('pymks.egg-info'):
         from pkg_resources import get_distribution, DistributionNotFound
         try:
-            version = get_distribution(__name__.split('.')[0]).version # pylint: disable=no-member
+            version = get_distribution(package_name).version # pylint: disable=no-member
         except DistributionNotFound: # pragma: no cover
             version = "unknown, try running `python setup.py egg_info`"
 
     return version
 
 
-setup(name='pymks',
-      version=make_version(),
+PACKAGE_NAME = "pymks"
+
+
+setup(name=PACKAGE_NAME,
+      version=make_version(PACKAGE_NAME),
       description='Materials Knowledge Systems in Python (PyMKS)',
       author='David Brough, Daniel Wheeler',
       author_email='david.brough.0416@gmail.com',
