@@ -30,16 +30,30 @@ alt="Travis CI">
 </a>
 </p>
 
-<br>
+<p align="center">
+<a href="https://circleci.com/gh/conda-forge/pymks-feedstock" target="_blank">
+<img src="https://circleci.com/gh/conda-forge/pymks-feedstock.svg?style=shield"
+alt="Circle CI">
+</a>
+<a href="https://travis-ci.org/conda-forge/pymks-feedstock" target="_blank">
+<img src="https://travis-ci.org/conda-forge/pymks-feedstock.svg?branch=master"
+alt="Travis CI">
+</a>
+<a href="https://ci.appveyor.com/project/conda-forge/pymks-feedstock/branch/master">
+<img src="https://ci.appveyor.com/api/projects/status/github/conda-forge/pymks-feedstock?svg=True" alt="AppVeyor" height="18">
+</a>
+</p>
 
-Linux: [![Circle CI](https://circleci.com/gh/conda-forge/pymks-feedstock.svg?style=shield)](https://circleci.com/gh/conda-forge/pymks-feedstock)
-OSX: [![TravisCI](https://travis-ci.org/conda-forge/pymks-feedstock.svg?branch=master)](https://travis-ci.org/conda-forge/pymks-feedstock)
-Windows: [![AppVeyor](https://ci.appveyor.com/api/projects/status/github/conda-forge/pymks-feedstock?svg=True)](https://ci.appveyor.com/project/conda-forge/pymks-feedstock/branch/master)
-
-<br>
-
-Version: [![Anaconda-Server Badge](https://anaconda.org/conda-forge/pymks/badges/version.svg)](https://anaconda.org/conda-forge/pymks)
-Downloads: [![Anaconda-Server Badge](https://anaconda.org/conda-forge/pymks/badges/downloads.svg)](https://anaconda.org/conda-forge/pymks)
+<p align="center">
+<a href="https://anaconda.org/conda-forge/pymks" target="_blank">
+<img src="https://anaconda.org/conda-forge/pymks/badges/version.svg"
+alt="Anaconda-Server Badge">
+</a>
+<a href="https://anaconda.org/conda-forge/pymks" target="_blank">
+<img src="https://anaconda.org/conda-forge/pymks/badges/downloads.svg"
+alt="Anaconda-Server Badge">
+</a>
+</p>
 
 ## MKS
 
