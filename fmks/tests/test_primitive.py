@@ -2,7 +2,7 @@
 """
 
 import numpy as np
-from fmks.bases import discretize
+from fmks.bases.primitive import discretize
 from toolz import pipe
 
 
