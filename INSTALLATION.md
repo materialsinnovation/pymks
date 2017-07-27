@@ -1,13 +1,13 @@
 # Installation
 
 PyMKS is a pure Python package and is fully tested in both Python 2
-and 3.
+and 3 and on Windows, Mac OSX and Linux.
 
 ## Conda
 
 [Conda][conda] is the easiest way to install PyMKS. To install use
 
-    $ conda install -c pymks pymks
+    $ conda install -c conda-forge pymks
 
 This will install all the requirements necessary to use PyMKS.
 

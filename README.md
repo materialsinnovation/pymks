@@ -30,6 +30,31 @@ alt="Travis CI">
 </a>
 </p>
 
+<p align="center">
+<a href="https://circleci.com/gh/conda-forge/pymks-feedstock" target="_blank">
+<img src="https://circleci.com/gh/conda-forge/pymks-feedstock.svg?style=shield"
+alt="Circle CI">
+</a>
+<a href="https://travis-ci.org/conda-forge/pymks-feedstock" target="_blank">
+<img src="https://travis-ci.org/conda-forge/pymks-feedstock.svg?branch=master"
+alt="Travis CI">
+</a>
+<a href="https://ci.appveyor.com/project/conda-forge/pymks-feedstock/branch/master">
+<img src="https://ci.appveyor.com/api/projects/status/github/conda-forge/pymks-feedstock?svg=True" alt="AppVeyor" height="18">
+</a>
+</p>
+
+<p align="center">
+<a href="https://anaconda.org/conda-forge/pymks" target="_blank">
+<img src="https://anaconda.org/conda-forge/pymks/badges/version.svg"
+alt="Anaconda-Server Badge">
+</a>
+<a href="https://anaconda.org/conda-forge/pymks" target="_blank">
+<img src="https://anaconda.org/conda-forge/pymks/badges/downloads.svg"
+alt="Anaconda-Server Badge">
+</a>
+</p>
+
 ## MKS
 
 The Materials Knowledge Systems (MKS) is a novel data science approach
