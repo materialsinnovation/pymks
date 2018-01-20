@@ -128,8 +128,8 @@ class ElasticFESimulation(object):
         """
         def _convert(E, nu):
             ec = ElasticConstants(young=E, poisson=nu)
-            mu = dim / 3. * ec.mu
-            lame = ec.lam
+            mu = dim / 3. * ec.mu  # pylint: disable=no-member
+            lame = ec.lam  # pylint: disable=no-member
             return lame, mu
 
         return np.array([_convert(E, nu) for E,
@@ -149,7 +149,7 @@ class ElasticFESimulation(object):
         ...                               poissons_ratio=(1., 1., 1.))
         >>> lame = lame0, lame1, lame2 = -0.5, -1., -1.5
         >>> mu = mu0, mu1, mu2 = 1. / 6, 1. / 3, 1. / 2
-        >>> lm = zip(lame, mu)
+        >>> lm = list(zip(lame, mu))
         >>> X2D_property = np.array([[lm[0], lm[1], lm[2], lm[1]],
         ...                          [lm[2], lm[1], lm[0], lm[0]],
         ...                          [lm[1], lm[0], lm[2], lm[2]]])
@@ -498,7 +498,7 @@ class ElasticFESimulation(object):
 
         region_all = domain.create_region('region_all', 'all')
 
-        field = Field.from_args('fu', np.float64, 'vector', region_all,
+        field = Field.from_args('fu', np.float64, 'vector', region_all, # pylint: disable=no-member
                                 approx_order=2)
 
         u = FieldVariable('u', 'unknown', field)

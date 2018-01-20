@@ -1,9 +1,10 @@
 ---
 language: python
 env:
-  - SFEPY_VERSION=0 USE_FFTW=0 PYTHON_VERSION=3
-  - SFEPY_VERSION=release_2016.2 USE_FFTW=1 PYTHON_VERSION=2
-  - SFEPY_VERSION=master USE_FFTW=0 PYTHON_VERSION=2
+  - PYMKS_USE_FFTW=1 PYTHON_VERSION=3
+  - PYMKS_USE_FFTW=0 PYTHON_VERSION=3
+  - PYMKS_USE_FFTW=1 PYTHON_VERSION=2
+  - PYMKS_USE_FFTW=0 PYTHON_VERSION=2
 install:
   - sudo apt-get update
   # We do this conditionally because it saves us some downloading if the
@@ -22,13 +23,20 @@ install:
   - conda info -a
   - conda create -q -y -n test-environment python="$PYTHON_VERSION"
   - source activate test-environment
-  - conda install -q -y -n test-environment numpy scipy pytest scikit-learn matplotlib
-  - if [[ "$USE_FFTW" -eq 1 ]]; then
-      conda install -q -y -n test-environment -c wd15 pyfftw;
+  - conda install -q -y -n test-environment numpy scipy pytest scikit-learn matplotlib pytest-cov
+  - conda install -q -y -n test-environment sympy cython pytables jupyter
+  - if [[ "$PYMKS_USE_FFTW" -eq 1 ]]; then
+      conda install -q -y -n test-environment -c conda-forge pyfftw;
     fi
-  - if [[ "$SFEPY_VERSION" -ne 0 ]]; then
-      pip install git+https://github.com/sfepy/sfepy.git@"$SFEPY_VERSION";
-    fi
+  - conda install -q -y -n test-environment -c conda-forge sfepy
+  - pip install pylint configparser nbval
+  - unset VIRTUAL_ENV
   - pip install .
 script:
-  py.test
+  - if [[ "$PYTHON_VERSION" == "2" ]]; then
+      py.test pymks;
+    else
+      py.test;
+    fi
+after_success:
+  - #pylint --extension-pkg-whitelist=numpy pymks

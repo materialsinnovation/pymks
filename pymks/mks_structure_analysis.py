@@ -73,8 +73,8 @@ class MKSStructureAnalysis(BaseEstimator):
             store_correlations (boolean, optional): If true the computed
                 2-point statistics will be saved as an attributes
                 fit_correlations and transform_correlations.
-            n_jobs (int, optional): number of parallel jobs to run. only used
-                if pyfftw is install.
+            n_jobs (int, optional): number of parallel jobs to run, only used
+                if pyfftw is installed.
             mean_center (boolean, optional): If true the data will be mean
                 centered before dimensionality reduction is computed.
         """

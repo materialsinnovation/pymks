@@ -261,7 +261,7 @@ def test_normalization_rfftn():
     prim_basis._axes_shape = (2 * Nx, 2 * Ny)
     norm = _normalize(X_.shape, prim_basis, None)
     assert norm.shape == (1, Nx, Ny, 1)
-    assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
+    assert np.allclose(norm[0, Nx // 2, Ny // 2, 0], 25)
 
 
 def test_normalization_fftn():
@@ -276,7 +276,7 @@ def test_normalization_fftn():
     f_basis._axes_shape = (2 * Nx, 2 * Ny)
     norm = _normalize(X_.shape, f_basis, None)
     assert norm.shape == (1, Nx, Ny, 1)
-    assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
+    assert np.allclose(norm[0, Nx // 2, Ny // 2, 0], 25)
 
 
 def test_gsh_basis_normalization():
@@ -289,25 +289,19 @@ def test_gsh_basis_normalization():
     gsh_basis._axes_shape = (2 * Nx, 2 * Ny)
     norm = _normalize(X_.shape, gsh_basis, None)
     assert norm.shape == (1, Nx, Ny, 1)
-    assert np.allclose(norm[0, Nx / 2, Ny / 2, 0], 25)
+    assert np.allclose(norm[0, Nx // 2, Ny // 2, 0], 25)
 
 
 def test_stats_in_parallel():
-    import time
     from pymks.bases import PrimitiveBasis
     from pymks.stats import correlate
     from pymks.datasets import make_microstructure
     p_basis = PrimitiveBasis(5)
-    if p_basis._pyfftw:
-        X = make_microstructure(n_samples=5, n_phases=3)
-        t = []
-        for i in range(1, 4):
-            t_start = time.time()
-            correlate(X, p_basis, n_jobs=i)
-            t.append(time.time() - t_start)
-            assert t == sorted(t, reverse=True)
-    else:
-        pass
+    X = make_microstructure(n_samples=5, n_phases=3)
+    X_corr_actual = correlate(X, p_basis)
+    for i in range(1, 4):
+        X_corr_test = correlate(X, p_basis, n_jobs=i)
+        assert np.allclose(X_corr_actual, X_corr_test)
 
 
 def test_autocorrelate_with_specific_correlations():

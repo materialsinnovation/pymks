@@ -1,9 +1,9 @@
+======
 Theory
 ======
 
 .. toctree::
    :maxdepth: 2
 
-   rst/derivation.rst
-   rst/tech_overview.rst
-
+   rst/notebooks/derivation.ipynb
+   rst/notebooks/tech_overview.ipynb

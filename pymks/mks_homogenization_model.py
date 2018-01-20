@@ -96,8 +96,8 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
                 correlations will not be calculated as part of the fit and
                 predict methods. The spatial correlations can be passed as `X`
                 to both methods, default is True.
-            n_jobs (int, optional): number of parallel jobs to run. only used
-                if pyfftw is install.
+            n_jobs (int, optional): number of parallel jobs to run, only used
+                if pyfftw is installed.
             store_correlations (boolean, optional): indicate if spatial
                 correlations should be stored
             mean_center (boolean, optional): If true the data will be mean
@@ -354,9 +354,9 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
         """
         _size = self.basis._axes_shape
         if self.periodic_axes is None or len(self.periodic_axes) != len(_size):
-            _axes = range(len(_size))
+            _axes = list(range(len(_size)))
             if self.periodic_axes is not None:
                 [_axes.remove(a) for a in self.periodic_axes]
-            _size = np.ones(len(_size)) * _size
-            _size[_axes] *= .5
+            _size = np.ones(len(_size), dtype=int) * _size
+            _size[_axes] = _size[_axes] // 2
         return tuple(_size)

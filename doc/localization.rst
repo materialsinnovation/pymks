@@ -10,4 +10,3 @@ Localization
    rst/filter.rst
    rst/localization_cahn_hilliard_2D.rst
    rst/localization_cahn_hilliard_Legendre_2D.rst
-   rst/localization_elasticity_polycrystal_hex_3D.rst

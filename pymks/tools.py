@@ -14,7 +14,9 @@ import numpy as np
 import warnings
 
 warnings.filterwarnings("ignore")
-plt.style.library['ggplot']['text.color'] = '#555555'
+plt.style.library['ggplot']['xtick.color'] = '#000000'
+plt.style.library['ggplot']['ytick.color'] = '#000000'
+plt.style.library['ggplot']['axes.labelcolor'] = '#000000'
 plt.style.use('ggplot')
 
 
@@ -192,17 +194,21 @@ def draw_microstructure_strain(microstructure, strain):
     plt.show()
 
 
-def draw_microstructures(*microstructures):
+def draw_microstructures(microstructures, labels=None, figsize=None):
     """
     Draw microstructures
 
     Args:
         microstructures (3D array): numpy array with dimensions
             (n_samples, x, y)
+        labels (list, str, optional): titles for strain fields
+        figsize (tuple, optional): specifies the number of images in each
+            direction.
     """
     cmap = _get_microstructure_cmap()
-    titles = [' ' for s in np.arange(microstructures[0].shape[0])]
-    _draw_fields(microstructures[0], cmap, 10, titles)
+    if labels is None:
+        labels = [' ' for s in np.arange(microstructures.shape[0])]
+    _draw_fields(microstructures, cmap, 15, labels, figsize=figsize)
 
 
 def draw_strains(strains, labels=None, fontsize=15):
@@ -286,6 +292,7 @@ def _draw_fields(fields, field_cmap, fontsize, titles, figsize=None):
         field_cmap - color map for plot
         fontsize - font size for titles and color bar text
         titles - titles for plot
+        figsize - controls the number of images in each direction
     """
     plt.close('all')
     vmin = np.min(fields)
@@ -322,8 +329,8 @@ def _draw_fields(fields, field_cmap, fontsize, titles, figsize=None):
     cbar_ax.tick_params(labelsize=cbar_font)
     cbar_ax.yaxis.set_offset_position('right')
     fig.colorbar(im, cax=cbar_ax)
-    plt.tight_layout()
     plt.rc('font', **{'size': str(cbar_font)})
+    plt.tight_layout()
     plt.show()
 
 
@@ -403,7 +410,7 @@ def draw_gridscores_matrix(grid_scores, params, score_label=None,
     param_range_0 = grid_scores.param_grid[params[0]]
     param_range_1 = grid_scores.param_grid[params[1]]
     mat_size = (len(param_range_1), len(param_range_0))
-    fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+    fig, axs = plt.subplots(2, 1, figsize=(10, 5))
     matrices = np.concatenate((np.array(means).reshape(mat_size)[None],
                                np.array(stddev).reshape(mat_size)[None]))
     X_cmap = _grid_matrix_cmap()
@@ -428,6 +435,7 @@ def draw_gridscores_matrix(grid_scores, params, score_label=None,
         cbar = plt.colorbar(im, cax=cbar_ax)
         cbar.ax.tick_params(labelsize=12)
         fig.subplots_adjust(right=1.2)
+    plt.tight_layout()
     plt.show()
 
 
@@ -471,9 +479,9 @@ def draw_components_scatter(datasets, labels, title=None,
     plt.close('all')
     if title is None:
         title = 'Low Dimensional Representation'
-    n_components = np.array(datasets[0][-1].shape)
+    n_components = np.array(datasets[0][-1].shape, dtype=int)
     if component_labels is None:
-        component_labels = range(1, n_components + 1)
+        component_labels = range(1, n_components[0] + 1)
     if len(datasets) != len(labels):
         raise RuntimeError('datasets and labels must have the same length')
     if n_components != len(component_labels):
@@ -691,9 +699,9 @@ def draw_correlations(X_corr, correlations=None):
     """
     if correlations is None:
         n_cross = X_corr.shape[-1]
-        L = range((np.sqrt(1 + 8 * n_cross) - 1).astype(int) / 2)
-        correlations = zip(*list(_auto_correlations(L)))
-        correlations += zip(*list(_cross_correlations(L)))
+        L = range(int((np.sqrt(1 + 8 * n_cross) - 1) / 2))
+        correlations = list(zip(*list(_auto_correlations(L))))
+        correlations += list(zip(*list(_cross_correlations(L))))
     _draw_stats(X_corr, correlations=correlations)
 
 
@@ -801,7 +809,7 @@ def _get_colorbar_ticks(X_, n_ticks):
            (n_samples, x,  y, local_state_correlation)
     """
     tick_range = np.linspace(np.min(X_), np.max(X_), n_ticks)
-    return tick_range.astype(float)
+    return tick_range.astype(float) # pylint: disable=no-member
 
 
 def draw_learning_curves(estimator, X, y, ylim=None, cv=None, n_jobs=1,

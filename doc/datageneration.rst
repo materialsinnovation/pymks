@@ -28,6 +28,10 @@ make_elastic_FE_strain_delta
 ----------------------------
 .. autofunction:: pymks.datasets.make_elastic_FE_strain_delta
 
+make_elastic_stiffness
+----------------------
+.. autofunction:: pymks.datasets.make_elastic_stiffness
+
 make_elastic_stress_random
 --------------------------
 .. autofunction:: pymks.datasets.make_elastic_stress_random
