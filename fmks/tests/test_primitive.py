@@ -2,8 +2,8 @@
 """
 
 import numpy as np
-from fmks.bases.primitive import discretize
 from toolz import pipe
+from fmks.bases.primitive import discretize
 
 
 def test_local():
