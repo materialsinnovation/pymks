@@ -252,3 +252,4 @@ doc/_build
 
 #pytest
 .cache
+.pytest_cache
