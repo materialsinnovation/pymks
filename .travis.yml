@@ -23,12 +23,12 @@ install:
   - conda info -a
   - conda create -q -y -n test-environment python="$PYTHON_VERSION"
   - source activate test-environment
-  - conda install -q -y -n test-environment numpy scipy pytest scikit-learn matplotlib pytest-cov
+  - conda install -q -y -n test-environment numpy scipy=0.19 pytest scikit-learn matplotlib=2.0 pytest-cov
   - conda install -q -y -n test-environment sympy cython pytables jupyter
   - if [[ "$PYMKS_USE_FFTW" -eq 1 ]]; then
       conda install -q -y -n test-environment -c conda-forge pyfftw;
     fi
-  - conda install -q -y -n test-environment -c conda-forge sfepy
+  - conda install -q -y -n test-environment -c conda-forge sfepy=2017.4.1
   - pip install pylint configparser nbval
   - unset VIRTUAL_ENV
   - pip install .
