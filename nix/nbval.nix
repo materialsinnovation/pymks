@@ -1,8 +1,5 @@
-{ nixpkgs ? import <nixpkgs> {} }:
-let
-  python36Packages = nixpkgs.python36Packages;
-in
-  python36Packages.buildPythonPackage rec {
+{ nixpkgs, pypkgs }:
+pypkgs.buildPythonPackage rec {
   name = "nbval-0.9.0";
   src = nixpkgs.fetchurl {
     url = "https://pypi.python.org/packages/58/ce/d705c865bdec10ab94c1c57b76e77f07241ef5c11c4976ec7e00de259f92/nbval-0.9.0.tar.gz";
@@ -10,12 +7,12 @@ in
   };
   doCheck=false;
   buildInputs = [
-    python36Packages.ipython
-    python36Packages.jupyter_client
-    python36Packages.tornado
-    python36Packages.nbformat
-    python36Packages.ipykernel
-    python36Packages.coverage
-    python36Packages.pytest
+    pypkgs.ipython
+    pypkgs.jupyter_client
+    pypkgs.tornado
+    pypkgs.nbformat
+    pypkgs.ipykernel
+    pypkgs.coverage
+    pypkgs.pytest
   ];
 }
