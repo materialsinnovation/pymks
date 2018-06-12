@@ -15,5 +15,7 @@ before_install:
 before_cache:
   - mkdir -p $STORE
   - nix copy --to file://$STORE -f shell.nix buildInputs
+install:
+  - nix-shell --command "python -c 'import pymks'"
 script:
   - nix-shell --command "py.test"
