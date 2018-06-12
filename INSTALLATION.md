@@ -5,7 +5,8 @@ and 3 and on Windows, Mac OSX and Linux.
 
 ## Nix
 
-[Nix][nix] is a seamless way to install PyMKS. After [installing
+[Nix](https://nixos.org/nix/) is a seamless way to install
+PyMKS. After [installing
 Nix](https://nixos.org/nix/manual/#chap-quick-start), run
 
     $ nix-shell
