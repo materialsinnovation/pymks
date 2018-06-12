@@ -28,6 +28,7 @@ in
       pypkgs.tkinter
       pypkgs.setuptools
       sfepy
+      pypkgs.pyfftw
     ];
     src=./.;
     shellHook = ''
