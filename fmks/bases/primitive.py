@@ -123,12 +123,14 @@ def discretize(x_data, n_state, min_=0.0, max_=1.0, chunks=()):
     >>> discretize(np.array([[0, 1], [0.5, 0.5]]), 3, chunks=(1,)).chunks
     ((2,), (2,), (1, 1, 1))
 
-    >>> discretize(np.array([[0, 1], [0.5, 0.5]]), 3, chunks=(1,)).compute()
-    array([[[ 1.,  0.,  0.],
-            [ 0.,  0.,  1.]],
-    <BLANKLINE>
-           [[ 0.,  1.,  0.],
-            [ 0.,  1.,  0.]]])
+    >>> assert np.allclose(
+    ...     discretize(
+    ...         np.array([[0, 1], [0.5, 0.5]]),
+    ...         3,
+    ...         chunks=(1,)
+    ...     ).compute(),
+    ...     [[[1, 0, 0], [0, 0, 1]], [[0, 1, 0], [0, 1, 0]]]
+    ... )
     """
     return da.maximum(
         discretize_nomax(da.clip(x_data, min_, max_),

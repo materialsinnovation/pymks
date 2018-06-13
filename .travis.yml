@@ -12,7 +12,7 @@ install:
   - conda update -q conda
   # Useful for debugging any issues with conda
   - conda info -a
-  - conda create -q -y -n test-environment python=3.5
+  - conda create -q -y -n test-environment python=3.6
   - source activate test-environment
   - conda install -q -y -n test-environment numpy scipy pytest scikit-learn matplotlib pytest-cov
   - conda install -q -y -n test-environment sympy cython pytables jupyter dask h5py
