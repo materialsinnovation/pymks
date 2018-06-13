@@ -1,27 +1,19 @@
 ---
-language: python
+language: nix
+env:
+  global:
+    - STORE=$HOME/nix-store
+cache:
+  directories:
+    - $STORE
+before_install:
+  - sudo mkdir -p /etc/nix
+  - echo "binary-caches = https://cache.nixos.org/ file://$STORE" | sudo tee -a /etc/nix/nix.conf > /dev/null
+  - echo 'require-sigs = false' | sudo tee -a /etc/nix/nix.conf > /dev/null
+before_cache:
+  - mkdir -p $STORE
+  - nix copy --to file://$STORE -f shell.nix buildInputs
 install:
-  - sudo apt-get update
-  # We do this conditionally because it saves us some downloading if the
-  # version is the same.
-  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - hash -r
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  # Useful for debugging any issues with conda
-  - conda info -a
-  - conda create -q -y -n test-environment python=3.6
-  - source activate test-environment
-  - conda install -q -y -n test-environment numpy scipy pytest scikit-learn matplotlib pytest-cov
-  - conda install -q -y -n test-environment sympy cython pytables jupyter dask h5py
-  - conda install -q -y -n test-environment -c conda-forge pyfftw
-  - conda install -q -y -n test-environment -c conda-forge sfepy=2017.2
-  - pip install pylint nbval flake8
-  - unset VIRTUAL_ENV
-  - pip install .
+  - nix-shell --command "python -c 'import fmks'"
 script:
-  - py.test
-  - pylint --rcfile=.pylintrc fmks fmks/tests
-  - flake8 --exclude=fmks/fext.py fmks fmks/tests
+  - nix-shell --command "py.test"
