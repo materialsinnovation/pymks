@@ -17,3 +17,5 @@ install:
   - nix-shell --command "python -c 'import fmks'"
 script:
   - nix-shell --command "py.test"
+  - nix-shell --command "pylint --rcfile=.pylintrc fmks fmks/tests"
+  - nix-shell --command "flake8 --exclude=fmks/fext.py fmks fmks/tests"

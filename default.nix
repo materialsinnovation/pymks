@@ -31,6 +31,8 @@ in
       sfepy
       pypkgs.toolz
       pypkgs.dask
+      pypkgs.pylint
+      pypkgs.flake8
     ];
     src=./.;
     catchConflicts=false;
