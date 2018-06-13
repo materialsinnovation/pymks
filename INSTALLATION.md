@@ -3,9 +3,21 @@
 PyMKS is a pure Python package and is fully tested in both Python 2
 and 3 and on Windows, Mac OSX and Linux.
 
+## Nix
+
+[Nix](https://nixos.org/nix/) is a seamless way to install
+PyMKS. After [installing
+Nix](https://nixos.org/nix/manual/#chap-quick-start), run
+
+    $ nix-shell
+
+to drop into a shell with PyMKS and all its requirements
+available. This may take awhile the first time through, but afterwards
+will be instantaneous.
+
 ## Conda
 
-[Conda][conda] is the easiest way to install PyMKS. To install use
+[Conda][conda] is another way to install PyMKS. To install use
 
     $ conda install -c conda-forge pymks
 
