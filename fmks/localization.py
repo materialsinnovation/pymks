@@ -5,7 +5,7 @@ System in Fourier Space.
 
 Example:
 
->>> from fmks.bases import primitive_basis
+>>> from fmks.bases.primitive import primitive_basis
 >>> from fmks.func import allclose
 
 >>> basis = primitive_basis(n_state=2)
@@ -18,7 +18,6 @@ Example:
 ...     predict(x_data(), basis=basis),
 ...     allclose(y_data())
 ... )
-
 """
 
 import dask.array as da
@@ -189,7 +188,7 @@ def fit(x_data, y_data, basis):
     Returns:
       the influence coefficients
 
-    >>> from fmks.bases import primitive_basis
+    >>> from fmks.bases.primitive import primitive_basis
 
     >>> matrix = fit(da.from_array(np.array([[0], [1]]), chunks=(2, 1)),
     ...              da.from_array(np.array([[2], [1]]), chunks=(2, 1)),

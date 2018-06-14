@@ -3,8 +3,7 @@
 
 import numpy as np
 import dask.array as da
-
-from fmks.bases import primitive_basis
+from fmks.bases.primitive import primitive_basis
 from fmks.localization import fit
 
 

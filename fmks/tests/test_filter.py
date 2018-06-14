@@ -4,10 +4,11 @@
 import numpy as np
 
 from toolz import pipe
+import dask.array as da
+
 from fmks.func import dafft, daifft
 from fmks.localization import fit, coeff_to_real
-from fmks.bases import primitive_basis
-import dask.array as da
+from fmks.bases.primitive import primitive_basis
 
 
 def _filter(data):
