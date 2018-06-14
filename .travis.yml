@@ -4,6 +4,7 @@ env:
   global:
     - STORE=$HOME/nix-store
   matrix:
+    - PYMKS_USE_FFTW=0
     - PYMKS_USE_FFTW=1
 cache:
   directories:
@@ -16,6 +17,8 @@ before_cache:
   - mkdir -p $STORE
   - nix copy --to file://$STORE -f shell.nix buildInputs
 install:
-  - nix-shell --command "python -c 'import pymks'"
+  - nix-shell --pure --command "python -c 'import pymks'"
 script:
-  - nix-shell --command "py.test"
+  - nix-shell --pure --command "py.test"
+  - nix-shell --pure --command "pylint --rcfile=.pylintrc pymks/fmks pymks/fmks/tests"
+  - nix-shell --pure --command "flake8 pymks/fmks pymkgs/fmks/tests"

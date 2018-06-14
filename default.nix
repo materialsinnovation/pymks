@@ -10,10 +10,11 @@ let
     HOME=$TMPDIR OMP_NUM_THREADS=1 nosetests --doctest-options=+SKIP $out/${python.sitePackages}/sklearn/
   '';});
 in
-  nixpkgs.stdenv.mkDerivation rec {
-    name = "pymks-dev";
-    env = nixpkgs.buildEnv { name=name; paths=buildInputs; };
-    buildInputs = [
+  pypkgs.buildPythonPackage rec {
+    pname = "pymks";
+    version = "0.3.4";
+    env = nixpkgs.buildEnv { name=pname; paths=buildInputs; };
+    buildInputs =  [
       pypkgs.numpy
       scipy
       pypkgs.pytest
@@ -28,12 +29,11 @@ in
       pypkgs.tkinter
       pypkgs.setuptools
       sfepy
-      pypkgs.pyfftw
+      pypkgs.toolz
+      pypkgs.dask
+      pypkgs.pylint
+      pypkgs.flake8
     ];
     src=./.;
-    shellHook = ''
-      python ${src}/setup.py develop --prefix=$HOME/.local
-      export VERSION=`python -V | sed -r 's/.*\s([0-9]\.[0-9])\..*/\1/g'`
-      export PYTHONPATH=$PYTHONPATH:$HOME/.local/lib/python$VERSION/site-packages
-    '';
+    catchConflicts=false;
   }
