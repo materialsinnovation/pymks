@@ -2,7 +2,6 @@
 """
 
 from functools import wraps
-from typing import Callable, Tuple, Any, List
 
 import numpy as np
 import dask.array as da
@@ -10,7 +9,7 @@ import toolz.curried
 from toolz.curried import iterate
 
 
-def curry(func: Callable) -> Callable:
+def curry(func):
     """Curry a function, but keep the docstring
 
     Args:
@@ -31,9 +30,7 @@ def curry(func: Callable) -> Callable:
 
 
 @curry
-def array_from_tuple(data: List[Tuple[slice, Any]],
-                     shape: Tuple[int, ...],
-                     dtype: np.dtype) -> np.ndarray:
+def array_from_tuple(data, shape, dtype):
     """Create an array from a list of slices and values.
 
     Args:
@@ -61,7 +58,7 @@ def array_from_tuple(data: List[Tuple[slice, Any]],
 
 
 @curry
-def iterate_times(func: Callable, times: int, value: Any):
+def iterate_times(func, times, value):
     """Iterate a function over a value.
 
     Args:
@@ -124,3 +121,9 @@ fftshift = curry(np.fft.fftshift)  # pylint: disable=invalid-name
 daifftn = curry(da.fft.ifftn)  # pylint: disable=invalid-name
 
 dafftn = curry(da.fft.fftn)  # pylint: disable=invalid-name
+
+darfftn = curry(da.fft.rfftn)  # pylint: disable=invalid-name
+
+dafft = curry(da.fft.fft)  # pylint: disable=invalid-name
+
+daifft = curry(da.fft.ifft)  # pylint: disable=invalid-name

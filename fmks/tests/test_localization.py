@@ -2,12 +2,14 @@
 """
 
 import numpy as np
+import dask.array as da
 from fmks.bases.primitive import primitive_basis
 from fmks.localization import fit
 
 
 def _get_x():
-    return np.linspace(0, 1, 4).reshape((1, 2, 2))
+    return da.from_array(np.linspace(0, 1, 4).reshape((1, 2, 2)),
+                         chunks=(1, 2, 2))
 
 
 def test():
