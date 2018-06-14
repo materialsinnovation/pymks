@@ -67,10 +67,10 @@ def lstsq_mks(fx_data, fy_data, redundancy_func, ijk):
     """
     fx_data_ = lambda: fx_data[(slice(None),) + ijk + redundancy_func(ijk)]
     fy_data_ = lambda: fy_data[(slice(None),) + ijk]
-    return (ijk + redundancy_func(ijk),
-            lstsq(fx_data_().compute(),
-                  fy_data_().compute(),
-                  np.finfo(float).eps * 1e4)[0])
+    return (
+        ijk + redundancy_func(ijk),
+        lstsq(fx_data_().compute(), fy_data_().compute(), np.finfo(float).eps * 1e4)[0],
+    )
 
 
 def fit_fourier(fx_data, fy_data, redundancy_func):
@@ -106,7 +106,7 @@ def fit_fourier(fx_data, fy_data, redundancy_func):
     return pipe(
         fmap(lstsq_mks_, np.ndindex(fx_data.shape[1:-1])),
         list,
-        array_from_tuple(shape=fx_data.shape[1:], dtype=np.complex)
+        array_from_tuple(shape=fx_data.shape[1:], dtype=np.complex),
     )
 
 
@@ -171,7 +171,7 @@ def fit_disc(x_data, y_data, redundancy_func):
         fmap(darfftn(axes=faxes(x_data))),
         list,
         lambda x: fit_fourier(*x, redundancy_func),
-        lambda x: da.from_array(x, chunks=chunks(x))
+        lambda x: da.from_array(x, chunks=chunks(x)),
     )
 
 
@@ -196,11 +196,7 @@ def fit(x_data, y_data, basis):
     >>> assert np.allclose(matrix, [[2, 0, 1]])
 
     """
-    return pipe(
-        x_data,
-        basis,
-        lambda x: fit_disc(x[0], y_data, x[1])
-    )
+    return pipe(x_data, basis, lambda x: fit_disc(x[0], y_data, x[1]))
 
 
 @curry
@@ -208,7 +204,7 @@ def _predict_disc(x_data, coeff):
     return pipe(
         rfftn(x_data, axes=faxes(x_data)),
         lambda x: np.sum(x * coeff[None], axis=-1),
-        irfftn(axes=faxes(x_data), s=x_data.shape[1:-1])
+        irfftn(axes=faxes(x_data), s=x_data.shape[1:-1]),
     ).real
 
 
@@ -245,5 +241,5 @@ def coeff_to_real(coeff, new_shape):
     return pipe(
         coeff,
         irfftn(axes=_ini_axes(coeff), s=new_shape),
-        fftshift(axes=_ini_axes(coeff))
+        fftshift(axes=_ini_axes(coeff)),
     )

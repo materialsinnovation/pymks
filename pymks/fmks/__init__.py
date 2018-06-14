@@ -17,12 +17,11 @@ def test():  # pragma: no cover
     Run all the doctests available.
     """
     import pytest
+
     path = os.path.split(__file__)[0]
-    pytest.main(args=[path,
-                      '--doctest-modules',
-                      '--ignore=setup.py ',
-                      '-r s',
-                      '--cov=fmks'])
+    pytest.main(
+        args=[path, "--doctest-modules", "--ignore=setup.py ", "-r s", "--cov=fmks"]
+    )
 
 
 def get_version() -> str:
@@ -35,7 +34,7 @@ def get_version() -> str:
 
     try:
         # pylint: disable=no-member
-        version = get_distribution(__name__.split('.')[0]).version
+        version = get_distribution(__name__.split(".")[0]).version
     except DistributionNotFound:  # pragma: no cover
         version = "unknown, try running `python setup.py egg_info`"
 
@@ -44,5 +43,4 @@ def get_version() -> str:
 
 __version__ = get_version()
 
-__all__ = ['__version__',
-           'test']
+__all__ = ["__version__", "test"]

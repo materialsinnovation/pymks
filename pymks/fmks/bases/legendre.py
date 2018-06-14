@@ -82,9 +82,9 @@ def discretize(data, states=np.arange(2), domain=(0, 1)):
         Float valued field of of Legendre polynomial coefficients as a
         numpy array.
     """
-    return pipe(data[..., None],
-                scaled_data(domain=domain),
-                leg_data(coeff_=coeff(states)))
+    return pipe(
+        data[..., None], scaled_data(domain=domain), leg_data(coeff_=coeff(states))
+    )
 
 
 @curry
@@ -103,8 +103,11 @@ def legendre_basis(x_data, n_state=2, domain=(0, 1), chunks=(1,)):
         Float valued field of of Legendre polynomial coefficients as a chunked
         dask array of shape `(n_samples, n_x, ..., n_state)`.
     """
-    return (discretize(da.from_array(x_data,
-                                     chunks=chunks + x_data.shape[1:]),
-                       np.arange(n_state),
-                       domain),
-            lambda x: (slice(-1),))
+    return (
+        discretize(
+            da.from_array(x_data, chunks=chunks + x_data.shape[1:]),
+            np.arange(n_state),
+            domain,
+        ),
+        lambda x: (slice(-1),),
+    )

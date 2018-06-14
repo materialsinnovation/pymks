@@ -60,8 +60,9 @@ from ..func import curry, map_blocks, ifftn, fftn, iterate_times
 def _k_space(size):
     size1 = lambda: (size // 2) if (size % 2 == 0) else (size - 1) // 2
     size2 = lambda: size1() if (size % 2 == 0) else size1() + 1
-    return np.concatenate((np.arange(size)[:size2()],
-                           (np.arange(size) - size1())[:size1()]))
+    return np.concatenate(
+        (np.arange(size)[:size2()], (np.arange(size) - size1())[:size1()])
+    )
 
 
 @memoize
@@ -71,8 +72,7 @@ def _calc_ksq_(shape):
 
 
 def _calc_ksq(x_data, delta_x):
-    return _calc_ksq_(x_data.shape[1:]) * \
-        (2 * np.pi / (delta_x * x_data.shape[1]))**2
+    return _calc_ksq_(x_data.shape[1:]) * (2 * np.pi / (delta_x * x_data.shape[1])) ** 2
 
 
 def _axes(x_data):
@@ -88,9 +88,9 @@ def _f_response(x_data, delta_t, gamma, ksq):
     fx3_data = lambda: fftn(x_data ** 3, axes=_axes(x_data))
     implicit = lambda: (1 - gamma * ksq) - _explicit(gamma, ksq)
     delta_t_ksq = lambda: delta_t * ksq
-    numerator = lambda: fx_data() * \
-        (1 + delta_t_ksq() * _explicit(gamma, ksq)) - \
-        delta_t_ksq() * fx3_data()
+    numerator = lambda: fx_data() * (
+        1 + delta_t_ksq() * _explicit(gamma, ksq)
+    ) - delta_t_ksq() * fx3_data()
     return numerator() / (1 - delta_t_ksq() * implicit())
 
 
@@ -115,11 +115,10 @@ def solve_cahn_hilliard(x_data, delta_x=0.25, delta_t=0.001, gamma=1.):
       RuntimeError if domain is not square
 
     """
-    return ifftn(_f_response(_check(x_data),
-                             delta_t,
-                             gamma,
-                             _calc_ksq(x_data, delta_x)),
-                 axes=_axes(x_data)).real
+    return ifftn(
+        _f_response(_check(x_data), delta_t, gamma, _calc_ksq(x_data, delta_x)),
+        axes=_axes(x_data),
+    ).real
 
 
 def _check(x_data):
@@ -142,13 +141,11 @@ def _check(x_data):
     """
     if not np.all(np.array(x_data.shape[1:]) == x_data.shape[1]):
         raise RuntimeError("X must represent a square domain")
+
     return x_data
 
 
-def generate_cahn_hilliard_data(shape,
-                                chunks=(),
-                                n_steps=1,
-                                **kwargs):
+def generate_cahn_hilliard_data(shape, chunks=(), n_steps=1, **kwargs):
 
     """Generate microstructures and responses for Cahn-Hilliard.
 

@@ -133,12 +133,11 @@ def discretize(x_data, n_state, min_=0.0, max_=1.0, chunks=()):
     ... )
     """
     return da.maximum(
-        discretize_nomax(da.clip(x_data, min_, max_),
-                         da.linspace(min_,
-                                     max_,
-                                     n_state,
-                                     chunks=chunks or (n_state,))),
-        0
+        discretize_nomax(
+            da.clip(x_data, min_, max_),
+            da.linspace(min_, max_, n_state, chunks=chunks or (n_state,)),
+        ),
+        0,
     )
 
 
@@ -153,6 +152,7 @@ def redundancy(ijk):
     """
     if np.all(np.array(ijk) == 0):
         return (slice(None),)
+
     return (slice(-1),)
 
 
@@ -170,5 +170,6 @@ def primitive_basis(x_data, n_state, min_=0.0, max_=1.0, chunks=()):
       a tuple, the first entry is the discretized data, other entries
       are functions required for localization
     """
-    return (discretize(x_data, n_state, min_=min_, max_=max_, chunks=chunks),
-            redundancy)
+    return (
+        discretize(x_data, n_state, min_=min_, max_=max_, chunks=chunks), redundancy
+    )
