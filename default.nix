@@ -12,7 +12,7 @@ let
 in
   pypkgs.buildPythonPackage rec {
     pname = "pymks";
-    version = "0.3.4";
+    version = "0.3.4.dev104+g21790f7";
     env = nixpkgs.buildEnv { name=pname; paths=buildInputs; };
     buildInputs =  [
       pypkgs.numpy
