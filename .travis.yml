@@ -3,6 +3,9 @@ language: nix
 env:
   global:
     - STORE=$HOME/nix-store
+  matrix:
+    - PYMKS_USE_FFTW=0
+    - PYMKS_USE_FFTW=1
 cache:
   directories:
     - $STORE
@@ -16,8 +19,7 @@ before_cache:
 install:
   - nix-build -A buildInputs
 script:
-  - nix-shell --pure --command "export PYMKS_USE_FFTW=1; py.test"
-  - nix-shell --pure --command "export PYMKS_USE_FFTW=0; py.test"
+  - nix-shell --pure --command "export PYMKS_USE_FFTW=$PYMKS_USE_FFTW; py.test"
   - nix-shell --pure --command "pylint --rcfile=.pylintrc pymks/fmks pymks/fmks/tests"
   - nix-shell --pure --command "flake8 pymks/fmks pymkgs/fmks/tests"
   - nix-shell --pure -p "python36Packages.black" --command "black --check pymks/fmks pymks/fmks/tests"
