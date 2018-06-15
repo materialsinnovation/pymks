@@ -17,7 +17,7 @@ before_cache:
   - mkdir -p $STORE
   - nix copy --to file://$STORE -f shell.nix buildInputs
 install:
-  - nix-shell --pure --command "python -c 'import pymks'"
+  - nix-shell --pure --command "python -c 'import pymks'" &> /dev/null
 script:
   - nix-shell --pure --command "py.test"
   - nix-shell --pure --command "pylint --rcfile=.pylintrc pymks/fmks pymks/fmks/tests"
