@@ -33,6 +33,7 @@ in
       pypkgs.dask
       pypkgs.pylint
       pypkgs.flake8
+      pypkgs.pyfftw
     ];
     src=./.;
     catchConflicts=false;
