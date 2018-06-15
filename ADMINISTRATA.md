@@ -24,8 +24,8 @@ Basic administrative procedures.
 
  * Use Sphinx
 
- * All documentation with
-   [Google Python doc styling](http://google-styleguide.googlecode.com/svn/trunk/pyguide.html#Comments).
+ * All documentation with [Google Python doc
+   styling](https://github.com/google/styleguide/blob/gh-pages/pyguide.md#38-comments-and-docstrings)
 
 Steps to install
 
