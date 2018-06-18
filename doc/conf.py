@@ -30,7 +30,8 @@ sys.path.insert(0, os.path.abspath('..'))
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.mathjax',
               'sphinxcontrib.napoleon',
-              'nbsphinx']
+              'nbsphinx',
+              'm2r']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -265,10 +266,10 @@ texinfo_documents = [
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 #texinfo_show_urls = 'footnote'
 
-from recommonmark.parser import CommonMarkParser
-from recommonmark.transform import AutoStructify
+# from recommonmark.parser import CommonMarkParser
+# from recommonmark.transform import AutoStructify
 
-source_parsers = {'.md' : CommonMarkParser}
+# source_parsers = {'.md' : CommonMarkParser}
 source_suffix = ['.rst', '.md']
 
 def url_resolver(url):
@@ -288,12 +289,12 @@ def url_resolver(url):
     else:
         return url
 
-def setup(app):
-    app.add_config_value('recommonmark_config', {
-            'url_resolver': url_resolver,
-            'auto_toc_tree_section': 'Contents',
-            }, True)
-    app.add_transform(AutoStructify)
+# def setup(app):
+#     app.add_config_value('recommonmark_config', {
+#             'url_resolver': url_resolver,
+#             'auto_toc_tree_section': 'Contents',
+#             }, True)
+#     app.add_transform(AutoStructify)
 
 import shutil, os, glob
 
