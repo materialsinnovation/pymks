@@ -22,17 +22,13 @@ Basic administrative procedures.
 
 ## Docs
 
- * Use Sphinx
-
  * All documentation with [Google Python doc
    styling](https://github.com/google/styleguide/blob/gh-pages/pyguide.md#38-comments-and-docstrings)
 
-Steps to install
+There is a Nix environment for building the documentation
 
-    $ pip install sphinx
-    $ pip install sphinx_bootstrap_theme
-    $ pip install sphinxcontrib-napoleon
-    $ cd doc/
+    $ cd doc
+    $ nix-shell --pure
     $ make
 
 The documentation should be in `_build/html`.
