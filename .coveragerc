@@ -1,2 +1,2 @@
 [run]
-omit = pymks/bases/gsh_functions/*
+omit = pymks/bases/*

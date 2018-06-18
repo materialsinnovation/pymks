@@ -15,6 +15,7 @@ PyMKS &ndash; The Materials Knowledge System in Python
 <img src="https://img.shields.io/gitter/room/gitterHQ/gitter.svg"
 alt="Gitter Chat">
 </a>
+
 <a href="https://travis-ci.org/materialsinnovation/pymks" target="_blank">
 <img src="https://api.travis-ci.org/materialsinnovation/pymks.svg"
 alt="Travis CI">
@@ -83,6 +84,7 @@ See these references for further reading:
  - *Developing higher-order materials knowledge systems*, T. N. Fast;
    Thesis (PhD, Materials engineering)--Drexel University, 2011,
    [doi:1860/4057](http://dx.doi.org/1860/4057).
+
 
 ## PyMKS
 
