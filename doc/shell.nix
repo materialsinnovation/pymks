@@ -21,7 +21,7 @@ in
     mkdir -p $HOME/.local
     pip install --user sphinx_bootstrap_theme==0.6.5
     pip install --user sphinxcontrib-napoleon==0.6.1
-    pip install --user nbsphinx
+    pip install --user nbsphinx==0.3.3
     export PYTHONPATH=$HOME/.local/lib/python3.6/site-packages:$PYTHONPATH
     export PATH=$PATH:$HOME/.local/bin
     '';
