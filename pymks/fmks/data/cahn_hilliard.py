@@ -109,7 +109,7 @@ def solve_cahn_hilliard(x_data, delta_x=0.25, delta_t=0.001, gamma=1.):
 
     Returns:
       an updated microsturcture
-
+n
 
     Raises:
       RuntimeError if domain is not square
@@ -145,7 +145,7 @@ def _check(x_data):
     return x_data
 
 
-def generate_cahn_hilliard_data(shape, chunks=(), n_steps=1, **kwargs):
+def generate(shape, chunks=(), n_steps=1, **kwargs):
 
     """Generate microstructures and responses for Cahn-Hilliard.
 
@@ -168,7 +168,7 @@ def generate_cahn_hilliard_data(shape, chunks=(), n_steps=1, **kwargs):
 
     Example
 
-    >>> x_data, y_data = generate_cahn_hilliard_data((1, 6, 6))
+    >>> x_data, y_data = generate((1, 6, 6))
     >>> print(y_data.chunks)
     ((1,), (6,), (6,))
 

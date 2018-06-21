@@ -1,14 +1,15 @@
 let
   nixpkgs = import ./nix/nixpkgs_version.nix;
   pypkgs = nixpkgs.python36Packages;
-  pytest-cov = import ./nix/pytest-cov.nix { inherit nixpkgs; inherit pypkgs; };
-  nbval = import ./nix/nbval.nix { inherit nixpkgs; inherit pypkgs; };
-  scipy = import ./nix/scipy.nix { inherit nixpkgs; inherit pypkgs; };
-  sfepy = import ./nix/sfepy.nix { inherit nixpkgs; inherit pypkgs; };
-  python = pypkgs.python;
-  scikitlearn = pypkgs.scikitlearn.overridePythonAttrs (oldAttrs: {checkPhase=''
-    HOME=$TMPDIR OMP_NUM_THREADS=1 nosetests --doctest-options=+SKIP $out/${python.sitePackages}/sklearn/
-  '';});
+  pytest-cov = import ./nix/pytest-cov.nix { inherit nixpkgs pypkgs; };
+  nbval = import ./nix/nbval.nix { inherit nixpkgs pypkgs; };
+  scipy = import ./nix/scipy.nix { inherit nixpkgs pypkgs; };
+  sfepy = import ./nix/sfepy.nix { inherit nixpkgs pypkgs; };
+  dklearn = import ./nix/dklearn.nix { inherit nixpkgs pypkgs; };
+  sklearn = import ./nix/sklearn.nix { inherit pypkgs; };
+  dask-searchcv = import ./nix/dask-searchcv.nix { inherit pypkgs sklearn; };
+  dask-ml = import ./nix/dask-ml.nix { inherit pypkgs sklearn dask-searchcv dask-glm; };
+  dask-glm = import ./nix/dask-glm.nix { inherit pypkgs scipy sklearn; };
 in
   pypkgs.buildPythonPackage rec {
     pname = "pymks";
@@ -18,7 +19,6 @@ in
       pypkgs.numpy
       scipy
       pypkgs.pytest
-      scikitlearn
       pypkgs.matplotlib
       pypkgs.sympy
       pypkgs.cython
@@ -34,6 +34,11 @@ in
       pypkgs.pylint
       pypkgs.flake8
       pypkgs.pyfftw
+      dklearn
+      sklearn
+      dask-ml
+      dask-searchcv
+      pypkgs.pandas
     ];
     src=./.;
     catchConflicts=false;
