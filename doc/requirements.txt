@@ -7,3 +7,4 @@ sphinxcontrib-napoleon==0.6.1
 nbsphinx==0.3.3
 pytest
 matplotlib
+m2r==0.1.13
