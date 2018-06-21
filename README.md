@@ -128,8 +128,8 @@ the [Office of Naval Research](http://www.onr.navy.mil/) and the
 
 ## License
 
-See the [license](./LICENSE.md).
+See the [license](./LICENSE.html).
 
 ## Citing
 
-See [CITATION.md](./CITATION.md).
+See [CITATION.md](./CITATION.html).

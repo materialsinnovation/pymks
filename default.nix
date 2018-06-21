@@ -42,4 +42,5 @@ in
     ];
     src=./.;
     catchConflicts=false;
+    doCheck=false;
   }
