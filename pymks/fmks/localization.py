@@ -25,6 +25,7 @@ import numpy as np
 from scipy.linalg import lstsq
 from toolz.curried import pipe
 from toolz.curried import map as fmap
+from sklearn.base import RegressorMixin
 
 from .func import curry, array_from_tuple
 from .func import fftshift, rfftn, irfftn
@@ -243,3 +244,30 @@ def coeff_to_real(coeff, new_shape):
         irfftn(axes=_ini_axes(coeff), s=new_shape),
         fftshift(axes=_ini_axes(coeff)),
     )
+
+
+def xunflatten(data, shape):
+    return data.reshape(data.shape[0], *shape[1:], data.shape[-1])
+
+
+def yunflatten(data, shape):
+    return data.reshape(data.shape[0], *shape[1:])
+
+
+def flatten(data):
+    return data.reshape(data.shape[0], -1)
+
+
+class LocalizationRegressor(RegressorMixin):
+    def __init__(self, redundancy_func, shape):
+        self.redundancy_func = redundancy_func
+        self.shape = shape
+
+    def fit(self, x_data, y_data):
+        self.coeff = fit_disc(xunflatten(x_data, self.shape),
+                              yunflatten(y_data, self.shape),
+                              self.redundancy_func)
+        return self
+
+    def predict(self, x_data):
+        return flatten(_predict_disc(xunflatten(x_data, self.shape), self.coeff))

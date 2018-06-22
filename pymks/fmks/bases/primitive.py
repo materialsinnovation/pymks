@@ -59,6 +59,7 @@ For example, if a cell has a label of 2, its local state will be
 
 """
 
+from sklearn.base import TransformerMixin
 import dask.array as da
 import numpy as np
 from ..func import curry
@@ -103,7 +104,7 @@ def discretize_nomax(data, states):
 
 
 @curry
-def discretize(x_data, n_state, min_=0.0, max_=1.0, chunks=()):
+def discretize(x_data, n_state=2, min_=0.0, max_=1.0, chunks=()):
     """Primitive discretization of a microstructure.
 
     Args:
@@ -173,3 +174,16 @@ def primitive_basis(x_data, n_state, min_=0.0, max_=1.0, chunks=()):
     return (
         discretize(x_data, n_state, min_=min_, max_=max_, chunks=chunks), redundancy
     )
+
+
+class PrimitiveTransformer(TransformerMixin):
+    def __init__(self, n_state=2, min_=0.0, max_=1.0):
+        self.n_state = n_state
+        self.min_ = min_
+        self.max_ = max_
+
+    def transform(self, data):
+        return discretize(data, n_state=self.n_state, min_=self.min_, max_=self.max_)
+
+    def fit(self, x_data, y_data):
+        return self
