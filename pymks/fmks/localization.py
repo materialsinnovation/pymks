@@ -25,7 +25,7 @@ import numpy as np
 from scipy.linalg import lstsq
 from toolz.curried import pipe
 from toolz.curried import map as fmap
-from sklearn.base import RegressorMixin
+from sklearn.base import RegressorMixin, TransformerMixin, BaseEstimator
 
 from .func import curry, array_from_tuple
 from .func import fftshift, rfftn, irfftn
@@ -246,11 +246,7 @@ def coeff_to_real(coeff, new_shape):
     )
 
 
-def xunflatten(data, shape):
-    return data.reshape(data.shape[0], *shape[1:], data.shape[-1])
-
-
-def yunflatten(data, shape):
+def reshape(data, shape):
     return data.reshape(data.shape[0], *shape[1:])
 
 
@@ -258,16 +254,29 @@ def flatten(data):
     return data.reshape(data.shape[0], -1)
 
 
-class LocalizationRegressor(RegressorMixin):
-    def __init__(self, redundancy_func, shape):
-        self.redundancy_func = redundancy_func
+class ReshapeTransformer(BaseEstimator, TransformerMixin):
+    def __init__(self, shape):
         self.shape = shape
 
+    def transform(self, x_data):
+        return reshape(x_data, self.shape)
+
     def fit(self, x_data, y_data):
-        self.coeff = fit_disc(xunflatten(x_data, self.shape),
-                              yunflatten(y_data, self.shape),
-                              self.redundancy_func)
+        return self
+
+
+class LocalizationRegressor(BaseEstimator, RegressorMixin):
+    def __init__(self, redundancy_func):
+        self.redundancy_func = redundancy_func
+        self.coeff = None
+        self.y_data_shape = None
+
+    def fit(self, x_data, y_data):
+        self.y_data_shape = y_data.shape
+        y_data_reshape = reshape(y_data, x_data.shape[:-1])
+        y_data_da = da.from_array(y_data_reshape, chunks=x_data.chunks[:-1])
+        self.coeff = fit_disc(x_data, y_data_da, self.redundancy_func)
         return self
 
     def predict(self, x_data):
-        return flatten(_predict_disc(xunflatten(x_data, self.shape), self.coeff))
+        return reshape(_predict_disc(x_data, self.coeff), self.y_data_shape)

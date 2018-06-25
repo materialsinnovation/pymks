@@ -39,6 +39,7 @@ in
       dask-ml
       dask-searchcv
       pypkgs.pandas
+      pypkgs.ipdb
     ];
     src=./.;
     catchConflicts=false;

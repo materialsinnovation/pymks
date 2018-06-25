@@ -59,7 +59,7 @@ For example, if a cell has a label of 2, its local state will be
 
 """
 
-from sklearn.base import TransformerMixin
+from sklearn.base import TransformerMixin, BaseEstimator
 import dask.array as da
 import numpy as np
 from ..func import curry
@@ -176,7 +176,7 @@ def primitive_basis(x_data, n_state, min_=0.0, max_=1.0, chunks=()):
     )
 
 
-class PrimitiveTransformer(TransformerMixin):
+class PrimitiveTransformer(BaseEstimator, TransformerMixin):
     def __init__(self, n_state=2, min_=0.0, max_=1.0):
         self.n_state = n_state
         self.min_ = min_
