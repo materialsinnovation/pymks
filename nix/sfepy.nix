@@ -1,9 +1,10 @@
 { nixpkgs, pypkgs }:
 pypkgs.buildPythonPackage rec {
-  name = "sfepy-2017.4.1";
+  name = "sfepy_${version}";
+  version = "2018.2";
   src = nixpkgs.fetchurl {
-    url = "https://github.com/sfepy/sfepy/archive/release_2017.4.1.tar.gz";
-    sha256 = "06x3xnfxz6iwp3wd926298ybb4p707bciwkq5f13sfqwc9m16km8";
+    url="https://github.com/sfepy/sfepy/archive/release_${version}.tar.gz";
+    sha256 = "16g51rnhfkfw1xs8qja837fbhqdnvfpnhy69jb1rvy5wd12qiqk9";
   };
   doCheck = false;
   buildInputs = [
