@@ -230,11 +230,11 @@ class ElasticFESimulation(object):
                 property_array_qp = property_array[ijk_tuple]
                 lam = property_array_qp[..., 0]
                 mu = property_array_qp[..., 1]
-                lam = np.ascontiguousarray(lam.reshape((lam.shape[0], 1, 1)))
-                mu = np.ascontiguousarray(mu.reshape((mu.shape[0], 1, 1)))
 
                 from sfepy.mechanics.matcoefs import stiffness_from_lame
                 stiffness = stiffness_from_lame(dims, lam=lam, mu=mu)
+                lam = np.ascontiguousarray(lam.reshape((lam.shape[0], 1, 1)))
+                mu = np.ascontiguousarray(mu.reshape((mu.shape[0], 1, 1)))
                 return {'lam': lam, 'mu': mu, 'D': stiffness}
             else:
                 return
@@ -519,10 +519,9 @@ class ElasticFESimulation(object):
 
         ls = ScipyDirect({})
 
-        pb = Problem('elasticity', equations=eqs, auto_solvers=None)
+        pb = Problem('elasticity', equations=eqs, functions=functions)
 
-        pb.time_update(
-            ebcs=ebcs, epbcs=epbcs, lcbcs=lcbcs, functions=functions)
+        pb.time_update(ebcs=ebcs, epbcs=epbcs, lcbcs=lcbcs)
 
         ev = pb.get_evaluator()
         nls = Newton({}, lin_solver=ls,
