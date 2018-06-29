@@ -39,7 +39,11 @@ in
       dask-ml
       dask-searchcv
       pypkgs.pandas
-      pypkgs.ipdb
+      dask-glm
+      pypkgs.multipledispatch
+      nixpkgs.graphviz
+      pypkgs.graphviz
+      pypkgs.distributed
     ];
     src=./.;
     catchConflicts=false;

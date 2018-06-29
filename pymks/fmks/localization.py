@@ -70,7 +70,7 @@ def lstsq_mks(fx_data, fy_data, redundancy_func, ijk):
     fy_data_ = lambda: fy_data[(slice(None),) + ijk]
     return (
         ijk + redundancy_func(ijk),
-        lstsq(fx_data_().compute(), fy_data_().compute(), np.finfo(float).eps * 1e4)[0],
+        lstsq(fx_data_(), fy_data_(), np.finfo(float).eps * 1e4)[0],
     )
 
 
@@ -103,7 +103,7 @@ def fit_fourier(fx_data, fy_data, redundancy_func):
     >>> assert np.allclose(matrix, test_matrix)
 
     """
-    lstsq_mks_ = lstsq_mks(fx_data, fy_data, redundancy_func)
+    lstsq_mks_ = lstsq_mks(fx_data.compute(), fy_data.compute(), redundancy_func)
     return pipe(
         fmap(lstsq_mks_, np.ndindex(fx_data.shape[1:-1])),
         list,
