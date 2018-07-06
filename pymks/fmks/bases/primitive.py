@@ -184,6 +184,7 @@ class PrimitiveTransformer(BaseEstimator, TransformerMixin):
         min_: the minimum local state
         max_: the maximum local state
 
+    >>> from toolz import pipe
     >>> pipe(
     ...     PrimitiveTransformer(),
     ...     lambda x: x.fit(None, None),
