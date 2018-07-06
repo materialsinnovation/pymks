@@ -177,13 +177,47 @@ def primitive_basis(x_data, n_state, min_=0.0, max_=1.0, chunks=()):
 
 
 class PrimitiveTransformer(BaseEstimator, TransformerMixin):
+    """Transformer for Sklearn pipelines
+
+    Attributes:
+        n_state: the number of local states
+        min_: the minimum local state
+        max_: the maximum local state
+
+    >>> pipe(
+    ...     PrimitiveTransformer(),
+    ...     lambda x: x.fit(None, None),
+    ...     lambda x: x.transform(np.array([[0, 0.5, 1]])).compute(),
+    ... )
+    array([[[1. , 0. ],
+            [0.5, 0.5],
+            [0. , 1. ]]])
+    """
+
     def __init__(self, n_state=2, min_=0.0, max_=1.0):
+        """Instantiate a PrimitiveTransformer
+
+        Args:
+            n_state: the number of local states
+            min_: the minimum local state
+            max_: the maximum local state
+        """
         self.n_state = n_state
         self.min_ = min_
         self.max_ = max_
 
     def transform(self, data):
+        """Perform the discretization of the data
+
+        Args:
+            data: the data to discretize
+
+        Returns:
+            the discretized data
+        """
         return discretize(data, n_state=self.n_state, min_=self.min_, max_=self.max_)
 
-    def fit(self, x_data, y_data):
+    def fit(self, *_):
+        """Only necessary to make pipelines work
+        """
         return self
