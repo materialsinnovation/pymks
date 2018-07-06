@@ -25,6 +25,7 @@ import numpy as np
 from scipy.linalg import lstsq
 from toolz.curried import pipe
 from toolz.curried import map as fmap
+from sklearn.base import RegressorMixin, TransformerMixin, BaseEstimator
 
 from .func import curry, array_from_tuple
 from .func import fftshift, rfftn, irfftn
@@ -69,7 +70,7 @@ def lstsq_mks(fx_data, fy_data, redundancy_func, ijk):
     fy_data_ = lambda: fy_data[(slice(None),) + ijk]
     return (
         ijk + redundancy_func(ijk),
-        lstsq(fx_data_().compute(), fy_data_().compute(), np.finfo(float).eps * 1e4)[0],
+        lstsq(fx_data_(), fy_data_(), np.finfo(float).eps * 1e4)[0],
     )
 
 
@@ -102,7 +103,7 @@ def fit_fourier(fx_data, fy_data, redundancy_func):
     >>> assert np.allclose(matrix, test_matrix)
 
     """
-    lstsq_mks_ = lstsq_mks(fx_data, fy_data, redundancy_func)
+    lstsq_mks_ = lstsq_mks(fx_data.compute(), fy_data.compute(), redundancy_func)
     return pipe(
         fmap(lstsq_mks_, np.ndindex(fx_data.shape[1:-1])),
         list,
@@ -243,3 +244,139 @@ def coeff_to_real(coeff, new_shape):
         irfftn(axes=_ini_axes(coeff), s=new_shape),
         fftshift(axes=_ini_axes(coeff)),
     )
+
+
+def reshape(data, shape):
+    """Reshape data along all but the first axis
+
+    Args:
+        data: the data to reshape
+        shape: the shape of the new data (not including the first axis)
+
+    Returns:
+        the reshaped data
+
+    >>> data = np.arange(18).reshape((2, 9))
+    >>> reshape(data, (None, 3, 3)).shape
+    (2, 3, 3)
+    """
+    return data.reshape(data.shape[0], *shape[1:])
+
+
+def flatten(data):
+    """Flatten data along all but the first axis
+
+    Args:
+        data: data to flatten
+
+    Returns:
+        the flattened data
+
+    >>> data = np.arange(18).reshape((2, 3, 3))
+    >>> flatten(data).shape
+    (2, 9)
+    """
+    return data.reshape(data.shape[0], -1)
+
+
+class ReshapeTransformer(BaseEstimator, TransformerMixin):
+    """Reshape data ready for the LocalizationRegressor
+
+    Sklearn likes flat image data, but MKS expects shaped data. This
+    class transforms the shape of flat data into shaped image data for
+    MKS.
+
+    Attributes:
+       shape: the shape of the reshaped data (ignoring the first axis)
+
+    >>> data = np.arange(18).reshape((2, 9))
+    >>> ReshapeTransformer((None, 3, 3)).fit(None, None).transform(data).shape
+    (2, 3, 3)
+
+    """
+
+    def __init__(self, shape):
+        """Instantiate a ReshapeTransformer
+
+        Args:
+            shape: the shape of the reshaped data (ignoring the first axis)
+        """
+        self.shape = shape
+
+    def transform(self, x_data):
+        """Transform the X data
+
+        Args:
+            x_data: the data to be transformed
+        """
+        return reshape(x_data, self.shape)
+
+    def fit(self, *_):
+        """Only necessary to make pipelines work
+        """
+        return self
+
+
+class LocalizationRegressor(BaseEstimator, RegressorMixin):
+    """Perform the localization in Sklearn pipelines
+
+    Allows the localization to be part of a Sklearn pipeline
+
+    Attributes:
+        redundancy_func: function to remove redundant elements from
+            the coefficient matrix
+        coeff: the coefficient matrix
+        y_data_shape: the shape of the predicited data
+
+    >>> make_data = lambda s, c: da.from_array(
+    ...     np.arange(np.prod(s),
+    ...               dtype=float).reshape(s),
+    ...     chunks=c
+    ... )
+
+    >>> X = make_data((6, 4, 4, 3), (2, 4, 4, 1))
+    >>> y = make_data((6, 4, 4), (2, 4, 4))
+
+    >>> y_out = LocalizationRegressor(lambda _: (slice(None),)).fit(X, y).predict(X)
+
+    >>> assert np.allclose(y, y_out)
+
+    """
+
+    def __init__(self, redundancy_func):
+        """Instantiate a LocalizationRegressor
+
+        Args:
+            redundancy_func: function to remove redundant elements
+                from the coefficient matrix
+        """
+        self.redundancy_func = redundancy_func
+        self.coeff = None
+        self.y_data_shape = None
+
+    def fit(self, x_data, y_data):
+        """Fit the data
+
+        Args:
+            x_data: the X data to fit
+            y_data: the y data to fit
+
+        Returns:
+            the fitted LocalizationRegressor
+        """
+        self.y_data_shape = y_data.shape
+        y_data_reshape = reshape(y_data, x_data.shape[:-1])
+        y_data_da = da.from_array(y_data_reshape, chunks=x_data.chunks[:-1])
+        self.coeff = fit_disc(x_data, y_data_da, self.redundancy_func)
+        return self
+
+    def predict(self, x_data):
+        """Predict the data
+
+        Args:
+            x_data: the X data to predict
+
+        Returns:
+            The predicted y data
+        """
+        return reshape(_predict_disc(x_data, self.coeff), self.y_data_shape)

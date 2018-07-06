@@ -25,12 +25,12 @@ semi-implicit discretization in time and is given by
 
 where :math:`a_1=3` and :math:`a_2=0`.
 
->>> solve = solve_cahn_hilliard(gamma=1., delta_t=1.)
+>>> solve_ = solve(gamma=1., delta_t=1.)
 
 >>> def tester(shape, min_, max_, steps):
 ...     return pipe(
 ...         0.01 * (2 * da.random.random(shape, chunks=shape) - 1),
-...         map_blocks(iterate_times(solve, steps)),
+...         map_blocks(iterate_times(solve_, steps)),
 ...         lambda x: da.max(x) > max_ and da.min(x) < min_
 ...     )
 
@@ -95,7 +95,7 @@ def _f_response(x_data, delta_t, gamma, ksq):
 
 
 @curry
-def solve_cahn_hilliard(x_data, delta_x=0.25, delta_t=0.001, gamma=1.):
+def solve(x_data, delta_x=0.25, delta_t=0.001, gamma=1.):
     """Solve the Cahn-Hilliard equation for one step.
 
     Advance multiple microstuctures in time with the Cahn-Hilliard
@@ -109,7 +109,7 @@ def solve_cahn_hilliard(x_data, delta_x=0.25, delta_t=0.001, gamma=1.):
 
     Returns:
       an updated microsturcture
-
+n
 
     Raises:
       RuntimeError if domain is not square
@@ -145,7 +145,7 @@ def _check(x_data):
     return x_data
 
 
-def generate_cahn_hilliard_data(shape, chunks=(), n_steps=1, **kwargs):
+def generate(shape, chunks=(), n_steps=1, **kwargs):
 
     """Generate microstructures and responses for Cahn-Hilliard.
 
@@ -168,14 +168,12 @@ def generate_cahn_hilliard_data(shape, chunks=(), n_steps=1, **kwargs):
 
     Example
 
-    >>> x_data, y_data = generate_cahn_hilliard_data((1, 6, 6))
+    >>> x_data, y_data = generate((1, 6, 6))
     >>> print(y_data.chunks)
     ((1,), (6,), (6,))
 
     """
-    solve = solve_cahn_hilliard(**kwargs)
-
     return pipe(
         2 * da.random.random(shape, chunks=chunks or shape) - 1,
-        juxt(identity, map_blocks(iterate_times(solve, n_steps)))
+        juxt(identity, map_blocks(iterate_times(solve(**kwargs), n_steps)))
     )
