@@ -246,6 +246,42 @@ def coeff_to_real(coeff, new_shape):
     )
 
 
+def zero_pad(arr, shape):
+    """Zero pad an array with zeros
+
+    The first and last axes are not padded so the length of shape
+    needs to be arr.shape - 2 (i.e. shape only refers to the middle
+    axes, which are padded). The first axis of arr is the sample axis
+    while the last axis is for the basis discretization (both unpadded).
+
+    Args:
+      arr: the array to pad
+      shape: the shape of the new array excluding the first and last
+        axes
+
+    Returns:
+      the new padded version of the array
+
+    >>> print(zero_pad(np.arange(4).reshape([1, 2, 2, 1]), (4, 5))[0,...,0])
+    [[0 0 0 0 0]
+     [0 0 0 1 0]
+     [0 0 2 3 0]
+     [0 0 0 0 0]]
+
+    """
+    if len(shape) != len(arr.shape[1:-1]):
+        raise RuntimeError("length of shape is incorrect")
+    if not np.all(shape >= arr.shape[1:-1]):
+        raise RuntimeError("resize shape is too small")
+    return pipe(
+        np.array(arr.shape[:1] + tuple(shape) + arr.shape[-1:]) - np.array(arr.shape),
+        lambda x: np.concatenate(((x - (x // 2))[..., None], (x // 2)[..., None]), axis=1),
+        fmap(tuple),
+        tuple,
+        lambda x: np.pad(arr, x, 'constant', constant_values=0),
+    )
+
+
 def reshape(data, shape):
     """Reshape data along all but the first axis
 
