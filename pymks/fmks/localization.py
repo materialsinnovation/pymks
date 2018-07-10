@@ -28,8 +28,8 @@ from toolz.curried import map as fmap
 from sklearn.base import RegressorMixin, TransformerMixin, BaseEstimator
 
 from .func import curry, array_from_tuple
-from .func import fftshift, rfftn, irfftn
-from .func import darfftn
+from .func import fftshift, fftn, ifftn
+from .func import dafftn
 
 
 @curry
@@ -158,10 +158,10 @@ def fit_disc(x_data, y_data, redundancy_func):
     ...                   lambda _: (slice(None),))
 
     >>> print(matrix.shape)
-    (4, 3, 3)
+    (4, 4, 3)
 
     >>> print(matrix.chunks)
-    ((4,), (3,), (1, 1, 1))
+    ((4,), (4,), (1, 1, 1))
 
     >>> assert np.allclose(matrix.compute()[0, 0, 0], 5. / 18.)
 
@@ -169,7 +169,7 @@ def fit_disc(x_data, y_data, redundancy_func):
     chunks = lambda x: (None,) * (len(x.shape) - 1) + (x_data.chunks[-1],)
     return pipe(
         [x_data, y_data],
-        fmap(darfftn(axes=faxes(x_data))),
+        fmap(dafftn(axes=faxes(x_data))),
         list,
         lambda x: fit_fourier(*x, redundancy_func),
         lambda x: da.from_array(x, chunks=chunks(x)),
@@ -203,9 +203,9 @@ def fit(x_data, y_data, basis):
 @curry
 def _predict_disc(x_data, coeff):
     return pipe(
-        rfftn(x_data, axes=faxes(x_data)),
+        fftn(x_data, axes=faxes(x_data)),
         lambda x: np.sum(x * coeff[None], axis=-1),
-        irfftn(axes=faxes(x_data), s=x_data.shape[1:-1]),
+        ifftn(axes=faxes(x_data), s=x_data.shape[1:-1]),
     ).real
 
 
@@ -241,7 +241,7 @@ def coeff_to_real(coeff, new_shape):
     """
     return pipe(
         coeff,
-        irfftn(axes=_ini_axes(coeff), s=new_shape),
+        ifftn(axes=_ini_axes(coeff), s=new_shape),
         fftshift(axes=_ini_axes(coeff)),
     )
 

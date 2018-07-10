@@ -110,19 +110,13 @@ ifft = curry(np.fft.ifft)  # pylint: disable=invalid-name
 
 fftn = curry(np.fft.fftn)  # pylint: disable=invalid-name
 
-rfftn = curry(np.fft.rfftn)  # pylint: disable=invalid-name
-
 ifftn = curry(np.fft.ifftn)  # pylint: disable=invalid-name
-
-irfftn = curry(np.fft.irfftn)  # pylint: disable=invalid-name
 
 fftshift = curry(np.fft.fftshift)  # pylint: disable=invalid-name
 
 daifftn = curry(da.fft.ifftn)  # pylint: disable=invalid-name
 
 dafftn = curry(da.fft.fftn)  # pylint: disable=invalid-name
-
-darfftn = curry(da.fft.rfftn)  # pylint: disable=invalid-name
 
 dafft = curry(da.fft.fft)  # pylint: disable=invalid-name
 
