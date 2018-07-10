@@ -28,8 +28,7 @@ from toolz.curried import map as fmap
 from sklearn.base import RegressorMixin, TransformerMixin, BaseEstimator
 
 from .func import curry, array_from_tuple
-from .func import fftshift, fftn, ifftn
-from .func import dafftn
+from .func import dafftshift, dafftn, daifftn, daifftshift
 
 
 @curry
@@ -203,9 +202,9 @@ def fit(x_data, y_data, basis):
 @curry
 def _predict_disc(x_data, coeff):
     return pipe(
-        fftn(x_data, axes=faxes(x_data)),
+        dafftn(x_data, axes=faxes(x_data)),
         lambda x: np.sum(x * coeff[None], axis=-1),
-        ifftn(axes=faxes(x_data), s=x_data.shape[1:-1]),
+        daifftn(axes=faxes(x_data), s=x_data.shape[1:-1]),
     ).real
 
 
@@ -225,11 +224,11 @@ def predict(x_data, coeff, basis):
 
 
 def _ini_axes(arr):
-    return np.arange(arr.ndim - 1)
+    return tuple(np.arange(arr.ndim - 1))
 
 
 @curry
-def coeff_to_real(coeff, new_shape):
+def coeff_to_real(coeff, new_shape=None):
     """Covert the coefficents to real space
 
     Args:
@@ -241,44 +240,127 @@ def coeff_to_real(coeff, new_shape):
     """
     return pipe(
         coeff,
-        ifftn(axes=_ini_axes(coeff), s=new_shape),
-        fftshift(axes=_ini_axes(coeff)),
+        daifftn(axes=_ini_axes(coeff), s=new_shape),
+        dafftshift(axes=_ini_axes(coeff)),
     )
 
 
+@curry
+def coeff_to_frequency(coeff):
+    """Convert the coefficients to frequency space.
+
+    Args:
+      coeff: the influence coefficients in real space
+
+    Returns:
+      the influence coefficiencts in frequency space
+
+    >>> from .func import rcompose
+    >>> f = rcompose(
+    ...     lambda x: np.concatenate((x, np.ones_like(x)), axis=-1),
+    ...     lambda x: da.from_array(x, chunks=x.shape),
+    ...     coeff_to_frequency,
+    ...     coeff_to_real,
+    ...     lambda x: x.real[..., :1].compute()
+    ... )
+    >>> assert (lambda x: np.allclose(f(x), x))(np.arange(20).reshape((5, 4, 1)))
+
+    """
+    return pipe(
+        coeff.copy(), daifftshift(axes=_ini_axes(coeff)), dafftn(axes=_ini_axes(coeff))
+    )
+
+
+@curry
+def coeff_resize(coeff, shape):
+    """Resize the influence coefficients.
+
+    Resize the influence coefficients by padding with zeros to the
+    size determined by shape. Apply to coefficients in frequency space.
+
+    Args:
+      coeff: the influence coefficients with size (nx, ny, nz, nstate)
+      shape: the new padded shape (NX, NY, NZ, nstate)
+
+    Returns:
+      the resized influence coefficients
+
+    >>> from .func import ifftshift, fftn
+    >>> assert pipe(
+    ...     np.arange(20).reshape((5, 4, 1)),
+    ...     lambda x: np.concatenate((x, np.ones_like(x)), axis=-1),
+    ...     ifftshift(axes=(0, 1)),
+    ...     fftn(axes=(0, 1)),
+    ...     lambda x: da.from_array(x, chunks=x.shape),
+    ...     coeff_resize(shape=(10, 7, 2)),
+    ...     coeff_to_real,
+    ...     lambda x: np.allclose(x.real[..., 0],
+    ...         [[0, 0, 0, 0, 0, 0, 0],
+    ...          [0, 0, 0, 0, 0, 0, 0],
+    ...          [0, 0, 0, 0, 0, 0, 0],
+    ...          [0, 0, 0, 1, 2, 3, 0],
+    ...          [0, 0, 4, 5, 6, 7, 0],
+    ...          [0, 0, 8, 9,10,11, 0],
+    ...          [0, 0,12,13,14,15, 0],
+    ...          [0, 0,16,17,18,19, 0],
+    ...          [0, 0, 0, 0, 0, 0, 0],
+    ...          [0, 0, 0, 0, 0, 0, 0]])
+    ... )
+
+    """
+    return pipe(coeff, coeff_to_real, zero_pad(shape=shape), coeff_to_frequency)
+
+
+@curry
 def zero_pad(arr, shape):
     """Zero pad an array with zeros
 
-    The first and last axes are not padded so the length of shape
-    needs to be arr.shape - 2 (i.e. shape only refers to the middle
-    axes, which are padded). The first axis of arr is the sample axis
-    while the last axis is for the basis discretization (both unpadded).
-
     Args:
       arr: the array to pad
-      shape: the shape of the new array excluding the first and last
-        axes
+      shape: the shape of the new array
 
     Returns:
       the new padded version of the array
 
-    >>> print(zero_pad(np.arange(4).reshape([1, 2, 2, 1]), (4, 5))[0,...,0])
+    >>> print(
+    ...     zero_pad(
+    ...         np.arange(4).reshape([1, 2, 2, 1]),
+    ...         (1, 4, 5, 1)
+    ...     )[0,...,0].compute()
+    ... )
     [[0 0 0 0 0]
      [0 0 0 1 0]
      [0 0 2 3 0]
      [0 0 0 0 0]]
-
+    >>> print(zero_pad(np.arange(4).reshape([2, 2]), (4, 5)).compute())
+    [[0 0 0 0 0]
+     [0 0 0 1 0]
+     [0 0 2 3 0]
+     [0 0 0 0 0]]
+    >>> zero_pad(zero_pad(np.arange(4).reshape([2, 2]), (4, 5, 1)))
+    Traceback (most recent call last):
+    ...
+    RuntimeError: length of shape is incorrect
+    >>> zero_pad(zero_pad(np.arange(4).reshape([2, 2]), (1, 2)))
+    Traceback (most recent call last):
+    ...
+    RuntimeError: resize shape is too small
     """
-    if len(shape) != len(arr.shape[1:-1]):
+    if len(shape) != len(arr.shape):
         raise RuntimeError("length of shape is incorrect")
-    if not np.all(shape >= arr.shape[1:-1]):
+
+    if not np.all(shape >= arr.shape):
         raise RuntimeError("resize shape is too small")
+
     return pipe(
-        np.array(arr.shape[:1] + tuple(shape) + arr.shape[-1:]) - np.array(arr.shape),
-        lambda x: np.concatenate(((x - (x // 2))[..., None], (x // 2)[..., None]), axis=1),
+        np.array(shape) - np.array(arr.shape),
+        lambda x: da.concatenate(
+            ((x - (x // 2))[..., None], (x // 2)[..., None]), axis=1
+        ),
         fmap(tuple),
         tuple,
-        lambda x: np.pad(arr, x, 'constant', constant_values=0),
+        lambda x: np.pad(arr, x, "constant", constant_values=0),
+        lambda x: da.from_array(x, chunks=x.shape),
     )
 
 
