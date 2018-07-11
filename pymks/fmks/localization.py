@@ -280,7 +280,7 @@ def coeff_resize(coeff, shape):
 
     Args:
       coeff: the influence coefficients with size (nx, ny, nz, nstate)
-      shape: the new padded shape (NX, NY, NZ, nstate)
+      shape: the new padded shape (NX, NY, NZ)
 
     Returns:
       the resized influence coefficients
@@ -292,7 +292,7 @@ def coeff_resize(coeff, shape):
     ...     ifftshift(axes=(0, 1)),
     ...     fftn(axes=(0, 1)),
     ...     lambda x: da.from_array(x, chunks=x.shape),
-    ...     coeff_resize(shape=(10, 7, 2)),
+    ...     coeff_resize(shape=(10, 7)),
     ...     coeff_to_real,
     ...     lambda x: np.allclose(x.real[..., 0],
     ...         [[0, 0, 0, 0, 0, 0, 0],
@@ -308,7 +308,12 @@ def coeff_resize(coeff, shape):
     ... )
 
     """
-    return pipe(coeff, coeff_to_real, zero_pad(shape=shape), coeff_to_frequency)
+    return pipe(
+        coeff,
+        coeff_to_real,
+        zero_pad(shape=shape + coeff.shape[-1:]),
+        coeff_to_frequency,
+    )
 
 
 @curry
@@ -455,9 +460,15 @@ class LocalizationRegressor(BaseEstimator, RegressorMixin):
     >>> X = make_data((6, 4, 4, 3), (2, 4, 4, 1))
     >>> y = make_data((6, 4, 4), (2, 4, 4))
 
-    >>> y_out = LocalizationRegressor(lambda _: (slice(None),)).fit(X, y).predict(X)
+    >>> redundancy = lambda _: (slice(None),)
+
+    >>> y_out = LocalizationRegressor(redundancy).fit(X, y).predict(X)
 
     >>> assert np.allclose(y, y_out)
+
+    >>> y_out_flat = LocalizationRegressor(redundancy).fit(X, y.reshape(6, 16)).predict(X)
+    >>> print(y_out_flat.shape)
+    (6, 16)
 
     """
 
@@ -497,4 +508,20 @@ class LocalizationRegressor(BaseEstimator, RegressorMixin):
         Returns:
             The predicted y data
         """
-        return reshape(_predict_disc(x_data, self.coeff), self.y_data_shape)
+        if len(self.y_data_shape) == len(x_data.shape) - 1:
+            new_shape = (1,) + self.coeff.shape[:-1]
+        else:
+            new_shape = (1, np.prod(self.coeff.shape[:-1]))
+        return reshape(_predict_disc(x_data, self.coeff), new_shape)
+
+    def coeff_resize(self, shape):
+        """Generate new model with larger coefficients
+
+        Args:
+          shape: the shape of the new coefficients
+
+        Returns:
+          a new model with larger influence coefficients
+        """
+        self.coeff = coeff_resize(self.coeff, shape)
+        return self
