@@ -104,31 +104,32 @@ def discretize_nomax(data, states):
 
 
 @curry
-def discretize(x_data, n_state=2, min_=0.0, max_=1.0, chunks=()):
+def discretize(x_data, n_state=2, min_=0.0, max_=1.0, chunks=None):
     """Primitive discretization of a microstructure.
 
     Args:
-      x_data: the data to discrtize
+      x_data: the data to discretize
       n_state: the number of local states
       min_: the minimum local state
       max_: the maximum local state
+      chunks: chunks size for state axis
 
     Returns:
       the discretized microstructure
 
     >>> discretize(da.random.random((12, 9), chunks=(3, 9)),
     ...            3,
-    ...            chunks=(1,)).chunks
+    ...            chunks=1).chunks
     ((3, 3, 3, 3), (9,), (1, 1, 1))
 
-    >>> discretize(np.array([[0, 1], [0.5, 0.5]]), 3, chunks=(1,)).chunks
+    >>> discretize(np.array([[0, 1], [0.5, 0.5]]), 3, chunks=1).chunks
     ((2,), (2,), (1, 1, 1))
 
     >>> assert np.allclose(
     ...     discretize(
     ...         np.array([[0, 1], [0.5, 0.5]]),
     ...         3,
-    ...         chunks=(1,)
+    ...         chunks=1
     ...     ).compute(),
     ...     [[[1, 0, 0], [0, 0, 1]], [[0, 1, 0], [0, 1, 0]]]
     ... )
@@ -136,7 +137,7 @@ def discretize(x_data, n_state=2, min_=0.0, max_=1.0, chunks=()):
     return da.maximum(
         discretize_nomax(
             da.clip(x_data, min_, max_),
-            da.linspace(min_, max_, n_state, chunks=chunks or (n_state,)),
+            da.linspace(min_, max_, n_state, chunks=(chunks or n_state,)),
         ),
         0,
     )
@@ -158,7 +159,7 @@ def redundancy(ijk):
 
 
 @curry
-def primitive_basis(x_data, n_state, min_=0.0, max_=1.0, chunks=()):
+def primitive_basis(x_data, n_state, min_=0.0, max_=1.0, chunks=None):
     """Primitive discretization of a microstucture
 
     Args:
@@ -166,6 +167,7 @@ def primitive_basis(x_data, n_state, min_=0.0, max_=1.0, chunks=()):
       n_state: the number of local states
       min_: the minimum local state
       max_: the maximum local state
+      chunks: the chunk size for the state axis
 
     Returns:
       a tuple, the first entry is the discretized data, other entries
