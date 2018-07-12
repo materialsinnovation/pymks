@@ -466,8 +466,12 @@ class LocalizationRegressor(BaseEstimator, RegressorMixin):
 
     >>> assert np.allclose(y, y_out)
 
-    >>> y_out_flat = LocalizationRegressor(redundancy).fit(X, y.reshape(6, 16)).predict(X)
-    >>> print(y_out_flat.shape)
+    >>> print(
+    ...     pipe(
+    ...         LocalizationRegressor(redundancy),
+    ...         lambda x: x.fit(X, y.reshape(6, 16)).predict(X).shape
+    ...     )
+    ... )
     (6, 16)
 
     """
