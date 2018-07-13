@@ -5,17 +5,16 @@ System in Fourier Space.
 
 Example:
 
->>> from pymks.fmks.bases.primitive import primitive_basis
+>>> from pymks.fmks.bases.primitive import discretize
 >>> from pymks.fmks.func import allclose
 
->>> basis = primitive_basis(n_state=2)
-
+>>> disc = discretize(n_state=2)
 >>> x_data = lambda: da.from_array(np.linspace(0, 1, 8).reshape((2, 2, 2)),
 ...                                chunks=(1, 2, 2))
 >>> y_data = lambda: x_data().swapaxes(1, 2)
 >>> assert pipe(
-...     fit(x_data(), y_data(), basis),
-...     predict(x_data(), basis=basis),
+...     fit(x_data(), y_data(), disc),
+...     predict(x_data(), discretize=disc),
 ...     allclose(y_data())
 ... )
 """
@@ -176,27 +175,28 @@ def fit_disc(x_data, y_data, redundancy_func):
 
 
 @curry
-def fit(x_data, y_data, basis):
+def fit(x_data, y_data, discretize, redundancy_func=lambda _: (slice(None),)):
     """Calculate the MKS influence coefficients.
 
     Args:
       x_data: the mircrostructure field
       y_data: the response field
-      basis: a function that returns the discretized data and
+      discretize: a function that returns the discretized data and
         redundancy function
+
 
     Returns:
       the influence coefficients
 
-    >>> from pymks.fmks.bases.primitive import primitive_basis
+    >>> from pymks.fmks.bases.primitive import discretize
 
     >>> matrix = fit(da.from_array(np.array([[0], [1]]), chunks=(2, 1)),
     ...              da.from_array(np.array([[2], [1]]), chunks=(2, 1)),
-    ...              primitive_basis(n_state=3))
+    ...              discretize(n_state=3))
     >>> assert np.allclose(matrix, [[2, 0, 1]])
 
     """
-    return pipe(x_data, basis, lambda x: fit_disc(x[0], y_data, x[1]))
+    return pipe(x_data, discretize, fit_disc(y_data=y_data, redundancy_func=redundancy_func))
 
 
 @curry
@@ -209,18 +209,18 @@ def _predict_disc(x_data, coeff):
 
 
 @curry
-def predict(x_data, coeff, basis):
+def predict(x_data, coeff, discretize):
     """Predict a response given a microstructure
 
     Args:
       x_data: the microstructure data
       coeff: the influence coefficients
-      basis: the basis function
+      discretize: the basis function
 
     Returns:
       the response
     """
-    return _predict_disc(basis(x_data)[0], coeff)
+    return _predict_disc(discretize(x_data), coeff)
 
 
 def _ini_axes(arr):
@@ -460,15 +460,13 @@ class LocalizationRegressor(BaseEstimator, RegressorMixin):
     >>> X = make_data((6, 4, 4, 3), (2, 4, 4, 1))
     >>> y = make_data((6, 4, 4), (2, 4, 4))
 
-    >>> redundancy = lambda _: (slice(None),)
-
-    >>> y_out = LocalizationRegressor(redundancy).fit(X, y).predict(X)
+    >>> y_out = LocalizationRegressor().fit(X, y).predict(X)
 
     >>> assert np.allclose(y, y_out)
 
     >>> print(
     ...     pipe(
-    ...         LocalizationRegressor(redundancy),
+    ...         LocalizationRegressor(),
     ...         lambda x: x.fit(X, y.reshape(6, 16)).predict(X).shape
     ...     )
     ... )
@@ -476,7 +474,7 @@ class LocalizationRegressor(BaseEstimator, RegressorMixin):
 
     """
 
-    def __init__(self, redundancy_func):
+    def __init__(self, redundancy_func=lambda _: (slice(None),)):
         """Instantiate a LocalizationRegressor
 
         Args:

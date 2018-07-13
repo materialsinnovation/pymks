@@ -158,26 +158,6 @@ def redundancy(ijk):
     return (slice(-1),)
 
 
-@curry
-def primitive_basis(x_data, n_state, min_=0.0, max_=1.0, chunks=None):
-    """Primitive discretization of a microstucture
-
-    Args:
-      x_data: the data to discrtize
-      n_state: the number of local states
-      min_: the minimum local state
-      max_: the maximum local state
-      chunks: the chunk size for the state axis
-
-    Returns:
-      a tuple, the first entry is the discretized data, other entries
-      are functions required for localization
-    """
-    return (
-        discretize(x_data, n_state, min_=min_, max_=max_, chunks=chunks), redundancy
-    )
-
-
 class PrimitiveTransformer(BaseEstimator, TransformerMixin):
     """Transformer for Sklearn pipelines
 
@@ -187,14 +167,15 @@ class PrimitiveTransformer(BaseEstimator, TransformerMixin):
         max_: the maximum local state
 
     >>> from toolz import pipe
-    >>> pipe(
+    >>> assert pipe(
     ...     PrimitiveTransformer(),
     ...     lambda x: x.fit(None, None),
     ...     lambda x: x.transform(np.array([[0, 0.5, 1]])).compute(),
+    ...     lambda x: np.allclose(x,
+    ...         [[[1. , 0. ],
+    ...           [0.5, 0.5],
+    ...           [0. , 1. ]]])
     ... )
-    array([[[1. , 0. ],
-            [0.5, 0.5],
-            [0. , 1. ]]])
     """
 
     def __init__(self, n_state=2, min_=0.0, max_=1.0):

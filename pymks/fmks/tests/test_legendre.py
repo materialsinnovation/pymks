@@ -26,7 +26,7 @@ def test_1():
     data = da.from_array(np.array([[0.25, 0.1], [0.5, 0.25]]), chunks=(2, 2))
     assert (
         np.allclose(
-            leg.legendre_basis(data, n_state=3, min_=0.0, max_=0.5, chunks=1)[0].compute(),
+            leg.discretize(data, n_state=3, min_=0.0, max_=0.5, chunks=1).compute(),
             polyval(data),
         )
     )
@@ -34,7 +34,7 @@ def test_1():
     data = da.from_array(np.array([[-1, 1], [0, -1]]), chunks=(2, 2))
     assert (
         np.allclose(
-            leg.legendre_basis(data, n_state=3, min_=0.0, max_=0.5, chunks=1)[0].compute(),
+            leg.discretize(data, n_state=3, min_=0.0, max_=0.5, chunks=1).compute(),
             polyval(data),
         )
     )
@@ -47,7 +47,7 @@ def test_2():
     """
     np.random.seed(3)
     data = da.from_array(np.random.random((1, 3, 3)), chunks=(1, 3, 3))
-    data_ = leg.legendre_basis(data, n_state=2, min_=0.0, max_=1.0)[0].compute()
+    data_ = leg.discretize(data, n_state=2, min_=0.0, max_=1.0).compute()
     f_data = np.fft.fftn(data_, axes=(1, 2))
     f_test = np.array(
         [

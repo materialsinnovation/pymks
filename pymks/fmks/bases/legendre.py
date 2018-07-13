@@ -26,8 +26,8 @@ mapped into local state space, which results in an array of shape
 `(n_samples, n_x, n_y, n_states)`, where `n_states=4` in this case.
 
 >>> from toolz import pipe
->>> data_ = pipe(data, legendre_basis(n_state=4, min_=-1, max_=1))
->>> assert(data_[0].shape == (1, 3, 3, 4))
+>>> data_ = pipe(data, discretize(n_state=4, min_=-1, max_=1))
+>>> assert(data_.shape == (1, 3, 3, 4))
 
 """
 
@@ -102,36 +102,6 @@ def discretize(data, n_state=2, min_=0, max_=1, chunks=None):
     )
 
 
-@curry
-def legendre_basis(x_data, n_state=2, min_=0.0, max_=1.0, chunks=None):
-    """legendre discretization of a microstructure.
-
-    Args:
-        x_data: The microstructure as an `(n_samples, n_x, ...)`
-            shaped array where `n_samples` is the number of samples
-            and `n_x` is the spatial discretization.
-        n_state: the number of local states
-        min_: the minimum local state
-        max_: the maximum local state
-        chunks: the chunks size for the state axis
-
-    Returns:
-        Float valued field of of Legendre polynomial coefficients as a chunked
-        dask array of shape `(n_samples, n_x, ..., n_state)`.
-
-    """
-    return (
-        discretize(
-            x_data,
-            n_state=n_state,
-            min_=min_,
-            max_=max_,
-            chunks=chunks
-        ),
-        lambda x: (slice(-1),),
-    )
-
-
 class LegendreTransformer(BaseEstimator, TransformerMixin):
     """Transformer for Sklearn pipelines
 
@@ -152,7 +122,6 @@ class LegendreTransformer(BaseEstimator, TransformerMixin):
             [ 0.5,  1.5]]])
 
     """
-
     def __init__(self, n_state=2, min_=0.0, max_=1.0):
         """Instantiate a LegendreTransformer
 
@@ -173,7 +142,7 @@ class LegendreTransformer(BaseEstimator, TransformerMixin):
 
         Returns:
             the discretized data
-        """
+         """
         return discretize(data, n_state=self.n_state, min_=self.min_, max_=self.max_)
 
     def fit(self, *_):
