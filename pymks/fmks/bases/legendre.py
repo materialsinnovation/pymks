@@ -32,12 +32,12 @@ mapped into local state space, which results in an array of shape
 """
 
 
-from sklearn.base import TransformerMixin, BaseEstimator
 import numpy as np
 import numpy.polynomial.legendre as leg
 import dask.array as da
 from toolz.curried import pipe
 from ..func import curry
+from .basis_transformer import BasisTransformer
 
 
 @curry
@@ -67,7 +67,7 @@ def leg_data(data, coeff_):
     return da.map_blocks(
         lambda x: leg.legval(x, coeff_, tensor=False),
         data,
-        chunks=data.chunks[:-1] + (len(coeff_),)
+        chunks=data.chunks[:-1] + (len(coeff_),),
     )
 
 
@@ -98,17 +98,17 @@ def discretize(data, n_state=2, min_=0, max_=1, chunks=None):
         data[..., None],
         scaled_data(domain=(min_, max_)),
         leg_data(coeff_=coeff(np.arange(n_state))),
-        lambda x: x.rechunk(data.chunks + (chunks or n_state,))
+        lambda x: x.rechunk(data.chunks + (chunks or n_state,)),
     )
 
 
-class LegendreTransformer(BaseEstimator, TransformerMixin):
-    """Transformer for Sklearn pipelines
+class LegendreTransformer(BasisTransformer):
+    """Legendre transformer for Sklearn pipelines
 
     Attributes:
-        n_state: the number of local states
-        min_: the minimum local state
-        max_: the maximum local state
+      n_state: the number of local states
+      min_: the minimum local state
+      max_: the maximum local state
 
     >>> from toolz import pipe
     >>> data = da.from_array(np.array([[0, 0.5, 1]]), chunks=(1, 3))
@@ -122,6 +122,7 @@ class LegendreTransformer(BaseEstimator, TransformerMixin):
             [ 0.5,  1.5]]])
 
     """
+
     def __init__(self, n_state=2, min_=0.0, max_=1.0):
         """Instantiate a LegendreTransformer
 
@@ -130,22 +131,4 @@ class LegendreTransformer(BaseEstimator, TransformerMixin):
             min_: the minimum local state
             max_: the maximum local state
         """
-        self.n_state = n_state
-        self.min_ = min_
-        self.max_ = max_
-
-    def transform(self, data):
-        """Perform the discretization of the data
-
-        Args:
-            data: the data to discretize
-
-        Returns:
-            the discretized data
-         """
-        return discretize(data, n_state=self.n_state, min_=self.min_, max_=self.max_)
-
-    def fit(self, *_):
-        """Only necessary to make pipelines work
-        """
-        return self
+        super().__init__(discretize, n_state=n_state, min_=min_, max_=max_)

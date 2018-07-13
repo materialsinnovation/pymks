@@ -15,7 +15,12 @@ def test():
     """Very simple example.
     """
     assert np.allclose(
-        fit(_get_x(), _get_x().swapaxes(1, 2), discretize(n_state=2), redundancy_func=redundancy),
+        fit(
+            _get_x(),
+            _get_x().swapaxes(1, 2),
+            discretize(n_state=2),
+            redundancy_func=redundancy,
+        ),
         [[[0.5, 0.5], [-2, 0]], [[-0.5, 0], [-1, 0]]],
     )
 
@@ -32,9 +37,7 @@ def test_setting_kernel():
         size=(21, 21), elastic_modulus=(100, 130), poissons_ratio=(0.3, 0.3)
     )
 
-    model = make_pipeline(
-        PrimitiveTransformer(n_state=2), LocalizationRegressor()
-    )
+    model = make_pipeline(PrimitiveTransformer(n_state=2), LocalizationRegressor())
 
     shape = (30, 30)
     fcoeff = model.fit(x_data, y_data).steps[1][1].coeff

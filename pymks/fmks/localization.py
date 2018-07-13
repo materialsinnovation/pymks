@@ -196,7 +196,9 @@ def fit(x_data, y_data, discretize, redundancy_func=lambda _: (slice(None),)):
     >>> assert np.allclose(matrix, [[2, 0, 1]])
 
     """
-    return pipe(x_data, discretize, fit_disc(y_data=y_data, redundancy_func=redundancy_func))
+    return pipe(
+        x_data, discretize, fit_disc(y_data=y_data, redundancy_func=redundancy_func)
+    )
 
 
 @curry

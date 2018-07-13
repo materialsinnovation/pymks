@@ -41,7 +41,10 @@ def _response(x_data, n_space, n_state):
 
 def _mks_fcoeff(x_data, n_space, n_state):
     return fit(
-        x_data, _response(x_data, n_space, n_state), discretize(n_state=n_state), redundancy_func=redundancy
+        x_data,
+        _response(x_data, n_space, n_state),
+        discretize(n_state=n_state),
+        redundancy_func=redundancy,
     )
 
 

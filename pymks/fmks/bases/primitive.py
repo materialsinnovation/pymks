@@ -59,10 +59,10 @@ For example, if a cell has a label of 2, its local state will be
 
 """
 
-from sklearn.base import TransformerMixin, BaseEstimator
 import dask.array as da
 import numpy as np
 from ..func import curry
+from .basis_transformer import BasisTransformer
 
 
 def discretize_nomax(data, states):
@@ -87,20 +87,6 @@ def discretize_nomax(data, states):
 
     """
     return 1 - (abs(data[..., None] - states)) / (states[1] - states[0])
-
-
-# def minmax(data, min_, max_):
-#     """Bound the values in an array by min_ and max_.
-
-#     Args:
-#       data: the data to
-#       min_: min value
-
-
-#     >>>
-
-#     """
-#     return da.minimum(da.maximum(data, min_), max_)
 
 
 @curry
@@ -136,10 +122,10 @@ def discretize(x_data, n_state=2, min_=0.0, max_=1.0, chunks=None):
     """
     return da.maximum(
         discretize_nomax(
-            da.clip(x_data, min_, max_),
+            da.clip(x_data, a_min=min_, a_max=max_),
             da.linspace(min_, max_, n_state, chunks=(chunks or n_state,)),
         ),
-        0,
+        0
     )
 
 
@@ -158,13 +144,13 @@ def redundancy(ijk):
     return (slice(-1),)
 
 
-class PrimitiveTransformer(BaseEstimator, TransformerMixin):
-    """Transformer for Sklearn pipelines
+class PrimitiveTransformer(BasisTransformer):
+    """Primiteive transformer for Sklearn pipelines
 
     Attributes:
-        n_state: the number of local states
-        min_: the minimum local state
-        max_: the maximum local state
+      n_state: the number of local states
+      min_: the minimum local state
+      max_: the maximum local state
 
     >>> from toolz import pipe
     >>> assert pipe(
@@ -178,30 +164,12 @@ class PrimitiveTransformer(BaseEstimator, TransformerMixin):
     ... )
     """
 
-    def __init__(self, n_state=2, min_=0.0, max_=1.0):
+    def __init__(self, n_state=2, min_=0.0, max_=1.0, chunks=None):
         """Instantiate a PrimitiveTransformer
 
         Args:
-            n_state: the number of local states
-            min_: the minimum local state
-            max_: the maximum local state
+          n_state: the number of local states
+          min_: the minimum local state
+          max_: the maximum local state
         """
-        self.n_state = n_state
-        self.min_ = min_
-        self.max_ = max_
-
-    def transform(self, data):
-        """Perform the discretization of the data
-
-        Args:
-            data: the data to discretize
-
-        Returns:
-            the discretized data
-        """
-        return discretize(data, n_state=self.n_state, min_=self.min_, max_=self.max_)
-
-    def fit(self, *_):
-        """Only necessary to make pipelines work
-        """
-        return self
+        super().__init__(discretize, n_state=n_state, min_=min_, max_=max_, chunks=chunks)
