@@ -6,7 +6,7 @@ from functools import wraps
 import numpy as np
 import dask.array as da
 import toolz.curried
-from toolz.curried import iterate
+from toolz.curried import iterate, compose
 
 
 def curry(func):
@@ -110,20 +110,34 @@ ifft = curry(np.fft.ifft)  # pylint: disable=invalid-name
 
 fftn = curry(np.fft.fftn)  # pylint: disable=invalid-name
 
-rfftn = curry(np.fft.rfftn)  # pylint: disable=invalid-name
-
 ifftn = curry(np.fft.ifftn)  # pylint: disable=invalid-name
 
-irfftn = curry(np.fft.irfftn)  # pylint: disable=invalid-name
-
 fftshift = curry(np.fft.fftshift)  # pylint: disable=invalid-name
+
+ifftshift = curry(np.fft.ifftshift)  # pylint: disable=invalid-name
 
 daifftn = curry(da.fft.ifftn)  # pylint: disable=invalid-name
 
 dafftn = curry(da.fft.fftn)  # pylint: disable=invalid-name
 
-darfftn = curry(da.fft.rfftn)  # pylint: disable=invalid-name
-
 dafft = curry(da.fft.fft)  # pylint: disable=invalid-name
 
 daifft = curry(da.fft.ifft)  # pylint: disable=invalid-name
+
+dafftshift = curry(da.fft.fftshift)  # pylint: disable=invalid-name
+
+daifftshift = curry(da.fft.ifftshift)  # pylint: disable=invalid-name
+
+
+def rcompose(*args):
+    """Compose functions in order
+
+    Args:
+      args: the functions to compose
+
+    Returns:
+      composed functions
+
+    >>> assert rcompose(lambda x: x + 1, lambda x: x * 2)(3) == 8
+    """
+    return compose(*args[::-1])
