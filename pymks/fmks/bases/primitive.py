@@ -122,10 +122,10 @@ def discretize(x_data, n_state=2, min_=0.0, max_=1.0, chunks=None):
     """
     return da.maximum(
         discretize_nomax(
-            da.clip(x_data, a_min=min_, a_max=max_),
+            da.clip(x_data, min_, max_),
             da.linspace(min_, max_, n_state, chunks=(chunks or n_state,)),
         ),
-        0
+        0,
     )
 
 
@@ -151,6 +151,7 @@ class PrimitiveTransformer(BasisTransformer):
       n_state: the number of local states
       min_: the minimum local state
       max_: the maximum local state
+      chunks: chunks size for state axis
 
     >>> from toolz import pipe
     >>> assert pipe(
@@ -166,10 +167,7 @@ class PrimitiveTransformer(BasisTransformer):
 
     def __init__(self, n_state=2, min_=0.0, max_=1.0, chunks=None):
         """Instantiate a PrimitiveTransformer
-
-        Args:
-          n_state: the number of local states
-          min_: the minimum local state
-          max_: the maximum local state
         """
-        super().__init__(discretize, n_state=n_state, min_=min_, max_=max_, chunks=chunks)
+        super().__init__(
+            discretize, n_state=n_state, min_=min_, max_=max_, chunks=chunks
+        )
