@@ -1,3 +1,11 @@
+"""MKS Correlation Module
+
+For computing auto and cross corelations under assumption
+of periodic boundary conditions using discreete fourier
+transform.
+"""
+
+
 import dask.array as da
 import numpy as np
 from toolz.curried import pipe, curry
@@ -15,9 +23,9 @@ fftshift = curry(da.fft.fftshift)  # pylint: disable=invalid-name
 
 ifftshift = curry(da.fft.fftshift)  # pylint: disable=invalid-name
 
-conj = curry(da.conj)
+conj = curry(da.conj)  # pylint: disable=invalid-name
 
-func = curry(lambda x, y: conj(x) * fftn(y))
+func = curry(lambda x, y: conj(x) * fftn(y))  # pylint: disable=invalid-name
 
 
 def faxes(arr):
@@ -75,7 +83,7 @@ def cross_correlation(arr1, arr2):
 
     Returns:
         an nd-array of same dimension as the input field
-        
+
     >>> x_data = np.asarray([[[1,1,0], [0,0,1], [1,1,0]]])
     >>> chunks = x_data.shape
     >>> x_data = da.from_array(x_data, chunks=chunks)
