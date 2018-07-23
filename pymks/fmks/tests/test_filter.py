@@ -8,7 +8,7 @@ import dask.array as da
 
 from pymks.fmks.func import dafft, daifft
 from pymks.fmks.localization import fit, coeff_to_real
-from pymks.fmks.bases.primitive import primitive_basis
+from pymks.fmks.bases.primitive import discretize, redundancy
 
 
 def _filter(data):
@@ -41,7 +41,10 @@ def _response(x_data, n_space, n_state):
 
 def _mks_fcoeff(x_data, n_space, n_state):
     return fit(
-        x_data, _response(x_data, n_space, n_state), primitive_basis(n_state=n_state)
+        x_data,
+        _response(x_data, n_space, n_state),
+        discretize(n_state=n_state),
+        redundancy_func=redundancy,
     )
 
 

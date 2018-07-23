@@ -1,7 +1,8 @@
-"""Test the primitive basis.
+"""Test the Legendre basis.
 """
 
 import numpy as np
+import dask.array as da
 from pymks.fmks.bases import legendre as leg
 
 
@@ -22,23 +23,18 @@ def test_1():
         polynomial expansion results.
     """
 
-    n_state = 3
-    data = np.array([[0.25, 0.1], [0.5, 0.25]])
-    domain = [0., 0.5]
-    chunks = (1,)
+    data = da.from_array(np.array([[0.25, 0.1], [0.5, 0.25]]), chunks=(2, 2))
     assert (
         np.allclose(
-            leg.legendre_basis(data, n_state, domain, chunks)[0].compute(),
+            leg.discretize(data, n_state=3, min_=0.0, max_=0.5, chunks=1).compute(),
             polyval(data),
         )
     )
-    n_state = 3
-    data = np.array([[-1, 1], [0, -1]])
-    domain = [0., 0.5]
-    chunks = (1,)
+
+    data = da.from_array(np.array([[-1, 1], [0, -1]]), chunks=(2, 2))
     assert (
         np.allclose(
-            leg.legendre_basis(data, n_state, domain, chunks)[0].compute(),
+            leg.discretize(data, n_state=3, min_=0.0, max_=0.5, chunks=1).compute(),
             polyval(data),
         )
     )
@@ -50,8 +46,8 @@ def test_2():
     known, hardcoded results.
     """
     np.random.seed(3)
-    data = np.random.random((1, 3, 3))
-    data_ = leg.legendre_basis(data, n_state=2, domain=(0, 1))[0].compute()
+    data = da.from_array(np.random.random((1, 3, 3)), chunks=(1, 3, 3))
+    data_ = leg.discretize(data, n_state=2, min_=0.0, max_=1.0).compute()
     f_data = np.fft.fftn(data_, axes=(1, 2))
     f_test = np.array(
         [
