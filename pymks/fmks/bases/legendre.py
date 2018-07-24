@@ -76,7 +76,7 @@ def discretize(data, n_state=2, min_=0, max_=1, chunks=None):
     """legendre discretization of a microstructure.
 
     Args:
-      x_data: The microstructure as an `(n_samples, n_x, ...)` shaped
+      data: The microstructure as an `(n_samples, n_x, ...)` shaped
         array where `n_samples` is the number of samples and `n_x` is
         the spatial discretization.
       n_state: the number of local states

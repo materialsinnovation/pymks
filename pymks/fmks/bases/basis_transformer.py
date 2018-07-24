@@ -2,6 +2,7 @@
 """
 
 from sklearn.base import TransformerMixin, BaseEstimator
+import dask.array as da
 
 
 class BasisTransformer(BaseEstimator, TransformerMixin):
@@ -39,11 +40,11 @@ class BasisTransformer(BaseEstimator, TransformerMixin):
             the discretized data
         """
         return self.discretize(
-            data,
+            data if hasattr(data, 'chunks') else da.from_array(data, data.shape),
             n_state=self.n_state,
             min_=self.min_,
             max_=self.max_,
-            chunks=self.chunks,
+            chunks=self.chunks
         )
 
     def fit(self, *_):
