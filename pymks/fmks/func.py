@@ -128,6 +128,8 @@ dafftshift = curry(da.fft.fftshift)  # pylint: disable=invalid-name
 
 daifftshift = curry(da.fft.ifftshift)  # pylint: disable=invalid-name
 
+daconj = curry(da.conj)  # pylint: disable=invalid-name
+
 
 def rcompose(*args):
     """Compose functions in order

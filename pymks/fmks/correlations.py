@@ -6,26 +6,9 @@ transform.
 """
 
 
-import dask.array as da
 import numpy as np
 from toolz.curried import pipe, curry
-
-
-fft = curry(da.fft.fft)  # pylint: disable=invalid-name
-
-ifft = curry(da.fft.ifft)  # pylint: disable=invalid-name
-
-fftn = curry(da.fft.fftn)  # pylint: disable=invalid-name
-
-ifftn = curry(da.fft.ifftn)  # pylint: disable=invalid-name
-
-fftshift = curry(da.fft.fftshift)  # pylint: disable=invalid-name
-
-ifftshift = curry(da.fft.fftshift)  # pylint: disable=invalid-name
-
-conj = curry(da.conj)  # pylint: disable=invalid-name
-
-func = curry(lambda x, y: conj(x) * fftn(y))  # pylint: disable=invalid-name
+from .func import dafftshift, dafftn, daifftn, daconj
 
 
 def faxes(arr):
@@ -44,6 +27,18 @@ def faxes(arr):
     (1, 2, 3, 4)
     """
     return tuple(np.arange(arr.ndim - 1) + 1)
+
+
+def corr_master(arr1, arr2):
+    """
+    Returns cross correlation between the two input fields, arr1 and arr2
+    """
+    return pipe(arr1,
+                dafftn(axes=faxes(arr1)),
+                lambda x: daconj(x) * dafftn(arr2, axes=faxes(arr2)),
+                daifftn(axes=faxes(arr1)),
+                dafftshift(axes=faxes(arr1)),
+                lambda x: x.real)
 
 
 @curry
@@ -65,12 +60,7 @@ def auto_correlation(arr1):
     ...        [0.33333333, 0.22222222, 0.33333333]]]
     >>> assert np.allclose(f_data.compute(), gg)
     """
-    return pipe(arr1,
-                fftn(axes=faxes(arr1)),
-                lambda x: conj(x) * x,
-                ifftn(axes=faxes(arr1)),
-                fftshift(axes=faxes(arr1)),
-                lambda x: x.real / arr1[0].size)
+    return corr_master(arr1, arr1) / arr1[0].size
 
 
 @curry
@@ -94,9 +84,4 @@ def cross_correlation(arr1, arr2):
     ...                   [ 2.22222222e-01,  3.33333333e-01,  2.22222222e-01]]])
     >>> assert np.allclose(f_data.compute(), gg)
     """
-    return pipe(arr1,
-                fftn(axes=faxes(arr1)),
-                lambda x: conj(x) * fftn(arr2, axes=faxes(arr2)),
-                ifftn(axes=faxes(arr1)),
-                fftshift(axes=faxes(arr1)),
-                lambda x: x.real / arr1[0].size)
+    return corr_master(arr1, arr2) / arr1[0].size
