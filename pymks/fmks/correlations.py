@@ -52,7 +52,9 @@ def auto_correlation(arr1):
         an nd-array of same dimension as the input field
 
     >>> import dask.array as da
-    >>> x_data = np.asarray([[[1, 1, 0], [0, 0, 1], [1, 1, 0]]])
+    >>> x_data = np.asarray([[[1, 1, 0],
+    ...                       [0, 0, 1],
+    ...                       [1, 1, 0]]])
     >>> chunks = x_data.shape
     >>> x_data = da.from_array(x_data, chunks=chunks)
     >>> f_data = auto_correlation(x_data)
@@ -76,7 +78,9 @@ def cross_correlation(arr1, arr2):
         an nd-array of same dimension as the input field
 
     >>> import dask.array as da
-    >>> x_data = np.asarray([[[1,1,0], [0,0,1], [1,1,0]]])
+    >>> x_data = np.asarray([[[1,1,0],
+    ...                       [0,0,1],
+    ...                       [1,1,0]]])
     >>> chunks = x_data.shape
     >>> x_data = da.from_array(x_data, chunks=chunks)
     >>> y_data = da.from_array(1 - x_data, chunks=chunks)
