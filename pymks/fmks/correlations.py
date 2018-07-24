@@ -51,13 +51,14 @@ def auto_correlation(arr1):
     Returns:
         an nd-array of same dimension as the input field
 
+    >>> import dask.array as da
     >>> x_data = np.asarray([[[1, 1, 0], [0, 0, 1], [1, 1, 0]]])
     >>> chunks = x_data.shape
     >>> x_data = da.from_array(x_data, chunks=chunks)
     >>> f_data = auto_correlation(x_data)
-    >>> gg = [[[0.33333333, 0.22222222, 0.33333333],
-    ...        [0.22222222, 0.55555556, 0.22222222],
-    ...        [0.33333333, 0.22222222, 0.33333333]]]
+    >>> gg = [[[3/9, 2/9, 3/9],
+    ...        [2/9, 5/9, 2/9],
+    ...        [3/9, 2/9, 3/9]]]
     >>> assert np.allclose(f_data.compute(), gg)
     """
     return corr_master(arr1, arr1) / arr1[0].size
@@ -74,14 +75,15 @@ def cross_correlation(arr1, arr2):
     Returns:
         an nd-array of same dimension as the input field
 
+    >>> import dask.array as da
     >>> x_data = np.asarray([[[1,1,0], [0,0,1], [1,1,0]]])
     >>> chunks = x_data.shape
     >>> x_data = da.from_array(x_data, chunks=chunks)
     >>> y_data = da.from_array(1 - x_data, chunks=chunks)
     >>> f_data = cross_correlation(x_data, y_data)
-    >>> gg = np.asarray([[[ 2.22222222e-01,  3.33333333e-01,  2.22222222e-01],
-    ...                   [ 3.33333333e-01, -2.63163976e-16,  3.33333333e-01],
-    ...                   [ 2.22222222e-01,  3.33333333e-01,  2.22222222e-01]]])
+    >>> gg = np.asarray([[[ 2/9,  3/9,  2/9],
+    ...                   [ 3/9, 0,  3/9],
+    ...                   [ 2/9,  3/9,  2/9]]])
     >>> assert np.allclose(f_data.compute(), gg)
     """
     return corr_master(arr1, arr2) / arr1[0].size
