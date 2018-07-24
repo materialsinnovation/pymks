@@ -62,6 +62,7 @@ def auto_correlation(arr1):
     ...        [2/9, 5/9, 2/9],
     ...        [3/9, 2/9, 3/9]]]
     >>> assert np.allclose(f_data.compute(), gg)
+    >>> assert x_data.chunks == f_data.chunks
     """
     return corr_master(arr1, arr1) / arr1[0].size
 
@@ -89,5 +90,6 @@ def cross_correlation(arr1, arr2):
     ...                   [ 3/9, 0,  3/9],
     ...                   [ 2/9,  3/9,  2/9]]])
     >>> assert np.allclose(f_data.compute(), gg)
+    >>> assert x_data.chunks == f_data.chunks
     """
     return corr_master(arr1, arr2) / arr1[0].size
