@@ -19,6 +19,7 @@ class BasisTransformer(BaseEstimator, TransformerMixin):
     >>> BasisTransformer(f).fit().transform(None)
 
     """
+
     # pylint: disable=too-many-arguments
 
     def __init__(self, discretize, n_state=2, min_=0.0, max_=1.0, chunks=None):
@@ -40,11 +41,11 @@ class BasisTransformer(BaseEstimator, TransformerMixin):
             the discretized data
         """
         return self.discretize(
-            data if hasattr(data, 'chunks') else da.from_array(data, data.shape),
+            data if hasattr(data, "chunks") else da.from_array(data, data.shape),
             n_state=self.n_state,
             min_=self.min_,
             max_=self.max_,
-            chunks=self.chunks
+            chunks=self.chunks,
         )
 
     def fit(self, *_):

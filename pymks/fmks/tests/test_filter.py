@@ -15,14 +15,15 @@ def _filter(data):
     return np.where(
         data < 10,
         np.exp(-abs(data)) * np.cos(data * np.pi),
-        np.exp(-abs(data - 20)) * np.cos((data - 20) * np.pi)
+        np.exp(-abs(data - 20)) * np.cos((data - 20) * np.pi),
     )
 
 
 def _coeff(n_space, n_state):
-    return np.linspace(1, 0, n_state)[None, :] * _filter(np.linspace(0, 20, n_space))[
-        :, None
-    ]
+    return (
+        np.linspace(1, 0, n_state)[None, :]
+        * _filter(np.linspace(0, 20, n_space))[:, None]
+    )
 
 
 def _fcoeff(n_space, n_state):

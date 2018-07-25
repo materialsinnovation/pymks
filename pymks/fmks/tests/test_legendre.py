@@ -24,19 +24,15 @@ def test_1():
     """
 
     data = da.from_array(np.array([[0.25, 0.1], [0.5, 0.25]]), chunks=(2, 2))
-    assert (
-        np.allclose(
-            leg.discretize(data, n_state=3, min_=0.0, max_=0.5, chunks=1).compute(),
-            polyval(data),
-        )
+    assert np.allclose(
+        leg.discretize(data, n_state=3, min_=0.0, max_=0.5, chunks=1).compute(),
+        polyval(data),
     )
 
     data = da.from_array(np.array([[-1, 1], [0, -1]]), chunks=(2, 2))
-    assert (
-        np.allclose(
-            leg.discretize(data, n_state=3, min_=0.0, max_=0.5, chunks=1).compute(),
-            polyval(data),
-        )
+    assert np.allclose(
+        leg.discretize(data, n_state=3, min_=0.0, max_=0.5, chunks=1).compute(),
+        polyval(data),
     )
 
 
