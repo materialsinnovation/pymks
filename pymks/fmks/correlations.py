@@ -33,12 +33,14 @@ def corr_master(arr1, arr2):
     """
     Returns cross correlation between the two input fields, arr1 and arr2
     """
-    return pipe(arr1,
-                dafftn(axes=faxes(arr1)),
-                lambda x: daconj(x) * dafftn(arr2, axes=faxes(arr2)),
-                daifftn(axes=faxes(arr1)),
-                dafftshift(axes=faxes(arr1)),
-                lambda x: x.real)
+    return pipe(
+        arr1,
+        dafftn(axes=faxes(arr1)),
+        lambda x: daconj(x) * dafftn(arr2, axes=faxes(arr2)),
+        daifftn(axes=faxes(arr1)),
+        dafftshift(axes=faxes(arr1)),
+        lambda x: x.real,
+    )
 
 
 @curry
