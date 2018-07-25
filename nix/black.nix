@@ -10,6 +10,8 @@ pypkgs.buildPythonPackage rec {
   buildInputs = [
     pypkgs.appdirs
     pypkgs.click
+    pypkgs.attrs
     toml
   ];
+  catchConflicts = false;
 }
