@@ -15,8 +15,9 @@ class BasisTransformer(BaseEstimator, TransformerMixin):
       max_: the maximum local state
       chunks: chunks size for state axis
 
+    >>> import numpy as np
     >>> f = lambda *_, **__: None
-    >>> BasisTransformer(f).fit().transform(None)
+    >>> BasisTransformer(f).fit().transform(np.arange(4).reshape(1, 2, 2))
 
     """
 
