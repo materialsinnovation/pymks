@@ -64,7 +64,14 @@ def auto_correlation(arr1):
     ...        [2/9, 5/9, 2/9],
     ...        [3/9, 2/9, 3/9]]]
     >>> assert np.allclose(f_data.compute(), gg)
+    >>> shape = (7, 5, 5)
+    >>> chunks = (2, 5, 5)
+    >>> da.random.seed(42)
+    >>> x_data = da.random.random(shape, chunks=chunks)
+    >>> f_data = auto_correlation(x_data)
     >>> assert x_data.chunks == f_data.chunks
+    >>> print(f_data.chunks)
+    ((2, 2, 2, 1), (5,), (5,))
     """
     return corr_master(arr1, arr1) / arr1[0].size
 
@@ -92,6 +99,19 @@ def cross_correlation(arr1, arr2):
     ...                   [ 3/9, 0,  3/9],
     ...                   [ 2/9,  3/9,  2/9]]])
     >>> assert np.allclose(f_data.compute(), gg)
+    >>> da.random.seed(42)
+    >>> shape = (10, 5, 5)
+    >>> chunks = (2, 5, 5)
+    >>> x_data = da.random.random(shape, chunks=chunks)
+    >>> y_data = 1 - x_data
+    >>> f_data = cross_correlation(x_data, y_data)
     >>> assert x_data.chunks == f_data.chunks
+    >>> shape = (10, 5, 5)
+    >>> # When the two input fields have different chunkings
+    >>> x_data = da.random.random(shape, chunks=(2,5,5))
+    >>> y_data = da.random.random(shape, chunks=(5,5,5))
+    >>> f_data = cross_correlation(x_data, y_data)
+    >>> print(f_data.chunks)
+    ((2, 2, 1, 1, 2, 2), (5,), (5,))
     """
     return corr_master(arr1, arr2) / arr1[0].size
