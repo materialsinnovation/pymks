@@ -10,6 +10,8 @@ let
   dask-searchcv = import ./nix/dask-searchcv.nix { inherit pypkgs sklearn; };
   dask-ml = import ./nix/dask-ml.nix { inherit pypkgs sklearn dask-searchcv dask-glm; };
   dask-glm = import ./nix/dask-glm.nix { inherit pypkgs scipy sklearn; };
+  toml = import ./nix/toml.nix { inherit pypkgs; };
+  black = import ./nix/black.nix { inherit pypkgs toml; };
 in
   pypkgs.buildPythonPackage rec {
     pname = "pymks";
@@ -44,6 +46,9 @@ in
       nixpkgs.graphviz
       pypkgs.graphviz
       pypkgs.distributed
+      black
+      pypkgs.appdirs
+      toml
       nixpkgs.python36Packages.tkinter
       pypkgs.ipywidgets
     ];

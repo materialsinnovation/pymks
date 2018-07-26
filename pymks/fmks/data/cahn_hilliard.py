@@ -61,7 +61,7 @@ def _k_space(size):
     size1 = lambda: (size // 2) if (size % 2 == 0) else (size - 1) // 2
     size2 = lambda: size1() if (size % 2 == 0) else size1() + 1
     return np.concatenate(
-        (np.arange(size)[:size2()], (np.arange(size) - size1())[:size1()])
+        (np.arange(size)[: size2()], (np.arange(size) - size1())[: size1()])
     )
 
 
@@ -88,9 +88,10 @@ def _f_response(x_data, delta_t, gamma, ksq):
     fx3_data = lambda: fftn(x_data ** 3, axes=_axes(x_data))
     implicit = lambda: (1 - gamma * ksq) - _explicit(gamma, ksq)
     delta_t_ksq = lambda: delta_t * ksq
-    numerator = lambda: fx_data() * (
-        1 + delta_t_ksq() * _explicit(gamma, ksq)
-    ) - delta_t_ksq() * fx3_data()
+    numerator = (
+        lambda: fx_data() * (1 + delta_t_ksq() * _explicit(gamma, ksq))
+        - delta_t_ksq() * fx3_data()
+    )
     return numerator() / (1 - delta_t_ksq() * implicit())
 
 
@@ -175,5 +176,5 @@ def generate(shape, chunks=(), n_steps=1, **kwargs):
     """
     return pipe(
         2 * da.random.random(shape, chunks=chunks or shape) - 1,
-        juxt(identity, map_blocks(iterate_times(solve(**kwargs), n_steps)))
+        juxt(identity, map_blocks(iterate_times(solve(**kwargs), n_steps))),
     )
