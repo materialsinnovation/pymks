@@ -44,8 +44,14 @@ in
       nixpkgs.graphviz
       pypkgs.graphviz
       pypkgs.distributed
+      nixpkgs.python36Packages.tkinter
+      pypkgs.ipywidgets
     ];
     src=./.;
     catchConflicts=false;
     doCheck=false;
+    preShellHook = ''
+      jupyter nbextension install --py widgetsnbextension --user
+      jupyter nbextension enable widgetsnbextension --user --py
+    '';
   }
