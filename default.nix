@@ -49,8 +49,14 @@ in
       black
       pypkgs.appdirs
       toml
+      nixpkgs.python36Packages.tkinter
+      pypkgs.ipywidgets
     ];
     src=./.;
     catchConflicts=false;
     doCheck=false;
+    preShellHook = ''
+      jupyter nbextension install --py widgetsnbextension --user
+      jupyter nbextension enable widgetsnbextension --user --py
+    '';
   }
