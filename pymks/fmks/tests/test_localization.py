@@ -3,7 +3,7 @@
 
 import numpy as np
 import dask.array as da
-from pymks.fmks.bases.primitive import primitive_basis
+from pymks.fmks.bases.primitive import discretize, redundancy
 from pymks.fmks.localization import fit
 
 
@@ -15,7 +15,12 @@ def test():
     """Very simple example.
     """
     assert np.allclose(
-        fit(_get_x(), _get_x().swapaxes(1, 2), primitive_basis(n_state=2)),
+        fit(
+            _get_x(),
+            _get_x().swapaxes(1, 2),
+            discretize(n_state=2),
+            redundancy_func=redundancy,
+        ),
         [[[0.5, 0.5], [-2, 0]], [[-0.5, 0], [-1, 0]]],
     )
 
@@ -25,7 +30,6 @@ def test_setting_kernel():
     """
     from pymks.datasets import make_elastic_FE_strain_delta
     from pymks.fmks.bases.primitive import PrimitiveTransformer
-    from pymks.fmks.bases.primitive import redundancy
     from pymks.fmks.localization import LocalizationRegressor
     from sklearn.pipeline import make_pipeline
 
@@ -33,9 +37,7 @@ def test_setting_kernel():
         size=(21, 21), elastic_modulus=(100, 130), poissons_ratio=(0.3, 0.3)
     )
 
-    model = make_pipeline(
-        PrimitiveTransformer(n_state=2), LocalizationRegressor(redundancy)
-    )
+    model = make_pipeline(PrimitiveTransformer(n_state=2), LocalizationRegressor())
 
     shape = (30, 30)
     fcoeff = model.fit(x_data, y_data).steps[1][1].coeff
