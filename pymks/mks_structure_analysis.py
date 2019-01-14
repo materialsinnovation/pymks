@@ -1,6 +1,6 @@
 from pymks.stats import correlate
 from sklearn.base import BaseEstimator
-from sklearn.decomposition import RandomizedPCA
+from sklearn.decomposition import PCA
 import numpy as np
 
 
@@ -87,7 +87,7 @@ class MKSStructureAnalysis(BaseEstimator):
         if basis is not None:
             self.basis._n_jobs = n_jobs
         if self.dimension_reducer is None:
-            self.dimension_reducer = RandomizedPCA(copy=False)
+            self.dimension_reducer = RandomizedPCA(copy=False,svd_solver="randomized")
         if n_components is None:
             n_components = self.dimension_reducer.n_components
         if n_components is None:
