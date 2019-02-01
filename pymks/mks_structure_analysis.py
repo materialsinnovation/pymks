@@ -56,7 +56,7 @@ class MKSStructureAnalysis(BaseEstimator):
             basis: an instance of a bases class.
             dimension_reducer (class, optional): an instance of a
                 dimensionality reduction class with a fit_transform method. The
-                default class is RandomizedPCA.
+                default class is PCA.
             n_components (int, optional): number of components kept by the
                 dimension_reducer
             correlations (list, optional): list of spatial correlations to
@@ -87,7 +87,7 @@ class MKSStructureAnalysis(BaseEstimator):
         if basis is not None:
             self.basis._n_jobs = n_jobs
         if self.dimension_reducer is None:
-            self.dimension_reducer = RandomizedPCA(copy=False,svd_solver="randomized")
+            self.dimension_reducer = PCA(copy=False,svd_solver="randomized")
         if n_components is None:
             n_components = self.dimension_reducer.n_components
         if n_components is None:
