@@ -7,7 +7,7 @@ except ImportError:
 import matplotlib.colors as colors
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from sklearn.learning_curve import learning_curve
+from sklearn.model_selection import learning_curve
 from .stats import _auto_correlations
 from .stats import _cross_correlations
 import numpy as np
