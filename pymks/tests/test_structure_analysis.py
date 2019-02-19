@@ -40,11 +40,11 @@ def test_default_n_components():
 
 
 def test_default_dimension_reducer():
-    from sklearn.decomposition import RandomizedPCA
+    from sklearn.decomposition import PCA
     from pymks import MKSStructureAnalysis
     from pymks import PrimitiveBasis
     model = MKSStructureAnalysis(basis=PrimitiveBasis())
-    assert isinstance(model.dimension_reducer, RandomizedPCA)
+    assert isinstance(model.dimension_reducer, PCA)
 
 
 def test_default_correlations():
