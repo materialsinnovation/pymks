@@ -3,6 +3,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import Pipeline
 import numpy as np
+import torch
 
 
 class MKSHomogenizationModel(MKSStructureAnalysis):
@@ -360,3 +361,7 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
             _size = np.ones(len(_size), dtype=int) * _size
             _size[_axes] = _size[_axes] // 2
         return tuple(_size)
+
+
+    def save(self, fname):
+        torch.save(self, fname)
