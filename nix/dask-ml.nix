@@ -14,6 +14,7 @@ pypkgs.buildPythonPackage rec {
     pypkgs.multipledispatch
     dask-glm
     pypkgs.dask
+    pypkgs.setuptools_scm
   ];
   ignoreCollisions=true;
   catchConflicts=false;

@@ -12,6 +12,7 @@ pypkgs.buildPythonPackage rec {
     pypkgs.multipledispatch
     sklearn
     pypkgs.dask
+    pypkgs.setuptools_scm
   ];
   ignoreCollisions=true;
   catchConflicts=false;
