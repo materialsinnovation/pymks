@@ -12,6 +12,8 @@ let
   dask-glm = import ./nix/dask-glm.nix { inherit pypkgs scipy sklearn; };
   toml = import ./nix/toml.nix { inherit pypkgs; };
   black = import ./nix/black.nix { inherit pypkgs toml; };
+  distributed = import ./nix/distributed.nix { inherit pypkgs; };
+  # pytest = import ./nix/pytest.nix { inherit nixpkgs pypkgs; };
 in
   pypkgs.buildPythonPackage rec {
     pname = "pymks";
@@ -45,18 +47,20 @@ in
       pypkgs.multipledispatch
       nixpkgs.graphviz
       pypkgs.graphviz
-      pypkgs.distributed
+      distributed
       black
       pypkgs.appdirs
       toml
       nixpkgs.python36Packages.tkinter
       pypkgs.ipywidgets
     ];
-    src=./.;
+    src=builtins.filterSource (path: type: type != "directory" || baseNameOf path != ".git") ./.;
     catchConflicts=false;
     doCheck=false;
     preShellHook = ''
       jupyter nbextension install --py widgetsnbextension --user
       jupyter nbextension enable widgetsnbextension --user --py
+
+      export OMPI_MCA_plm_rsh_agent=/usr/bin/ssh
     '';
   }
