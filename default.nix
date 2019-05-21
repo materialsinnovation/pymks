@@ -13,7 +13,6 @@ let
   toml = import ./nix/toml.nix { inherit pypkgs; };
   black = import ./nix/black.nix { inherit pypkgs toml; };
   distributed = import ./nix/distributed.nix { inherit pypkgs; };
-  # pytest = import ./nix/pytest.nix { inherit nixpkgs pypkgs; };
 in
   pypkgs.buildPythonPackage rec {
     pname = "pymks";
