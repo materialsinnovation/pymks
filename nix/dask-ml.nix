@@ -1,4 +1,4 @@
-{ pypkgs, sklearn, dask-searchcv, dask-glm }:
+{ pypkgs, dask-searchcv, dask-glm }:
 pypkgs.buildPythonPackage rec {
   pname = "dask-ml";
   version = "0.6.0";
@@ -9,7 +9,7 @@ pypkgs.buildPythonPackage rec {
   buildInputs = [
     pypkgs.numpy
     pypkgs.pandas
-    sklearn
+    pypkgs.scikitlearn
     dask-searchcv
     pypkgs.multipledispatch
     dask-glm

@@ -1,4 +1,4 @@
-{ pypkgs, sklearn }:
+{ pypkgs }:
 pypkgs.buildPythonPackage rec {
   pname = "dask-searchcv";
   version = "0.2.0";
@@ -9,7 +9,7 @@ pypkgs.buildPythonPackage rec {
   buildInputs = [
     pypkgs.toolz
     pypkgs.numpy
-    sklearn
+    pypkgs.scikitlearn
     pypkgs.dask
   ];
   ignoreCollisions=true;

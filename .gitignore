@@ -156,3 +156,5 @@ ENV/
 .mypy_cache/
 
 .pytest_cache/
+
+.local/
