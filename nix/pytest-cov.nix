@@ -1,10 +1,10 @@
 { nixpkgs, pypkgs }:
 pypkgs.buildPythonPackage rec {
   pname = "pytest-cov";
-  version = "2.5.1";
+  version = "2.7.1";
   src = pypkgs.fetchPypi {
     inherit pname version;
-    sha256 = "03aa752cf11db41d281ea1d807d954c4eda35cfa1b21d6971966cc041bbf6e2d";
+    sha256 = "0filvmmyqm715azsl09ql8hy2x7h286n6d8z5x42a1wpvvys83p0";
   };
   buildInputs = [
     pypkgs.pytest

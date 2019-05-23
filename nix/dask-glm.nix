@@ -1,4 +1,4 @@
-{ pypkgs, scipy, sklearn }:
+{ pypkgs, scipy }:
 pypkgs.buildPythonPackage rec {
   pname = "dask-glm";
   version = "0.1.0";
@@ -10,7 +10,7 @@ pypkgs.buildPythonPackage rec {
     scipy
     pypkgs.cloudpickle
     pypkgs.multipledispatch
-    sklearn
+    pypkgs.scikitlearn
     pypkgs.dask
     pypkgs.setuptools_scm
   ];
