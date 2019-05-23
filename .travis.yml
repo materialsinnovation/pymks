@@ -16,6 +16,8 @@ before_install:
 before_cache:
   - mkdir -p $STORE
   - nix copy --to file://$STORE -f default.nix buildInputs
+  - nix-env -iA cachix -f https://cachix.org/api/v1/install
+  - cachix use pymks
 install:
   - nix-build -A buildInputs
 script:
