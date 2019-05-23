@@ -9,7 +9,7 @@ let
   nbval = import ./nix/nbval.nix { inherit nixpkgs pypkgs; };
   scipy = import ./nix/scipy.nix { inherit nixpkgs pypkgs; };
   sfepy = import ./nix/sfepy.nix { inherit nixpkgs pypkgs; };
-  dklearn = import ./nix/dklearn.nix { inherit nixpkgs pypkgs; };
+  dklearn = import ./nix/dklearn.nix { inherit pypkgs; };
   dask-searchcv = import ./nix/dask-searchcv.nix { inherit pypkgs; };
   dask-ml = import ./nix/dask-ml.nix { inherit pypkgs dask-searchcv dask-glm; };
   dask-glm = import ./nix/dask-glm.nix { inherit pypkgs scipy; };
