@@ -38,8 +38,9 @@ of the domain is 1.
 
 import pytest
 import numpy as np
-from toolz.curried import pipe, do, curry
+from toolz.curried import pipe, do, curry, first
 from toolz.curried import map as map_
+from toolz.sandbox.parallel import fold
 
 try:
     import sfepy  # pylint: disable=unused-import; # noqa: F401
@@ -196,7 +197,7 @@ def _check(n_phases, n_phases_other, x_data):
         raise RuntimeError("the shape of x_data is incorrect")
 
 
-def get_uv(shape, delta_x):
+def get_fields(shape, delta_x):
     """Get the fields for the displacement and test function
 
     Args:
@@ -264,6 +265,73 @@ def _get_material(property_array, domain, delta_x):
     return Material("m", function=Function("material_func", _material_func_))
 
 
+@curry
+def get_term(property_array, delta_x, fields):
+    """Get the term
+
+    Args:
+      property_array: the spatial array of property values
+      delta_x: the grid spacing
+      fields: the Sfepy u, v fields
+
+    Returns:
+      a new term
+    """
+    return Term.new(
+        "dw_lin_elastic_iso(m.lam, m.mu, v, u)",
+        Integral("i", order=4),
+        fields[0].field.region,
+        m=_get_material(property_array, fields[0].field.region.domain, delta_x),
+        u=fields[0],
+        v=fields[1],
+    )
+
+
+def subdomain_func(x_points=(), y_points=(), z_points=(), max_x=None):
+    """
+    Creates a function to mask subdomains in Sfepy.
+
+    Args:
+      x_points: tuple of lines or points to be masked in the x-plane
+      y_points: tuple of lines or points to be masked in the y-plane
+      z_points: tuple of lines or points to be masked in the z-plane
+
+    Returns:
+      array of masked location indices
+
+    """
+
+    eps = lambda x: 1e-3 * (x[1, -1] - x[0, -1])
+
+    def np_or(seq):
+        if seq:
+            return fold((lambda x, y: x | y), seq)
+        return True
+
+    @curry
+    def flag_it(points, coords, index):
+        close = lambda x: (coords[:, index] < (x + eps(coords))) & (
+            coords[:, index] > (x - eps(coords))
+        )
+        return pipe(points, map_(close), list, np_or, lambda x: (len(points) == 0) | x)
+
+    def _func(coords, domain=None):  # pylint: disable=unused-argument
+        return pipe(
+            (x_points, y_points, z_points),
+            enumerate,
+            map_(lambda x: flag_it(x[1], coords, x[0])),
+            list,
+            curry(fold)(lambda x, y: x & y),
+            lambda x: (x & (coords[:, 0] < (max_x - eps(coords))))
+            if max_x is not None
+            else x,
+            np.where,
+            first,
+        )
+
+    return _func
+
+
 class ElasticFESimulation(object):
 
     """
@@ -325,42 +393,6 @@ class ElasticFESimulation(object):
     @property
     def response(self):
         return self.strain[..., 0]
-
-    # def _get_material(self, property_array, domain, dx):
-    #     """
-    #     Creates an SfePy material from the material property fields for the
-    #     quadrature points.
-
-    #     Args:
-    #       property_array: array of the properties with shape (n_x, n_y, n_z, 2)
-
-    #     Returns:
-    #       an SfePy material
-
-    #     """
-    #     min_xyz = domain.get_mesh_bounding_box()[0]
-    #     dims = domain.get_mesh_bounding_box().shape[1]
-
-    #     def _material_func_(ts, coors, mode=None, **kwargs):
-    #         if mode == "qp":
-    #             ijk_out = np.empty_like(coors, dtype=int)
-    #             ijk = np.floor((coors - min_xyz[None]) / dx, ijk_out, casting="unsafe")
-    #             ijk_tuple = tuple(ijk.swapaxes(0, 1))
-    #             property_array_qp = property_array[ijk_tuple]
-    #             lam = property_array_qp[..., 0]
-    #             mu = property_array_qp[..., 1]
-
-    #             from sfepy.mechanics.matcoefs import stiffness_from_lame
-
-    #             stiffness = stiffness_from_lame(dims, lam=lam, mu=mu)
-    #             lam = np.ascontiguousarray(lam.reshape((lam.shape[0], 1, 1)))
-    #             mu = np.ascontiguousarray(mu.reshape((mu.shape[0], 1, 1)))
-    #             return {"lam": lam, "mu": mu, "D": stiffness}
-    #         else:
-    #             return
-
-    #     material_func = Function("material_func", _material_func_)
-    #     return Material("m", function=material_func)
 
     def _subdomain_func(self, x=(), y=(), z=(), max_x=None):
         """
@@ -430,10 +462,9 @@ class ElasticFESimulation(object):
         if len(min_xyz) == 3:
             kwargs = {"z": (max_xyz[2], min_xyz[2])}
             fix_points_dict["u.2"] = 0.0
-        fix_x_points_ = self._subdomain_func(
-            x=(min_xyz[0],), y=(max_xyz[1], min_xyz[1]), **kwargs
+        fix_x_points_ = subdomain_func(
+            x_points=(min_xyz[0],), y_points=(max_xyz[1], min_xyz[1]), **kwargs
         )
-
         fix_x_points = Function("fix_x_points", fix_x_points_)
         region_fix_points = domain.create_region(
             "region_fix_points",
@@ -463,10 +494,9 @@ class ElasticFESimulation(object):
         displacement = macro_strain * (max_xyz[0] - min_xyz[0])
         shift_points_dict = {"u.0": displacement}
 
-        shift_x_points_ = self._subdomain_func(
-            x=(max_xyz[0],), y=(max_xyz[1], min_xyz[1]), **kwargs
+        shift_x_points_ = subdomain_func(
+            x_points=(max_xyz[0],), y_points=(max_xyz[1], min_xyz[1]), **kwargs
         )
-
         shift_x_points = Function("shift_x_points", shift_x_points_)
         region_shift_points = domain.create_region(
             "region_shift_points",
@@ -494,8 +524,8 @@ class ElasticFESimulation(object):
         """
         min_xyz = domain.get_mesh_bounding_box()[0]
         max_xyz = domain.get_mesh_bounding_box()[1]
-        xplus_ = self._subdomain_func(x=(max_xyz[0],))
-        xminus_ = self._subdomain_func(x=(min_xyz[0],))
+        xplus_ = subdomain_func(x_points=(max_xyz[0],))
+        xminus_ = subdomain_func(x_points=(min_xyz[0],))
 
         xplus = Function("xplus", xplus_)
         xminus = Function("xminus", xminus_)
@@ -531,8 +561,8 @@ class ElasticFESimulation(object):
         match_plane = dim_dict[dim][1]
         min_, max_ = domain.get_mesh_bounding_box()[:, dim]
         min_x, max_x = domain.get_mesh_bounding_box()[:, 0]
-        plus_ = self._subdomain_func(max_x=max_x, **{dim_string: (max_,)})
-        minus_ = self._subdomain_func(max_x=max_x, **{dim_string: (min_,)})
+        plus_ = subdomain_func(max_x=max_x, **{dim_string + "_points": (max_,)})
+        minus_ = subdomain_func(max_x=max_x, **{dim_string + "_points": (min_,)})
         plus_string = dim_string + "plus"
         minus_string = dim_string + "minus"
         plus = Function(plus_string, plus_)
@@ -571,8 +601,8 @@ class ElasticFESimulation(object):
         dim_string = dim_dict[dim][0]
         match_plane = dim_dict[dim][1]
         min_, max_ = domain.get_mesh_bounding_box()[:, dim]
-        plus_ = self._subdomain_func(**{dim_string: (max_,)})
-        minus_ = self._subdomain_func(**{dim_string: (min_,)})
+        plus_ = subdomain_func(**{dim_string + "_points": (max_,)})
+        minus_ = subdomain_func(**{dim_string + "_points": (min_,)})
         plus_string = dim_string + "plus"
         minus_string = dim_string + "minus"
         plus = Function(plus_string, plus_)
@@ -603,7 +633,7 @@ class ElasticFESimulation(object):
         )
         return bc, match_plane
 
-    def solve(self, property_array, macro_strain, dx):
+    def solve(self, property_array, macro_strain, delta_x):
         """
         Solve the Sfepy problem for one sample.
 
@@ -618,20 +648,16 @@ class ElasticFESimulation(object):
 
         """
 
-        u, v = get_uv(property_array.shape[:-1], dx)
+        fields = get_fields(property_array.shape[:-1], delta_x)
 
-        domain = u.field.region.domain
-        region_all = u.field.region
-        shape = property_array.shape[:-1]
-        m = _get_material(property_array, domain, dx)
-
-        integral = Integral("i", order=4)
-
-        t1 = Term.new(
-            "dw_lin_elastic_iso(m.lam, m.mu, v, u)", integral, region_all, m=m, v=v, u=u
+        eqs = pipe(
+            fields,
+            get_term(property_array, delta_x),
+            lambda x: Equation("balance_of_forces", x),
+            lambda x: Equations([x]),
         )
-        eq = Equation("balance_of_forces", t1)
-        eqs = Equations([eq])
+
+        domain = fields[0].field.region.domain
 
         epbcs, functions = self._get_periodicBCs(domain)
         ebcs = self._get_displacementBCs(domain, macro_strain)
@@ -656,6 +682,7 @@ class ElasticFESimulation(object):
         vec = pb.solve()
 
         u = vec.create_output_dict()["u"].data
+        shape = property_array.shape[:-1]
         u_reshape = np.reshape(u, (tuple(x + 1 for x in shape) + u.shape[-1:]))
 
         dims = domain.get_mesh_bounding_box().shape[1]
