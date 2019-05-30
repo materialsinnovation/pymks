@@ -453,6 +453,42 @@ def get_periodic_bcs(domain):
     )
 
 
+def get_shift_or_fixed_bcs(domain, points_dict_f, name, x_points_f):
+    """Generic function for generating fixed or shift boundary conditions
+
+    Args:
+      domain: the sfepy domain
+      points_dict_f: function to return displacements
+      name: the unique of the boundary condition
+      x_points_f: function to return x_points for subdomain_func
+
+    Returns:
+      a Sfepy EssentialBC
+    """
+
+    def func(min_xyz, max_xyz):
+        return pipe(
+            dict(z_points=(max_xyz[2], min_xyz[2])) if len(min_xyz) == 3 else dict(),
+            lambda x: subdomain_func(
+                x_points=x_points_f(min_xyz, max_xyz),
+                y_points=(max_xyz[1], min_xyz[1]),
+                **x,
+            ),
+            lambda x: Function(f"{name}_x_points", x),
+            lambda x: domain.create_region(
+                f"region_{name}_points",
+                f"vertices by {name}_x_points",
+                "vertex",
+                functions=Functions([x]),
+            ),
+            lambda x: EssentialBC(
+                f"{name}_points_BC", x, points_dict_f(min_xyz, max_xyz)
+            ),
+        )
+
+    return func(domain.get_mesh_bounding_box()[0], domain.get_mesh_bounding_box()[1])
+
+
 def get_shift_bcs(domain, macro_strain):
     """
     Fix the right top and bottom points in x, y and z
@@ -465,26 +501,33 @@ def get_shift_bcs(domain, macro_strain):
       the Sfepy boundary conditions
 
     """
+    return get_shift_or_fixed_bcs(
+        domain,
+        lambda min_, max_: {"u.0": macro_strain * (max_[0] - min_[0])},
+        "shift",
+        lambda min_, max_: (max_[0],),
+    )
 
-    def func(min_xyz, max_xyz):
-        return pipe(
-            dict(z_points=(max_xyz[2], min_xyz[2])) if len(min_xyz) == 3 else dict(),
-            lambda x: subdomain_func(
-                x_points=(max_xyz[0],), y_points=(max_xyz[1], min_xyz[1]), **x
-            ),
-            lambda x: Function("shift_x_points", x),
-            lambda x: domain.create_region(
-                "region_shift_points",
-                "vertices by shift_x_points",
-                "vertex",
-                functions=Functions([x]),
-            ),
-            lambda x: EssentialBC(
-                "shift_points_BC", x, {"u.0": macro_strain * (max_xyz[0] - min_xyz[0])}
-            ),
-        )
 
-    return func(domain.get_mesh_bounding_box()[0], domain.get_mesh_bounding_box()[1])
+def get_fixed_bcs(domain):
+    """
+    Fix the left top and bottom points in x, y and z
+
+    Args:
+      domain: an Sfepy domain
+
+    Returns:
+      the Sfepy boundary conditions
+
+    """
+    return get_shift_or_fixed_bcs(
+        domain,
+        lambda min_, max_: merge(
+            {"u.0": 0.0, "u.1": 0.0}, {"u.2": 0.0} if len(min_) == 3 else dict()
+        ),
+        "fix",
+        lambda min_, max_: (min_[0],),
+    )
 
 
 class ElasticFESimulation(object):
@@ -598,40 +641,9 @@ class ElasticFESimulation(object):
         center = np.zeros_like(shape)
         return gen_block_mesh(shape, np.array(shape) + 1, center, verbose=False)
 
-    def _get_fixed_displacementsBCs(self, domain):
-        """
-        Fix the left top and bottom points in x, y and z
-
-        Args:
-          domain: an Sfepy domain
-
-        Returns:
-          the Sfepy boundary conditions
-
-        """
-        min_xyz = domain.get_mesh_bounding_box()[0]
-        max_xyz = domain.get_mesh_bounding_box()[1]
-
-        kwargs = {}
-        fix_points_dict = {"u.0": 0.0, "u.1": 0.0}
-        if len(min_xyz) == 3:
-            kwargs = {"z_points": (max_xyz[2], min_xyz[2])}
-            fix_points_dict["u.2"] = 0.0
-        fix_x_points_ = subdomain_func(
-            x_points=(min_xyz[0],), y_points=(max_xyz[1], min_xyz[1]), **kwargs
-        )
-        fix_x_points = Function("fix_x_points", fix_x_points_)
-        region_fix_points = domain.create_region(
-            "region_fix_points",
-            "vertices by fix_x_points",
-            "vertex",
-            functions=Functions([fix_x_points]),
-        )
-        return EssentialBC("fix_points_BC", region_fix_points, fix_points_dict)
-
     def _get_displacementBCs(self, domain, macro_strain):
         shift_points_BC = get_shift_bcs(domain, macro_strain)
-        fix_points_BC = self._get_fixed_displacementsBCs(domain)
+        fix_points_BC = get_fixed_bcs(domain)
         return Conditions([fix_points_BC, shift_points_BC])
 
     def _get_linear_combinationBCs(self, domain, macro_strain):
