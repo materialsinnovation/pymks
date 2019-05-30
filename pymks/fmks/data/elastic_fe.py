@@ -489,9 +489,14 @@ def get_shift_or_fixed_bcs(domain, points_dict_f, name, x_points_f):
     return func(domain.get_mesh_bounding_box()[0], domain.get_mesh_bounding_box()[1])
 
 
-def get_shift_bcs(domain, macro_strain):
-    """
-    Fix the right top and bottom points in x, y and z
+def get_displacement_bcs(domain, macro_strain):
+    """Get the shift and fixed BCs.
+
+    The shift BC has the the right top and bottom points in x, y and z
+    fixed or displaced.
+
+    The fixed BC has the left top and bottom points in x, y and z
+    fixed.
 
     Args:
       domain: an Sfepy domain
@@ -501,33 +506,59 @@ def get_shift_bcs(domain, macro_strain):
       the Sfepy boundary conditions
 
     """
-    return get_shift_or_fixed_bcs(
-        domain,
-        lambda min_, max_: {"u.0": macro_strain * (max_[0] - min_[0])},
-        "shift",
-        lambda min_, max_: (max_[0],),
+    return Conditions(
+        [
+            get_shift_or_fixed_bcs(
+                domain,
+                lambda min_, max_: {"u.0": macro_strain * (max_[0] - min_[0])},
+                "shift",
+                lambda min_, max_: (max_[0],),
+            ),
+            get_shift_or_fixed_bcs(
+                domain,
+                lambda min_, max_: merge(
+                    {"u.0": 0.0, "u.1": 0.0}, {"u.2": 0.0} if len(min_) == 3 else dict()
+                ),
+                "fix",
+                lambda min_, max_: (min_[0],),
+            ),
+        ]
     )
 
 
-def get_fixed_bcs(domain):
+def get_linear_combination_bcs(domain, macro_strain):
     """
-    Fix the left top and bottom points in x, y and z
+    The right nodes are periodic with the left nodes but also displaced.
 
     Args:
-      domain: an Sfepy domain
+      domain: the Sfepy domain
+      macro_strain: the macro strain
 
     Returns:
-      the Sfepy boundary conditions
+      linear combination boundary conditions
 
     """
-    return get_shift_or_fixed_bcs(
-        domain,
-        lambda min_, max_: merge(
-            {"u.0": 0.0, "u.1": 0.0}, {"u.2": 0.0} if len(min_) == 3 else dict()
-        ),
-        "fix",
-        lambda min_, max_: (min_[0],),
-    )
+
+    def func(min_xyz, max_xyz):
+        def shift_(_, coors, __):
+            return np.ones_like(coors[:, 0]) * macro_strain * (max_xyz[0] - min_xyz[0])
+
+        return pipe(
+            [("plus", max_xyz[0]), ("minus", min_xyz[0])],
+            map_(get_region_func(None, "x", domain)),
+            list,
+            lambda x: LinearCombinationBC(
+                "lcbc",
+                x,
+                {"u.0": "u.0"},
+                Function("match_x_plane", per.match_x_plane),
+                "shifted_periodic",
+                arguments=(Function("shift", shift_),),
+            ),
+            lambda x: Conditions([x]),
+        )
+
+    return func(domain.get_mesh_bounding_box()[0], domain.get_mesh_bounding_box()[1])
 
 
 class ElasticFESimulation(object):
@@ -588,144 +619,6 @@ class ElasticFESimulation(object):
 
     """
 
-    @property
-    def response(self):
-        return self.strain[..., 0]
-
-    def _subdomain_func(self, x=(), y=(), z=(), max_x=None):
-        """
-        Creates a function to mask subdomains in Sfepy.
-
-        Args:
-          x: tuple of lines or points to be masked in the x-plane
-          y: tuple of lines or points to be masked in the y-plane
-          z: tuple of lines or points to be masked in the z-plane
-
-        Returns:
-          array of masked location indices
-
-        """
-
-        def _func(coords, domain=None):
-            eps = 1e-3 * (coords[1, -1] - coords[0, -1])
-            flag_x = len(x) == 0
-            flag_y = len(y) == 0
-            flag_z = len(z) == 0
-            for x_ in x:
-                flag = (coords[:, 0] < (x_ + eps)) & (coords[:, 0] > (x_ - eps))
-                flag_x = flag_x | flag
-            for y_ in y:
-                flag = (coords[:, 1] < (y_ + eps)) & (coords[:, 1] > (y_ - eps))
-                flag_y = flag_y | flag
-            for z_ in z:
-                flag = (coords[:, 2] < (z_ + eps)) & (coords[:, 2] > (z_ - eps))
-                flag_z = flag_z | flag
-            flag = flag_x & flag_y & flag_z
-            if max_x is not None:
-                flag = flag & (coords[:, 0] < (max_x - eps))
-            return np.where(flag)[0]
-
-        return _func
-
-    def _get_mesh(self, shape):
-        """
-        Generate an Sfepy rectangular mesh
-
-        Args:
-          shape: proposed shape of domain (vertex shape) (n_x, n_y)
-
-        Returns:
-          Sfepy mesh
-
-        """
-        center = np.zeros_like(shape)
-        return gen_block_mesh(shape, np.array(shape) + 1, center, verbose=False)
-
-    def _get_displacementBCs(self, domain, macro_strain):
-        shift_points_BC = get_shift_bcs(domain, macro_strain)
-        fix_points_BC = get_fixed_bcs(domain)
-        return Conditions([fix_points_BC, shift_points_BC])
-
-    def _get_linear_combinationBCs(self, domain, macro_strain):
-        """
-        The right nodes are periodic with the left nodes but also displaced.
-
-        Args:
-          domain: an Sfepy domain
-
-        Returns:
-          the Sfepy boundary conditions
-
-        """
-        min_xyz = domain.get_mesh_bounding_box()[0]
-        max_xyz = domain.get_mesh_bounding_box()[1]
-        xplus_ = subdomain_func(x_points=(max_xyz[0],))
-        xminus_ = subdomain_func(x_points=(min_xyz[0],))
-
-        xplus = Function("xplus", xplus_)
-        xminus = Function("xminus", xminus_)
-        region_x_plus = domain.create_region(
-            "region_x_plus", "vertices by xplus", "facet", functions=Functions([xplus])
-        )
-        region_x_minus = domain.create_region(
-            "region_x_minus",
-            "vertices by xminus",
-            "facet",
-            functions=Functions([xminus]),
-        )
-        match_x_plane = Function("match_x_plane", per.match_x_plane)
-
-        def shift_(ts, coors, region):
-            return np.ones_like(coors[:, 0]) * macro_strain * (max_xyz[0] - min_xyz[0])
-
-        shift = Function("shift", shift_)
-        lcbc = LinearCombinationBC(
-            "lcbc",
-            [region_x_plus, region_x_minus],
-            {"u.0": "u.0"},
-            match_x_plane,
-            "shifted_periodic",
-            arguments=(shift,),
-        )
-
-        return Conditions([lcbc])
-
-    def _get_periodicBC_X(self, domain, dim):
-        dim_dict = {1: ("y", per.match_y_plane), 2: ("z", per.match_z_plane)}
-        dim_string = dim_dict[dim][0]
-        match_plane = dim_dict[dim][1]
-        min_, max_ = domain.get_mesh_bounding_box()[:, dim]
-        min_x, max_x = domain.get_mesh_bounding_box()[:, 0]
-        plus_ = subdomain_func(max_x=max_x, **{dim_string + "_points": (max_,)})
-        minus_ = subdomain_func(max_x=max_x, **{dim_string + "_points": (min_,)})
-        plus_string = dim_string + "plus"
-        minus_string = dim_string + "minus"
-        plus = Function(plus_string, plus_)
-        minus = Function(minus_string, minus_)
-        region_plus = domain.create_region(
-            "region_{0}_plus".format(dim_string),
-            "vertices by {0}".format(plus_string),
-            "facet",
-            functions=Functions([plus]),
-        )
-        region_minus = domain.create_region(
-            "region_{0}_minus".format(dim_string),
-            "vertices by {0}".format(minus_string),
-            "facet",
-            functions=Functions([minus]),
-        )
-        match_plane = Function("match_{0}_plane".format(dim_string), match_plane)
-
-        bc_dict = {"u.0": "u.0"}
-
-        bc = PeriodicBC(
-            "periodic_{0}".format(dim_string),
-            [region_plus, region_minus],
-            bc_dict,
-            match="match_{0}_plane".format(dim_string),
-        )
-        return bc, match_plane
-
     def solve(self, property_array, macro_strain, delta_x):
         """
         Solve the Sfepy problem for one sample.
@@ -753,8 +646,10 @@ class ElasticFESimulation(object):
         domain = fields[0].field.region.domain
 
         epbcs, functions = get_periodic_bcs(domain)
-        ebcs = self._get_displacementBCs(domain, macro_strain)
-        lcbcs = self._get_linear_combinationBCs(domain, macro_strain)
+
+        ebcs = get_displacement_bcs(domain, macro_strain)
+
+        lcbcs = get_linear_combination_bcs(domain, macro_strain)
 
         ls = ScipyDirect({})
 
