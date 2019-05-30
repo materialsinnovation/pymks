@@ -34,6 +34,35 @@ of the domain is 1.
 >>> assert np.allclose(eyy, 0)
 >>> assert np.allclose(exy, 0)
 
+The following example is for a system with contrast. It tests the
+left/right periodic offset and the top/bottom periodicity.
+
+>>> X = np.array([[[1, 0, 0, 1],
+...                [0, 1, 1, 1],
+...                [0, 0, 1, 1],
+...                [1, 0, 0, 1]]])
+>>> n_samples, N, N = X.shape
+>>> macro_strain = 0.1
+>>> _, displacement, _ = solve(
+...     X,
+...     elastic_modulus=(10.0, 1.0),
+...     poissons_ratio=(0.3, 0.3),
+...     macro_strain=macro_strain
+... )
+>>> u = displacement[0]
+
+Check that the offset for the left/right planes is `N *
+macro_strain`.
+
+>>> assert np.allclose(u[-1,:,0] - u[0,:,0], N * macro_strain)
+
+Check that the left/right side planes are periodic in y.
+
+>>> assert np.allclose(u[0,:,1], u[-1,:,1])
+
+Check that the top/bottom planes are periodic in both x and y.
+
+>>> assert np.allclose(u[:,0], u[:,-1])
 """
 
 import pytest
@@ -97,13 +126,22 @@ def solve(x_data, elastic_modulus, poissons_ratio, macro_strain=1., delta_x=1.):
       (n_samples, n_x, ...)
 
     """
+
+    def func(property_array):
+        return pipe(
+            get_fields(property_array.shape[:-1], delta_x),
+            lambda x: get_problem(x, property_array, delta_x, macro_strain),
+            lambda x: (x, x.solve()),
+            lambda x: get_data(property_array.shape[:-1], *x),
+        )
+
     return pipe(
         x_data,
         do(_check(len(elastic_modulus), len(poissons_ratio))),
         lambda x: _convert_properties(
             len(x.shape) - 1, elastic_modulus, poissons_ratio
         )[x],
-        map_(lambda x: ElasticFESimulation().solve(x, macro_strain, delta_x)),
+        map_(func),
         lambda x: zip(*x),
         map_(np.array),
         tuple,
@@ -561,135 +599,111 @@ def get_linear_combination_bcs(domain, macro_strain):
     return func(domain.get_mesh_bounding_box()[0], domain.get_mesh_bounding_box()[1])
 
 
-class ElasticFESimulation(object):
+def get_nls(evaluator):
+    """Get the non-linear solver
 
+    Args:
+      evaluator: the problem evaluator
+
+    Returns:
+      the non-linear solver
     """
-    Use SfePy to solve a linear strain problem in 2D with a varying
-    microstructure on a rectangular grid. The rectangle (cube) is held
-    at the negative edge (plane) and displaced by 1 on the positive x
-    edge (plane). Periodic boundary conditions are applied to the
-    other boundaries.
+    return Newton(
+        {},
+        lin_solver=ScipyDirect({}),
+        fun=evaluator.eval_residual,
+        fun_grad=evaluator.eval_tangent_matrix,
+    )
 
-    The microstructure is of shape (n_samples, n_x, n_y) or (n_samples, n_x,
-    n_y, n_z).
 
-    >>> X = np.zeros((1, 3, 3), dtype=int)
-    >>> X[0, :, 1] = 1
+def get_problem(fields, property_array, delta_x, macro_strain):
+    """Build the Sfepy problem
 
-    >>> y, _, _ = solve(X, elastic_modulus=(1.0, 10.0), poissons_ratio=(0., 0.))
+    Args:
+      fields: the Sfepy fields
+      property_array: lame and mu params for every mesh element
+      delta_x: the grid spacing
+      macro_strain: the macro strain
 
-    y is the strain with components as follows
-
-    >>> exx = y[..., 0]
-    >>> eyy = y[..., 1]
-    >>> exy = y[..., 2]
-
-    In this example, the strain is only in the x-direction and has a
-    uniform value of 1 since the displacement is always 1 and the size
-    of the domain is 1.
-
-    >>> assert np.allclose(exx, 1)
-    >>> assert np.allclose(eyy, 0)
-    >>> assert np.allclose(exy, 0)
-
-    The following example is for a system with contrast. It tests the
-    left/right periodic offset and the top/bottom periodicity.
-
-    >>> X = np.array([[[1, 0, 0, 1],
-    ...                [0, 1, 1, 1],
-    ...                [0, 0, 1, 1],
-    ...                [1, 0, 0, 1]]])
-    >>> n_samples, N, N = X.shape
-    >>> macro_strain = 0.1
-    >>> _, displacement, _ = solve(X, elastic_modulus=(10.0, 1.0), poissons_ratio=(0.3, 0.3), macro_strain=macro_strain)
-    >>> u = displacement[0]
-
-    Check that the offset for the left/right planes is `N *
-    macro_strain`.
-
-    >>> assert np.allclose(u[-1,:,0] - u[0,:,0], N * macro_strain)
-
-    Check that the left/right side planes are periodic in y.
-
-    >>> assert np.allclose(u[0,:,1], u[-1,:,1])
-
-    Check that the top/bottom planes are periodic in both x and y.
-
-    >>> assert np.allclose(u[:,0], u[:,-1])
-
+    Returns:
+      the Sfepy problem
     """
 
-    def solve(self, property_array, macro_strain, delta_x):
-        """
-        Solve the Sfepy problem for one sample.
-
-        Args:
-          property_array: array of shape (n_x, n_y, 2) where the last
-          index is for Lame's parameter and shear modulus,
-          respectively.
-
-        Returns:
-          the strain field of shape (n_x, n_y, 2) where the last
-          index represents the x and y displacements
-
-        """
-
-        fields = get_fields(property_array.shape[:-1], delta_x)
-
-        eqs = pipe(
+    def func(epbcs, functions, ebcs, lcbcs):
+        return pipe(
             fields,
             get_term(property_array, delta_x),
-            lambda x: Equation("balance_of_forces", x),
-            lambda x: Equations([x]),
+            lambda x: [Equation("balance_of_forces", x)],
+            Equations,
+            lambda x: Problem("elasticity", equations=x, functions=functions),
+            do(lambda x: x.time_update(ebcs=ebcs, epbcs=epbcs, lcbcs=lcbcs)),
+            do(lambda x: x.set_solver(get_nls(x.get_evaluator()))),
         )
 
-        domain = fields[0].field.region.domain
+    return pipe(
+        fields[0].field.region.domain,
+        lambda x: func(
+            *get_periodic_bcs(x),
+            get_displacement_bcs(x, macro_strain),
+            get_linear_combination_bcs(x, macro_strain),
+        ),
+    )
 
-        epbcs, functions = get_periodic_bcs(domain)
 
-        ebcs = get_displacement_bcs(domain, macro_strain)
+def get_stress_strain_data(problem, shape, name):
+    """Get the stress or strain data
 
-        lcbcs = get_linear_combination_bcs(domain, macro_strain)
+    Args:
+      problem: the sovled Sfepy problem
+      shape: the shape of the domain
+      name: either 'stress' or 'strain' string
 
-        ls = ScipyDirect({})
+    Returns:
+      reshaped stress or strain data
+    """
+    return pipe(
+        dict(
+            dims=problem.domain.get_mesh_bounding_box().shape[1],
+            args=dict(stress="m.D, u", strain="u")[name],
+            name=name,
+        ),
+        lambda x: "ev_cauchy_{name}.{dims}.region_all({args})".format(**x),
+        lambda x: problem.evaluate(x, mode="el_avg", copy_materials=False),
+        np.squeeze,
+        lambda x: np.reshape(x, (shape + x.shape[-1:])),
+    )
 
-        pb = Problem("elasticity", equations=eqs, functions=functions)
 
-        pb.time_update(ebcs=ebcs, epbcs=epbcs, lcbcs=lcbcs)
+def get_displacement(vec, shape):
+    """Extract the displacement data
 
-        ev = pb.get_evaluator()
-        nls = Newton(
-            {}, lin_solver=ls, fun=ev.eval_residual, fun_grad=ev.eval_tangent_matrix
-        )
+    Args:
+      vec: the output from problem.solve()
+      shape: the grid shape
 
-        try:
-            pb.set_solvers_instances(ls, nls)
-        except AttributeError:
-            pb.set_solver(nls)
+    Returns:
+      displacement field
+    """
+    return pipe(
+        vec.create_output_dict()["u"].data,
+        lambda x: np.reshape(x, (tuple(x + 1 for x in shape) + x.shape[-1:])),
+    )
 
-        vec = pb.solve()
 
-        u = vec.create_output_dict()["u"].data
-        shape = property_array.shape[:-1]
-        u_reshape = np.reshape(u, (tuple(x + 1 for x in shape) + u.shape[-1:]))
+@curry
+def get_data(shape, problem, vec):
+    """Get the data fields given a solved Sfepy problem
 
-        dims = domain.get_mesh_bounding_box().shape[1]
-        strain = np.squeeze(
-            pb.evaluate(
-                "ev_cauchy_strain.{dim}.region_all(u)".format(dim=dims),
-                mode="el_avg",
-                copy_materials=False,
-            )
-        )
-        strain_reshape = np.reshape(strain, (shape + strain.shape[-1:]))
+    Args:
+      shape: the grid shape
+      problem: the solved Sfepy problem
+      vec: the output from problem.solve()
 
-        stress = np.squeeze(
-            pb.evaluate(
-                "ev_cauchy_stress.{dim}.region_all(m.D, u)".format(dim=dims),
-                mode="el_avg",
-                copy_materials=False,
-            )
-        )
-        stress_reshape = np.reshape(stress, (shape + stress.shape[-1:]))
-
-        return strain_reshape, u_reshape, stress_reshape
+    Returns
+      the reshaped displacement field
+    """
+    return (
+        get_stress_strain_data(problem, shape, "strain"),
+        get_displacement(vec, shape),
+        get_stress_strain_data(problem, shape, "stress"),
+    )
