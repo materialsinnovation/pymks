@@ -5,4 +5,4 @@ extension-pkg-whitelist = numpy
 ignored-modules = numpy, toolz.curried
 
 [MESSAGES CONTROL]
-disable = no-value-for-parameter
+disable = no-value-for-parameter, bad-continuation
