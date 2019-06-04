@@ -5,8 +5,10 @@ from functools import wraps
 
 import numpy as np
 import dask.array as da
+from dask import delayed
 import toolz.curried
-from toolz.curried import iterate, compose
+from toolz.curried import iterate, compose, pipe, get
+from toolz.curried import map as map_
 
 
 def curry(func):
@@ -85,12 +87,13 @@ def iterate_times(func, times, value):
 
 
 @curry
-def map_blocks(func, data):
+def map_blocks(func, data, chunks=None):
     """Curried version of Dask's map_blocks
 
     Args:
       func: the function to map
       data: a Dask array
+      chunks: chunks for new array if reshaped
 
     Returns:
       a new Dask array
@@ -99,7 +102,7 @@ def map_blocks(func, data):
     >>> f(da.arange(4, chunks=(2,)))
     dask.array<lambda, shape=(4,), dtype=int64, chunksize=(2,)>
     """
-    return da.map_blocks(func, data)
+    return da.map_blocks(func, data, chunks=chunks)
 
 
 allclose = curry(np.allclose)  # pylint: disable=invalid-name
@@ -143,3 +146,70 @@ def rcompose(*args):
     >>> assert rcompose(lambda x: x + 1, lambda x: x * 2)(3) == 8
     """
     return compose(*args[::-1])
+
+
+sequence = rcompose  # pylint: disable=invalid-name
+
+
+def apply_dict_func(func, data, shape_dict):
+
+    """Apply a function that returns a dictionary of arrays to a Dask
+    array in parallel.
+
+    e.g.
+
+    >>> data = da.from_array(np.arange(36).reshape(4, 3, 3), chunks=(2, 3, 3))
+    >>> def func(arr):
+    ...     return dict(
+    ...         a=np.resize(
+    ...             arr,
+    ...             (arr.shape[0],) + (arr.shape[1] + 1,) + (arr.shape[2] + 1,)
+    ...         ),
+    ...         b=np.resize(arr, (arr.shape[:3]) + (1,))
+    ...     )
+    >>> out = apply_dict_func(func, data, dict(a=(4, 4, 4), b=(4, 3, 3, 1)))
+    >>> print(out['a'].chunks)
+    ((2, 2), (4,), (4,))
+    >>> print(out['b'].shape)
+    (4, 3, 3, 1)
+    >>> print(out['a'].compute().shape)
+    (4, 4, 4)
+
+    Args:
+      func: the function to apply to the Dask array
+      data: the Dask array to call the function with
+      shape_dict: a dictionary of shapes, the keys are the keys
+        returned by the funcion and the shapes correspond to the
+        shapes that are output from the function
+
+    """
+
+    @curry
+    def from_delayed(key, shape, delayed_func):
+        return da.from_delayed(
+            delayed_func, dtype=float, shape=(shape[0],) + shape_dict[key][1:]
+        )
+
+    def concat(key):
+        return pipe(
+            lambda x: func(np.array(x)),
+            delayed,
+            lambda x: map_(lambda y: (y.shape, x(y)), data.blocks),
+            map_(lambda x: (x[0], get(key, x[1]))),
+            map_(lambda x: from_delayed(key, x[0], x[1])),
+            list,
+            lambda x: da.concatenate(x, axis=0),
+        )
+
+    return pipe(shape_dict.keys(), map_(lambda x: (x, concat(x))), dict)
+
+
+@curry
+def debug(stmt, data):  # pragma: no cover
+    """Helpful debug function
+    """
+    print(stmt)
+    import ipdb
+
+    ipdb.set_trace()
+    return data

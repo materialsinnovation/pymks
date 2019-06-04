@@ -12,13 +12,13 @@ n_x, n_y, n_z).
 >>> X = np.zeros((1, 3, 3), dtype=int)
 >>> X[0, :, 1] = 1
 
->>> strain, _, _ = solve(
+>>> strain = solve(
 ...     X,
 ...     elastic_modulus=(1.0, 10.0),
 ...     poissons_ratio=(0., 0.),
 ...     macro_strain=1.,
 ...     delta_x=1.
-... )
+... )['strain']
 
 y is the strain with components as follows
 
@@ -43,12 +43,12 @@ left/right periodic offset and the top/bottom periodicity.
 ...                [1, 0, 0, 1]]])
 >>> n_samples, N, N = X.shape
 >>> macro_strain = 0.1
->>> _, displacement, _ = solve(
+>>> displacement = solve(
 ...     X,
 ...     elastic_modulus=(10.0, 1.0),
 ...     poissons_ratio=(0.3, 0.3),
 ...     macro_strain=macro_strain
-... )
+... )['displacement']
 >>> u = displacement[0]
 
 Check that the offset for the left/right planes is `N *
@@ -63,17 +63,44 @@ Check that the left/right side planes are periodic in y.
 Check that the top/bottom planes are periodic in both x and y.
 
 >>> assert np.allclose(u[:,0], u[:,-1])
+
+The module also works with Dask arrays,
+
+>>> X = np.array([[[1, 0, 0, 1],
+...                [0, 1, 1, 1],
+...                [0, 0, 1, 1],
+...                [1, 0, 0, 1]],
+...               [[0, 0, 0, 1],
+...                [0, 0, 1, 1],
+...                [1, 0, 1, 1],
+...                [1, 1, 0, 1]]
+...              ])
+>>> print(X.shape)
+(2, 4, 4)
+>>> x_data = da.from_array(X, chunks=(1, 4, 4))
+>>> out = solve(x_data,
+...             elastic_modulus=(10.0, 1.0),
+...             poissons_ratio=(0.3, 0.3),
+...             macro_strain=macro_strain)['displacement']
+>>> print(out.chunks)
+((1, 1), (5,), (5,), (2,))
+>>> print(out.shape)
+(2, 5, 5, 2)
+>>> value = out.compute()
+>>> assert np.allclose(value[0, -1, :, 0] - value[0 ,0, :,0], N * macro_strain)
+
 """
 
 import pytest
 import numpy as np
-from toolz.curried import pipe, do, curry, first, merge
+import dask.array as da
+from toolz.curried import pipe, do, first, merge
 from toolz.curried import map as map_
 from toolz.sandbox.parallel import fold
 
 try:
     import sfepy  # pylint: disable=unused-import; # noqa: F401
-except ImportError:
+except ImportError:  # pragma: no cover
     pytest.importorskip("sfepy")
     raise
 
@@ -82,7 +109,7 @@ from sfepy.discrete.fem import Field
 
 try:
     from sfepy.discrete.fem import FEDomain as Domain
-except ImportError:
+except ImportError:  # pragma: no cover
     from sfepy.discrete.fem import Domain
 from sfepy.discrete import (
     FieldVariable,
@@ -105,6 +132,7 @@ from sfepy.base.base import output
 from sfepy.discrete.conditions import LinearCombinationBC
 from sfepy.mechanics.matcoefs import stiffness_from_lame
 
+from ..func import curry, sequence, apply_dict_func
 
 goptions["verbose"] = False
 output.set_output(quiet=True)
@@ -122,12 +150,13 @@ def solve(x_data, elastic_modulus, poissons_ratio, macro_strain=1., delta_x=1.):
       delta_x: the grid spacing
 
     Returns:
-      a tuple of strain, displacement and stress each of shape
-      (n_samples, n_x, ...)
+      a dictionary of strain, displacement and stress with stress and
+      strain of shape (n_samples, n_x, ..., 3) and displacement shape
+      of (n_samples, n_x + 1, ..., 2)
 
     """
 
-    def func(property_array):
+    def solve_one_sample(property_array):
         return pipe(
             get_fields(property_array.shape[:-1], delta_x),
             lambda x: get_problem(x, property_array, delta_x, macro_strain),
@@ -135,16 +164,32 @@ def solve(x_data, elastic_modulus, poissons_ratio, macro_strain=1., delta_x=1.):
             lambda x: get_data(property_array.shape[:-1], *x),
         )
 
-    return pipe(
-        x_data,
+    convert = lambda x: _convert_properties(
+        len(x.shape) - 1, elastic_modulus, poissons_ratio
+    )[x]
+
+    solve_multiple_samples = sequence(
         do(_check(len(elastic_modulus), len(poissons_ratio))),
-        lambda x: _convert_properties(
-            len(x.shape) - 1, elastic_modulus, poissons_ratio
-        )[x],
-        map_(func),
+        convert,
+        map_(solve_one_sample),
         lambda x: zip(*x),
         map_(np.array),
-        tuple,
+        lambda x: zip(("strain", "displacement", "stress"), tuple(x)),
+        dict,
+    )
+
+    shape = lambda x: (x.shape[0],) + x.shape[1:] + (3,)
+    dis_shape = lambda x: (x.shape[0],) + tuple(y + 1 for y in x.shape[1:]) + (2,)
+
+    if isinstance(x_data, np.ndarray):
+        return solve_multiple_samples(x_data)
+
+    return apply_dict_func(
+        solve_multiple_samples,
+        x_data,
+        dict(
+            strain=shape(x_data), stress=shape(x_data), displacement=dis_shape(x_data)
+        ),
     )
 
 
@@ -218,19 +263,49 @@ def _convert_properties(dim, elastic_modulus, poissons_ratio):
 
 @curry
 def _check(n_phases, n_phases_other, x_data):
-    """Various sanity checks on the data, Elastic modulus and Poissons ratio.
+    """Various sanity checks on the data, Elastic modulus and Poissons
+    ratio.
 
     Args:
       n_phases: number of phases in the elastic modulus
       n_phases_other: number of phases in the Poissons ratio
       x_data: the microstructures
 
+    Poissons ratio and elasticy arrays must have equal length
+
+    >>> _check(3, 2, None)
+    Traceback (most recent call last):
+    ...
+    RuntimeError: elastic_modulus and poissons_ratio must be the same length
+
+    The microstructure array must be integer values
+
+    >>> _check(1, 1, np.zeros((2, 2), dtype=float))
+    Traceback (most recent call last):
+    ...
+    TypeError: X must be an integer array
+
+    The microstructure array must be shape (n_sample, n_x, n_y) or
+    (n_sample, n_x, n_y, n_z)
+
+    >>> _check(2, 2, np.array([0, 1]).reshape((1, 2)))
+    Traceback (most recent call last):
+    ...
+    RuntimeError: the shape of x_data is incorrect
+
+    The phase index must be bounded by 0 and the n_phases - 1.
+
+    >>> _check(2, 2, np.array([0, 3]))
+    Traceback (most recent call last):
+    ...
+    RuntimeError: X must be between 0 and 1.
+
     """
     if n_phases != n_phases_other:
         raise RuntimeError("elastic_modulus and poissons_ratio must be the same length")
     if not issubclass(x_data.dtype.type, np.integer):
         raise TypeError("X must be an integer array")
-    if np.max(x_data) >= n_phases or np.min(x_data) < 0:
+    if da.max(x_data) >= n_phases or da.min(x_data) < 0:
         raise RuntimeError("X must be between 0 and {N}.".format(N=n_phases - 1))
     if not 3 <= len(x_data.shape) <= 4:
         raise RuntimeError("the shape of x_data is incorrect")
@@ -702,6 +777,7 @@ def get_data(shape, problem, vec):
     Returns
       the reshaped displacement field
     """
+
     return (
         get_stress_strain_data(problem, shape, "strain"),
         get_displacement(vec, shape),

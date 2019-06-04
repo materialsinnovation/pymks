@@ -3,7 +3,7 @@
 
 import pytest
 import numpy as np
-from toolz.curried import pipe, first, second
+from toolz.curried import pipe, first, get
 from pymks.fmks.data.elastic_fe import solve
 
 
@@ -21,7 +21,8 @@ def test_3d():
         setone,
         solve(elastic_modulus=(1., 10.), poissons_ratio=(0., 0.)),
         lambda x: np.allclose(
-            [np.mean(x[0][0, ..., i]) for i in range(6)], [1., 0., 0., 0., 0., 0.]
+            [np.mean(x["strain"][0, ..., i]) for i in range(6)],
+            [1., 0., 0., 0., 0., 0.],
         ),
     )
 
@@ -40,7 +41,7 @@ def test_3d_bcs():
                 poissons_ratio=(0.3, 0.3),
                 macro_strain=macro_strain,
             ),
-            second,
+            get("displacement"),
             first,
             lambda x: (
                 np.allclose(x[-1, ..., 0] - x[0, ..., 0], size * macro_strain),
