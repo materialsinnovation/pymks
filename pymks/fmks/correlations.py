@@ -13,6 +13,7 @@ from .func import dafftshift, dafftn, daifftn, daconj
 from sklearn.base import RegressorMixin, TransformerMixin, BaseEstimator
 import dask.array as da
 
+
 def faxes(arr):
     """Get the spatial axes to perform the Fourier transform
 
@@ -29,6 +30,7 @@ def faxes(arr):
     (1, 2, 3, 4)
     """
     return tuple(np.arange(arr.ndim - 1) + 1)
+
 
 def corr_master(arr1, arr2):
     """
@@ -151,25 +153,33 @@ def flatten(data):
     (2, 9)
     """
     return data.reshape(data.shape[0], -1)
+
+
 @curry
 def return_slice(x_data, cutoff):
     """
     returns region of interest around the center voxel upto the cutoff length
     """
 
-    s = np.asarray(x_data.shape).astype(int) // 2
+    sliced = np.asarray(x_data.shape).astype(int) // 2
 
     if x_data.ndim == 2:
-        return x_data[(s[0] - cutoff):(s[0] + cutoff+1),
-                      (s[1] - cutoff):(s[1] + cutoff+1)]
-    elif x_data.ndim ==3:
-        return x_data[(s[0] - cutoff):(s[0] + cutoff+1),
-                      (s[1] - cutoff):(s[1] + cutoff+1),
-                      (s[2] - cutoff):(s[2] + cutoff+1)]
+        return x_data[
+            (sliced[0] - cutoff) : (sliced[0] + cutoff + 1),
+            (sliced[1] - cutoff) : (sliced[1] + cutoff + 1)
+        ]
+    if x_data.ndim == 3:
+        return x_data[
+            (sliced[0] - cutoff) : (sliced[0] + cutoff + 1),
+            (sliced[1] - cutoff) : (sliced[1] + cutoff + 1),
+            (sliced[2] - cutoff) : (sliced[2] + cutoff + 1),
+        ]
 
 
 @curry
-def Two_point_stats(boundary="periodic", corrtype="auto", cutoff=None, args0=None, args1=None):
+def two_point_stats(
+        boundary="periodic", corrtype="auto", cutoff=None, args0=None, args1=None
+):
     """
     Wrapper function that returns auto or crosscorrelations for
     input fields by calling appropriate modules.
@@ -182,26 +192,33 @@ def Two_point_stats(boundary="periodic", corrtype="auto", cutoff=None, args0=Non
     """
 
     ndim = args0.ndim
-    size = args0.size
-    x=args0
+    #size = args0.size
+    x_data = args0
     if cutoff is None:
         cutoff = args0.shape[0] // 2
     cropper = return_slice(cutoff=cutoff)
 
-    if boundary is "periodic":
+    if boundary == "periodic":
         padder = lambda x: x
-        if corrtype is "auto":
-            y = None
-        elif corrtype is "cross":
-            y = args1
-    elif boundary is "nonperiodic":
-        padder = lambda x: np.pad(x, [(cutoff, cutoff),] * ndim, mode="constant", constant_values=0)
-        if corrtype is "auto":
-            y = None
-        elif corrtype is "cross":
-            y = padder(args1)
+        if corrtype == "auto":
+            y_data = None
+        elif corrtype == "cross":
+            y_data = args1
+    elif boundary == "nonperiodic":
+        padder = lambda x: np.pad(
+            x, [(cutoff, cutoff)] * ndim, mode="constant", constant_values=0
+        )
+        if corrtype == "auto":
+            y_data = None
+        elif corrtype == "cross":
+            y_data = padder(args1)
 
-    return corr_master(x, y) / x[0].size if corrtype is "cross" else corr_master(x, x) / x[0].size
+    return (
+        corr_master(x_data, y_data) / x_data[0].size
+        if corrtype == "cross"
+        else corr_master(x_data, x_data) / x_data[0].size
+    )
+
 
 class TwoPointcorrelation(BaseEstimator, TransformerMixin):
     """Reshape data ready for the LocalizationRegressor
@@ -214,7 +231,9 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
     Add test
     """
 
-    def __init__(self,boundary="periodic", corrtype="auto", cutoff=None,correlations=[1,0]):
+    def __init__(
+            self, boundary="periodic", corrtype="auto", cutoff=None, correlations=[1, 0]
+    ):
         """Instantiate a TwoPointcorrelation
 
         Args:
@@ -223,17 +242,17 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
             cutoff   :  cutoff radius of interest for the 2PtStatistics field
             correlations: patial correlations to compute
         """
-        self.boundary=boundary
-        self.corrtype=corrtype
-        self.cutoff=cutoff
-        self.xdata=correlations[0]
-        self.ydata=correlations[1]
+        self.boundary = boundary
+        self.corrtype = corrtype
+        self.cutoff = cutoff
+        self.xdata = correlations[0]
+        self.ydata = correlations[1]
 
-    def transform(self,X=None,y=None):
-# Add a code for pulling the information for the fit_correlations
+    def transform(self, X=None, y=None):
+        # Add a code for pulling the information for the fit_correlations
 
-        x_data=X[:,:,:,self.xdata]
-        y_data=X[:,:,:,self.ydata]
+        x_data = X[:, :, :, self.xdata]
+        y_data = X[:, :, :, self.ydata]
         """Transform the X data
 
         Args:
@@ -241,13 +260,19 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
         """
         if type(x_data) is np.ndarray:
 
-            chunks=x_data.shape
-            x_data=da.from_array(x_data,chunks=chunks)
+            chunks = x_data.shape
+            x_data = da.from_array(x_data, chunks=chunks)
         if type(y_data) is np.ndarray:
-            chunks=y_data.shape
-            y_data=da.from_array(y_data,chunks=chunks)
+            chunks = y_data.shape
+            y_data = da.from_array(y_data, chunks=chunks)
 
-        return Two_point_stats(boundary=self.boundary, corrtype=self.corrtype, cutoff=self.cutoff, args0=x_data, args1=y_data).compute()
+        return two_point_stats(
+            boundary=self.boundary,
+            corrtype=self.corrtype,
+            cutoff=self.cutoff,
+            args0=x_data,
+            args1=y_data,
+        ).compute()
 
     def fit(self, *_):
         """Only necessary to make pipelines work
@@ -272,6 +297,7 @@ class FlattenTransformer(BaseEstimator, TransformerMixin):
         """Instantiate a FlattenTransformer
 
         """
+
     def transform(self, x_data):
         """Transform the X data
 
