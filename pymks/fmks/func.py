@@ -209,7 +209,5 @@ def debug(stmt, data):  # pragma: no cover
     """Helpful debug function
     """
     print(stmt)
-    import ipdb
-
-    ipdb.set_trace()
+    print(data)
     return data

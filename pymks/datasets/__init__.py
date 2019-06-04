@@ -34,15 +34,14 @@ def make_elastic_FE_strain_delta(elastic_modulus=(100, 150),
         tuple containing delta microstructures and their strain fields
 
     """
-    from .elastic_FE_simulation import ElasticFESimulation
-
-    FEsim = ElasticFESimulation(elastic_modulus=elastic_modulus,
-                                poissons_ratio=poissons_ratio,
-                                macro_strain=macro_strain)
+    from pymks.fmks.data.elastic_fe import solve
 
     X = make_delta_microstructures(len(elastic_modulus), size=size)
-    FEsim.run(X)
-    return X, FEsim.response
+
+    return X, solve(X,
+                    elastic_modulus=elastic_modulus,
+                    poissons_ratio=poissons_ratio,
+                    macro_strain=macro_strain)['strain'][..., 0]
 
 
 def make_delta_microstructures(n_phases=2, size=(21, 21)):
@@ -116,15 +115,15 @@ def make_elastic_FE_strain_random(n_samples=1, elastic_modulus=(100, 150),
          tuple containing delta microstructures and their strain fields
 
     """
-    from .elastic_FE_simulation import ElasticFESimulation
 
-    FEsim = ElasticFESimulation(elastic_modulus=elastic_modulus,
-                                poissons_ratio=poissons_ratio,
-                                macro_strain=macro_strain)
+    from pymks.fmks.data.elastic_fe import solve
 
     X = np.random.randint(len(elastic_modulus), size=((n_samples, ) + size))
-    FEsim.run(X)
-    return X, FEsim.response
+
+    return X, solve(X,
+                    elastic_modulus=elastic_modulus,
+                    poissons_ratio=poissons_ratio,
+                    macro_strain=macro_strain)['strain'][..., 0]
 
 
 def make_cahn_hilliard(n_samples=1, size=(21, 21), dx=0.25, width=1.,
