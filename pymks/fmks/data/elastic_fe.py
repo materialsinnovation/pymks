@@ -66,6 +66,8 @@ Check that the top/bottom planes are periodic in both x and y.
 
 The module also works with Dask arrays,
 
+>>> import dask.array as da
+
 >>> X = np.array([[[1, 0, 0, 1],
 ...                [0, 1, 1, 1],
 ...                [0, 0, 1, 1],
@@ -93,7 +95,7 @@ The module also works with Dask arrays,
 
 import pytest
 import numpy as np
-import dask.array as da
+
 from toolz.curried import pipe, do, first, merge
 from toolz.curried import map as map_
 from toolz.sandbox.parallel import fold
@@ -305,7 +307,7 @@ def _check(n_phases, n_phases_other, x_data):
         raise RuntimeError("elastic_modulus and poissons_ratio must be the same length")
     if not issubclass(x_data.dtype.type, np.integer):
         raise TypeError("X must be an integer array")
-    if da.max(x_data) >= n_phases or da.min(x_data) < 0:
+    if np.max(x_data) >= n_phases or np.min(x_data) < 0:
         raise RuntimeError("X must be between 0 and {N}.".format(N=n_phases - 1))
     if not 3 <= len(x_data.shape) <= 4:
         raise RuntimeError("the shape of x_data is incorrect")
