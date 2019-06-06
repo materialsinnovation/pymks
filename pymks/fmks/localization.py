@@ -179,7 +179,7 @@ def fit(x_data, y_data, discretize, redundancy_func=lambda _: (slice(None),)):
     """Calculate the MKS influence coefficients.
 
     Args:
-      x_data: the mircrostructure field
+      x_data: the microstructure field
       y_data: the response field
       discretize: a function that returns the discretized data and
         redundancy function
