@@ -9,9 +9,9 @@ where X=[n_sample,x,y.n_basis]
 """
 import numpy as np
 from toolz.curried import pipe, curry
-from .func import dafftshift, dafftn, daifftn, daconj
-from sklearn.base import RegressorMixin, TransformerMixin, BaseEstimator
+from sklearn.base import  TransformerMixin, BaseEstimator
 import dask.array as da
+from .func import dafftshift, dafftn, daifftn, daconj
 
 
 def faxes(arr):
@@ -168,12 +168,13 @@ def return_slice(x_data, cutoff):
             (sliced[0] - cutoff) : (sliced[0] + cutoff + 1),
             (sliced[1] - cutoff) : (sliced[1] + cutoff + 1)
         ]
-    if x_data.ndim == 3:
+    if  x_data.ndim == 3:
         return x_data[
             (sliced[0] - cutoff) : (sliced[0] + cutoff + 1),
             (sliced[1] - cutoff) : (sliced[1] + cutoff + 1),
             (sliced[2] - cutoff) : (sliced[2] + cutoff + 1),
         ]
+    return Exception('Data should be either 2D or 3D')
 
 
 @curry
@@ -196,8 +197,8 @@ def two_point_stats(
     x_data = args0
     if cutoff is None:
         cutoff = args0.shape[0] // 2
-    cropper = return_slice(cutoff=cutoff)
-
+    #cropper = return_slice(cutoff=cutoff)
+    # Make sure this is working
     if boundary == "periodic":
         padder = lambda x: x
         if corrtype == "auto":
@@ -232,7 +233,7 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
     """
 
     def __init__(
-            self, boundary="periodic", corrtype="auto", cutoff=None, correlations=[1, 0]
+            self, boundary="periodic", corrtype="auto", cutoff=None, correlations=None
     ):
         """Instantiate a TwoPointcorrelation
 
@@ -248,21 +249,20 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
         self.xdata = correlations[0]
         self.ydata = correlations[1]
 
-    def transform(self, X=None, y=None):
-        # Add a code for pulling the information for the fit_correlations
-
-        x_data = X[:, :, :, self.xdata]
-        y_data = X[:, :, :, self.ydata]
+    def transform(self, x_input=None):
         """Transform the X data
 
-        Args:
-            x_data: the data to be transformed
+            Args:
+                x_data: the data to be transformed
         """
-        if type(x_data) is np.ndarray:
+        x_data = x_input[:, :, :, self.xdata]
+        y_data = x_input[:, :, :, self.ydata]
+
+        if isinstance(x_data, np.ndarray):
 
             chunks = x_data.shape
             x_data = da.from_array(x_data, chunks=chunks)
-        if type(y_data) is np.ndarray:
+        if isinstance(y_data, np.ndarray):
             chunks = y_data.shape
             y_data = da.from_array(y_data, chunks=chunks)
 
@@ -292,13 +292,12 @@ class FlattenTransformer(BaseEstimator, TransformerMixin):
     (2, 25)
 
     """
-
     def __init__(self):
         """Instantiate a FlattenTransformer
 
         """
-
-    def transform(self, x_data):
+    @staticmethod
+    def transform(x_data):
         """Transform the X data
 
         Args:
