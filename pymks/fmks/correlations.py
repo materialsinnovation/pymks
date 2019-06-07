@@ -9,7 +9,7 @@ where X=[n_sample,x,y.n_basis]
 """
 import numpy as np
 from toolz.curried import pipe, curry
-from sklearn.base import  TransformerMixin, BaseEstimator
+from sklearn.base import TransformerMixin, BaseEstimator
 import dask.array as da
 from .func import dafftshift, dafftn, daifftn, daconj
 
@@ -165,21 +165,21 @@ def return_slice(x_data, cutoff):
 
     if x_data.ndim == 2:
         return x_data[
-            (sliced[0] - cutoff) : (sliced[0] + cutoff + 1),
-            (sliced[1] - cutoff) : (sliced[1] + cutoff + 1)
+            (sliced[0] - cutoff):(sliced[0] + cutoff + 1),
+            (sliced[1] - cutoff):(sliced[1] + cutoff + 1),
         ]
-    if  x_data.ndim == 3:
+    if x_data.ndim == 3:
         return x_data[
-            (sliced[0] - cutoff) : (sliced[0] + cutoff + 1),
-            (sliced[1] - cutoff) : (sliced[1] + cutoff + 1),
-            (sliced[2] - cutoff) : (sliced[2] + cutoff + 1),
+            (sliced[0] - cutoff):(sliced[0] + cutoff + 1),
+            (sliced[1] - cutoff):(sliced[1] + cutoff + 1),
+            (sliced[2] - cutoff):(sliced[2] + cutoff + 1),
         ]
-    return Exception('Data should be either 2D or 3D')
+    return Exception("Data should be either 2D or 3D")
 
 
 @curry
 def two_point_stats(
-        boundary="periodic", corrtype="auto", cutoff=None, args0=None, args1=None
+    boundary="periodic", corrtype="auto", cutoff=None, args0=None, args1=None
 ):
     """
     Wrapper function that returns auto or crosscorrelations for
@@ -188,16 +188,17 @@ def two_point_stats(
         boundary : "periodic" or "nonperiodic"
         corrtype : "auto" or "cross"
         cutoff   :  cutoff radius of interest for the 2PtStatistics field
-	args0    : 2D or 3D primary field of interest
-	args1    : 2D or 3D field of interest which needs to be cross-correlated with args1
+        args0    : 2D or 3D primary field of interest
+        args1    : 2D or 3D field of interest which needs to be cross-correlated
+                   with args1
     """
 
     ndim = args0.ndim
-    #size = args0.size
+    # size = args0.size
     x_data = args0
     if cutoff is None:
         cutoff = args0.shape[0] // 2
-    #cropper = return_slice(cutoff=cutoff)
+    # cropper = return_slice(cutoff=cutoff)
     # Make sure this is working
     if boundary == "periodic":
         padder = lambda x: x
@@ -233,7 +234,7 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
     """
 
     def __init__(
-            self, boundary="periodic", corrtype="auto", cutoff=None, correlations=None
+        self, boundary="periodic", corrtype="auto", cutoff=None, correlations=None
     ):
         """Instantiate a TwoPointcorrelation
 
@@ -292,10 +293,12 @@ class FlattenTransformer(BaseEstimator, TransformerMixin):
     (2, 25)
 
     """
+
     def __init__(self):
         """Instantiate a FlattenTransformer
 
         """
+
     @staticmethod
     def transform(x_data):
         """Transform the X data
