@@ -163,17 +163,12 @@ def return_slice(x_data, cutoff):
 
     sliced = np.asarray(x_data.shape).astype(int) // 2
 
+    make_slice = lambda i: slice(sliced[i] - cutoff, sliced[i] + cutoff + 1)
+
     if x_data.ndim == 2:
-        return x_data[
-            (sliced[0] - cutoff):(sliced[0] + cutoff + 1),
-            (sliced[1] - cutoff):(sliced[1] + cutoff + 1),
-        ]
+        return x_data[make_slice(0), make_slice(1)]
     if x_data.ndim == 3:
-        return x_data[
-            (sliced[0] - cutoff):(sliced[0] + cutoff + 1),
-            (sliced[1] - cutoff):(sliced[1] + cutoff + 1),
-            (sliced[2] - cutoff):(sliced[2] + cutoff + 1),
-        ]
+        return x_data[make_slice(0), make_slice(1), make_slice(2)]
     return Exception("Data should be either 2D or 3D")
 
 
