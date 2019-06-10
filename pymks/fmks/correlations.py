@@ -11,7 +11,7 @@ import numpy as np
 from toolz.curried import pipe, curry
 from sklearn.base import TransformerMixin, BaseEstimator
 import dask.array as da
-from .func import dafftshift, dafftn, daifftn, daconj
+from func import dafftshift, dafftn, daifftn, daconj
 
 
 def faxes(arr):
@@ -211,9 +211,9 @@ def two_point_stats(
             y_data = padder(args1)
 
     return (
-        corr_master(x_data, y_data) / x_data[0].size
+        return_slice((corr_master(x_data, y_data) / x_data[0].size),cutoff)
         if corrtype == "cross"
-        else corr_master(x_data, x_data) / x_data[0].size
+        else return_slice((corr_master(x_data, x_data) / x_data[0].size),cutoff)
     )
 
 
