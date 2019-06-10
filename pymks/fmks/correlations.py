@@ -173,9 +173,7 @@ def return_slice(x_data, cutoff):
 
 
 @curry
-def two_point_stats(
-    boundary="periodic",cutoff=None, args0=None, args1=None
-):
+def two_point_stats(boundary="periodic", cutoff=None, args0=None, args1=None):
     """
     Wrapper function that returns auto or crosscorrelations for
     input fields by calling appropriate modules.
@@ -203,9 +201,7 @@ def two_point_stats(
         )
         x_data = padder(x_data)
         y_data = padder(y_data)
-    return (
-        return_slice((corr_master(x_data, y_data) / x_data[0].size), cutoff)
-    )
+    return return_slice((corr_master(x_data, y_data) / x_data[0].size), cutoff)
 
 
 class TwoPointcorrelation(BaseEstimator, TransformerMixin):
@@ -219,9 +215,7 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
     Add test
     """
 
-    def __init__(
-        self, boundary="periodic", cutoff=None, correlations=None
-    ):
+    def __init__(self, boundary="periodic", cutoff=None, correlations=None):
         """Instantiate a TwoPointcorrelation
 
         Args:
@@ -253,10 +247,7 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
             y_data = da.from_array(y_data, chunks=chunks)
 
         return two_point_stats(
-            boundary=self.boundary,
-            cutoff=self.cutoff,
-            args0=x_data,
-            args1=y_data,
+            boundary=self.boundary, cutoff=self.cutoff, args0=x_data, args1=y_data
         ).compute()
 
     def fit(self, *_):
