@@ -174,7 +174,7 @@ def return_slice(x_data, cutoff):
 
 @curry
 def two_point_stats(
-    boundary="periodic", corrtype="auto", cutoff=None, args0=None, args1=None
+    boundary="periodic",cutoff=None, args0=None, args1=None
 ):
     """
     Wrapper function that returns auto or crosscorrelations for
@@ -191,28 +191,20 @@ def two_point_stats(
     ndim = args0.ndim
     # size = args0.size
     x_data = args0
+    y_data = args1
     if cutoff is None:
         cutoff = args0.shape[0] // 2
     # Make sure this is working
     if boundary == "periodic":
         padder = lambda x: x
-        if corrtype == "auto":
-            y_data = None
-        elif corrtype == "cross":
-            y_data = args1
     elif boundary == "nonperiodic":
         padder = lambda x: np.pad(
             x, [(cutoff, cutoff)] * ndim, mode="constant", constant_values=0
         )
-        if corrtype == "auto":
-            y_data = None
-        elif corrtype == "cross":
-            y_data = padder(args1)
-
+        x_data = padder(x_data)
+        y_data = padder(y_data)
     return (
         return_slice((corr_master(x_data, y_data) / x_data[0].size), cutoff)
-        if corrtype == "cross"
-        else return_slice((corr_master(x_data, x_data) / x_data[0].size), cutoff)
     )
 
 
@@ -228,7 +220,7 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
     """
 
     def __init__(
-        self, boundary="periodic", corrtype="auto", cutoff=None, correlations=None
+        self, boundary="periodic", cutoff=None, correlations=None
     ):
         """Instantiate a TwoPointcorrelation
 
@@ -239,7 +231,6 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
             correlations: patial correlations to compute
         """
         self.boundary = boundary
-        self.corrtype = corrtype
         self.cutoff = cutoff
         self.xdata = correlations[0]
         self.ydata = correlations[1]
@@ -263,7 +254,6 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
 
         return two_point_stats(
             boundary=self.boundary,
-            corrtype=self.corrtype,
             cutoff=self.cutoff,
             args0=x_data,
             args1=y_data,
