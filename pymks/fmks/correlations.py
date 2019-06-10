@@ -211,9 +211,9 @@ def two_point_stats(
             y_data = padder(args1)
 
     return (
-        return_slice((corr_master(x_data, y_data) / x_data[0].size),cutoff)
+        return_slice((corr_master(x_data, y_data) / x_data[0].size), cutoff)
         if corrtype == "cross"
-        else return_slice((corr_master(x_data, x_data) / x_data[0].size),cutoff)
+        else return_slice((corr_master(x_data, x_data) / x_data[0].size), cutoff)
     )
 
 
