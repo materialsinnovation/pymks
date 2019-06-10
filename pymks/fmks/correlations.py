@@ -11,7 +11,7 @@ import numpy as np
 from toolz.curried import pipe, curry
 from sklearn.base import TransformerMixin, BaseEstimator
 import dask.array as da
-from func import dafftshift, dafftn, daifftn, daconj
+from .func import dafftshift, dafftn, daifftn, daconj
 
 
 def faxes(arr):
@@ -193,7 +193,6 @@ def two_point_stats(
     x_data = args0
     if cutoff is None:
         cutoff = args0.shape[0] // 2
-    # cropper = return_slice(cutoff=cutoff)
     # Make sure this is working
     if boundary == "periodic":
         padder = lambda x: x
