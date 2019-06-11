@@ -160,15 +160,18 @@ def return_slice(x_data, cutoff):
     """
     returns region of interest around the center voxel upto the cutoff length
     """
-
-    sliced = np.asarray(x_data.shape).astype(int) // 2
-
+    # print(x_data.shape[1:])
+    sliced = np.asarray(x_data.shape[1:]).astype(int) // 2
+    # print(sliced)
+    if any(x < cutoff for x in sliced):
+        raise NameError("Cut off is too large for the input array")
+    print(type(sliced))
     make_slice = lambda i: slice(sliced[i] - cutoff, sliced[i] + cutoff + 1)
 
-    if x_data.ndim == 2:
-        return x_data[make_slice(0), make_slice(1)]
     if x_data.ndim == 3:
-        return x_data[make_slice(0), make_slice(1), make_slice(2)]
+        return x_data[:, make_slice(0), make_slice(1)]
+    if x_data.ndim == 4:
+        return x_data[:, make_slice(0), make_slice(1), make_slice(2)]
     return Exception("Data should be either 2D or 3D")
 
 
@@ -192,7 +195,6 @@ def two_point_stats(boundary="periodic", cutoff=None, args0=None, args1=None):
     y_data = args1
     if cutoff is None:
         cutoff = args0.shape[0] // 2
-    # Make sure this is working
     if boundary == "periodic":
         padder = lambda x: x
     elif boundary == "nonperiodic":
