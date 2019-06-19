@@ -388,22 +388,6 @@ def reshape(data, shape):
     return data.reshape(data.shape[0], *shape[1:])
 
 
-def flatten(data):
-    """Flatten data along all but the first axis
-
-    Args:
-        data: data to flatten
-
-    Returns:
-        the flattened data
-
-    >>> data = np.arange(18).reshape((2, 3, 3))
-    >>> flatten(data).shape
-    (2, 9)
-    """
-    return data.reshape(data.shape[0], -1)
-
-
 class ReshapeTransformer(BaseEstimator, TransformerMixin):
     """Reshape data ready for the LocalizationRegressor
 
