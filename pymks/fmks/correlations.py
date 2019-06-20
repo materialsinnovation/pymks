@@ -176,7 +176,9 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
     """Calculate the 2-point stats for two arrays
     """
 
-    def __init__(self, periodic_boundary=True, cutoff=None, correlations1=0, correlations2=0):
+    def __init__(
+        self, periodic_boundary=True, cutoff=None, correlations1=0, correlations2=0
+    ):
         """Instantiate a TwoPointcorrelation
 
         Args:
@@ -201,9 +203,10 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
             data,
             lambda x: da.from_array(x, chunks=x.shape),
             lambda x: (x[..., self.correlations1], x[..., self.correlations2]),
-            lambda x: two_point_stats(*x, periodic_boundary=self.periodic_boundary, cutoff=self.cutoff)
+            lambda x: two_point_stats(
+                *x, periodic_boundary=self.periodic_boundary, cutoff=self.cutoff
+            ),
         )
-
 
     def fit(self, *_):
         """Only necessary to make pipelines work
@@ -223,6 +226,7 @@ class FlattenTransformer(BaseEstimator, TransformerMixin):
     (2, 25)
 
     """
+
     @staticmethod
     def transform(x_data):
         """Transform the X data
