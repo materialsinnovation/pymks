@@ -211,3 +211,19 @@ def debug(stmt, data):  # pragma: no cover
     print(stmt)
     print(data)
     return data
+
+
+def flatten(data):
+    """Flatten data along all but the first axis
+
+    Args:
+      data: data to flatten
+
+    Returns:
+      the flattened data
+
+    >>> data = np.arange(18).reshape((2, 3, 3))
+    >>> flatten(data).shape
+    (2, 9)
+    """
+    return data.reshape(data.shape[0], -1)
