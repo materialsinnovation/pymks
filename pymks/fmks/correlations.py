@@ -9,86 +9,23 @@ where X=[n_sample,x,y.n_basis]
 """
 import numpy as np
 from toolz.curried import pipe, curry
+from toolz.curried import map as map_, identity
 from sklearn.base import TransformerMixin, BaseEstimator
 import dask.array as da
-from .func import dafftshift, dafftn, daifftn, daconj
+from .func import dafftshift, dafftn, daifftn, daconj, flatten
+from .func import sequence
 
 
-def faxes(arr):
-    """Get the spatial axes to perform the Fourier transform
-
-    The first axis should not have the Fourier transform
-    performed.
-
-    Args:
-      arr: the discretized array
-    Returns:
-      an array starting at 1 to n - 1 where n is the length of the
-      shape of arr
-
-    >>> faxes(np.array([1]).reshape((1, 1, 1, 1, 1)))
-    (1, 2, 3, 4)
-    """
-    return tuple(np.arange(arr.ndim - 1) + 1)
-
-
-def corr_master(arr1, arr2):
-    """
-    Returns cross correlation between the two input fields, arr1 and arr2
-    """
-    return pipe(
-        arr1,
-        dafftn(axes=faxes(arr1)),
-        lambda x: daconj(x) * dafftn(arr2, axes=faxes(arr2)),
-        daifftn(axes=faxes(arr1)),
-        dafftshift(axes=faxes(arr1)),
-        lambda x: x.real,
-    )
-
-
-@curry
-def auto_correlation(arr1):
-    """
-    Returns auto-corrlation of and input field with itself.
-    Args:
-        arr1: the input field
-
-    Returns:
-        an nd-array of same dimension as the input field
-
-    >>> import dask.array as da
-    >>> x_data = np.asarray([[[1, 1, 0],
-    ...                       [0, 0, 1],
-    ...                       [1, 1, 0]]])
-    >>> chunks = x_data.shape
-    >>> x_data = da.from_array(x_data, chunks=chunks)
-    >>> f_data = auto_correlation(x_data)
-    >>> gg = [[[3/9, 2/9, 3/9],
-    ...        [2/9, 5/9, 2/9],
-    ...        [3/9, 2/9, 3/9]]]
-    >>> assert np.allclose(f_data.compute(), gg)
-    >>> shape = (7, 5, 5)
-    >>> chunks = (2, 5, 5)
-    >>> da.random.seed(42)
-    >>> x_data = da.random.random(shape, chunks=chunks)
-    >>> f_data = auto_correlation(x_data)
-    >>> assert x_data.chunks == f_data.chunks
-    >>> print(f_data.chunks)
-    ((2, 2, 2, 1), (5,), (5,))
-    """
-    return corr_master(arr1, arr1) / arr1[0].size
-
-
-@curry
 def cross_correlation(arr1, arr2):
     """
     Returns the cross-correlation of and input field with another field.
+
     Args:
-        arr1: the input field
-        arr2: the other input field
+      arr1: the input field
+      arr2: the other input field
 
     Returns:
-        an nd-array of same dimension as the input field
+      an nd-array of same dimension as the input field
 
     >>> import dask.array as da
     >>> x_data = np.asarray([[[1,1,0],
@@ -118,139 +55,155 @@ def cross_correlation(arr1, arr2):
     ((2, 2, 1, 1, 2, 2), (5,), (5,))
     """
 
-    # Check if normalization is correct
-    return corr_master(arr1, arr2) / arr1[0].size
+    faxes = lambda x: tuple(np.arange(x.ndim - 1) + 1)
 
-
-def reshape(data, shape):
-    """Reshape data along all but the first axis
-
-    Args:
-        data: the data to reshape
-        shape: the shape of the new data (not including the first axis)
-
-    Returns:
-        the reshaped data
-
-    >>> data = np.arange(18).reshape((2, 9))
-    >>> reshape(data, (None, 3, 3)).shape
-    (2, 3, 3)
-    """
-    return data.reshape(data.shape[0], *shape[1:])
-
-
-def flatten(data):
-    """Flatten data along all but the first axis
-
-    Args:
-        data: data to flatten
-
-    Returns:
-        the flattened data
-
-    >>> data = np.arange(18).reshape((2, 3, 3))
-    >>> flatten(data).shape
-    (2, 9)
-    """
-    return data.reshape(data.shape[0], -1)
+    return pipe(
+        arr1,
+        dafftn(axes=faxes(arr1)),
+        lambda x: daconj(x) * dafftn(arr2, axes=faxes(arr2)),
+        daifftn(axes=faxes(arr1)),
+        dafftshift(axes=faxes(arr1)),
+        lambda x: x.real / arr1[0].size,
+    )
 
 
 @curry
-def return_slice(x_data, cutoff):
+def auto_correlation(arr):
     """
-    returns region of interest around the center voxel upto the cutoff length
-    """
-    # print(x_data.shape[1:])
-    sliced = np.asarray(x_data.shape[1:]).astype(int) // 2
-    # print(sliced)
-    if any(x < cutoff for x in sliced):
-        raise NameError("Cut off is too large for the input array")
-    print(type(sliced))
-    make_slice = lambda i: slice(sliced[i] - cutoff, sliced[i] + cutoff + 1)
+    Returns auto-corrlation of and input field with itself.
 
-    if x_data.ndim == 3:
-        return x_data[:, make_slice(0), make_slice(1)]
-    if x_data.ndim == 4:
-        return x_data[:, make_slice(0), make_slice(1), make_slice(2)]
-    return Exception("Data should be either 2D or 3D")
+    Args:
+      arr: the input field
+
+    Returns:
+      an nd-array of same dimension as the input field
+
+    >>> import dask.array as da
+    >>> x_data = np.asarray([[[1, 1, 0],
+    ...                       [0, 0, 1],
+    ...                       [1, 1, 0]]])
+    >>> chunks = x_data.shape
+    >>> x_data = da.from_array(x_data, chunks=chunks)
+    >>> f_data = auto_correlation(x_data)
+    >>> gg = [[[3/9, 2/9, 3/9],
+    ...        [2/9, 5/9, 2/9],
+    ...        [3/9, 2/9, 3/9]]]
+    >>> assert np.allclose(f_data.compute(), gg)
+    >>> shape = (7, 5, 5)
+    >>> chunks = (2, 5, 5)
+    >>> da.random.seed(42)
+    >>> x_data = da.random.random(shape, chunks=chunks)
+    >>> f_data = auto_correlation(x_data)
+    >>> assert x_data.chunks == f_data.chunks
+    >>> print(f_data.chunks)
+    ((2, 2, 2, 1), (5,), (5,))
+    """
+    return cross_correlation(arr, arr)
 
 
 @curry
-def two_point_stats(boundary="periodic", cutoff=None, args0=None, args1=None):
-    """
-    Wrapper function that returns auto or crosscorrelations for
-    input fields by calling appropriate modules.
-    args:
-        boundary : "periodic" or "nonperiodic"
-        corrtype : "auto" or "cross"
-        cutoff   :  cutoff radius of interest for the 2PtStatistics field
-        args0    : 2D or 3D primary field of interest
-        args1    : 2D or 3D field of interest which needs to be cross-correlated
-                   with args1
-    """
+def center_slice(x_data, cutoff):
+    """Calculate region of interest around the center voxel upto the
+    cutoff length
 
-    ndim = args0.ndim
-    # size = args0.size
-    x_data = args0
-    y_data = args1
+    Args:
+      x_data: the data array, first index is left unchanged
+      cutoff: cutoff size
+
+    Returns:
+      reduced size array
+
+    >>> a = np.arange(7).reshape(1, 7)
+    >>> print(center_slice(a, 2))
+    [[1 2 3 4 5]]
+
+    >>> a = np.arange(49).reshape(1, 7, 7)
+    >>> print(center_slice(a, 1).shape)
+    (1, 3, 3)
+
+    >>> center_slice(np.arange(5), 1)
+    Traceback (most recent call last):
+    ...
+    RuntimeError: Data should be greater than 1D
+
+    """
+    if x_data.ndim <= 1:
+        raise RuntimeError("Data should be greater than 1D")
+
+    make_slice = sequence(
+        lambda x: x_data.shape[1:][x] // 2, lambda x: slice(x - cutoff, x + cutoff + 1)
+    )
+
+    return pipe(
+        range(len(x_data.shape) - 1),
+        map_(make_slice),
+        tuple,
+        lambda x: (slice(len(x_data)),) + x,
+        lambda x: x_data[x],
+    )
+
+
+@curry
+def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None):
+    """Calculate the 2-points stats for two arrays
+
+    Args:
+      arr1: array used to calculate cross-correlations
+      arr2: array used to calculate cross-correlations
+      periodic_boundary: whether to assume a periodic boudnary (default is true)
+      cutoff: the subarray of the 2 point stats to keep
+
+    Returns:
+      the snipped 2-points stats
+
+    >>> two_point_stats(
+    ...     da.from_array(np.arange(10).reshape(2, 5), chunks=(2, 5)),
+    ...     da.from_array(np.arange(10).reshape(2, 5), chunks=(2, 5)),
+    ... )
+    dask.array<getitem, shape=(2, 3), dtype=float64, chunksize=(2, 3)>
+
+    """
     if cutoff is None:
-        cutoff = args0.shape[0] // 2
-    if boundary == "periodic":
-        padder = lambda x: x
-    elif boundary == "nonperiodic":
-        padder = lambda x: np.pad(
-            x, [(cutoff, cutoff)] * ndim, mode="constant", constant_values=0
-        )
-        x_data = padder(x_data)
-        y_data = padder(y_data)
-    return return_slice((corr_master(x_data, y_data) / x_data[0].size), cutoff)
+        cutoff = arr1.shape[0] // 2
+    nonperiodic_padder = lambda x: np.pad(
+        x, [(cutoff, cutoff)] * arr1.ndim, mode="constant", constant_values=0
+    )
+    padder = identity if periodic_boundary else nonperiodic_padder
+    return center_slice(cross_correlation(padder(arr1), padder(arr2)), cutoff)
 
 
 class TwoPointcorrelation(BaseEstimator, TransformerMixin):
-    """Reshape data ready for the LocalizationRegressor
-
-    Sklearn likes flat image data, but MKS expects shaped data. This
-    class transforms the shape of flat data into shaped image data for
-    MKS.
-
-    Attributes:
-    Add test
+    """Calculate the 2-point stats for two arrays
     """
 
-    def __init__(self, boundary="periodic", cutoff=None, correlations=None):
+    def __init__(self, periodic_boundary=True, cutoff=None, correlations1=0, correlations2=0):
         """Instantiate a TwoPointcorrelation
 
         Args:
-            boundary : "periodic" or "nonperiodic"
-            corrtype : "auto" or "cross"
-            cutoff   :  cutoff radius of interest for the 2PtStatistics field
-            correlations: patial correlations to compute
+          periodic_boundary: whether the boundary conditions are periodic
+          cutoff: cutoff radius of interest for the 2PtStatistics field
+          correlations1: an index
+          correlations2: an index
+
         """
-        self.boundary = boundary
+        self.periodic_boundary = periodic_boundary
         self.cutoff = cutoff
-        self.xdata = correlations[0]
-        self.ydata = correlations[1]
+        self.correlations1 = correlations1
+        self.correlations2 = correlations2
 
-    def transform(self, x_input=None):
-        """Transform the X data
+    def transform(self, data):
+        """Transform the data
 
-            Args:
-                x_data: the data to be transformed
+         Args:
+           data: the data to be transformed
         """
-        x_data = x_input[:, :, :, self.xdata]
-        y_data = x_input[:, :, :, self.ydata]
+        return pipe(
+            data,
+            lambda x: da.from_array(x, chunks=x.shape),
+            lambda x: (x[..., self.correlations1], x[..., self.correlations2]),
+            lambda x: two_point_stats(*x, periodic_boundary=self.periodic_boundary, cutoff=self.cutoff)
+        )
 
-        if isinstance(x_data, np.ndarray):
-
-            chunks = x_data.shape
-            x_data = da.from_array(x_data, chunks=chunks)
-        if isinstance(y_data, np.ndarray):
-            chunks = y_data.shape
-            y_data = da.from_array(y_data, chunks=chunks)
-
-        return two_point_stats(
-            boundary=self.boundary, cutoff=self.cutoff, args0=x_data, args1=y_data
-        ).compute()
 
     def fit(self, *_):
         """Only necessary to make pipelines work
@@ -270,12 +223,6 @@ class FlattenTransformer(BaseEstimator, TransformerMixin):
     (2, 25)
 
     """
-
-    def __init__(self):
-        """Instantiate a FlattenTransformer
-
-        """
-
     @staticmethod
     def transform(x_data):
         """Transform the X data

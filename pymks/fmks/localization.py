@@ -179,7 +179,7 @@ def fit(x_data, y_data, discretize, redundancy_func=lambda _: (slice(None),)):
     """Calculate the MKS influence coefficients.
 
     Args:
-      x_data: the mircrostructure field
+      x_data: the microstructure field
       y_data: the response field
       discretize: a function that returns the discretized data and
         redundancy function
@@ -386,22 +386,6 @@ def reshape(data, shape):
     (2, 3, 3)
     """
     return data.reshape(data.shape[0], *shape[1:])
-
-
-def flatten(data):
-    """Flatten data along all but the first axis
-
-    Args:
-        data: data to flatten
-
-    Returns:
-        the flattened data
-
-    >>> data = np.arange(18).reshape((2, 3, 3))
-    >>> flatten(data).shape
-    (2, 9)
-    """
-    return data.reshape(data.shape[0], -1)
 
 
 class ReshapeTransformer(BaseEstimator, TransformerMixin):
