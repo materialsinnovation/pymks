@@ -9,11 +9,11 @@ where X=[n_sample,x,y.n_basis]
 """
 import numpy as np
 from toolz.curried import pipe, curry
+from toolz.curried import map as map_, identity
 from sklearn.base import TransformerMixin, BaseEstimator
 import dask.array as da
 from .func import dafftshift, dafftn, daifftn, daconj, flatten
 from .func import sequence
-from toolz.curried import map as map_, identity
 
 
 def cross_correlation(arr1, arr2):
@@ -203,7 +203,7 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
             y_data = da.from_array(y_data, chunks=chunks)
 
         return two_point_stats(
-            x_data, y_data, self.boundary is "periodic", cutoff=self.cutoff
+            x_data, y_data, self.boundary == "periodic", cutoff=self.cutoff
         ).compute()
 
     def fit(self, *_):

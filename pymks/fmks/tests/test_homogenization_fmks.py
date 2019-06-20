@@ -8,9 +8,6 @@ import dask.array as da
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
-import pymks
-print(pymks.__path__)
-import pymks.fmks
 from pymks.fmks.correlations import FlattenTransformer, TwoPointcorrelation
 from pymks.fmks.data.cahn_hilliard import generate
 from pymks.fmks.bases.legendre import LegendreTransformer
