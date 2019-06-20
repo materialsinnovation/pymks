@@ -121,6 +121,11 @@ def center_slice(x_data, cutoff):
     >>> print(center_slice(a, 1).shape)
     (1, 3, 3)
 
+    >>> center_slice(np.arange(5), 1)
+    Traceback (most recent call last):
+    ...
+    RuntimeError: Data should be greater than 1D
+
     """
     if x_data.ndim <= 1:
         raise RuntimeError("Data should be greater than 1D")
@@ -150,6 +155,13 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None):
 
     Returns:
       the snipped 2-points stats
+
+    >>> two_point_stats(
+    ...     da.from_array(np.arange(10).reshape(2, 5), chunks=(2, 5)),
+    ...     da.from_array(np.arange(10).reshape(2, 5), chunks=(2, 5)),
+    ... )
+    dask.array<getitem, shape=(2, 3), dtype=float64, chunksize=(2, 3)>
+
     """
     if cutoff is None:
         cutoff = arr1.shape[0] // 2
@@ -161,50 +173,37 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None):
 
 
 class TwoPointcorrelation(BaseEstimator, TransformerMixin):
-    """Reshape data ready for the LocalizationRegressor
-
-    Sklearn likes flat image data, but MKS expects shaped data. This
-    class transforms the shape of flat data into shaped image data for
-    MKS.
-
-    Attributes:
-    Add test
+    """Calculate the 2-point stats for two arrays
     """
 
-    def __init__(self, boundary="periodic", cutoff=None, correlations=None):
+    def __init__(self, periodic_boundary=True, cutoff=None, correlations1=0, correlations2=0):
         """Instantiate a TwoPointcorrelation
 
         Args:
-            boundary : "periodic" or "nonperiodic"
-            corrtype : "auto" or "cross"
-            cutoff   :  cutoff radius of interest for the 2PtStatistics field
-            correlations: patial correlations to compute
+          periodic_boundary: whether the boundary conditions are periodic
+          cutoff: cutoff radius of interest for the 2PtStatistics field
+          correlations1: an index
+          correlations2: an index
+
         """
-        self.boundary = boundary
+        self.periodic_boundary = periodic_boundary
         self.cutoff = cutoff
-        self.xdata = correlations[0]
-        self.ydata = correlations[1]
+        self.correlations1 = correlations1
+        self.correlations2 = correlations2
 
-    def transform(self, x_input=None):
-        """Transform the X data
+    def transform(self, data):
+        """Transform the data
 
-            Args:
-                x_data: the data to be transformed
+         Args:
+           data: the data to be transformed
         """
-        x_data = x_input[:, :, :, self.xdata]
-        y_data = x_input[:, :, :, self.ydata]
+        return pipe(
+            data,
+            lambda x: da.from_array(x, chunks=x.shape),
+            lambda x: (x[..., self.correlations1], x[..., self.correlations2]),
+            lambda x: two_point_stats(*x, periodic_boundary=self.periodic_boundary, cutoff=self.cutoff)
+        )
 
-        if isinstance(x_data, np.ndarray):
-
-            chunks = x_data.shape
-            x_data = da.from_array(x_data, chunks=chunks)
-        if isinstance(y_data, np.ndarray):
-            chunks = y_data.shape
-            y_data = da.from_array(y_data, chunks=chunks)
-
-        return two_point_stats(
-            x_data, y_data, self.boundary == "periodic", cutoff=self.cutoff
-        ).compute()
 
     def fit(self, *_):
         """Only necessary to make pipelines work
@@ -224,12 +223,6 @@ class FlattenTransformer(BaseEstimator, TransformerMixin):
     (2, 25)
 
     """
-
-    def __init__(self):
-        """Instantiate a FlattenTransformer
-
-        """
-
     @staticmethod
     def transform(x_data):
         """Transform the X data

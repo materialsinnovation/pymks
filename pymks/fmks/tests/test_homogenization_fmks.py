@@ -26,7 +26,7 @@ def test_classification():
             (
                 "Correlations",
                 TwoPointcorrelation(
-                    boundary="periodic", cutoff=10, correlations=[1, 1]
+                    periodic_boundary=True, cutoff=10, correlations1=1, correlations2=1
                 ),
             ),
             ("flatten", FlattenTransformer()),
@@ -46,3 +46,6 @@ def test_classification():
     y0_test = homogenization_pipeline.predict(x0_test)
     assert np.allclose(y0_test, [0, 0, 0])
     assert np.allclose(y1_test, [1, 1, 1])
+
+
+test_classification()
