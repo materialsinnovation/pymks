@@ -160,7 +160,7 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None):
     ...     da.from_array(np.arange(10).reshape(2, 5), chunks=(2, 5)),
     ...     da.from_array(np.arange(10).reshape(2, 5), chunks=(2, 5)),
     ... )
-    dask.array<truediv, shape=(2, 5), dtype=float64, chunksize=(2, 5)>
+    dask.array<getitem, shape=(2, 3), dtype=float64, chunksize=(2, 3)>
 
     """
     if cutoff is None:
@@ -170,6 +170,18 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None):
     )
     padder = identity if periodic_boundary else nonperiodic_padder
     return center_slice(cross_correlation(padder(arr1), padder(arr2)), cutoff)
+
+
+@curry
+def calc_corel(i, corr, boundary, cutoff):
+    """Calculate 2-point stats for multiple auto/cross correlations
+    """
+    return pipe(
+        i,
+        lambda x: da.from_array(x, chunks=x.shape),
+        lambda x: (x[..., corr[0]], x[..., corr[1]]),
+        lambda x: two_point_stats(*x, periodic_boundary=boundary, cutoff=cutoff),
+    )
 
 
 class TwoPointcorrelation(BaseEstimator, TransformerMixin):
@@ -186,10 +198,8 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
           correlations2: an index
 
         """
-        if correlations is None:
-            self.correlations = [(0, 0)]
-        else:
-            self.correlations = correlations
+
+        self.correlations = correlations
         self.periodic_boundary = periodic_boundary
         self.cutoff = cutoff
 
@@ -199,29 +209,16 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
          Args:
            data: the data to be transformed
         """
-
-        @curry
-        def calc_corel(i, corr):
-            return pipe(
-                i,
-                lambda x: da.from_array(x, chunks=x.shape),
-                lambda x: (x[..., corr[0]], x[..., corr[1]]),
-                lambda x: two_point_stats(
-                    *x, periodic_boundary=self.periodic_boundary, cutoff=self.cutoff
-                ),
-            )
-
-        def calc(i, values):
-            return map(calc_corel(i), values)
-
-        def compute_def(list_in):
-            return list_in.compute()
+        if self.correlations is None:
+            correlations = [(0, l) for l in range(data.shape[3])]
+        else:
+            correlations = self.correlations
 
         return pipe(
-            data,
-            lambda x: calc(x, self.correlations),
-            lambda x: list(map(compute_def, x)),
-            lambda x: np.stack(x, axis=-1),
+            correlations,
+            map_(calc_corel(data, boundary=self.periodic_boundary, cutoff=self.cutoff)),
+            list,
+            lambda x: da.stack(x, axis=-1),
         )
 
     def fit(self, *_):
