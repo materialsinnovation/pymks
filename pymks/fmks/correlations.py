@@ -172,14 +172,11 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None):
     return center_slice(cross_correlation(padder(arr1), padder(arr2)), cutoff)
 
 
-
 class TwoPointcorrelation(BaseEstimator, TransformerMixin):
     """Calculate the 2-point stats for two arrays
     """
 
-    def __init__(
-        self, periodic_boundary=True, cutoff=None, correlations=[(0,0)]
-    ):
+    def __init__(self, periodic_boundary=True, cutoff=None, correlations=None):
         """Instantiate a TwoPointcorrelation
 
         Args:
@@ -189,10 +186,12 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
           correlations2: an index
 
         """
+        if correlations is None:
+            self.correlations = [(0, 0)]
+        else:
+            self.correlations = correlations
         self.periodic_boundary = periodic_boundary
         self.cutoff = cutoff
-        self.correlations = correlations
-
 
     def transform(self, data):
         """Transform the data
@@ -200,26 +199,30 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
          Args:
            data: the data to be transformed
         """
+
         @curry
-        def calc_corel(i, c):
-            return pipe(i,
-                        lambda x: da.from_array(x, chunks=x.shape),
-                        lambda x: (x[..., c[0]], x[..., c[1]]),
-                        lambda x: two_point_stats(
-                            *x, periodic_boundary=self.periodic_boundary, cutoff=self.cutoff),
-                       )
+        def calc_corel(i, corr):
+            return pipe(
+                i,
+                lambda x: da.from_array(x, chunks=x.shape),
+                lambda x: (x[..., corr[0]], x[..., corr[1]]),
+                lambda x: two_point_stats(
+                    *x, periodic_boundary=self.periodic_boundary, cutoff=self.cutoff
+                ),
+            )
 
         def calc(i, values):
             return map(calc_corel(i), values)
 
-        def compute_def(a):
-            return a.compute()
+        def compute_def(list_in):
+            return list_in.compute()
 
-        return  pipe(data,
-                    lambda x:calc(x,self.correlations),
-                    lambda x:list(map(compute_def,x)),
-                    lambda x:np.stack(x,axis=-1)
-                    )
+        return pipe(
+            data,
+            lambda x: calc(x, self.correlations),
+            lambda x: list(map(compute_def, x)),
+            lambda x: np.stack(x, axis=-1),
+        )
 
     def fit(self, *_):
         """Only necessary to make pipelines work
