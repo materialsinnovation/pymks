@@ -26,7 +26,7 @@ def test_classification():
             (
                 "Correlations",
                 TwoPointcorrelation(
-                    periodic_boundary=True, cutoff=10, correlations1=1, correlations2=1
+                    periodic_boundary=True, cutoff=10, correlations=[(1,1),(0,1)]
                 ),
             ),
             ("flatten", FlattenTransformer()),
