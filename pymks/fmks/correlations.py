@@ -160,7 +160,7 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None):
     ...     da.from_array(np.arange(10).reshape(2, 5), chunks=(2, 5)),
     ...     da.from_array(np.arange(10).reshape(2, 5), chunks=(2, 5)),
     ... )
-    dask.array<getitem, shape=(2, 3), dtype=float64, chunksize=(2, 3)>
+    dask.array<truediv, shape=(2, 5), dtype=float64, chunksize=(2, 5)>
 
     """
     if cutoff is None:
