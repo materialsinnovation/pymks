@@ -13,7 +13,7 @@ from toolz.curried import map as map_, identity
 from sklearn.base import TransformerMixin, BaseEstimator
 import dask.array as da
 from .func import dafftshift, dafftn, daifftn, daconj, flatten
-from .func import sequence
+from .func import sequence, make_da
 
 
 def cross_correlation(arr1, arr2):
@@ -160,11 +160,11 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None):
     ...     da.from_array(np.arange(10).reshape(2, 5), chunks=(2, 5)),
     ...     da.from_array(np.arange(10).reshape(2, 5), chunks=(2, 5)),
     ... )
-    dask.array<getitem, shape=(2, 3), dtype=float64, chunksize=(2, 3)>
+    dask.array<truediv, shape=(2, 5), dtype=float64, chunksize=(2, 5)>
 
     """
     if cutoff is None:
-        cutoff = arr1.shape[0] // 2
+        cutoff = arr1.shape[0]
     nonperiodic_padder = lambda x: np.pad(
         x, [(cutoff, cutoff)] * arr1.ndim, mode="constant", constant_values=0
     )
@@ -172,13 +172,49 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None):
     return center_slice(cross_correlation(padder(arr1), padder(arr2)), cutoff)
 
 
+@make_da
+def correlations_multiple(data, correlations, periodic_boundary=True, cutoff=None):
+    """Calculate 2-point stats for a multiple auto/cross correlation
+
+    Args:
+      data: the discretized data
+      correlation_pair: the correlation pairs
+      periodic_boundary: whether to assume a periodic boudnary (default is true)
+      cutoff: the subarray of the 2 point stats to keep
+
+    Returns:
+      the 2-points stats array
+
+    >>> data = np.arange(18).reshape(1, 3, 3, 2)
+    >>> out = correlations_multiple(data, [[0, 1], [1, 1]])
+    >>> out
+    dask.array<stack, shape=(1, 3, 3, 2), dtype=float64, chunksize=(1, 3, 3, 1)>
+    >>> answer = np.array([[[58, 62, 58], [94, 98, 94], [58, 62, 58]]]) + 1. / 3.
+    >>> assert(out.compute()[...,0], answer)
+    """
+
+    return pipe(
+        range(data.shape[-1]),
+        map_(lambda x: (0, x)),
+        lambda x: correlations if correlations else x,
+        map_(
+            lambda x: two_point_stats(
+                data[..., x[0]],
+                data[..., x[1]],
+                periodic_boundary=periodic_boundary,
+                cutoff=cutoff,
+            )
+        ),
+        list,
+        lambda x: da.stack(x, axis=-1),
+    )
+
+
 class TwoPointcorrelation(BaseEstimator, TransformerMixin):
     """Calculate the 2-point stats for two arrays
     """
 
-    def __init__(
-        self, periodic_boundary=True, cutoff=None, correlations1=0, correlations2=0
-    ):
+    def __init__(self, periodic_boundary=True, cutoff=None, correlations=None):
         """Instantiate a TwoPointcorrelation
 
         Args:
@@ -188,24 +224,25 @@ class TwoPointcorrelation(BaseEstimator, TransformerMixin):
           correlations2: an index
 
         """
+
+        self.correlations = correlations
         self.periodic_boundary = periodic_boundary
         self.cutoff = cutoff
-        self.correlations1 = correlations1
-        self.correlations2 = correlations2
 
     def transform(self, data):
         """Transform the data
 
-         Args:
-           data: the data to be transformed
+        Args:
+          data: the data to be transformed
+
+        Returns:
+          the 2-point stats array
         """
-        return pipe(
+        return correlations_multiple(
             data,
-            lambda x: da.from_array(x, chunks=x.shape),
-            lambda x: (x[..., self.correlations1], x[..., self.correlations2]),
-            lambda x: two_point_stats(
-                *x, periodic_boundary=self.periodic_boundary, cutoff=self.cutoff
-            ),
+            self.correlations,
+            periodic_boundary=self.periodic_boundary,
+            cutoff=self.cutoff,
         )
 
     def fit(self, *_):

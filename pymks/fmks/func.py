@@ -227,3 +227,28 @@ def flatten(data):
     (2, 9)
     """
     return data.reshape(data.shape[0], -1)
+
+
+def make_da(func):
+    """Decorator to allow functions that only take Dask arrays to take
+    Numpy arrays.
+
+    Args:
+      func: the function to be decorated
+
+    Returns:
+      the decorated function
+
+    >>> @make_da
+    ... def my_func(arr):
+    ...     return arr + 1
+
+    >>> my_func(np.array([1, 1]))
+    dask.array<add, shape=(2,), dtype=int64, chunksize=(2,)>
+
+    """
+
+    def wrapper(arr, *args, **kwargs):
+        return func(da.from_array(arr, chunks=arr.shape), *args, **kwargs)
+
+    return wrapper
