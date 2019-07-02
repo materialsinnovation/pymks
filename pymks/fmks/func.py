@@ -227,3 +227,18 @@ def flatten(data):
     (2, 9)
     """
     return data.reshape(data.shape[0], -1)
+
+
+def make_da(func):
+    """Decorator to turn Numpy arrays into Dask arrays
+
+    Args:
+      func: the function to be decorated
+
+    Returns:
+      the decorated function
+    """
+    def wrapper(arr, *args, **kwargs):
+        return func(da.from_array(arr, chunks=arr.shape), *args, **kwargs)
+
+    return wrapper
