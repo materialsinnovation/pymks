@@ -20,11 +20,6 @@ jobs:
           name: Activate env
           command: |
             source activate conda-test1
-      # Step 3: run linter and tests
-      # - run:
-      #     name: Install Pymks
-      #     command: |
-      #       python setup.py install
 
       - run:
           name: Install libGL
@@ -40,10 +35,3 @@ jobs:
           command: |
             source activate conda-test1
             python -c "import pymks;pymks.test()"
-      # - run:
-      #     name: run tests
-      #     command: |
-      #       source activate conda-test1
-      #       python setup.py install
-      #       which python
-      #       py.test
