@@ -88,10 +88,10 @@ def test_default_property_linker():
 
 
 def test_default_dimension_reducer():
-    from sklearn.decomposition import RandomizedPCA
+    from sklearn.decomposition import PCA
     from pymks import MKSHomogenizationModel
     model = MKSHomogenizationModel(compute_correlations=False)
-    assert isinstance(model.dimension_reducer, RandomizedPCA)
+    assert isinstance(model.dimension_reducer, PCA)
 
 
 def test_default_correlations():

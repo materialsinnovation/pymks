@@ -1,4 +1,3 @@
-
 """
 The MKS homogenization module test cases
 

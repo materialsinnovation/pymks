@@ -46,7 +46,7 @@ def scaled_data(data, domain):
     Scales data to range between -1.0 and 1.0, viz. the domain over which
     legendre polynomials are defined
     """
-    return (2. * data - domain[0] - domain[1]) / (domain[1] - domain[0])
+    return (2.0 * data - domain[0] - domain[1]) / (domain[1] - domain[0])
 
 
 @curry

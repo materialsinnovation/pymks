@@ -4,6 +4,7 @@ let
     sha256 = "0q2m2qhyga9yq29yz90ywgjbn9hdahs7i8wwlq7b55rdbyiwa5dy";
   }) {};
   pypkgs = pkgs.python3Packages;
+  # Sfepy is in process of being added to Nixpkgs
   sfepy = pypkgs.buildPythonPackage rec {
     name = "sfepy_${version}";
     version = "2019.2";
@@ -22,6 +23,7 @@ let
     ];
     catchConflicts = false;
   };
+  # This nbval fix is not required for latest master branch of Nixpkgs (33b67761be99)
   nbval = (pypkgs.nbval.overridePythonAttrs ({ nativeBuildInputs = [ pypkgs.pytest ]; }));
 in
   pypkgs.buildPythonPackage rec {
