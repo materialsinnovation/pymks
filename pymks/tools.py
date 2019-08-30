@@ -569,7 +569,6 @@ def _draw_components_2D(X, labels, title, component_labels,
     if legend_outside is not False:
         lg = plt.legend(bbox_to_anchor=(1.05, 1.0), loc=2,
                         borderaxespad=0., fontsize=15)
-    lg.draggable()
     plt.title(title, fontsize=20)
     plt.show()
 
@@ -605,7 +604,6 @@ def _draw_components_evolution(X, labels, title, component_labels,
     if legend_outside:
         lg = plt.legend(bbox_to_anchor=(1.05, 1.0), loc=2,
                         borderaxespad=0., fontsize=15)
-    lg.draggable()
     plt.title(title, fontsize=20)
     plt.show()
 
