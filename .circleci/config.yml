@@ -15,11 +15,11 @@ jobs:
           name: Create env and install dependencies
           command: |
             conda env create -f environment.yml
-            source activate conda-test1
+            source activate pymks
       - run:
           name: Activate env
           command: |
-            source activate conda-test1
+            source activate pymks
 
       - run:
           name: Install libGL
@@ -33,5 +33,5 @@ jobs:
       - run:
           name: run tests
           command: |
-            source activate conda-test1
+            source activate pymks
             python -c "import pymks;pymks.test()"
