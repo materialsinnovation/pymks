@@ -40,11 +40,11 @@ def test_default_n_components():
 
 
 def test_default_dimension_reducer():
-    from sklearn.decomposition import RandomizedPCA
+    from sklearn.decomposition import PCA
     from pymks import MKSStructureAnalysis
     from pymks import PrimitiveBasis
     model = MKSStructureAnalysis(basis=PrimitiveBasis())
-    assert isinstance(model.dimension_reducer, RandomizedPCA)
+    assert isinstance(model.dimension_reducer, PCA)
 
 
 def test_default_correlations():
@@ -92,7 +92,7 @@ def test_store_correlations():
     from pymks import PrimitiveBasis
     from pymks.stats import correlate
     p_basis = PrimitiveBasis(2)
-    model = MKSStructureAnalysis(basis=p_basis, store_correlations=True)
+    model = MKSStructureAnalysis(basis=p_basis, store_correlations=True, n_components=2)
     X = np.random.randint(2, size=(2, 4, 4))
     model.fit(X)
     X = correlate(X, p_basis, correlations=[(0, 0), (0, 1)])

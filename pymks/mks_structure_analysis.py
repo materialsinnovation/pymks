@@ -1,6 +1,6 @@
 from pymks.stats import correlate
 from sklearn.base import BaseEstimator
-from sklearn.decomposition import RandomizedPCA
+from sklearn.decomposition import PCA
 import numpy as np
 
 
@@ -56,7 +56,7 @@ class MKSStructureAnalysis(BaseEstimator):
             basis: an instance of a bases class.
             dimension_reducer (class, optional): an instance of a
                 dimensionality reduction class with a fit_transform method. The
-                default class is RandomizedPCA.
+                default class is PCA.
             n_components (int, optional): number of components kept by the
                 dimension_reducer
             correlations (list, optional): list of spatial correlations to
@@ -87,7 +87,7 @@ class MKSStructureAnalysis(BaseEstimator):
         if basis is not None:
             self.basis._n_jobs = n_jobs
         if self.dimension_reducer is None:
-            self.dimension_reducer = RandomizedPCA(copy=False)
+            self.dimension_reducer = PCA(svd_solver='randomized', copy=False)
         if n_components is None:
             n_components = self.dimension_reducer.n_components
         if n_components is None:
@@ -151,11 +151,14 @@ class MKSStructureAnalysis(BaseEstimator):
         >>> size = (2, 3, 3)
         >>> X = np.random.randint(2, size=size)
         >>> analyzer.fit(X)
-        >>> print(analyzer.dimension_reducer.components_.reshape(size)[0])
-        ... # doctest: +ELLIPSIS
-        [[ 0.02886463  0.02886463  0.02886463]
-         [ 0.02886463 -0.43874233  0.49647159]
-         [ 0.02886463  0.02886463 -0.17896069]]
+
+        >>> res = analyzer.dimension_reducer.components_.reshape(size)[0]
+        >>> sol = [[0.02886463, 0.02886463, 0.02886463],
+        ...        [0.02886463, -0.43874233, 0.49647159],
+        ...        [0.02886463, 0.02886463, -0.17896069]]
+
+        >>> assert np.allclose(res, sol) or np.allclose(-res, sol)
+
         """
         X_stats = self._compute_stats(X, confidence_index)
         self._fit_transform(X_stats, reducer_labels)
@@ -188,9 +191,10 @@ class MKSStructureAnalysis(BaseEstimator):
         >>> size = (2, 3, 3)
         >>> X = np.random.randint(2, size=size)
         >>>
-        >>> print(analyzer.fit_transform(X)) # doctest: +ELLIPSIS
-        [[ 0.26731852]
-         [-0.26731852]]
+        >>> res = analyzer.fit_transform(X)
+        >>> sol = [[ 0.26731852], [-0.26731852]]
+        >>> assert np.allclose(res, sol) or np.allclose(-res, sol)
+
         """
         X_stats = self._compute_stats(X, confidence_index)
         return self._fit_transform(X_stats, None)
@@ -219,12 +223,15 @@ class MKSStructureAnalysis(BaseEstimator):
         >>> np.random.seed(5)
         >>> size = (2, 3, 3)
         >>> X = np.random.randint(2, size=size)
-        >>> print(analyzer.fit_transform(X)) # doctest: +ELLIPSIS
-        [[ 0.26731852]
-         [-0.26731852]]
-        >>> print(analyzer.transform(X)) # doctest: +ELLIPSIS
-        [[ 0.26731852]
-         [-0.26731852]]
+
+        >>> res = analyzer.fit_transform(X)
+        >>> sol = [[ 0.26731852], [-0.26731852]]
+        >>> assert np.allclose(res, sol) or np.allclose(-res, sol)
+
+        >>> res = analyzer.fit_transform(X)
+        >>> sol = [[ 0.26731852], [-0.26731852]]
+        >>> assert np.allclose(res, sol) or np.allclose(-res, sol)
+
         """
         X_stats = self._compute_stats(X, confidence_index)
         return self._transform(X_stats)

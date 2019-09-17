@@ -79,7 +79,7 @@ def _axes(x_data):
     return np.arange(len(x_data.shape) - 1) + 1
 
 
-def _explicit(gamma, ksq, param_a1=3., param_a2=0.):
+def _explicit(gamma, ksq, param_a1=3.0, param_a2=0.0):
     return param_a1 - gamma * param_a2 * ksq
 
 
@@ -96,7 +96,7 @@ def _f_response(x_data, delta_t, gamma, ksq):
 
 
 @curry
-def solve(x_data, delta_x=0.25, delta_t=0.001, gamma=1.):
+def solve(x_data, delta_x=0.25, delta_t=0.001, gamma=1.0):
     """Solve the Cahn-Hilliard equation for one step.
 
     Advance multiple microstuctures in time with the Cahn-Hilliard

@@ -12,17 +12,17 @@ def test_3d():
     """
 
     def setone(arr):
-        arr[0, :, (arr.shape[0] - 1) // 2] = 1.
+        arr[0, :, (arr.shape[0] - 1) // 2] = 1.0
         return arr
 
     assert pipe(
         5,
         lambda x: np.zeros((1, x, x, x), dtype=int),
         setone,
-        solve(elastic_modulus=(1., 10.), poissons_ratio=(0., 0.)),
+        solve(elastic_modulus=(1.0, 10.0), poissons_ratio=(0.0, 0.0)),
         lambda x: np.allclose(
             [np.mean(x["strain"][0, ..., i]) for i in range(6)],
-            [1., 0., 0., 0., 0., 0.],
+            [1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
         ),
     )
 
