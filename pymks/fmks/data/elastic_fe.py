@@ -93,6 +93,7 @@ The module also works with Dask arrays,
 
 """
 
+import warnings
 import pytest
 import numpy as np
 
@@ -138,6 +139,9 @@ from ..func import curry, sequence, apply_dict_func
 
 goptions["verbose"] = False
 output.set_output(quiet=True)
+
+
+warnings.simplefilter("ignore", category=FutureWarning)
 
 
 @curry
