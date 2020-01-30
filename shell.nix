@@ -61,6 +61,7 @@ in
       toml
       tkinter
       ipywidgets
+      pip
     ];
     src=builtins.filterSource (path: type: type != "directory" || baseNameOf path != ".git") ./.;
     preShellHook = ''
