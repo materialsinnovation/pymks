@@ -72,6 +72,6 @@ class MicrostructureGenerator(_BaseMicrostructureGenerator):
                                          for i, x in zip(seg_ind, X_sort)])
             new_axes = [None for i in X_blur[0].shape]
             seg_slices = [slice(None)] + new_axes + [slice(None)]
-            X_bool = X_blur[..., None] > seg_values[seg_slices]
+            X_bool = X_blur[..., None] > seg_values[tuple(seg_slices)]
             X_phases = np.sum(X_bool, axis=-1)
         return X_phases

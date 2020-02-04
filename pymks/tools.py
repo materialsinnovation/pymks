@@ -7,7 +7,7 @@ except ImportError:
 import matplotlib.colors as colors
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from sklearn.learning_curve import learning_curve
+from sklearn.model_selection import learning_curve
 from .stats import _auto_correlations
 from .stats import _cross_correlations
 import numpy as np
@@ -364,8 +364,7 @@ def draw_gridscores(grid_scores, param, score_label=None, colors=None,
             "grid_scores, colors, and param_lables must have the same length.")
     mins, maxes = [], []
     for grid_score, data_label, color in zip(grid_scores, data_labels, colors):
-        tmp = [[params[param], mean_score, scores.std()]
-               for params, mean_score, scores in grid_score]
+        tmp = [[item['params'][param], item['mean_test_score'], item['std_test_score']] for item in grid_score]
         _param, errors, stddev = list(zip(*tmp))
         _mins = np.array(errors) - np.array(stddev)
         _maxes = np.array(errors) + np.array(stddev)
@@ -404,9 +403,14 @@ def draw_gridscores_matrix(grid_scores, params, score_label=None,
         score_label = 'R-Squared'
     if param_labels is None:
         param_labels = ['', '']
-    tmp = [[params, mean_score, scores.std()]
-           for parameters, mean_score, scores in grid_scores.grid_scores_]
-    param, means, stddev = list(zip(*tmp))
+
+    param = grid_scores.cv_results_['params']
+    means = grid_scores.cv_results_['mean_test_score']
+    stddev = grid_scores.cv_results_['std_test_score']
+
+#    tmp = [[params, mean_score, scores.std()]
+#           for parameters, mean_score, scores in grid_scores.grid_scores_]
+#    param, means, stddev = list(zip(*tmp))
     param_range_0 = grid_scores.param_grid[params[0]]
     param_range_1 = grid_scores.param_grid[params[1]]
     mat_size = (len(param_range_1), len(param_range_0))
@@ -565,7 +569,6 @@ def _draw_components_2D(X, labels, title, component_labels,
     if legend_outside is not False:
         lg = plt.legend(bbox_to_anchor=(1.05, 1.0), loc=2,
                         borderaxespad=0., fontsize=15)
-    lg.draggable()
     plt.title(title, fontsize=20)
     plt.show()
 
@@ -601,7 +604,6 @@ def _draw_components_evolution(X, labels, title, component_labels,
     if legend_outside:
         lg = plt.legend(bbox_to_anchor=(1.05, 1.0), loc=2,
                         borderaxespad=0., fontsize=15)
-    lg.draggable()
     plt.title(title, fontsize=20)
     plt.show()
 
