@@ -7,8 +7,8 @@ import numpy as np
 import dask.array as da
 from dask import delayed
 import toolz.curried
-from toolz.curried import iterate, compose, pipe, get
-from toolz.curried import map as map_
+from toolz.curried import iterate, compose, pipe, get, flip
+from toolz.curried import map as fmap
 
 
 def curry(func):
@@ -194,14 +194,14 @@ def apply_dict_func(func, data, shape_dict):
         return pipe(
             lambda x: func(np.array(x)),
             delayed,
-            lambda x: map_(lambda y: (y.shape, x(y)), data.blocks),
-            map_(lambda x: (x[0], get(key, x[1]))),
-            map_(lambda x: from_delayed(key, x[0], x[1])),
+            lambda x: fmap(lambda y: (y.shape, x(y)), data.blocks),
+            fmap(lambda x: (x[0], get(key, x[1]))),
+            fmap(lambda x: from_delayed(key, x[0], x[1])),
             list,
             lambda x: da.concatenate(x, axis=0),
         )
 
-    return pipe(shape_dict.keys(), map_(lambda x: (x, concat(x))), dict)
+    return pipe(shape_dict.keys(), fmap(lambda x: (x, concat(x))), dict)
 
 
 @curry
@@ -252,3 +252,74 @@ def make_da(func):
         return func(da.from_array(arr, chunks=arr.shape), *args, **kwargs)
 
     return wrapper
+
+
+@curry
+def extend(shape, arr):
+    """Extend an array by adding new axes with shape of shape argument.
+
+    The values from the existing axes are repeated in the new
+    axes. The is achieved using repeated uses of np.repeat followed by
+    np.reshape.
+
+    Args:
+      shape: the new shape to extend by
+      arr: the array to extend
+
+    Returns:
+      a new extended array
+
+    >>> a = np.arange(6).reshape((2, 3))
+    >>> extend((4,), a).shape
+    (2, 3, 4)
+    >>> print(extend((2, 3), a))
+    [[[[0 0 0]
+       [0 0 0]]
+    <BLANKLINE>
+      [[1 1 1]
+       [1 1 1]]
+    <BLANKLINE>
+      [[2 2 2]
+       [2 2 2]]]
+    <BLANKLINE>
+    <BLANKLINE>
+     [[[3 3 3]
+       [3 3 3]]
+    <BLANKLINE>
+      [[4 4 4]
+       [4 4 4]]
+    <BLANKLINE>
+      [[5 5 5]
+       [5 5 5]]]]
+
+    """
+    extend_ = curry(lambda s, x: np.repeat(x, s, axis=-1).reshape(x.shape + (s,)))
+    fextend = sequence(fmap(extend_), list, lambda x: sequence(*x))
+    return fextend(shape)(arr)
+
+
+@curry
+def assign(value, index, arr):
+    """Fake functional numpy assignment
+
+    Just to make things easier for function pipelines
+
+    Args:
+      value: the value to assing
+      index: the index
+      arr: the array
+
+    Returns:
+      Not a new array, but the same array updated
+
+    >>> a = np.arange(6).reshape((2, 3))
+    >>> assign(1, (slice(None), 2), a)
+    array([[0, 1, 1],
+           [3, 4, 1]])
+
+    """
+    arr[index] = value
+    return arr
+
+
+npresize = curry(flip(np.resize))  # pylint: disable=invalid-name

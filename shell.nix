@@ -65,6 +65,7 @@ in
       toml
       tkinter
       ipywidgets
+      pip
       pkgs.openssh
     ];
     src=builtins.filterSource (path: type: type != "directory" || baseNameOf path != ".git") ./.;
