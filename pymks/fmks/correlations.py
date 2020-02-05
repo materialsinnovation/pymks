@@ -15,7 +15,7 @@ import dask.array as da
 from .func import dafftshift, dafftn, daifftn, daconj, flatten
 from .func import sequence, make_da, star, dapad
 
-
+@make_da
 def cross_correlation(arr1, arr2):
     """
     Returns the cross-correlation of and input field with another field.
@@ -55,10 +55,15 @@ def cross_correlation(arr1, arr2):
     ((2, 2, 1, 1, 2, 2), (5,), (5,))
     """
     faxes = lambda x: tuple(np.arange(x.ndim - 1) + 1)
+    import ipdb; ipdb.set_trace()
+    def debug(x):
+        import ipdb; ipdb.set_trace()
+        return x
 
     return pipe(
         arr1,
         dafftn(axes=faxes(arr1)),
+        debug,
         lambda x: daconj(x) * dafftn(arr2, axes=faxes(arr2)),
         daifftn(axes=faxes(arr1)),
         dafftshift(axes=faxes(arr1)),
@@ -141,6 +146,19 @@ def center_slice(x_data, cutoff):
         lambda x: x_data[x],
     )
 
+@curry
+def nonperiodic_padder(cutoff, arr):
+    make_cutoff = lambda x: list(map_(lambda y: (y, y), x))
+    if cutoff is None:
+        cutoff_ = make_cutoff(arr.shape[1:])
+    if type(cutoff) is int:
+        cutoff_ = make_cutoff([cutoff] * (len(arr.shape) - 1))
+    if type(cutoff) is tuple:
+        cutoff_ = make_cutoff(cutoff)
+    import ipdb; ipdb.set_trace()
+    return da.pad(
+        arr, [(0, 0)] + cutoff_, mode="constant", constant_values=0
+    )
 
 @curry
 def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None):
