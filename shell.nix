@@ -1,8 +1,12 @@
-let
-  pkgs = import (builtins.fetchTarball {
+{ pkgs ? (import (builtins.fetchTarball {
     url = https://github.com/NixOS/nixpkgs/archive/19.03.tar.gz;
     sha256 = "0q2m2qhyga9yq29yz90ywgjbn9hdahs7i8wwlq7b55rdbyiwa5dy";
-  }) {};
+  }) {}) }:
+let
+  # pkgs = import (builtins.fetchTarball {
+  #   url = https://github.com/NixOS/nixpkgs/archive/19.03.tar.gz;
+  #   sha256 = "0q2m2qhyga9yq29yz90ywgjbn9hdahs7i8wwlq7b55rdbyiwa5dy";
+  # }) {};
   pypkgs = pkgs.python3Packages;
   # Sfepy is in process of being added to Nixpkgs
   sfepy = pypkgs.buildPythonPackage rec {
@@ -61,6 +65,7 @@ in
       toml
       tkinter
       ipywidgets
+      pkgs.openssh
     ];
     src=builtins.filterSource (path: type: type != "directory" || baseNameOf path != ".git") ./.;
     preShellHook = ''
