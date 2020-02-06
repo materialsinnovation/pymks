@@ -100,7 +100,7 @@ def map_blocks(func, data, chunks=None):
 
     >>> f = map_blocks(lambda x: x + 1)
     >>> f(da.arange(4, chunks=(2,)))
-    dask.array<lambda, shape=(4,), dtype=int64, chunksize=(2,)>
+    dask.array<lambda, shape=(4,), dtype=int64, chunksize=(2,), chunktype=numpy.ndarray>
     """
     return da.map_blocks(func, data, chunks=chunks)
 
@@ -229,6 +229,29 @@ def flatten(data):
     return data.reshape(data.shape[0], -1)
 
 
+def rechunk(data, chunks):
+    """An agnostic rechunk for numpy or dask
+
+    Required as from_array no longer accepts dask arrays.
+
+    Args:
+      data: either a numpy or dask array
+      chunks: the new chunk shape
+
+    Returns:
+      a rechunked dask array
+
+    >>> rechunk(np.arange(10).reshape((2, 5)), (1, 5)).chunks
+    ((1, 1), (5,))
+
+    """
+    if isinstance(data, np.ndarray):
+        rechunk_ = da.from_array
+    else:
+        rechunk_ = da.rechunk
+    return rechunk_(data, chunks=chunks)
+
+
 def make_da(func):
     """Decorator to allow functions that only take Dask arrays to take
     Numpy arrays.
@@ -244,12 +267,12 @@ def make_da(func):
     ...     return arr + 1
 
     >>> my_func(np.array([1, 1]))
-    dask.array<add, shape=(2,), dtype=int64, chunksize=(2,)>
+    dask.array<add, shape=(2,), dtype=int64, chunksize=(2,), chunktype=numpy.ndarray>
 
     """
 
     def wrapper(arr, *args, **kwargs):
-        return func(da.from_array(arr, chunks=arr.shape), *args, **kwargs)
+        return func(rechunk(arr, chunks=arr.shape), *args, **kwargs)
 
     return wrapper
 

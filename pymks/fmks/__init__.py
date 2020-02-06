@@ -10,13 +10,14 @@ primarily using the [Toolz](http://toolz.readthedocs.io) library.
 """
 
 import os
+import pytest
+from pkg_resources import get_distribution, DistributionNotFound
 
 
 def test():  # pragma: no cover
     r"""
     Run all the doctests available.
     """
-    import pytest
 
     path = os.path.split(__file__)[0]
     pytest.main(
@@ -30,7 +31,6 @@ def get_version() -> str:
     Returns:
       the package version number
     """
-    from pkg_resources import get_distribution, DistributionNotFound
 
     try:
         # pylint: disable=no-member

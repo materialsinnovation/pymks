@@ -82,8 +82,8 @@ def discretize_nomax(data, states):
             [-1.,  0.,  1.]]])
 
     >>> discretize_nomax(da.linspace(0, 1, 9, chunks=(3,)),
-    ...             da.linspace(0, 1, 6, chunks=(2,)))
-    dask.array<sub, shape=(9, 6), dtype=float64, chunksize=(3, 2)>
+    ...             da.linspace(0, 1, 6, chunks=(2,))).shape
+    (9, 6)
 
     """
     return 1 - (abs(data[..., None] - states)) / (states[1] - states[0])
