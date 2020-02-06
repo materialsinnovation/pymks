@@ -1,12 +1,13 @@
+# { pkgs ? (import (builtins.fetchTarball {
+#     url = "https://github.com/NixOS/nixpkgs/archive/19.09.tar.gz";
+#     sha256 = "0mhqhq21y5vrr1f30qd2bvydv4bbbslvyzclhw0kdxmkgg3z4c92";
+#   }) {}) }:
 { pkgs ? (import (builtins.fetchTarball {
-    url = https://github.com/NixOS/nixpkgs/archive/19.03.tar.gz;
-    sha256 = "0q2m2qhyga9yq29yz90ywgjbn9hdahs7i8wwlq7b55rdbyiwa5dy";
+    url = "https://github.com/NixOS/nixpkgs/archive/5a0e91e78f43484a46303f60dad4c411cdc6c7d4.tar.gz";
+    sha256 = "11cak4532852cbrzws2fx7jdwxkhc1jcvvagy4sprm0zlnqsvha6";
   }) {}) }:
+
 let
-  # pkgs = import (builtins.fetchTarball {
-  #   url = https://github.com/NixOS/nixpkgs/archive/19.03.tar.gz;
-  #   sha256 = "0q2m2qhyga9yq29yz90ywgjbn9hdahs7i8wwlq7b55rdbyiwa5dy";
-  # }) {};
   pypkgs = pkgs.python3Packages;
   # Sfepy is in process of being added to Nixpkgs
   sfepy = pypkgs.buildPythonPackage rec {
@@ -27,13 +28,12 @@ let
     ];
     catchConflicts = false;
   };
-  # This nbval fix is not required for latest master branch of Nixpkgs (33b67761be99)
-  nbval = (pypkgs.nbval.overridePythonAttrs ({ nativeBuildInputs = [ pypkgs.pytest ]; }));
 in
   pypkgs.buildPythonPackage rec {
     pname = "pymks";
     version = "0.3.4.dev";
     nativeBuildInputs =  with pypkgs; [
+      nbval
       numpy
       scipy
       pytest
