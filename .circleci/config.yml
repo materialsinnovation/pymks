@@ -33,5 +33,6 @@ jobs:
       - run:
           name: run tests
           command: |
+            set -e
             source activate pymks
             python -c "import pymks;pymks.test()"
