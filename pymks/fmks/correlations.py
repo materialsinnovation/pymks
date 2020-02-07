@@ -33,7 +33,7 @@ def cross_correlation(arr1, arr2):
     ...                       [1,1,0]]])
     >>> chunks = x_data.shape
     >>> x_data = da.from_array(x_data, chunks=chunks)
-    >>> y_data = da.from_array(1 - x_data, chunks=chunks)
+    >>> y_data = 1 - x_data
     >>> f_data = cross_correlation(x_data, y_data)
     >>> gg = np.asarray([[[ 2/9,  3/9,  2/9],
     ...                   [ 3/9, 0,  3/9],
@@ -159,8 +159,8 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None):
     >>> two_point_stats(
     ...     da.from_array(np.arange(10).reshape(2, 5), chunks=(2, 5)),
     ...     da.from_array(np.arange(10).reshape(2, 5), chunks=(2, 5)),
-    ... )
-    dask.array<truediv, shape=(2, 5), dtype=float64, chunksize=(2, 5)>
+    ... ).shape
+    (2, 5)
 
     """
     if cutoff is None:

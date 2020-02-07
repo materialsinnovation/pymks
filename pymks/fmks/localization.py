@@ -26,7 +26,7 @@ from toolz.curried import pipe
 from toolz.curried import map as fmap
 from sklearn.base import RegressorMixin, TransformerMixin, BaseEstimator
 
-from .func import curry, array_from_tuple
+from .func import curry, array_from_tuple, rechunk
 from .func import dafftshift, dafftn, daifftn, daifftshift
 
 
@@ -361,13 +361,13 @@ def zero_pad(arr, shape):
 
     return pipe(
         np.array(shape) - np.array(arr.shape),
-        lambda x: da.concatenate(
+        lambda x: np.concatenate(
             ((x - (x // 2))[..., None], (x // 2)[..., None]), axis=1
         ),
         fmap(tuple),
         tuple,
-        lambda x: np.pad(arr, x, "constant", constant_values=0),
-        lambda x: da.from_array(x, chunks=x.shape),
+        lambda x: da.pad(arr, x, "constant", constant_values=0),
+        lambda x: da.rechunk(x, chunks=x.shape),
     )
 
 
@@ -483,7 +483,7 @@ class LocalizationRegressor(BaseEstimator, RegressorMixin):
         """
         self.y_data_shape = y_data.shape
         y_data_reshape = reshape(y_data, x_data.shape[:-1])
-        y_data_da = da.from_array(y_data_reshape, chunks=x_data.chunks[:-1])
+        y_data_da = rechunk(y_data_reshape, chunks=x_data.chunks[:-1])
         self.coeff = fit_disc(x_data, y_data_da, self.redundancy_func)
         return self
 
