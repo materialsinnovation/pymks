@@ -346,3 +346,65 @@ def assign(value, index, arr):
 
 
 npresize = curry(flip(np.resize))  # pylint: disable=invalid-name
+
+
+@curry
+def zero_pad(arr, shape, chunks):
+    """Zero pad an array with zeros
+
+    Args:
+      arr: the array to pad
+      shape: the shape of the new array
+      chunks: how to rechunk the new array
+
+    Returns:
+      the new padded version of the array
+
+    >>> print(
+    ...     zero_pad(
+    ...         np.arange(4).reshape([1, 2, 2, 1]),
+    ...         (1, 4, 5, 1),
+    ...         None
+    ...     )[0,...,0].compute()
+    ... )
+    [[0 0 0 0 0]
+     [0 0 0 1 0]
+     [0 0 2 3 0]
+     [0 0 0 0 0]]
+    >>> print(zero_pad(np.arange(4).reshape([2, 2]), (4, 5), None).compute())
+    [[0 0 0 0 0]
+     [0 0 0 1 0]
+     [0 0 2 3 0]
+     [0 0 0 0 0]]
+    >>> zero_pad(zero_pad(np.arange(4).reshape([2, 2]), (4, 5, 1), None))
+    Traceback (most recent call last):
+    ...
+    RuntimeError: length of shape is incorrect
+    >>> zero_pad(zero_pad(np.arange(4).reshape([2, 2]), (1, 2), None))
+    Traceback (most recent call last):
+    ...
+    RuntimeError: resize shape is too small
+
+    >>> arr = da.from_array(np.arange(4).reshape((2, 2)), chunks=(2, 1))
+    >>> out = zero_pad(arr, (4, 3), (-1, 1))
+    >>> out.shape
+    (4, 3)
+    >>> out.chunks
+    ((4,), (1, 1, 1))
+    """
+    if len(shape) != len(arr.shape):
+        raise RuntimeError("length of shape is incorrect")
+
+    if not np.all(shape >= arr.shape):
+        raise RuntimeError("resize shape is too small")
+
+    return pipe(
+        np.array(shape) - np.array(arr.shape),
+        lambda x: np.concatenate(
+            ((x - (x // 2))[..., None], (x // 2)[..., None]), axis=1
+        ),
+        fmap(tuple),
+        tuple,
+        lambda x: da.pad(arr, x, "constant", constant_values=0),
+        lambda x: da.rechunk(x, chunks=chunks or x.shape),
+    )
