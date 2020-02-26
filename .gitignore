@@ -160,5 +160,4 @@ ENV/
 .local/
 
 domain.vtk
-notebooks/dask-worker-space
-notebooks/domain.vtk
+dask-worker-space
