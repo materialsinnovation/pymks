@@ -13,7 +13,7 @@ from toolz.curried import map as map_, identity
 from sklearn.base import TransformerMixin, BaseEstimator
 import dask.array as da
 from .func import dafftshift, dafftn, daifftn, daconj, flatten
-from .func import sequence, make_da
+from .func import sequence, make_da,zero_pad
 
 
 def cross_correlation(arr1, arr2):
@@ -21,8 +21,8 @@ def cross_correlation(arr1, arr2):
     Returns the cross-correlation of and input field with another field.
 
     Args:
-      arr1: the input field
-      arr2: the other input field
+      arr1: the input field (n_samples,n_x,n_y)
+      arr2: the other input field (n_samples,n_x,n_y)
 
     Returns:
       an nd-array of same dimension as the input field
@@ -54,7 +54,6 @@ def cross_correlation(arr1, arr2):
     >>> print(f_data.chunks)
     ((2, 2, 1, 1, 2, 2), (5,), (5,))
     """
-
     faxes = lambda x: tuple(np.arange(x.ndim - 1) + 1)
 
     return pipe(
@@ -73,7 +72,7 @@ def auto_correlation(arr):
     Returns auto-corrlation of and input field with itself.
 
     Args:
-      arr: the input field
+      arr: the input field (n_samples,n_x,n_y)
 
     Returns:
       an nd-array of same dimension as the input field
@@ -107,7 +106,7 @@ def center_slice(x_data, cutoff):
     cutoff length
 
     Args:
-      x_data: the data array, first index is left unchanged
+      x_data: the data array (n_samples,n_x,n_y), first index is left unchanged
       cutoff: cutoff size
 
     Returns:
@@ -148,9 +147,9 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None):
     """Calculate the 2-points stats for two arrays
 
     Args:
-      arr1: array used to calculate cross-correlations
-      arr2: array used to calculate cross-correlations
-      periodic_boundary: whether to assume a periodic boudnary (default is true)
+      arr1: array used to calculate cross-correlations (n_samples,n_x,n_y)
+      arr2: array used to calculate cross-correlations (n_samples,n_x,n_y)
+      periodic_boundary: whether to assume a periodic boundary (default is true)
       cutoff: the subarray of the 2 point stats to keep
 
     Returns:
@@ -164,12 +163,42 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None):
 
     """
     if cutoff is None:
-        cutoff = arr1.shape[0]
-    nonperiodic_padder = lambda x: np.pad(
-        x, [(cutoff, cutoff)] * arr1.ndim, mode="constant", constant_values=0
-    )
+        # print("B",np.min(arr1.shape[1:]))
+        cutoff = np.floor((np.min(arr1.shape[1:])-1)/2)
+        # print(cutoff)
+        # print("c",cutoff)
+    # nonperiodic_padder = lambda x: np.pad(
+    #     x,[(0,0)]+ [(cutoff, cutoff)] * (arr1.ndim-1), mode="constant", constant_values=0
+    # ).rechunk((x.chunks[0], -1, -1, x.chunks[-1]))
+
+    nonperiodic_padder =sequence(lambda x: np.pad(
+        x,[(0,0)]+ [(cutoff, cutoff)] * (arr1.ndim-1), mode="constant", constant_values=0
+    ),lambda x: x.rechunk(x.shape))
+
+    if cutoff > np.floor((np.min(arr1.shape[1:])-1)/2):
+         cutoff = np.floor((np.min(arr1.shape[1:])-1)/2)
+
+    # nonperiodic_padder =
+    # periodic_padder
+    # print(arr1.ndim)
     padder = identity if periodic_boundary else nonperiodic_padder
-    return center_slice(cross_correlation(padder(arr1), padder(arr2)), cutoff)
+    # print(padder(arr1).shape)
+    # print(padder(arr1).compute())
+    nonperiodic_normalize=lambda x: auto_correlation(padder(np.ones_like(x)))
+
+    nonperiodic_stats= sequence(lambda x : cross_correlation(padder(x[0]), padder(x[1])),
+        lambda x : x/nonperiodic_normalize(arr1),lambda x: center_slice(x,cutoff)
+        )
+    periodicstats=sequence(lambda x : cross_correlation(padder(x[0]), padder(x[1]))
+        ,lambda x: center_slice(x,cutoff)
+        )
+    stats=periodicstats if periodic_boundary else nonperiodic_stats
+
+
+    # normalize=identity if periodic_boundary else nonperiodic_normalize
+    # stats =center_slice(cross_correlation(padder(arr1), padder(arr2)), cutoff)
+    # print(nonperiodic_normalize(arr1).compute().shape)
+    return stats([arr1,arr2])
 
 
 @make_da
@@ -177,7 +206,7 @@ def correlations_multiple(data, correlations, periodic_boundary=True, cutoff=Non
     """Calculate 2-point stats for a multiple auto/cross correlation
 
     Args:
-      data: the discretized data
+      data: the discretized data (n_samples,n_x,n_y,n_correlation)
       correlation_pair: the correlation pairs
       periodic_boundary: whether to assume a periodic boudnary (default is true)
       cutoff: the subarray of the 2 point stats to keep
