@@ -13,7 +13,7 @@ from toolz.curried import map as map_, identity
 from sklearn.base import TransformerMixin, BaseEstimator
 import dask.array as da
 from .func import dafftshift, dafftn, daifftn, daconj, flatten
-from .func import sequence, make_da,zero_pad
+from .func import sequence, make_da
 
 
 def cross_correlation(arr1, arr2):
@@ -163,42 +163,37 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None):
 
     """
     if cutoff is None:
-        # print("B",np.min(arr1.shape[1:]))
-        cutoff = np.floor((np.min(arr1.shape[1:])-1)/2)
-        # print(cutoff)
-        # print("c",cutoff)
-    # nonperiodic_padder = lambda x: np.pad(
-    #     x,[(0,0)]+ [(cutoff, cutoff)] * (arr1.ndim-1), mode="constant", constant_values=0
-    # ).rechunk((x.chunks[0], -1, -1, x.chunks[-1]))
+        cutoff = np.floor((np.min(arr1.shape[1:]) - 1) / 2)
 
-    nonperiodic_padder =sequence(lambda x: np.pad(
-        x,[(0,0)]+ [(cutoff, cutoff)] * (arr1.ndim-1), mode="constant", constant_values=0
-    ),lambda x: x.rechunk(x.shape))
+    nonperiodic_padder = sequence(
+        lambda x: np.pad(
+            x,
+            [(0, 0)] + [(cutoff, cutoff)] * (arr1.ndim - 1),
+            mode="constant",
+            constant_values=0,
+        ),
+        lambda x: x.rechunk(x.shape),
+    )
 
-    if cutoff > np.floor((np.min(arr1.shape[1:])-1)/2):
-         cutoff = np.floor((np.min(arr1.shape[1:])-1)/2)
+    if cutoff > np.floor((np.min(arr1.shape[1:]) - 1) / 2):
+        cutoff = np.floor((np.min(arr1.shape[1:]) - 1) / 2)
 
-    # nonperiodic_padder =
-    # periodic_padder
-    # print(arr1.ndim)
     padder = identity if periodic_boundary else nonperiodic_padder
-    # print(padder(arr1).shape)
-    # print(padder(arr1).compute())
-    nonperiodic_normalize=lambda x: auto_correlation(padder(np.ones_like(x)))
 
-    nonperiodic_stats= sequence(lambda x : cross_correlation(padder(x[0]), padder(x[1])),
-        lambda x : x/nonperiodic_normalize(arr1),lambda x: center_slice(x,cutoff)
-        )
-    periodicstats=sequence(lambda x : cross_correlation(padder(x[0]), padder(x[1]))
-        ,lambda x: center_slice(x,cutoff)
-        )
-    stats=periodicstats if periodic_boundary else nonperiodic_stats
+    nonperiodic_normalize = lambda x: auto_correlation(padder(np.ones_like(x)))
 
+    nonperiodic_stats = sequence(
+        lambda x: cross_correlation(padder(x[0]), padder(x[1])),
+        lambda x: x / nonperiodic_normalize(arr1),
+        lambda x: center_slice(x, cutoff),
+    )
+    periodicstats = sequence(
+        lambda x: cross_correlation(padder(x[0]), padder(x[1])),
+        lambda x: center_slice(x, cutoff),
+    )
+    stats = periodicstats if periodic_boundary else nonperiodic_stats
 
-    # normalize=identity if periodic_boundary else nonperiodic_normalize
-    # stats =center_slice(cross_correlation(padder(arr1), padder(arr2)), cutoff)
-    # print(nonperiodic_normalize(arr1).compute().shape)
-    return stats([arr1,arr2])
+    return stats([arr1, arr2])
 
 
 @make_da
