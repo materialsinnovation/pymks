@@ -26,7 +26,7 @@ def _imfilter(x_data, f_data):
 
 
 @curry
-def _zero_pad(arr, shape):
+def _np_zero_pad(arr, shape):
     if len(shape) != len(arr.shape):
         raise RuntimeError("length of shape is incorrect")
 
@@ -48,7 +48,7 @@ def _gaussian_blur_filter(grain_size, domain_size):
     return pipe(grain_size, 
                 lambda x: fourier_gaussian(np.ones(x), np.ones(len(x))), 
                 fftshift,
-                _zero_pad(shape=domain_size))
+                _np_zero_pad(shape=domain_size))
 
 @curry
 def _cumulative_sum(volume_fraction, n_phases):
