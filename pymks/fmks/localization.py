@@ -26,8 +26,16 @@ from toolz.curried import pipe
 from toolz.curried import map as fmap
 from sklearn.base import RegressorMixin, TransformerMixin, BaseEstimator
 
-from .func import curry, array_from_tuple
-from .func import dafftshift, dafftn, daifftn, daifftshift
+from .func import (
+    curry,
+    array_from_tuple,
+    rechunk,
+    dafftshift,
+    dafftn,
+    daifftn,
+    daifftshift,
+    zero_pad,
+)
 
 
 @curry
@@ -313,61 +321,11 @@ def coeff_resize(coeff, shape):
     return pipe(
         coeff,
         coeff_to_real,
-        zero_pad(shape=shape + coeff.shape[-1:]),
-        coeff_to_frequency,
-    )
-
-
-@curry
-def zero_pad(arr, shape):
-    """Zero pad an array with zeros
-
-    Args:
-      arr: the array to pad
-      shape: the shape of the new array
-
-    Returns:
-      the new padded version of the array
-
-    >>> print(
-    ...     zero_pad(
-    ...         np.arange(4).reshape([1, 2, 2, 1]),
-    ...         (1, 4, 5, 1)
-    ...     )[0,...,0].compute()
-    ... )
-    [[0 0 0 0 0]
-     [0 0 0 1 0]
-     [0 0 2 3 0]
-     [0 0 0 0 0]]
-    >>> print(zero_pad(np.arange(4).reshape([2, 2]), (4, 5)).compute())
-    [[0 0 0 0 0]
-     [0 0 0 1 0]
-     [0 0 2 3 0]
-     [0 0 0 0 0]]
-    >>> zero_pad(zero_pad(np.arange(4).reshape([2, 2]), (4, 5, 1)))
-    Traceback (most recent call last):
-    ...
-    RuntimeError: length of shape is incorrect
-    >>> zero_pad(zero_pad(np.arange(4).reshape([2, 2]), (1, 2)))
-    Traceback (most recent call last):
-    ...
-    RuntimeError: resize shape is too small
-    """
-    if len(shape) != len(arr.shape):
-        raise RuntimeError("length of shape is incorrect")
-
-    if not np.all(shape >= arr.shape):
-        raise RuntimeError("resize shape is too small")
-
-    return pipe(
-        np.array(shape) - np.array(arr.shape),
-        lambda x: da.concatenate(
-            ((x - (x // 2))[..., None], (x // 2)[..., None]), axis=1
+        zero_pad(
+            shape=shape + coeff.shape[-1:],
+            chunks=((-1,) * len(shape)) + (coeff.chunks[-1],),
         ),
-        fmap(tuple),
-        tuple,
-        lambda x: np.pad(arr, x, "constant", constant_values=0),
-        lambda x: da.from_array(x, chunks=x.shape),
+        coeff_to_frequency,
     )
 
 
@@ -483,7 +441,7 @@ class LocalizationRegressor(BaseEstimator, RegressorMixin):
         """
         self.y_data_shape = y_data.shape
         y_data_reshape = reshape(y_data, x_data.shape[:-1])
-        y_data_da = da.from_array(y_data_reshape, chunks=x_data.chunks[:-1])
+        y_data_da = rechunk(y_data_reshape, chunks=x_data.chunks[:-1])
         self.coeff = fit_disc(x_data, y_data_da, self.redundancy_func)
         return self
 

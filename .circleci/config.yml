@@ -16,6 +16,7 @@ jobs:
           command: |
             conda env create -f environment.yml
             source activate pymks
+
       - run:
           name: Activate env
           command: |
@@ -29,9 +30,17 @@ jobs:
             apt-get --yes install libgl1-mesa-glx
             apt-get --yes install libxrender1
 
-
+      # only run select notebooks due to possible memory issues
       - run:
           name: run tests
           command: |
+            set -e
             source activate pymks
-            python -c "import pymks;pymks.test()"
+            python setup.py develop
+            py.test pymks
+            py.test notebooks/elasticity.ipynb
+            py.test notebooks/filter.ipynb
+            py.test notebooks/intro.ipynb
+            py.test notebooks/multiphase.ipynb
+            py.test notebooks/stats_checker_board.ipynb
+            py.test notebooks/stress.ipynb

@@ -158,3 +158,6 @@ ENV/
 .pytest_cache/
 
 .local/
+
+domain.vtk
+dask-worker-space

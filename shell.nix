@@ -1,39 +1,44 @@
+# { pkgs ? (import (builtins.fetchTarball {
+#     url = "https://github.com/NixOS/nixpkgs/archive/19.09.tar.gz";
+#     sha256 = "0mhqhq21y5vrr1f30qd2bvydv4bbbslvyzclhw0kdxmkgg3z4c92";
+#   }) {}) }:
 { pkgs ? (import (builtins.fetchTarball {
-    url = https://github.com/NixOS/nixpkgs/archive/19.03.tar.gz;
-    sha256 = "0q2m2qhyga9yq29yz90ywgjbn9hdahs7i8wwlq7b55rdbyiwa5dy";
+    url = "https://github.com/NixOS/nixpkgs/archive/20.03-beta.tar.gz";
+    sha256 = "04g53i02hrdfa6kcla5h1q3j50mx39fchva7z7l32pk699nla4hi";
   }) {}) }:
+
 let
-  # pkgs = import (builtins.fetchTarball {
-  #   url = https://github.com/NixOS/nixpkgs/archive/19.03.tar.gz;
-  #   sha256 = "0q2m2qhyga9yq29yz90ywgjbn9hdahs7i8wwlq7b55rdbyiwa5dy";
-  # }) {};
   pypkgs = pkgs.python3Packages;
-  # Sfepy is in process of being added to Nixpkgs
-  sfepy = pypkgs.buildPythonPackage rec {
+  sfepy = pypkgs.sfepy.overridePythonAttrs (old: rec {
     name = "sfepy_${version}";
-    version = "2019.2";
-    src = pkgs.fetchurl {
+    version = "2019.4";
+    src = builtins.fetchurl {
       url="https://github.com/sfepy/sfepy/archive/release_${version}.tar.gz";
-      sha256 = "17dj0wbchcfa6x27yx4d4jix4z4nk6r2640xkqcsw0mf62x5l1pj";
+      sha256 = "1l9vgcw09l6bwhgfzlbn68fzpvns25r6nkd1pcp7hz5165hs6zzn";
     };
-    doCheck = false;
-    buildInputs = with pypkgs; [
-      numpy
-      cython
-      scipy
-      matplotlib
-      pyparsing
-      tables
-    ];
-    catchConflicts = false;
-  };
-  # This nbval fix is not required for latest master branch of Nixpkgs (33b67761be99)
-  nbval = (pypkgs.nbval.overridePythonAttrs ({ nativeBuildInputs = [ pypkgs.pytest ]; }));
+    postPatch = ''
+    # broken test
+    rm tests/test_homogenization_perfusion.py
+    rm tests/test_splinebox.py
+
+    # slow tests
+    rm tests/test_input_*.py
+    rm tests/test_elasticity_small_strain.py
+    rm tests/test_term_call_modes.py
+    rm tests/test_refine_hanging.py
+    rm tests/test_hyperelastic_tlul.py
+    rm tests/test_poly_spaces.py
+    rm tests/test_linear_solvers.py
+    rm tests/test_quadratures.py
+    '';
+  });
 in
   pypkgs.buildPythonPackage rec {
     pname = "pymks";
     version = "0.3.4.dev";
     nativeBuildInputs =  with pypkgs; [
+      sfepy
+      nbval
       numpy
       scipy
       pytest

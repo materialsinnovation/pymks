@@ -100,7 +100,7 @@ def map_blocks(func, data, chunks=None):
 
     >>> f = map_blocks(lambda x: x + 1)
     >>> f(da.arange(4, chunks=(2,)))
-    dask.array<lambda, shape=(4,), dtype=int64, chunksize=(2,)>
+    dask.array<lambda, shape=(4,), dtype=int64, chunksize=(2,), chunktype=numpy.ndarray>
     """
     return da.map_blocks(func, data, chunks=chunks)
 
@@ -229,6 +229,29 @@ def flatten(data):
     return data.reshape(data.shape[0], -1)
 
 
+def rechunk(data, chunks):
+    """An agnostic rechunk for numpy or dask
+
+    Required as from_array no longer accepts dask arrays.
+
+    Args:
+      data: either a numpy or dask array
+      chunks: the new chunk shape
+
+    Returns:
+      a rechunked dask array
+
+    >>> rechunk(np.arange(10).reshape((2, 5)), (1, 5)).chunks
+    ((1, 1), (5,))
+
+    """
+    if isinstance(data, np.ndarray):
+        rechunk_ = da.from_array
+    else:
+        rechunk_ = da.rechunk
+    return rechunk_(data, chunks=chunks)
+
+
 def make_da(func):
     """Decorator to allow functions that only take Dask arrays to take
     Numpy arrays.
@@ -244,12 +267,12 @@ def make_da(func):
     ...     return arr + 1
 
     >>> my_func(np.array([1, 1]))
-    dask.array<add, shape=(2,), dtype=int64, chunksize=(2,)>
+    dask.array<add, shape=(2,), dtype=int64, chunksize=(2,), chunktype=numpy.ndarray>
 
     """
 
     def wrapper(arr, *args, **kwargs):
-        return func(da.from_array(arr, chunks=arr.shape), *args, **kwargs)
+        return func(rechunk(arr, chunks=arr.shape), *args, **kwargs)
 
     return wrapper
 
@@ -323,3 +346,65 @@ def assign(value, index, arr):
 
 
 npresize = curry(flip(np.resize))  # pylint: disable=invalid-name
+
+
+@curry
+def zero_pad(arr, shape, chunks):
+    """Zero pad an array with zeros
+
+    Args:
+      arr: the array to pad
+      shape: the shape of the new array
+      chunks: how to rechunk the new array
+
+    Returns:
+      the new padded version of the array
+
+    >>> print(
+    ...     zero_pad(
+    ...         np.arange(4).reshape([1, 2, 2, 1]),
+    ...         (1, 4, 5, 1),
+    ...         None
+    ...     )[0,...,0].compute()
+    ... )
+    [[0 0 0 0 0]
+     [0 0 0 1 0]
+     [0 0 2 3 0]
+     [0 0 0 0 0]]
+    >>> print(zero_pad(np.arange(4).reshape([2, 2]), (4, 5), None).compute())
+    [[0 0 0 0 0]
+     [0 0 0 1 0]
+     [0 0 2 3 0]
+     [0 0 0 0 0]]
+    >>> zero_pad(zero_pad(np.arange(4).reshape([2, 2]), (4, 5, 1), None))
+    Traceback (most recent call last):
+    ...
+    RuntimeError: length of shape is incorrect
+    >>> zero_pad(zero_pad(np.arange(4).reshape([2, 2]), (1, 2), None))
+    Traceback (most recent call last):
+    ...
+    RuntimeError: resize shape is too small
+
+    >>> arr = da.from_array(np.arange(4).reshape((2, 2)), chunks=(2, 1))
+    >>> out = zero_pad(arr, (4, 3), (-1, 1))
+    >>> out.shape
+    (4, 3)
+    >>> out.chunks
+    ((4,), (1, 1, 1))
+    """
+    if len(shape) != len(arr.shape):
+        raise RuntimeError("length of shape is incorrect")
+
+    if not np.all(shape >= arr.shape):
+        raise RuntimeError("resize shape is too small")
+
+    return pipe(
+        np.array(shape) - np.array(arr.shape),
+        lambda x: np.concatenate(
+            ((x - (x // 2))[..., None], (x // 2)[..., None]), axis=1
+        ),
+        fmap(tuple),
+        tuple,
+        lambda x: da.pad(arr, x, "constant", constant_values=0),
+        lambda x: da.rechunk(x, chunks=chunks or x.shape),
+    )
