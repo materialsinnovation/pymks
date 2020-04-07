@@ -13,7 +13,7 @@ from toolz.curried import map as map_, identity
 from sklearn.base import TransformerMixin, BaseEstimator
 import dask.array as da
 from .func import dafftshift, dafftn, daifftn, daconj, flatten
-from .func import sequence, make_da
+from .func import sequence, make_da, star, dapad
 
 
 def cross_correlation(arr1, arr2):
@@ -162,38 +162,33 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None):
     (2, 5)
 
     """
+    cutoff_ = int((np.min(arr1.shape[1:]) - 1) / 2)
     if cutoff is None:
-        cutoff = np.floor((np.min(arr1.shape[1:]) - 1) / 2)
+        cutoff = cutoff_
+    cutoff = min(cutoff, cutoff_)
 
     nonperiodic_padder = sequence(
-        lambda x: np.pad(
-            x,
-            [(0, 0)] + [(cutoff, cutoff)] * (arr1.ndim - 1),
+        dapad(
+            pad_width=[(0, 0)] + [(cutoff, cutoff)] * (arr1.ndim - 1),
             mode="constant",
             constant_values=0,
         ),
-        lambda x: x.rechunk(x.shape),
+        lambda x: da.rechunk(x, (x.chunks[0],) + x.shape[1:]),
     )
-
-    if cutoff > np.floor((np.min(arr1.shape[1:]) - 1) / 2):
-        cutoff = np.floor((np.min(arr1.shape[1:]) - 1) / 2)
 
     padder = identity if periodic_boundary else nonperiodic_padder
 
-    nonperiodic_normalize = lambda x: auto_correlation(padder(np.ones_like(x)))
+    nonperiodic_normalize = lambda x: x / auto_correlation(padder(np.ones_like(arr1)))
 
-    nonperiodic_stats = sequence(
-        lambda x: cross_correlation(padder(x[0]), padder(x[1])),
-        lambda x: x / nonperiodic_normalize(arr1),
-        lambda x: center_slice(x, cutoff),
-    )
-    periodicstats = sequence(
-        lambda x: cross_correlation(padder(x[0]), padder(x[1])),
-        lambda x: center_slice(x, cutoff),
-    )
-    stats = periodicstats if periodic_boundary else nonperiodic_stats
+    normalize = identity if periodic_boundary else nonperiodic_normalize
 
-    return stats([arr1, arr2])
+    return sequence(
+        map_(padder),
+        list,
+        star(cross_correlation),
+        normalize,
+        center_slice(cutoff=cutoff),
+    )([arr1, arr2])
 
 
 @make_da
