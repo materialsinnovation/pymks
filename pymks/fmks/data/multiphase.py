@@ -7,8 +7,9 @@ from toolz.curried import curry, pipe
 from scipy.ndimage.fourier import fourier_gaussian
 from pymks.fmks.func import fftn, ifftn, fftshift, ifftshift, fmap
 
-conj = curry(np.conjugate)
-fabs = curry(np.absolute)
+
+conj = curry(np.conjugate)  # pylint: disable=invalid-name
+fabs = curry(np.absolute)  # pylint: disable=invalid-name
 
 
 @curry
@@ -57,14 +58,11 @@ def _cumulative_sum(volume_fraction, n_phases):
         return pipe(n_phases,
                     lambda x: [1. / x] * x,
                     lambda x: np.cumsum(x)[:-1])
-    elif len(volume_fraction) == n_phases:
+    if len(volume_fraction) == n_phases:
         if np.sum(volume_fraction) == 1:
             return np.cumsum(volume_fraction)[:-1]
-        else:
-            raise RuntimeError("The terms in the volume fraction list should sum to 1")
-    else:
-        raise RuntimeError("No. of terms in the volume fraction \
-        list should be same as no. of phases.")
+        raise RuntimeError("The terms in the volume fraction list should sum to 1")
+    raise RuntimeError("len(volume_fraction) not equal to n_phases.")
 
 
 @curry
