@@ -3,16 +3,16 @@ channels:
   - conda-forge
 dependencies:
   - python=3.7
-  - sfepy=2019.2
-  - scipy=1.4.1
-  - dask=2.10.1
-  - scikit-learn=0.20.2
-  - toolz=0.10.0
-  - coverage=4.5.4
-  - matplotlib=3.1.2
-  - numpy=1.18.1
-  - pytest=5.3.5
-  - pytest-cov=2.8.1
-  - notebook=6.0.3
-  - dask-ml=1.2.0
-  - nbval=0.9.4
+  - sfepy
+  - scipy
+  - dask
+  - scikit-learn
+  - toolz
+  - coverage
+  - matplotlib=3.1
+  - numpy
+  - pytest
+  - pytest-cov
+  - notebook
+  - dask-ml
+  - nbval
