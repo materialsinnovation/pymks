@@ -7,7 +7,7 @@ import dask.array as da
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
-from pymks.fmks.correlations import FlattenTransformer, TwoPointcorrelation
+from pymks.fmks.correlations import FlattenTransformer, TwoPointCorrelation
 from pymks.fmks.data.cahn_hilliard import generate
 from pymks.fmks.bases.legendre import LegendreTransformer
 
@@ -24,7 +24,7 @@ def test_classification():
             ("discretize", LegendreTransformer(n_state=3, min_=-1.0, max_=1.0)),
             (
                 "Correlations",
-                TwoPointcorrelation(
+                TwoPointCorrelation(
                     periodic_boundary=True, cutoff=10, correlations=[(1, 1), (0, 1)]
                 ),
             ),

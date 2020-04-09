@@ -8,27 +8,25 @@ from ..func import curry
 
 
 @curry
-def _checkerboard(shape, square_shape):
+def _checkerboard(size, square_shape):
     """Generte a checkerboard numpy array
 
     `square_shape` must be a numpy array that can divide into
     `np.indices(shape)`
 
     Args:
-      shape: the shape of the domain
+      size: the size of the domain
       square_shape: the shape of each subdomain
 
     """
-    return pipe(
-        shape, indices, lambda x: x // square_shape, lambda x: x.sum(axis=0) % 2
-    )
+    return pipe(size, indices, lambda x: x // square_shape, lambda x: x.sum(axis=0) % 2)
 
 
-def generate(shape, square_shape=(1,)):
+def generate(size, square_shape=(1,)):
     """Generate a 2-phase checkerboard microstructure
 
     Args:
-      shape: the shape of the domain
+      size: the size of the domain
       square_shape: the shape of each subdomain
 
     Returns:
@@ -54,7 +52,7 @@ def generate(shape, square_shape=(1,)):
     return pipe(
         square_shape,
         array,
-        lambda x: reshape(x, x.shape + (1,) * len(shape)),
-        _checkerboard(shape),
+        lambda x: reshape(x, x.shape + (1,) * len(size)),
+        _checkerboard(size),
         lambda x: from_array(x[None], chunks=-1),
     )
