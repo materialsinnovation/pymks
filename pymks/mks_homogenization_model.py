@@ -74,7 +74,7 @@ class MKSHomogenizationModel(MKSStructureAnalysis):
             basis (class, optional): an instance of a bases class.
             dimension_reducer (class, optional): an instance of a
                 dimensionality reduction class with a fit_transform method. The
-                default class is RandomizedPCA.
+                default class is PCA.
             property_linker (class, optional): an instance for a machine
                 learning class with fit and predict methods.
             n_components (int, optional): number of components kept by the
