@@ -22,12 +22,6 @@ def _imfilter(x_data, f_data):
 
 @curry
 def _np_zero_pad(arr, shape):
-    if len(shape) != len(arr.shape):
-        raise RuntimeError("length of shape is incorrect")
-
-    if not np.all(shape >= arr.shape):
-        raise RuntimeError("resize shape is too small")
-
     return pipe(
         np.array(shape) - np.array(arr.shape),
         lambda x: np.concatenate(
