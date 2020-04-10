@@ -5,7 +5,7 @@ import numpy as np
 import dask.array as da
 from toolz.curried import curry, pipe
 from scipy.ndimage.fourier import fourier_gaussian
-from pymks.fmks.func import fftn, ifftn, fftshift, ifftshift, fmap
+from pymks.fmks.func import fftn, ifftn, fftshift, ifftshift, zero_pad
 
 
 conj = curry(np.conjugate)  # pylint: disable=invalid-name
@@ -20,23 +20,23 @@ def _imfilter(x_data, f_data):
     return pipe(f_data, ifftshift, fftn, lambda x: conj(x) * fftn(x_data), ifftn, fabs)
 
 
-@curry
-def _np_zero_pad(arr, shape):
-    if len(shape) != len(arr.shape):
-        raise RuntimeError("length of shape is incorrect")
-
-    if not np.all(shape >= arr.shape):
-        raise RuntimeError("resize shape is too small")
-
-    return pipe(
-        np.array(shape) - np.array(arr.shape),
-        lambda x: np.concatenate(
-            ((x - (x // 2))[..., None], (x // 2)[..., None]), axis=1
-        ),
-        fmap(tuple),
-        tuple,
-        lambda x: np.pad(arr, x, "constant", constant_values=0),
-    )
+# @curry
+# def _np_zero_pad(arr, shape):
+#     if len(shape) != len(arr.shape):
+#         raise RuntimeError("length of shape is incorrect")
+#
+#     if not np.all(shape >= arr.shape):
+#         raise RuntimeError("resize shape is too small")
+#
+#     return pipe(
+#         np.array(shape) - np.array(arr.shape),
+#         lambda x: np.concatenate(
+#             ((x - (x // 2))[..., None], (x // 2)[..., None]), axis=1
+#         ),
+#         fmap(tuple),
+#         tuple,
+#         lambda x: np.pad(arr, x, "constant", constant_values=0),
+#     )
 
 
 @curry
@@ -45,8 +45,8 @@ def _gaussian_blur_filter(grain_size, domain_size):
         grain_size,
         lambda x: fourier_gaussian(np.ones(x), np.ones(len(x))),
         fftshift,
-        _np_zero_pad(shape=domain_size),
-    )
+        zero_pad(shape=domain_size, chunks=None),
+    ).compute()
 
 
 @curry
@@ -102,6 +102,7 @@ def _npgenerate(
         lambda x: np.sum(x, axis=-1),
     )
 
+#pylint: disable=too-many-arguments
 
 @curry
 def generate(
