@@ -133,6 +133,8 @@ daifftshift = curry(da.fft.ifftshift)  # pylint: disable=invalid-name
 
 daconj = curry(da.conj)  # pylint: disable=invalid-name
 
+dapad = curry(da.pad)  # pylint: disable=invalid-name
+
 
 def rcompose(*args):
     """Compose functions in order
@@ -408,3 +410,20 @@ def zero_pad(arr, shape, chunks):
         lambda x: da.pad(arr, x, "constant", constant_values=0),
         lambda x: da.rechunk(x, chunks=chunks or x.shape),
     )
+
+
+@curry
+def star(func, args):
+    """Allow function to take piped sequence as arguments.
+
+    Args:
+      func: any function
+      args: a sequence of arguments to the function
+
+    Returns:
+      evaluated function
+
+    >>> star(lambda x, y: x * y)([2, 3])
+    6
+    """
+    return func(*args)
