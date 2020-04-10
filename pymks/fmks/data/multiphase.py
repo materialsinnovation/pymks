@@ -103,6 +103,7 @@ def _npgenerate(
     )
 
 
+# pylint: disable=too-many-arguments
 @curry
 def generate(
     n_phases=5,
