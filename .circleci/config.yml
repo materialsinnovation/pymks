@@ -42,5 +42,5 @@ jobs:
             py.test notebooks/filter.ipynb
             py.test notebooks/intro.ipynb
             py.test notebooks/multiphase.ipynb
-            py.test notebooks/stats_checker_board.ipynb
+            py.test notebooks/checkerboard.ipynb
             py.test notebooks/stress.ipynb
