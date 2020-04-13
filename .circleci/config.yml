@@ -1,0 +1,46 @@
+# Python CircleCI 2.0 configuration file
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: continuumio/miniconda3
+
+    working_directory: ~/repo
+
+    steps:
+      # Step 1: obtain repo from GitHub
+      - checkout
+      # Step 2: create virtual env and install dependencies
+      - run:
+          name: Create env and install dependencies
+          command: |
+            conda env create -f environment.yml
+            source activate pymks
+
+      - run:
+          name: Activate env
+          command: |
+            source activate pymks
+
+      - run:
+          name: Install libGL
+          command: |
+            apt-get --yes update
+            apt-get --yes install libglu1-mesa
+            apt-get --yes install libgl1-mesa-glx
+            apt-get --yes install libxrender1
+
+      # only run select notebooks due to possible memory issues
+      - run:
+          name: run tests
+          command: |
+            set -e
+            source activate pymks
+            python setup.py develop
+            py.test pymks
+            py.test notebooks/elasticity.ipynb
+            py.test notebooks/filter.ipynb
+            py.test notebooks/intro.ipynb
+            py.test notebooks/multiphase.ipynb
+            py.test notebooks/checkerboard.ipynb
+            py.test notebooks/stress.ipynb

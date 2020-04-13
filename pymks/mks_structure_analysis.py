@@ -87,7 +87,7 @@ class MKSStructureAnalysis(BaseEstimator):
         if basis is not None:
             self.basis._n_jobs = n_jobs
         if self.dimension_reducer is None:
-            self.dimension_reducer = PCA(copy=False,svd_solver="randomized")
+            self.dimension_reducer = PCA(svd_solver='randomized', copy=False)
         if n_components is None:
             n_components = self.dimension_reducer.n_components
         if n_components is None:
@@ -151,11 +151,14 @@ class MKSStructureAnalysis(BaseEstimator):
         >>> size = (2, 3, 3)
         >>> X = np.random.randint(2, size=size)
         >>> analyzer.fit(X)
-        >>> print(analyzer.dimension_reducer.components_.reshape(size)[0])
-        ... # doctest: +ELLIPSIS
-        [[ 0.02886463  0.02886463  0.02886463]
-         [ 0.02886463 -0.43874233  0.49647159]
-         [ 0.02886463  0.02886463 -0.17896069]]
+
+        >>> res = analyzer.dimension_reducer.components_.reshape(size)[0]
+        >>> sol = [[0.02886463, 0.02886463, 0.02886463],
+        ...        [0.02886463, -0.43874233, 0.49647159],
+        ...        [0.02886463, 0.02886463, -0.17896069]]
+
+        >>> assert np.allclose(res, sol) or np.allclose(-res, sol)
+
         """
         X_stats = self._compute_stats(X, confidence_index)
         self._fit_transform(X_stats, reducer_labels)
@@ -188,9 +191,10 @@ class MKSStructureAnalysis(BaseEstimator):
         >>> size = (2, 3, 3)
         >>> X = np.random.randint(2, size=size)
         >>>
-        >>> print(analyzer.fit_transform(X)) # doctest: +ELLIPSIS
-        [[ 0.26731852]
-         [-0.26731852]]
+        >>> res = analyzer.fit_transform(X)
+        >>> sol = [[ 0.26731852], [-0.26731852]]
+        >>> assert np.allclose(res, sol) or np.allclose(-res, sol)
+
         """
         X_stats = self._compute_stats(X, confidence_index)
         return self._fit_transform(X_stats, None)
@@ -219,12 +223,15 @@ class MKSStructureAnalysis(BaseEstimator):
         >>> np.random.seed(5)
         >>> size = (2, 3, 3)
         >>> X = np.random.randint(2, size=size)
-        >>> print(analyzer.fit_transform(X)) # doctest: +ELLIPSIS
-        [[ 0.26731852]
-         [-0.26731852]]
-        >>> print(analyzer.transform(X)) # doctest: +ELLIPSIS
-        [[ 0.26731852]
-         [-0.26731852]]
+
+        >>> res = analyzer.fit_transform(X)
+        >>> sol = [[ 0.26731852], [-0.26731852]]
+        >>> assert np.allclose(res, sol) or np.allclose(-res, sol)
+
+        >>> res = analyzer.fit_transform(X)
+        >>> sol = [[ 0.26731852], [-0.26731852]]
+        >>> assert np.allclose(res, sol) or np.allclose(-res, sol)
+
         """
         X_stats = self._compute_stats(X, confidence_index)
         return self._transform(X_stats)
