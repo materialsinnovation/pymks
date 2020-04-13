@@ -16,6 +16,7 @@ from .func import dafftshift, dafftn, daifftn, daconj, flatten
 from .func import sequence, make_da, star, dapad
 
 
+@make_da
 def cross_correlation(arr1, arr2):
     """
     Returns the cross-correlation of and input field with another field.
@@ -229,12 +230,12 @@ def correlations_multiple(data, correlations, periodic_boundary=True, cutoff=Non
     )
 
 
-class TwoPointcorrelation(BaseEstimator, TransformerMixin):
+class TwoPointCorrelation(BaseEstimator, TransformerMixin):
     """Calculate the 2-point stats for two arrays
     """
 
     def __init__(self, periodic_boundary=True, cutoff=None, correlations=None):
-        """Instantiate a TwoPointcorrelation
+        """Instantiate a TwoPointCorrelation
 
         Args:
           periodic_boundary: whether the boundary conditions are periodic
