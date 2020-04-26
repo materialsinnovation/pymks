@@ -441,7 +441,7 @@ class LocalizationRegressor(BaseEstimator, RegressorMixin):
         """
         self.y_data_shape = y_data.shape
         y_data_reshape = reshape(y_data, x_data.shape[:-1])
-        y_data_da = rechunk(y_data_reshape, chunks=x_data.chunks[:-1])
+        y_data_da = rechunk(x_data.chunks[:-1], y_data_reshape)
         self.coeff = fit_disc(x_data, y_data_da, self.redundancy_func)
         return self
 

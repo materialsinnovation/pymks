@@ -87,7 +87,7 @@ def iterate_times(func, times, value):
 
 
 @curry
-def map_blocks(func, data, chunks=None):
+def map_blocks(func, data, chunks=None, dtype=None):
     """Curried version of Dask's map_blocks
 
     Args:
@@ -102,7 +102,7 @@ def map_blocks(func, data, chunks=None):
     >>> f(da.arange(4, chunks=(2,)))
     dask.array<lambda, shape=(4,), dtype=int64, chunksize=(2,), chunktype=numpy.ndarray>
     """
-    return da.map_blocks(func, data, chunks=chunks)
+    return da.map_blocks(func, data, chunks=chunks, dtype=dtype)
 
 
 allclose = curry(np.allclose)  # pylint: disable=invalid-name
@@ -231,19 +231,21 @@ def flatten(data):
     return data.reshape(data.shape[0], -1)
 
 
-def rechunk(data, chunks):
+@curry
+def rechunk(chunks, data):
     """An agnostic rechunk for numpy or dask
 
     Required as from_array no longer accepts dask arrays.
 
     Args:
-      data: either a numpy or dask array
       chunks: the new chunk shape
+      data: either a numpy or dask array
+
 
     Returns:
       a rechunked dask array
 
-    >>> rechunk(np.arange(10).reshape((2, 5)), (1, 5)).chunks
+    >>> rechunk((1, 5), np.arange(10).reshape((2, 5))).chunks
     ((1, 1), (5,))
 
     """
@@ -274,7 +276,7 @@ def make_da(func):
     """
 
     def wrapper(arr, *args, **kwargs):
-        return func(rechunk(arr, chunks=arr.shape), *args, **kwargs)
+        return func(rechunk(arr.shape, arr), *args, **kwargs)
 
     return wrapper
 
