@@ -6,6 +6,7 @@ import numpy as np
 import dask.array as da
 
 from pymks.fmks.correlations import two_point_stats
+from pymks.fmks.correlations import correlations_multiple
 
 
 # pylint: disable=too-many-arguments
@@ -67,3 +68,15 @@ def test_onedim():
     """
     run_one((4, 10), (4, 9), 2, ((2, 2), (9,)), False, 4)
     run_one((4, 10), (4, 5), 2, ((2, 2), (5,)), True, 2)
+
+
+def test_correlations_multiple():
+    """Test that correlations_multiple chunks correctly.
+
+    Test for bug fix. Previously, chunks were ((1, 1), (3,), (3,), (1,
+    1)) for this example.
+
+    """
+    darr = da.random.randint(2, size=(2, 4, 4, 2), chunks=(1, 4, 4, 2))
+    out = correlations_multiple(darr, [[0, 0], [0, 1]])
+    assert out.chunks == ((1, 1), (3,), (3,), (2,))
