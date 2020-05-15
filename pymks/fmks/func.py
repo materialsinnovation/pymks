@@ -276,7 +276,11 @@ def make_da(func):
     """
 
     def wrapper(arr, *args, **kwargs):
-        return func(rechunk(arr.shape, arr), *args, **kwargs)
+        if isinstance(arr, np.ndarray):
+            chunks = arr.shape
+        else:
+            chunks = arr.chunks
+        return func(rechunk(chunks, arr), *args, **kwargs)
 
     return wrapper
 
