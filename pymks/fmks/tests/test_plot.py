@@ -14,3 +14,5 @@ def test_plot():
 
     """
     plot_microstructures(np.arange(4).reshape(2, 2), titles=["test"])
+    plot_microstructures(np.arange(4).reshape(2, 2), titles="test")
+    plot_microstructures(np.arange(4).reshape(2, 2))
