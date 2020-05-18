@@ -7,7 +7,8 @@ import numpy as np
 import pytest
 import dask.array as da
 
-from pymks.fmks.data.multiphase import generate
+from pymks.fmks.data.multiphase import generate, np_generate
+from pymks.datasets.microstructure_generator import MicrostructureGenerator
 
 
 def test_chunking():
@@ -27,7 +28,7 @@ def test_2d():
     """
     da.random.seed(10)
     data = generate(shape=(1, 4, 4), grain_size=(4, 4), volume_fraction=(0.5, 0.5))
-    assert np.allclose(data, [[[0, 0, 0, 0], [1, 0, 1, 1], [1, 1, 1, 1], [1, 0, 0, 0]]])
+    assert np.allclose(data, [[[0, 0, 0, 0], [1, 0, 1, 1], [1, 1, 0, 1], [1, 0, 0, 0]]])
 
 
 def test_1d():
@@ -82,3 +83,37 @@ def test_3d():
             [0, 1, 2, 2, 0],
         ],
     )
+
+
+def test_versus_old():
+    """Test that the fmks microstructure generator gives the same results
+    as the previous version.
+
+    """
+    n_samples = 3
+    size = (4, 4)
+    grain_size = (2, 2)
+    n_phases = 3
+    volume_fraction = (0.5, 0.25, 0.25)
+    percent_variance = 0.05
+
+    generator = MicrostructureGenerator(
+        n_samples,
+        size,
+        grain_size=grain_size,
+        n_phases=n_phases,
+        seed=10,
+        volume_fraction=volume_fraction,
+        percent_variance=percent_variance,
+    )
+    x_data_old = generator.generate()
+
+    np.random.seed(10)
+    x_data_new = np_generate(
+        grain_size,
+        volume_fraction,
+        percent_variance,
+        np.random.random((n_samples,) + size),
+    )
+
+    assert np.allclose(x_data_new, x_data_old)
