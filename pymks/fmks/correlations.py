@@ -227,6 +227,7 @@ def correlations_multiple(data, correlations, periodic_boundary=True, cutoff=Non
         ),
         list,
         lambda x: da.stack(x, axis=-1),
+        lambda x: da.rechunk(x, x.chunks[:-1] + (-1,)),
     )
 
 

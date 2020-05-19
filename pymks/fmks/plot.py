@@ -26,7 +26,7 @@ def _colorbar(fig, axis, image):
     fig.colorbar(image, cax=axis)
 
 
-def plot_microstructures(*arrs, titles, cmap=None):
+def plot_microstructures(*arrs, titles=(), cmap=None, colorbar=True):
     """Plot a set of microstructures
 
     Args:
@@ -40,8 +40,12 @@ def plot_microstructures(*arrs, titles, cmap=None):
     )
     if len(arrs) == 1:
         axs = (axs,)
-    _colorbar(
-        fig,
-        fig.add_axes([1.0, 0.05, 0.05, 0.9]),
-        list(fmap(_plot_ax(arrs=arrs, titles=titles, cmap=cmap), axs))[0],
-    )
+    if isinstance(titles, str):
+        titles = (titles,)
+    if len(titles) < len(arrs):
+        titles = titles + ("",) * (len(arrs) - len(titles))
+    plots = list(fmap(_plot_ax(arrs=arrs, titles=titles, cmap=cmap), axs))
+    if colorbar:
+        _colorbar(
+            fig, fig.add_axes([1.0, 0.05, 0.05, 0.9]), plots[0],
+        )
