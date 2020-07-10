@@ -72,11 +72,10 @@ in
       ipywidgets
       pip
       pkgs.openssh
+      zarr
     ];
     src=builtins.filterSource (path: type: type != "directory" || baseNameOf path != ".git") ./.;
     preShellHook = ''
-      jupyter nbextension install --py widgetsnbextension --user
-      jupyter nbextension enable widgetsnbextension --user --py
 
       export OMPI_MCA_plm_rsh_agent=/usr/bin/ssh
 
@@ -85,6 +84,13 @@ in
       export USER_SITE=`python -c "import site; print(site.USER_SITE)"`
       export PYTHONPATH=$PYTHONPATH:$USER_SITE
       export PATH=$PATH:$PYTHONUSERBASE/bin
+
+      jupyter nbextension install --py widgetsnbextension --user
+      jupyter nbextension enable widgetsnbextension --user --py
+      pip install jupyter_contrib_nbextensions --user
+      jupyter contrib nbextension install --user
+      jupyter nbextension enable spellchecker/main
+
 
       # To install extra packages use
       #
