@@ -16,3 +16,5 @@ dependencies:
   - notebook
   - dask-ml
   - nbval
+  - graphviz
+  - python-graphviz
