@@ -13,6 +13,8 @@ from .fmks.bases.legendre import LegendreTransformer
 from .fmks.localization import LocalizationRegressor
 from .fmks.localization import ReshapeTransformer
 from .fmks.localization import coeff_to_real
+from .fmks.data.delta import generate as generate_delta
+from .fmks.data.elastic_fe import solve as solve_fe
 
 from .mks_localization_model import MKSLocalizationModel
 from .bases.primitive import PrimitiveBasis
@@ -62,5 +64,6 @@ __all__ = ['__version__',
            'PrimitiveBasis',
            'LegendreBasis',
            'MKSHomogenizationModel',
-           'MKSStructureAnalysis'
+           'MKSStructureAnalysis',
+           'generate_delta'
 ]
