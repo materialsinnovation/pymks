@@ -15,6 +15,9 @@ from .fmks.localization import ReshapeTransformer
 from .fmks.localization import coeff_to_real
 from .fmks.data.delta import generate as generate_delta
 from .fmks.data.elastic_fe import solve as solve_fe
+from .fmks.data.multiphase import generate as generate_multiphase
+from .fmks.correlations import FlattenTransformer
+from .fmks.correlations import TwoPointCorrelation
 
 from .mks_localization_model import MKSLocalizationModel
 from .bases.primitive import PrimitiveBasis
@@ -65,5 +68,10 @@ __all__ = ['__version__',
            'LegendreBasis',
            'MKSHomogenizationModel',
            'MKSStructureAnalysis',
-           'generate_delta'
+           'generate_delta',
+           'LegendreTransformer',
+           'solve_fe',
+           'generate_multiphase',
+           'FlattenTransformer',
+           'TwoPointCorrelation'
 ]
