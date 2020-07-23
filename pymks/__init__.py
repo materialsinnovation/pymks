@@ -18,6 +18,7 @@ from .fmks.data.elastic_fe import solve as solve_fe
 from .fmks.data.multiphase import generate as generate_multiphase
 from .fmks.correlations import FlattenTransformer
 from .fmks.correlations import TwoPointCorrelation
+from .fmks.data.checkerboard import generate as generate_checkerboard
 
 from .mks_localization_model import MKSLocalizationModel
 from .bases.primitive import PrimitiveBasis
@@ -73,5 +74,6 @@ __all__ = ['__version__',
            'solve_fe',
            'generate_multiphase',
            'FlattenTransformer',
-           'TwoPointCorrelation'
+           'TwoPointCorrelation',
+           'generate_checkerboard'
 ]
