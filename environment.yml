@@ -18,3 +18,4 @@ dependencies:
   - nbval
   - graphviz
   - python-graphviz
+  - Deprecated
