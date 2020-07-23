@@ -6,6 +6,7 @@ from .gsh_functions import cub_basis_info
 from .gsh_functions import tri_basis_info
 from .imag_ffts import _ImagFFTBasis
 import numpy as np
+from ..fmks.func import deprecate
 
 
 class GSHBasis(_ImagFFTBasis):
@@ -52,7 +53,7 @@ class GSHBasis(_ImagFFTBasis):
     ...
     RuntimeError: invalid crystal symmetry
     """
-
+    @deprecate
     def __init__(self, n_states=15, domain=None):
         """
         Instantiate a `Basis`

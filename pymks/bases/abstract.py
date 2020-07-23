@@ -1,8 +1,9 @@
 import numpy as np
+from ..fmks.func import deprecate
 
 
 class _AbstractMicrostructureBasis(object):
-
+    @deprecate
     def __init__(self, n_states=2, domain=None):
         """
         Instantiate a `Basis`

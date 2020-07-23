@@ -2,7 +2,7 @@ from .filter import Filter
 from scipy.linalg import lstsq
 from sklearn.linear_model import LinearRegression
 import numpy as np
-
+from .fmks.func import deprecate
 
 class MKSLocalizationModel(LinearRegression):
 
@@ -58,7 +58,7 @@ class MKSLocalizationModel(LinearRegression):
 
     >>> assert np.allclose(np.fft.fftshift(coef_, axes=(0,)), model.coef_)
     """
-
+    @deprecate
     def __init__(self, basis, n_states=None, n_jobs=1, lstsq_rcond=None):
         """
         Instantiate a MKSLocalizationModel.

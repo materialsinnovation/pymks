@@ -1,5 +1,6 @@
 from .imag_ffts import _ImagFFTBasis
 import numpy as np
+from ..fmks.func import deprecate
 
 
 class FourierBasis(_ImagFFTBasis):
@@ -45,6 +46,7 @@ class FourierBasis(_ImagFFTBasis):
     >>> assert np.allclose(X_result, four_basis.discretize(X))
     """
 
+    @deprecate
     def __init__(self, n_states=5, domain=None):
 
         r"""

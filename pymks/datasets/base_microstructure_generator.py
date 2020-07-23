@@ -1,8 +1,9 @@
 from ..bases.imag_ffts import _ImagFFTBasis
 import numpy as np
-
+from ..fmks.func import deprecate
 
 class _BaseMicrostructureGenerator(_ImagFFTBasis):
+    @deprecate
     def __init__(self, n_samples=1, size=(21, 21),
                  n_phases=2, grain_size=None, seed=3, volume_fraction=None,
                  percent_variance=None):

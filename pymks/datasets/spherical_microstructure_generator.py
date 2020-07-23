@@ -1,6 +1,6 @@
 from .base_microstructure_generator import _BaseMicrostructureGenerator
 import numpy as np
-
+from ..fmks.func import deprecate
 
 class SphericalMicrostructureGenerator(_BaseMicrostructureGenerator):
 
@@ -52,7 +52,7 @@ class SphericalMicrostructureGenerator(_BaseMicrostructureGenerator):
     >>> assert np.allclose(generator.generate(), X)
 
     """
-
+    @deprecate
     def __init__(self, n_samples=1, size=(21, 21), n_particles=2,
                  grain_size=None, seed=3):
         """

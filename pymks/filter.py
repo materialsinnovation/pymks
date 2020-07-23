@@ -1,11 +1,11 @@
 import numpy as np
-
+from .fmks.func import deprecate
 
 class Filter(object):
     """
     Wrapper class for convolution with a kernel and resizing of a kernel
     """
-
+    @deprecate
     def __init__(self, Fkernel, basis):
         """
         Instantiate a Filter.

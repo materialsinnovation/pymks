@@ -1,6 +1,7 @@
 import numpy as np
+from ...fmks.func import deprecate
 
-
+@deprecate
 def gsh_basis_info():
 
     indxvec = np.array([[0, 0, 0],
@@ -28644,4 +28645,3 @@ if __name__ == '__main__':
     Bvec = np.arange(indxvec.shape[0])[lte2]
 
     out_tvalues = gsh_eval(X, Bvec)
-
