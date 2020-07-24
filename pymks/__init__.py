@@ -6,6 +6,14 @@ except:
     pass
 
 import os
+from .fmks.data.cahn_hilliard import solve as solve_cahn_hilliard
+from .fmks.plot import plot_microstructures
+from .fmks.bases.primitive import PrimitiveTransformer
+from .fmks.bases.legendre import LegendreTransformer
+from .fmks.localization import LocalizationRegressor
+from .fmks.localization import ReshapeTransformer
+from .fmks.localization import coeff_to_real
+
 from .mks_localization_model import MKSLocalizationModel
 from .bases.primitive import PrimitiveBasis
 from .bases.legendre import LegendreBasis
@@ -44,8 +52,15 @@ __version__ = get_version()
 
 __all__ = ['__version__',
            'test',
+           'solve_cahn_hilliard',
+           'plot_microstructures',
+           'PrimitiveTransformer',
+           'LocalizationRegressor',
+           'ReshapeTransformer',
+           'coeff_to_real'
            'MKSLocalizationModel',
            'PrimitiveBasis',
            'LegendreBasis',
            'MKSHomogenizationModel',
-           'MKSStructureAnalysis']
+           'MKSStructureAnalysis'
+]

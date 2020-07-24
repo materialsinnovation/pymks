@@ -25,7 +25,10 @@ semi-implicit discretization in time and is given by
 
 where :math:`a_1=3` and :math:`a_2=0`.
 
->>> solve_ = solve(gamma=1., delta_t=1.)
+>>> import dask.array as da
+>>> from toolz.curried import pipe
+
+>>> solve_ = np_solve(gamma=1., delta_t=1.)
 
 >>> def tester(shape, min_, max_, steps):
 ...     return pipe(
@@ -51,9 +54,8 @@ where :math:`a_1=3` and :math:`a_2=0`.
 
 """
 
-import dask.array as da
 import numpy as np
-from toolz.curried import pipe, juxt, identity, memoize
+from toolz.curried import memoize
 from ..func import curry, map_blocks, ifftn, fftn, iterate_times
 
 
@@ -96,7 +98,7 @@ def _f_response(x_data, delta_t, gamma, ksq):
 
 
 @curry
-def solve(x_data, delta_x=0.25, delta_t=0.001, gamma=1.0):
+def np_solve(x_data, delta_x=0.25, delta_t=0.001, gamma=1.0):
     """Solve the Cahn-Hilliard equation for one step.
 
     Advance multiple microstuctures in time with the Cahn-Hilliard
@@ -146,35 +148,24 @@ def _check(x_data):
     return x_data
 
 
-def generate(shape, chunks=(), n_steps=1, **kwargs):
-
-    """Generate microstructures and responses for Cahn-Hilliard.
-
-    Interface to generate random concentration fields and their
-    evolution to be used for the fit method in the localization
-    regression model.
+def solve(x_data, n_steps=1, delta_x=0.25, delta_t=0.001, gamma=1.0):
+    """Generate response for Cahn-Hilliard.
 
     Args:
-      shape: the shape of the microstructures where the first index is
-        the number of samples
-      chunks: chunks argument to make the Dast array
+      x_data: dask array chunked along the sample axis
       n_steps: number of time steps used
-      **kwargs: parameters for CH model
+      delta_x: the grid spacing
+      delta_t: the time step size
+      gamma: Cahn-Hilliard parameter
 
-    Returns:
-      Tuple containing the microstructures and responses.
-
-    Raises:
-      RuntimeError if domain is not square
-
-    Example
-
-    >>> x_data, y_data = generate((1, 6, 6))
-    >>> print(y_data.chunks)
+    >>> import dask.array as da
+    >>> x_data = 2 * da.random.random((1, 6, 6), chunks=(1, 6, 6)) - 1
+    >>> y_data = solve(x_data)
+    >>> y_data.chunks
     ((1,), (6,), (6,))
 
     """
-    return pipe(
-        2 * da.random.random(shape, chunks=chunks or shape) - 1,
-        juxt(identity, map_blocks(iterate_times(solve(**kwargs), n_steps))),
+    return map_blocks(
+        iterate_times(np_solve(delta_x=delta_x, delta_t=delta_t, gamma=gamma), n_steps),
+        x_data,
     )

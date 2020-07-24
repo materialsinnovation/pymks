@@ -8,7 +8,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
 from pymks.fmks.correlations import FlattenTransformer, TwoPointCorrelation
-from pymks.fmks.data.cahn_hilliard import generate
+from pymks.fmks.data.cahn_hilliard import solve
 from pymks.fmks.bases.legendre import LegendreTransformer
 
 
@@ -34,13 +34,15 @@ def test_classification():
         ]
     )
     da.random.seed(3)
-    x0_phase, x1_phase = generate(shape=(50, 21, 21))
+    x0_phase = 2 * da.random.random((50, 21, 21), chunks=(50, 21, 21)) - 1
+    x1_phase = solve(x0_phase)
     y0_class = np.zeros(x0_phase.shape[0])
     y1_class = np.ones(x1_phase.shape[0])
     x_combined = np.concatenate((x0_phase, x1_phase))
     y_combined = np.concatenate((y0_class, y1_class))
     homogenization_pipeline.fit(x_combined, y_combined)
-    x0_test, x1_test = generate(shape=(3, 21, 21))
+    x0_test = 2 * da.random.random((3, 21, 21), chunks=(3, 21, 21)) - 1
+    x1_test = solve(x0_test)
     y1_test = homogenization_pipeline.predict(x1_test)
     y0_test = homogenization_pipeline.predict(x0_test)
     assert np.allclose(y0_test, [0, 0, 0])
