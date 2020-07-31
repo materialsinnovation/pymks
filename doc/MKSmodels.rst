@@ -1,18 +1,16 @@
-MKS Models
-==========
+Localization
+============
 
-MKSStructureAnalysis
-----------------------
-.. autoclass:: pymks.mks_structure_analysis.MKSStructureAnalysis
+LocalizationRegressor
+---------------------
+.. autoclass:: pymks.LocalizationRegressor
    :members:
 
-MKSHomogenizationModel
-----------------------
-.. autoclass:: pymks.mks_homogenization_model.MKSHomogenizationModel
+ReshapeTransformer
+------------------
+.. autoclass:: pymks.ReshapeTransformer
    :members:
 
-MKSLocalizationModel
---------------------
-.. autoclass:: pymks.mks_localization_model.MKSLocalizationModel
-   :members:
-
+coeff_to_real
+-------------
+.. autofunction:: pymks.coeff_to_real

@@ -1,14 +1,10 @@
 Spatial Statistics
 ==================
 
-autocorrelate
--------------
-.. autofunction:: pymks.stats.autocorrelate
+TwoPointCorrelation
+-------------------
+.. autoclass:: pymks.TwoPointCorrelation
 
-crosscorrelate
---------------
-.. autofunction:: pymks.stats.crosscorrelate
-
-correlate
----------
-.. autofunction:: pymks.stats.correlate
+FlattenTransformer
+------------------
+.. autoclass:: pymks.FlattenTransformer
