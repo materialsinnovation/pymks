@@ -33,11 +33,12 @@ jobs:
       # only run select notebooks due to possible memory issues
       - run:
           name: run tests
+          no_output_timeout: 30m
           command: |
             set -e
             source activate pymks
             python setup.py develop
-            py.test pymks
+            py.test pymks/fmks
             py.test notebooks/elasticity.ipynb
             py.test notebooks/filter.ipynb
             py.test notebooks/intro.ipynb

@@ -1,22 +1,12 @@
-Microstructure Bases
-====================
+Bases Transformers
+==================
 
-PrimitiveBasis
-------------------------
-.. autoclass:: pymks.bases.PrimitiveBasis
+PrimitiveTransformer
+--------------------
+.. autoclass:: pymks.PrimitiveTransformer
    :members:
 
-LegendreBasis
--------------
-.. autoclass:: pymks.bases.LegendreBasis
-   :members:
-
-FourierBasis
--------------
-.. autoclass:: pymks.bases.FourierBasis
-   :members:
-
-GSHBasis
--------------
-.. autoclass:: pymks.bases.GSHBasis
+LegendreTransformer
+-------------------
+.. autoclass:: pymks.LegendreTransformer
    :members:

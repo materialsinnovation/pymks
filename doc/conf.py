@@ -29,9 +29,8 @@ sys.path.insert(0, os.path.abspath('..'))
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.mathjax',
-              'sphinxcontrib.napoleon',
               'nbsphinx',
-              'm2r']
+              'm2r2']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -53,6 +52,42 @@ copyright = u'2015, David Brough'
 # built documents.
 #
 # The short X.Y version.
+
+# Sfepy needs to be completely mocked for the docs as it can't be
+# install with pip.
+
+MOCK_MODULES = [
+    'sfe',
+    'sfepy',
+    'sfepy.base',
+    'sfepy.discrete',
+    'sfepy.discrete.fem',
+    'sfepy.discrete.conditions',
+    'sfepy.terms',
+    'sfepy.solvers',
+    'sfepy.solvers.ls',
+    'sfepy.solvers.nls',
+    'sfepy.discrete.fem.periodic',
+    'sfepy.mesh',
+    'sfepy.mesh.mesh_generators',
+    'sfepy.mechanics',
+    'sfepy.mechanics.matcoefs',
+    'sfepy.base.base'
+]
+
+import mock
+
+for module in MOCK_MODULES:
+    sys.modules[module] = mock.Mock()
+
+# goptions is assigned to so needs to support assignment
+
+m = mock.MagicMock()
+d = dict(key='value')
+m.__getitem__.side_effect = d.__getitem__
+sys.modules['sfepy.base.goptions'] = m
+
+
 import pymks
 version = pymks.__version__
 # The full version, including alpha/beta/rc tags.
@@ -72,6 +107,7 @@ release = pymks.__version__
 # directories to ignore when looking for source files.
 exclude_patterns = ['_build', '**.ipynb_checkpoints']
 autoclass_content = 'both'
+
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 #default_role = None
