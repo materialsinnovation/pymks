@@ -36,8 +36,9 @@ import os
 import numpy.fft as numpy_fft
 import numpy as np
 from pkg_resources import resource_string
+from ..fmks.func import deprecate
 
-
+@deprecate
 def config_use_pyfftw():
     """Determine the value of `use-fftw` in setup.cfg.
 
@@ -59,7 +60,7 @@ def config_use_pyfftw():
     else:
         return False
 
-
+@deprecate
 def env_use_pyfftw():
     """Determine the value of the `PYMKS_USE_FFTW` environment variable.
 
@@ -82,6 +83,7 @@ def env_use_pyfftw():
     return defined, value
 
 
+@deprecate
 def import_pyfftw():
     """Isolate pyfftw import
 
@@ -92,6 +94,7 @@ def import_pyfftw():
     return pyfftw_fft
 
 
+@deprecate
 def choose_fftmodule():
     """Select either PyFFTW or Numpy's FFT
 
@@ -118,6 +121,7 @@ def choose_fftmodule():
 
 FFTMODULE = choose_fftmodule()
 
+@deprecate
 def arg_wrap(fft_func, **extra_args):
     """Decorator to add kwargs based on fft suite.
 
@@ -152,6 +156,7 @@ def arg_wrap(fft_func, **extra_args):
             return fft_func(data, axes=axes, **kwargs)
     return wrapper
 
+@deprecate
 def arg_wrap_overwrite(fft_func):
     """Add the overwrite_input=True argument to arg_wrap
 
@@ -162,6 +167,7 @@ def arg_wrap_overwrite(fft_func):
       the wrapped function
     """
     return arg_wrap(fft_func, overwrite_input=True)
+
 
 @arg_wrap_overwrite
 def rfftn(data, axes=None, **kwargs):

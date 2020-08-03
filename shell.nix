@@ -91,6 +91,7 @@ in
       jupyter contrib nbextension install --user
       jupyter nbextension enable spellchecker/main
 
+      pip install --user Deprecated
 
       # To install extra packages use
       #

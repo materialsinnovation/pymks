@@ -9,6 +9,7 @@ from dask import delayed
 import toolz.curried
 from toolz.curried import iterate, compose, pipe, get, flip
 from toolz.curried import map as fmap
+import deprecated
 
 
 def curry(func):
@@ -433,3 +434,21 @@ def star(func, args):
     6
     """
     return func(*args)
+
+
+def deprecate(func, reason=None):
+    """Deprecation warning for PyMKS.
+
+    >>> @deprecate
+    ... def my_func():
+    ...     return
+
+    >>> my_func()
+
+    """
+
+    @deprecated.deprecated(version=0.4, reason=reason or "Use pymks.fmks instead.")
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+
+    return wrapper

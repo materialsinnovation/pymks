@@ -1,12 +1,12 @@
 from .filter import Correlation
 import numpy as np
-
+from .fmks.func import deprecate
 """
 The stats functions take in a microstructure function and returns its two
 point statistics.
 """
 
-
+@deprecate
 def autocorrelate(X, basis, periodic_axes=[], n_jobs=1, confidence_index=None,
                   autocorrelations=None):
     """
@@ -56,7 +56,7 @@ def autocorrelate(X, basis, periodic_axes=[], n_jobs=1, confidence_index=None,
     return _compute_stats(X, basis, autocorrelations, confidence_index,
                           periodic_axes, n_jobs)
 
-
+@deprecate
 def crosscorrelate(X, basis, periodic_axes=None, n_jobs=1,
                    confidence_index=None, crosscorrelations=None):
     """
@@ -130,7 +130,7 @@ def crosscorrelate(X, basis, periodic_axes=None, n_jobs=1,
     return _compute_stats(X, basis, crosscorrelations, confidence_index,
                           periodic_axes, n_jobs)
 
-
+@deprecate
 def correlate(X, basis, periodic_axes=None, n_jobs=1,
               confidence_index=None, correlations=None):
     """
@@ -182,7 +182,7 @@ def correlate(X, basis, periodic_axes=None, n_jobs=1,
     return _compute_stats(X, basis, correlations, confidence_index,
                           periodic_axes, n_jobs)
 
-
+@deprecate
 def _compute_stats(X, basis, correlations, confidence_index,
                    periodic_axes, n_jobs):
     """Helper function to compute statistics
@@ -209,7 +209,7 @@ def _compute_stats(X, basis, correlations, confidence_index,
     _norm = _normalize(X_.shape, basis, confidence_index)
     return _correlate(X_, basis, correlations) / _norm
 
-
+@deprecate
 def _correlate(X_, basis, correlations):
     """
     Helper function used to calculate the unnormalized correlation counts.
@@ -250,7 +250,7 @@ def _correlate(X_, basis, correlations):
                        basis).convolve(X_[..., correlations[1]])
     return _truncate(corr, X_.shape[:-1])
 
-
+@deprecate
 def _auto_correlations(n_states):
     """Returns list of autocorrelations
 
@@ -265,7 +265,7 @@ def _auto_correlations(n_states):
     """
     return tuple(n_states), tuple(n_states)
 
-
+@deprecate
 def _cross_correlations(n_states):
     """Returns list of crosscorrelations
 
@@ -285,7 +285,7 @@ def _cross_correlations(n_states):
     l_1 = tuple([_l[1] for _l in flat_corr])
     return l_0, l_1
 
-
+@deprecate
 def _normalize(X_shape, basis, confidence_index):
     """
     Returns the normalization for the statistics
@@ -315,7 +315,7 @@ def _normalize(X_shape, basis, confidence_index):
         corr = Correlation(mask[..., None], basis)
         return _truncate(corr.convolve(mask[..., None]), X_shape)
 
-
+@deprecate
 def _Fkernel_shape(X_shape, basis, periodic_axes):
     """
     Assigns the shape of the kernel in Fourier space with non-periodic padding
@@ -344,7 +344,7 @@ def _Fkernel_shape(X_shape, basis, periodic_axes):
     a[list(periodic_axes)] = 1
     basis._axes_shape = tuple((np.array(X_shape)[basis._axes] * a).astype(int))
 
-
+@deprecate
 def _truncate(a, shape):
     """
     _truncates the edges of the array, a, based on the shape. This is
@@ -389,7 +389,7 @@ def _truncate(a, shape):
     multi_slice = tuple(slice(index0[ii], index1[ii]) for ii in range(n))
     return a[multi_slice]
 
-
+@deprecate
 def _mask_X_(X_, confidence_index):
     """
     Helper function to verify that the confidence_index is the correct
@@ -413,7 +413,7 @@ def _mask_X_(X_, confidence_index):
         X_ = X_ * confidence_index[..., None]
     return X_
 
-
+@deprecate
 def _correlations_to_indices(correlations, basis):
     """
     Helper function to select correct indices given the local state values in

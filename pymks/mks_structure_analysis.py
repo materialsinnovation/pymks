@@ -2,7 +2,7 @@ from pymks.stats import correlate
 from sklearn.base import BaseEstimator
 from sklearn.decomposition import PCA
 import numpy as np
-
+from .fmks.func import deprecate
 
 class MKSStructureAnalysis(BaseEstimator):
     """
@@ -45,7 +45,7 @@ class MKSStructureAnalysis(BaseEstimator):
      [-0.5  0.5 -0.5]]
 
     """
-
+    @deprecate
     def __init__(self, basis, correlations=None, dimension_reducer=None,
                  n_components=None, periodic_axes=None,
                  store_correlations=False, n_jobs=1, mean_center=True):

@@ -2,6 +2,7 @@ from .cahn_hilliard_simulation import CahnHilliardSimulation
 from .microstructure_generator import MicrostructureGenerator
 from pymks import DiscreteIndicatorBasis, MKSRegressionModel
 import numpy as np
+from ..fmks.func import deprecate
 
 __all__ = ['make_delta_microstructures', 'make_elastic_FE_strain_delta',
            'make_elastic_FE_strain_random', 'make_cahn_hilliard',
@@ -9,6 +10,7 @@ __all__ = ['make_delta_microstructures', 'make_elastic_FE_strain_delta',
            'make_elastic_stress_random', 'make_elastic_stiffness']
 
 
+@deprecate
 def make_elastic_FE_strain_delta(elastic_modulus=(100, 150),
                                  poissons_ratio=(0.3, 0.3),
                                  size=(21, 21), macro_strain=0.01):
@@ -43,7 +45,7 @@ def make_elastic_FE_strain_delta(elastic_modulus=(100, 150),
                     poissons_ratio=poissons_ratio,
                     macro_strain=macro_strain)['strain'][..., 0]
 
-
+@deprecate
 def make_delta_microstructures(n_phases=2, size=(21, 21)):
     """Constructs delta microstructures
 
@@ -90,7 +92,7 @@ def make_delta_microstructures(n_phases=2, size=(21, 21)):
     mask = ~np.identity(n_phases, dtype=bool)
     return X[mask]
 
-
+@deprecate
 def make_elastic_FE_strain_random(n_samples=1, elastic_modulus=(100, 150),
                                   poissons_ratio=(0.3, 0.3), size=(21, 21),
                                   macro_strain=0.01):
@@ -125,7 +127,7 @@ def make_elastic_FE_strain_random(n_samples=1, elastic_modulus=(100, 150),
                     poissons_ratio=poissons_ratio,
                     macro_strain=macro_strain)['strain'][..., 0]
 
-
+@deprecate
 def make_cahn_hilliard(n_samples=1, size=(21, 21), dx=0.25, width=1.,
                        dt=0.001, n_steps=1):
     """Generate microstructures and responses for Cahn-Hilliard.
@@ -162,7 +164,7 @@ def make_cahn_hilliard(n_samples=1, size=(21, 21), dx=0.25, width=1.,
         X = CHsim.response
     return X0, X
 
-
+@deprecate
 def make_microstructure(n_samples=10, size=(101, 101), n_phases=2,
                         grain_size=None, seed=10, volume_fraction=None,
                         percent_variance=None):
@@ -208,7 +210,7 @@ def make_microstructure(n_samples=10, size=(101, 101), n_phases=2,
                                  percent_variance=percent_variance)
     return MS.generate()
 
-
+@deprecate
 def make_checkerboard_microstructure(square_size, n_squares):
     """
     Constructs a checkerboard_microstructure with the `square_size` by
@@ -242,7 +244,7 @@ def make_checkerboard_microstructure(square_size, n_squares):
     return np.tile(X, (int((n_squares + 1) / 2),
                    int((n_squares + 1) / 2)))[None, :L, :L]
 
-
+@deprecate
 def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
                                poissons_ratio=(0.3, 0.3), size=(21, 21),
                                macro_strain=0.01, grain_size=[(3, 3), (9, 9)],
@@ -318,7 +320,7 @@ def make_elastic_stress_random(n_samples=[10, 10], elastic_modulus=(100, 150),
     y_stress = model.predict(X) * modulus
     return X, np.average(y_stress.reshape(len(y_stress), -1), axis=1)
 
-
+@deprecate
 def make_elastic_stiffness(n_samples=[10, 10],
                            elastic_modulus=(100, 150),
                            poissons_ratio=(0.3, 0.3), size=(21, 21),

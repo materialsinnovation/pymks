@@ -13,14 +13,17 @@ from .stats import _cross_correlations
 import numpy as np
 import warnings
 
-warnings.filterwarnings("ignore")
+from .fmks.func import deprecate
+# warnings.filterwarnings("ignore")
 plt.style.library['ggplot']['xtick.color'] = '#000000'
 plt.style.library['ggplot']['ytick.color'] = '#000000'
 plt.style.library['ggplot']['axes.labelcolor'] = '#000000'
 plt.style.use('ggplot')
 
 
-def _set_colors():
+
+@deprecate
+def set_colors():
     """
     Helper function used to set the color map.
     """
@@ -31,7 +34,7 @@ def _set_colors():
     plt.register_cmap(name='PyMKS', data=cdict)
     plt.set_cmap('PyMKS')
 
-
+@deprecate
 def _get_response_cmap():
     """
     Helper function used to set the response color map.
@@ -46,7 +49,7 @@ def _get_response_cmap():
     cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
     return colors.LinearSegmentedColormap('coeff_cmap', cdict, 256)
 
-
+@deprecate
 def _get_microstructure_cmap():
     """
     Helper function used to set the microstructure color map.
@@ -61,7 +64,7 @@ def _get_microstructure_cmap():
     cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
     return colors.LinearSegmentedColormap('micro_cmap', cdict, 256)
 
-
+@deprecate
 def _get_diff_cmap():
     """
     Helper function used to set the difference color map.
@@ -75,7 +78,7 @@ def _get_diff_cmap():
     cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
     return colors.LinearSegmentedColormap('diff_cmap', cdict, 256)
 
-
+@deprecate
 def _grid_matrix_cmap():
     """
     Helper function used to set the grid matrix color map.
@@ -89,7 +92,7 @@ def _grid_matrix_cmap():
     cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
     return colors.LinearSegmentedColormap('grid_cmap', cdict, 256)
 
-
+@deprecate
 def _set_cdict(HighRGB, MediumRGB, LowRGB):
     """
     Helper function used to set color map from 3 RGB values.
@@ -116,7 +119,7 @@ def _set_cdict(HighRGB, MediumRGB, LowRGB):
 
     return cdict
 
-
+@deprecate
 def _get_coeff_cmap():
     """
     Helper function used to set the influence coefficients color map.
@@ -129,7 +132,7 @@ def _get_coeff_cmap():
     cdict = _set_cdict(HighRGB, MediumRGB, LowRGB)
     return colors.LinearSegmentedColormap('coeff_cmap', cdict, 256)
 
-
+@deprecate
 def _get_color_list(n_sets):
     """
     color list for dimensionality reduction plots
@@ -146,7 +149,7 @@ def _get_color_list(n_sets):
 
     return color_list[:n_sets]
 
-
+@deprecate
 def draw_coeff(coeff, fontsize=15, figsize=None):
     """
     Visualize influence coefficients.
@@ -164,7 +167,7 @@ def draw_coeff(coeff, fontsize=15, figsize=None):
     _draw_fields(np.rollaxis(coeff, -1, 0), coeff_cmap,
                  fontsize=fontsize, titles=titles, figsize=figsize)
 
-
+@deprecate
 def draw_microstructure_strain(microstructure, strain):
     """
     Draw microstructure and its associated strain
@@ -193,7 +196,7 @@ def draw_microstructure_strain(microstructure, strain):
     plt.tight_layout()
     plt.show()
 
-
+@deprecate
 def draw_microstructures(microstructures, labels=None, figsize=None):
     """
     Draw microstructures
@@ -210,7 +213,7 @@ def draw_microstructures(microstructures, labels=None, figsize=None):
         labels = [' ' for s in np.arange(microstructures.shape[0])]
     _draw_fields(microstructures, cmap, 15, labels, figsize=figsize)
 
-
+@deprecate
 def draw_strains(strains, labels=None, fontsize=15):
     """
     Draw strain fields
@@ -225,7 +228,7 @@ def draw_strains(strains, labels=None, fontsize=15):
         labels = [' ' for s in strains]
     _draw_fields(strains, cmap, fontsize, labels)
 
-
+@deprecate
 def draw_concentrations(concentrations, labels=None, fontsize=15):
     """Draw comparison fields
 
@@ -239,7 +242,7 @@ def draw_concentrations(concentrations, labels=None, fontsize=15):
     cmap = _get_response_cmap()
     _draw_fields(concentrations, cmap, fontsize, labels)
 
-
+@deprecate
 def draw_strains_compare(strain_FEM, strain_MKS, fontsize=20):
     """Draw comparison of strain fields.
 
@@ -254,7 +257,7 @@ def draw_strains_compare(strain_FEM, strain_MKS, fontsize=20):
     titles_ = [r'$\mathbf{\varepsilon_{xx}}$ - %s' % title for title in titles]
     _draw_fields((strain_FEM, strain_MKS), cmap, fontsize, titles_)
 
-
+@deprecate
 def draw_concentrations_compare(concentrations, labels, fontsize=15):
     """Draw comparesion of concentrations.
 
@@ -267,7 +270,7 @@ def draw_concentrations_compare(concentrations, labels, fontsize=15):
     cmap = _get_response_cmap()
     _draw_fields(concentrations, cmap, fontsize, labels)
 
-
+@deprecate
 def draw_differences(differences, labels=None, fontsize=15):
     """Draw differences in predicted response fields.
 
@@ -282,7 +285,7 @@ def draw_differences(differences, labels=None, fontsize=15):
         labels = [' ' for s in differences]
     _draw_fields(differences, cmap, fontsize, labels)
 
-
+@deprecate
 def _draw_fields(fields, field_cmap, fontsize, titles, figsize=None):
     """
     Helper function used to draw fields.
@@ -333,7 +336,7 @@ def _draw_fields(fields, field_cmap, fontsize, titles, figsize=None):
     plt.tight_layout()
     plt.show()
 
-
+@deprecate
 def draw_gridscores(grid_scores, param, score_label=None, colors=None,
                     data_labels=None, param_label=None, fontsize=20):
     """
@@ -385,7 +388,7 @@ def draw_gridscores(grid_scores, param, score_label=None, colors=None,
     plt.xlabel(param_label, fontsize=fontsize)
     plt.show()
 
-
+@deprecate
 def draw_gridscores_matrix(grid_scores, params, score_label=None,
                            param_labels=None):
     """
@@ -442,7 +445,7 @@ def draw_gridscores_matrix(grid_scores, params, score_label=None,
     plt.tight_layout()
     plt.show()
 
-
+@deprecate
 def draw_component_variance(variance):
     """
     Visualize the percent variance as a function of components.
@@ -460,7 +463,7 @@ def draw_component_variance(variance):
     plt.ylabel('Percent Variance', fontsize=15)
     plt.show()
 
-
+@deprecate
 def draw_components_scatter(datasets, labels, title=None,
                             component_labels=None, view_angles=None,
                             legend_outside=False, fig_size=None):
@@ -500,7 +503,7 @@ def draw_components_scatter(datasets, labels, title=None,
     else:
         raise RuntimeError("n_components must be 2 or 3.")
 
-
+@deprecate
 def draw_evolution(datasets, labels, title=None, component_labels=None,
                    view_angles=None, legend_outside=False, fig_size=None):
     """
@@ -537,7 +540,7 @@ def draw_evolution(datasets, labels, title=None, component_labels=None,
     else:
         raise RuntimeError("time and one component must be paired")
 
-
+@deprecate
 def _draw_components_2D(X, labels, title, component_labels,
                         legend_outside, fig_size):
     """
@@ -572,7 +575,7 @@ def _draw_components_2D(X, labels, title, component_labels,
     plt.title(title, fontsize=20)
     plt.show()
 
-
+@deprecate
 def _draw_components_evolution(X, labels, title, component_labels,
                                legend_outside, fig_size):
     """
@@ -607,7 +610,7 @@ def _draw_components_evolution(X, labels, title, component_labels,
     plt.title(title, fontsize=20)
     plt.show()
 
-
+@deprecate
 def _draw_components_3D(X, labels, title, component_labels, view_angles,
                         legend_outside, fig_size):
     """
@@ -648,7 +651,7 @@ def _draw_components_3D(X, labels, title, component_labels, view_angles,
                         borderaxespad=0., fontsize=15)
     plt.show()
 
-
+@deprecate
 def draw_goodness_of_fit(fit_data, pred_data, labels):
     """Goodness of fit plot for MKSHomogenizationModel.
 
@@ -676,7 +679,7 @@ def draw_goodness_of_fit(fit_data, pred_data, labels):
     plt.legend(loc=2, fontsize=15)
     plt.show()
 
-
+@deprecate
 def draw_components(X_comp, fontsize=15, figsize=None):
     """
     Visualize spatial correlations.
@@ -690,7 +693,7 @@ def draw_components(X_comp, fontsize=15, figsize=None):
               in np.arange(X_comp.shape[0])]
     _draw_fields(X_comp, cmap, fontsize, titles, figsize=figsize)
 
-
+@deprecate
 def draw_correlations(X_corr, correlations=None):
     """
     Visualize spatial correlations.
@@ -706,7 +709,7 @@ def draw_correlations(X_corr, correlations=None):
         correlations += list(zip(*list(_cross_correlations(L))))
     _draw_stats(X_corr, correlations=correlations)
 
-
+@deprecate
 def draw_autocorrelations(X_auto, autocorrelations=None):
     """
     Visualize spatial autocorrelations.
@@ -720,7 +723,7 @@ def draw_autocorrelations(X_auto, autocorrelations=None):
         autocorrelations = zip(*list(_auto_correlations(n_states)))
     _draw_stats(X_auto, correlations=autocorrelations)
 
-
+@deprecate
 def draw_crosscorrelations(X_cross, crosscorrelations=None):
     """
     Visualize spatial crosscorrelations.
@@ -735,7 +738,7 @@ def draw_crosscorrelations(X_cross, crosscorrelations=None):
         crosscorrelations = zip(*list(_cross_correlations(n_states)))
     _draw_stats(X_cross, correlations=crosscorrelations)
 
-
+@deprecate
 def _draw_stats(X_, correlations=None):
     """Visualize the spatial correlations.
 
@@ -786,7 +789,7 @@ def _draw_stats(X_, correlations=None):
         plt.tight_layout()
     plt.show()
 
-
+@deprecate
 def _get_ticks_params(l):
     """Get tick locations and labels for spatial correlation plots.
 
@@ -801,7 +804,7 @@ def _get_ticks_params(l):
                        int(round(int((l + 1) / 2 + n))), n))
     return tick_loc, tick_labels
 
-
+@deprecate
 def _get_colorbar_ticks(X_, n_ticks):
     """
     Helper function to get colorbar color tick locations.
@@ -813,7 +816,7 @@ def _get_colorbar_ticks(X_, n_ticks):
     tick_range = np.linspace(np.min(X_), np.max(X_), n_ticks)
     return tick_range.astype(float) # pylint: disable=no-member
 
-
+@deprecate
 def draw_learning_curves(estimator, X, y, ylim=None, cv=None, n_jobs=1,
                          scoring=None, train_sizes=np.linspace(.1, 1.0, 5)):
     """Code taken from scikit-learn examples for version 0.15.

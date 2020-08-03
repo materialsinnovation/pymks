@@ -24,6 +24,7 @@ from sfepy.mesh.mesh_generators import gen_block_mesh
 from sfepy.mechanics.matcoefs import ElasticConstants
 from sfepy.base.base import output
 from sfepy.discrete.conditions import LinearCombinationBC
+from ..fmks.func import deprecate
 
 goptions['verbose'] = False
 output.set_output(quiet=True)
@@ -90,7 +91,7 @@ class ElasticFESimulation(object):
     >>> assert np.allclose(u[:,0], u[:,-1])
 
     """
-
+    @deprecate
     def __init__(self, elastic_modulus, poissons_ratio, macro_strain=1.,):
         """Instantiate a ElasticFESimulation.
 

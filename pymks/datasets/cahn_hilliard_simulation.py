@@ -1,6 +1,6 @@
 from ..bases.imag_ffts import _ImagFFTBasis
 import numpy as np
-
+from ..fmks.func import deprecate
 
 class CahnHilliardSimulation(_ImagFFTBasis):
     r"""
@@ -61,7 +61,7 @@ class CahnHilliardSimulation(_ImagFFTBasis):
     >>> assert (max(phi.flat) > 0.0005) and (min(phi.flat) < -0.0005)
 
     """
-
+    @deprecate
     def __init__(self, dx=0.25, gamma=1., dt=0.001):
         r"""
         Instanitate a CahnHilliardSimulation
