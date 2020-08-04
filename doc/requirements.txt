@@ -9,4 +9,5 @@ scikit-learn
 mock
 nbsphinx==0.5.1
 m2r2
+Deprecated
 # require pandoc which is a haskell package

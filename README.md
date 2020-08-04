@@ -1,6 +1,6 @@
 <p align="center">
 <img src="https://raw.githubusercontent.com/materialsinnovation/pymks/master/doc/pymks_logo.ico"
-     height="100"
+     height="60"
      alt="PyMKS logo"
      class="inline">
 </p>
@@ -10,18 +10,9 @@ PyMKS &ndash; The Materials Knowledge System in Python
 </strong></sup></p>
 </h1>
 
-<p align="center">
-<a href="https://gitter.im/pymks/Lobby" target="_blank">
-<img src="https://img.shields.io/gitter/room/gitterHQ/gitter.svg"
-alt="Gitter Chat">
-</a>
-
 <a href="https://travis-ci.org/materialsinnovation/pymks" target="_blank">
 <img src="https://api.travis-ci.org/materialsinnovation/pymks.svg"
 alt="Travis CI">
-</a>
-<a href="https://pypi.python.org/pypi/pymks">
-<img src="https://badge.fury.io/py/pymks.svg" alt="PyPI version" height="18">
 </a>
 <a href="https://github.com/materialsinnovation/pymks/blob/master/LICENSE.md">
 <img src="https://img.shields.io/badge/license-mit-blue.svg" alt="License" height="18">
@@ -29,107 +20,77 @@ alt="Travis CI">
 <a href="http://pymks.readthedocs.io/en/latest/?badge=latest">
 <img src="https://readthedocs.org/projects/pymks/badge/?version=latest" alt="Documentation Status" height="18">
 </a>
-</p>
-
-<p align="center">
-<a href="https://circleci.com/gh/conda-forge/pymks-feedstock" target="_blank">
-<img src="https://circleci.com/gh/conda-forge/pymks-feedstock.svg?style=shield"
-alt="Circle CI">
+<a href="https://pypi.python.org/pypi/pymks">
+<img src="https://badge.fury.io/py/pymks.svg" alt="PyPI version" height="18">
 </a>
-<a href="https://travis-ci.org/conda-forge/pymks-feedstock" target="_blank">
-<img src="https://travis-ci.org/conda-forge/pymks-feedstock.svg?branch=master"
-alt="Travis CI">
+<a href="https://circleci.com/gh/materialsinnovation/pymks">
+<img src="https://circleci.com/gh/materialsinnovation/pymks.svg?style=shield" alt="Circle CI" height="18">
 </a>
-<a href="https://ci.appveyor.com/project/conda-forge/pymks-feedstock/branch/master">
-<img src="https://ci.appveyor.com/api/projects/status/github/conda-forge/pymks-feedstock?svg=True" alt="AppVeyor" height="18">
-</a>
-</p>
-
-<p align="center">
-<a href="https://anaconda.org/conda-forge/pymks" target="_blank">
-<img src="https://anaconda.org/conda-forge/pymks/badges/version.svg"
-alt="Anaconda-Server Badge">
-</a>
-<a href="https://anaconda.org/conda-forge/pymks" target="_blank">
-<img src="https://anaconda.org/conda-forge/pymks/badges/downloads.svg"
-alt="Anaconda-Server Badge">
-</a>
-</p>
-
-## MKS
-
-The Materials Knowledge Systems (MKS) is a novel data science approach
-for solving multiscale materials science problems. It uses techniques
-from physics, machine learning, regression analysis, signal processing,
-and spatial statistics to create processing-structure-property
-relationships. The MKS carries the potential to bridge multiple
-length scales using localization and homogenization linkages, and
-provides a data driven framework for solving inverse material design
-problems.
-
-See these references for further reading:
-
- - *Computationally-Efficient Fully-Coupled Multi-Scale Modeling of
-   Materials Phenomena Using Calibrated Localization Linkages*,
-   S. R. Kalidindi; ISRN Materials Science, vol. 2012, Article ID
-   305692, 2012,
-   [doi:10.5402/2012/305692](http://dx.doi.org/10.5402/2012/305692).
-
- - *Formulation and Calibration of Higher-Order Elastic Localization
-   Relationships Using the MKS Approach*, Tony Fast and
-   S. R. Kalidindi; Acta Materialia, vol. 59 (11), pp. 4595-4605,
-   2011,
-   [doi:10.1016/j.actamat.2011.04.005](http://dx.doi.org/10.1016/j.actamat.2011.04.005)
-
- - *Developing higher-order materials knowledge systems*, T. N. Fast;
-   Thesis (PhD, Materials engineering)--Drexel University, 2011,
-   [doi:1860/4057](http://dx.doi.org/1860/4057).
 
 
-## PyMKS
+The PyMKS framework is a set of machine learning tools for
+constructing process-structure-property models for materials science
+applications. It includes very fast models for both homogenization
+(scaling up), which uses spatial statistics, and localization (scaling
+down), which uses linkages adapted from Green's functions. Both of
+these techniques are fast because the derived models can be calibrated
+using convolutions in Fourier space.
 
-The Materials Knowledge Materials in Python (PyMKS) framework is an
-object-oriented set of tools and examples, written in Python, that
-provide high-level access to the MKS framework for rapid creation and
-analysis of structure-property-processing relationships. A short
-introduction on how to use PyMKS is outlined in the
-[introductory example](notebooks/intro.ipynb) and example cases can be
-found [in the examples section](./index.ipynb). Both code and examples
-contributions are welcome.
+To learn about PyMKS start with the [PyMKS examples](./index.ipynb),
+especially the [introductory example](notebooks/intro.ipynb). To learn
+more about the methods consult the [technical
+overview](http://pymks.org/en/latest/rst/notebooks/tech_overview.html)
+for an introduction.
 
-## Documentation
-
-Start with the [PyMKS examples](./index.ipynb), especially the
-[introductory example](notebooks/intro.ipynb).
+The two principle objects that PyMKS provides are the
+`TwoPointCorrelation` transformer and the `LocalizationRegressor`
+which provide the homogenization and localization functionality. The
+objects provided by PyMKS all work as either transformers or
+regressors in a Scikit-Learn pipeline and use both Numpy and Dask
+arrays for out-of-memory, distributed or parallel computations. The
+out-of-memory computations are still in an experimental stage as of
+version 0.4 and some issues still need to be resolved.
 
 ## Feedback
 
-##### Mailing List
+Please submit questions and issues on the [GitHub issue
+tracker](https://github.com/materialsinnovation/pymks/issues).
 
-Please feel free to ask open-ended questions about PyMKS on the
-[pymks-general@googlegroups.com](https://groups.google.com/forum/#!forum/pymks-general)
-list.
+## Installation
 
-##### Gitter
+### Conda
 
-For immediate help, please feel free to participate on
-[Gitter](https://gitter.im/pymks/Lobby).
+To install using [Conda][conda],
 
-## Financial Support
+    $ cd pymks
+    $ conda env create -f environment.yml
+    $ conda activate pymks
+    $ python setup.py install
 
-Financial support for the development of PyMKS is provided by the
-[Georgia Tech Institute of Materials](http://materials.gatech.edu/),
-the
-[National Institute of Standards and Technology](http://www.nist.gov/mml/msed/index.cfm),
-the
-[Air Force Office of Scientific Research](http://www.wpafb.af.mil/AFRL/afosr/),
-the [Office of Naval Research](http://www.onr.navy.mil/) and the
-[National Science Foundation](http://www.nsf.gov/).
+### Nix
 
-## License
+[Nix](https://nixos.org/nix/) is a seamless way to install
+PyMKS. After [installing
+Nix](https://nixos.org/nix/manual/#chap-quick-start), run
 
-See the [license](./LICENSE.html).
+    $ nix-shell
+
+to drop into a shell with PyMKS and all its requirements available.
+
+## Testing
+
+To test a PyMKS installation use
+
+    $ python -c "import pymks; pymks.test()"
 
 ## Citing
 
-See [CITATION.md](./CITATION.html).
+Please cite the following if you happen to use PyMKS for a
+publication.
+
+ - Brough, D.B., Wheeler, D. & Kalidindi, S.R. Materials Knowledge
+   Systems in Python—a Data Science Framework for Accelerated
+   Development of Hierarchical Materials. Integr Mater Manuf Innov 6,
+   36–53 (2017). https://doi.org/10.1007/s40192-017-0089-0
+
+[conda]: http://continuum.io/downloads
