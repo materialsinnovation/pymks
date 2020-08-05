@@ -10,4 +10,5 @@ mock
 nbsphinx==0.5.1
 m2r2
 Deprecated
+sphinx-jinja
 # require pandoc which is a haskell package
