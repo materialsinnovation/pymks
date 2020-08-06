@@ -145,7 +145,6 @@ html_theme_options = {
     'navbar_title': "PyMKS",
     'navbar_site_name': "More",
     'navbar_links': [
-        ("Installation", "rst/INSTALLATION.html", True),
         ("Examples", "rst/index.html", True),
         ("API", "API.html", True),
         ("Github", "https://github.com/materialsinnovation/pymks/", True),
@@ -343,7 +342,6 @@ for directory in [rst_directory, notebook_directory]:
 
 files_to_copy = (
     'README.md',
-    'INSTALLATION.md',
     'LICENSE.md',
     'CITATION.md',
     'index.ipynb',
