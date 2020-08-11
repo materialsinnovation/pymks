@@ -28,6 +28,14 @@ alt="Travis CI">
 </a>
 
 
+PyMKS is an open source, pythonic implementation of the methodologies 
+developed under the aegis of Materials Knowledge System [refs] to build salient 
+process-structure-property linkages for materials science applications.
+PyMKS provides for efficient tools for obtaining a digital, uniform grid representation 
+of a materials internal structure in terms of its local states, and computing hierarchical 
+descriptors of the structure that can be used to used to build efficient machine 
+learning based mappings to the relevant response space.
+
 The PyMKS framework is a set of machine learning tools for
 constructing process-structure-property models for materials science
 applications. It includes very fast models for both homogenization
