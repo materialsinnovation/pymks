@@ -12,7 +12,7 @@ n_x, n_y, n_z).
 >>> X = np.zeros((1, 3, 3), dtype=int)
 >>> X[0, :, 1] = 1
 
->>> strain = solve(
+>>> strain = solve_fe(
 ...     X,
 ...     elastic_modulus=(1.0, 10.0),
 ...     poissons_ratio=(0., 0.),
@@ -43,7 +43,7 @@ left/right periodic offset and the top/bottom periodicity.
 ...                [1, 0, 0, 1]]])
 >>> n_samples, N, N = X.shape
 >>> macro_strain = 0.1
->>> displacement = solve(
+>>> displacement = solve_fe(
 ...     X,
 ...     elastic_modulus=(10.0, 1.0),
 ...     poissons_ratio=(0.3, 0.3),
@@ -80,7 +80,7 @@ The module also works with Dask arrays,
 >>> print(X.shape)
 (2, 4, 4)
 >>> x_data = da.from_array(X, chunks=(1, 4, 4))
->>> out = solve(x_data,
+>>> out = solve_fe(x_data,
 ...             elastic_modulus=(10.0, 1.0),
 ...             poissons_ratio=(0.3, 0.3),
 ...             macro_strain=macro_strain)['displacement']
@@ -145,7 +145,7 @@ warnings.simplefilter("ignore", category=FutureWarning)
 
 
 @curry
-def solve(x_data, elastic_modulus, poissons_ratio, macro_strain=1.0, delta_x=1.0):
+def solve_fe(x_data, elastic_modulus, poissons_ratio, macro_strain=1.0, delta_x=1.0):
     """Solve the elasticity problem
 
     Args:

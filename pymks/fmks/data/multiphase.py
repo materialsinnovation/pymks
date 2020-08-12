@@ -112,7 +112,9 @@ def np_generate(grain_size, volume_fraction, percent_variance, x_blur):
 
 
 @curry
-def generate(shape, grain_size, volume_fraction, chunks=-1, percent_variance=0.0):
+def generate_multiphase(
+    shape, grain_size, volume_fraction, chunks=-1, percent_variance=0.0
+):
     """Constructs microstructures for an arbitrary number of phases
     given the size of the domain, and relative grain size.
 
@@ -134,7 +136,11 @@ def generate(shape, grain_size, volume_fraction, chunks=-1, percent_variance=0.0
     ...                    [0, 1, 0],
     ...                    [1, 1, 1]]])
     >>> da.random.seed(10)
-    >>> x = generate(shape=(1, 3, 3), grain_size=(1, 1), volume_fraction=(0.5, 0.5))
+    >>> x = generate_multiphase(
+    ...     shape=(1, 3, 3),
+    ...     grain_size=(1, 1),
+    ...     volume_fraction=(0.5, 0.5)
+    ... )
     >>> print(x.shape)
     (1, 3, 3)
     >>> print(x.chunks)

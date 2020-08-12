@@ -8,8 +8,8 @@ from pymks.fmks.bases.primitive import discretize, redundancy
 from pymks.fmks.localization import fit
 from pymks.fmks.bases.primitive import PrimitiveTransformer
 from pymks.fmks.localization import LocalizationRegressor
-from pymks.fmks.data.delta import generate
-from pymks.fmks.data.elastic_fe import solve
+from pymks.fmks.data.delta import generate_delta
+from pymks.fmks.data.elastic_fe import solve_fe
 
 
 def _get_x():
@@ -34,9 +34,9 @@ def test_setting_kernel():
     """Test resetting the coeffs after coeff resize.
     """
 
-    x_data = generate(n_phases=2, shape=(21, 21)).persist()
+    x_data = generate_delta(n_phases=2, shape=(21, 21)).persist()
 
-    y_data = solve(
+    y_data = solve_fe(
         x_data, elastic_modulus=(100, 130), poissons_ratio=(0.3, 0.3), macro_strain=0.01
     )["strain"][..., 0].persist()
 

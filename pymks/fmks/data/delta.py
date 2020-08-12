@@ -24,7 +24,7 @@ def _npgenerate(n_phases, shape):
 
 
 @curry
-def generate(n_phases, shape, chunks=()):
+def generate_delta(n_phases, shape, chunks=()):
     """Generate a delta microstructure
 
     Args:
@@ -35,7 +35,7 @@ def generate(n_phases, shape, chunks=()):
     Returns:
       a dask array of delta microstructures
 
-    >>> a = generate(5, (3, 4), chunks=(5,))
+    >>> a = generate_delta(5, (3, 4), chunks=(5,))
     >>> a.shape
     (20, 3, 4)
     >>> a.chunks
