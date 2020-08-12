@@ -1,4 +1,0 @@
-Testing
-=======
-
-.. autofunction:: pymks.test

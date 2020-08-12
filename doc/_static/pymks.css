@@ -100,3 +100,21 @@ th {
     background: #E4E4E4;
 }
 
+.py.function, .py.class, .function, .class {
+    margin-top: 5px;
+    border-top: solid 3px #6ab0de;
+    padding: 6px;
+    font-size: 90%;
+}
+
+.doctest pre, .highlight pre {
+    font-size: 90%;
+}
+
+.sig-prename.descclassname, .descclassname {
+    display: none;
+}
+
+th.field-name {
+    background: white;
+}

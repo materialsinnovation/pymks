@@ -29,8 +29,11 @@ sys.path.insert(0, os.path.abspath('..'))
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.mathjax',
+              'sphinx.ext.autosummary',
+              'sphinx.ext.napoleon',
               'nbsphinx',
-              'm2r2']
+              'm2r2',
+              'sphinxcontrib.jinja']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -147,14 +150,14 @@ html_theme_options = {
     'navbar_links': [
         ("Examples", "rst/index.html", True),
         ("API", "API.html", True),
-        ("Github", "https://github.com/materialsinnovation/pymks/", True),
         ("Theory", "THEORY.html", True),
+        ("GitHub", "https://github.com/materialsinnovation/pymks/", True),
     ],
     'navbar_pagenav': False,
     'navbar_sidebarrel': False,
-    'globaltoc_depth': 1,
+    'globaltoc_depth': 2,
     'source_link_position': '',
-    'bootswatch_theme': 'cosmo'
+    'bootswatch_theme': 'cosmo',
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -181,6 +184,9 @@ html_favicon = 'pymks_logo.ico'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+html_css_files = [
+    'pymks.css'
+]
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
 #html_last_updated_fmt = '%b %d, %Y'

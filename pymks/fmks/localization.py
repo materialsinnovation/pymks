@@ -239,7 +239,7 @@ def _ini_axes(arr):
 
 @curry
 def coeff_to_real(coeff, new_shape=None):
-    """Covert the coefficents to real space
+    """Convert the coefficents to real space
 
     Args:
       coeff: the coefficient in Fourier space
@@ -247,6 +247,7 @@ def coeff_to_real(coeff, new_shape=None):
 
     Returns:
       the coefficients in real space
+
     """
     return pipe(
         coeff,
@@ -353,9 +354,6 @@ class ReshapeTransformer(BaseEstimator, TransformerMixin):
     class transforms the shape of flat data into shaped image data for
     MKS.
 
-    Attributes:
-       shape: the shape of the reshaped data (ignoring the first axis)
-
     >>> data = np.arange(18).reshape((2, 9))
     >>> ReshapeTransformer((None, 3, 3)).fit(None, None).transform(data).shape
     (2, 3, 3)
@@ -374,7 +372,7 @@ class ReshapeTransformer(BaseEstimator, TransformerMixin):
         """Transform the X data
 
         Args:
-            x_data: the data to be transformed
+          x_data: the data to be transformed
         """
         return reshape(x_data, self.shape)
 
@@ -388,12 +386,6 @@ class LocalizationRegressor(BaseEstimator, RegressorMixin):
     """Perform the localization in Sklearn pipelines
 
     Allows the localization to be part of a Sklearn pipeline
-
-    Attributes:
-        redundancy_func: function to remove redundant elements from
-            the coefficient matrix
-        coeff: the coefficient matrix
-        y_data_shape: the shape of the predicited data
 
     >>> make_data = lambda s, c: da.from_array(
     ...     np.arange(np.prod(s),
@@ -422,8 +414,9 @@ class LocalizationRegressor(BaseEstimator, RegressorMixin):
         """Instantiate a LocalizationRegressor
 
         Args:
-            redundancy_func: function to remove redundant elements
-                from the coefficient matrix
+          redundancy_func: function to remove redundant elements from
+            the coefficient matrix
+
         """
         self.redundancy_func = redundancy_func
         self.coeff = None
@@ -433,11 +426,11 @@ class LocalizationRegressor(BaseEstimator, RegressorMixin):
         """Fit the data
 
         Args:
-            x_data: the X data to fit
-            y_data: the y data to fit
+          x_data: the X data to fit
+          y_data: the y data to fit
 
         Returns:
-            the fitted LocalizationRegressor
+          the fitted LocalizationRegressor
         """
         self.y_data_shape = y_data.shape
         y_data_reshape = reshape(y_data, x_data.shape[:-1])
