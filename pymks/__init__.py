@@ -58,7 +58,7 @@ def test():
     """
     import pytest  # pylint: disable=import-outside-toplevel
 
-    path = os.path.split(__file__)[0]
+    path = os.path.join(os.path.split(__file__)[0], "fmks")
     pytest.main(args=[path, "--doctest-modules", "-r s"])
 
 
