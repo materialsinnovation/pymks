@@ -52,6 +52,7 @@ DiscreteIndicatorBasis = PrimitiveBasis
 ContinuousIndicatorBasis = PrimitiveBasis
 # the above will be deprecatec
 
+
 def test():
     r"""
     Run all the doctests available.
