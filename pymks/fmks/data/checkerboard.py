@@ -22,7 +22,7 @@ def _checkerboard(size, square_shape):
     return pipe(size, indices, lambda x: x // square_shape, lambda x: x.sum(axis=0) % 2)
 
 
-def generate(size, square_shape=(1,)):
+def generate_checkerboard(size, square_shape=(1,)):
     """Generate a 2-phase checkerboard microstructure
 
     Args:
@@ -32,17 +32,17 @@ def generate(size, square_shape=(1,)):
     Returns:
       a microstructure of shape "(1,) + shape"
 
-    >>> print(generate((4,)).compute())
+    >>> print(generate_checkerboard((4,)).compute())
     [[0 1 0 1]]
-    >>> print(generate((3, 3)).compute())
+    >>> print(generate_checkerboard((3, 3)).compute())
     [[[0 1 0]
       [1 0 1]
       [0 1 0]]]
-    >>> print(generate((3, 3), (2,)).compute())
+    >>> print(generate_checkerboard((3, 3), (2,)).compute())
     [[[0 0 1]
       [0 0 1]
       [1 1 0]]]
-    >>> print(generate((5, 8), (2, 3)).compute())
+    >>> print(generate_checkerboard((5, 8), (2, 3)).compute())
     [[[0 0 0 1 1 1 0 0]
       [0 0 0 1 1 1 0 0]
       [1 1 1 0 0 0 1 1]
