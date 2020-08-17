@@ -102,4 +102,4 @@ publication.
    Development of Hierarchical Materials. Integr Mater Manuf Innov 6,
    36–53 (2017). https://doi.org/10.1007/s40192-017-0089-0
 
-[conda]: http://continuum.io/downloads
+[conda]: https://docs.conda.io/en/latest/
