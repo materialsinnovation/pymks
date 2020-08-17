@@ -1,11 +1,11 @@
 # Python CircleCI 2.0 configuration file
 version: 2.1
 jobs:
-  build:
+  conda_develop:
     docker:
       - image: continuumio/miniconda3
 
-    working_directory: ~/repo
+    working_directory: ~/repo-conda-develop
 
     steps:
       # Step 1: obtain repo from GitHub
@@ -45,3 +45,37 @@ jobs:
             py.test notebooks/multiphase.ipynb
             py.test notebooks/checkerboard.ipynb
             py.test notebooks/fiber.ipynb
+
+
+  pip_install:
+    docker:
+      - image: continuumio/miniconda3
+
+    working_directory: ~/repo-pip-install
+
+    steps:
+
+      - checkout
+
+      - run:
+          name: Setup
+          command: |
+            conda create -n pip-install python=3
+            source activate pip-install
+            pip install .
+
+      - run:
+          name: Test
+          no_output_timeout: 30m
+          command: |
+            set -e
+            source activate pip-install
+            python -c "import pymks; pymks.test()"
+
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - conda_develop
+      - pip_install

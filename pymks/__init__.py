@@ -12,6 +12,7 @@ except ImportError:
     pass
 
 import os
+
 from .fmks.data.cahn_hilliard import solve_cahn_hilliard
 from .fmks.plot import plot_microstructures
 from .fmks.bases.primitive import PrimitiveTransformer
@@ -20,12 +21,26 @@ from .fmks.localization import LocalizationRegressor
 from .fmks.localization import ReshapeTransformer
 from .fmks.localization import coeff_to_real
 from .fmks.data.delta import generate_delta
-from .fmks.data.elastic_fe import solve_fe
 from .fmks.data.multiphase import generate_multiphase
 from .fmks.correlations import FlattenTransformer
 from .fmks.correlations import TwoPointCorrelation
 from .fmks.data.checkerboard import generate_checkerboard
 
+try:
+    import sfepy  # noqa: F401
+except ImportError:
+
+    def solve_fe(*_, **__):
+        """Dummy funcion when sfepy unavailable
+        """
+        # pylint: disable=redefined-outer-name, import-outside-toplevel, unused-import
+        import sfepy  # noqa: F401, F811
+
+
+else:
+    from .fmks.data.elastic_fe import solve_fe
+
+# the following will be deprecated
 from .mks_localization_model import MKSLocalizationModel
 from .bases.primitive import PrimitiveBasis
 from .bases.legendre import LegendreBasis
@@ -35,6 +50,7 @@ from .mks_homogenization_model import MKSHomogenizationModel
 MKSRegressionModel = MKSLocalizationModel
 DiscreteIndicatorBasis = PrimitiveBasis
 ContinuousIndicatorBasis = PrimitiveBasis
+# the above will be deprecatec
 
 
 def test():
@@ -43,7 +59,7 @@ def test():
     """
     import pytest  # pylint: disable=import-outside-toplevel
 
-    path = os.path.split(__file__)[0]
+    path = os.path.join(os.path.split(__file__)[0], "fmks")
     pytest.main(args=[path, "--doctest-modules", "-r s"])
 
 
