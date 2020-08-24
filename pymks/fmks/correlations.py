@@ -196,10 +196,7 @@ def two_point_stats(arr1, arr2, mask=None, periodic_boundary=True, cutoff=None):
     padder = identity if periodic_boundary else nonperiodic_padder
 
     periodic_normalize = lambda x: x / arr1[0].size
-    # print('Padded Mask Array')
-    # print(nonperiodic_padder(mask_array()).compute())
-    # print('Center Cut Normalization')
-    # print(center_slice(auto_correlation(nonperiodic_padder(mask_array())), cutoff=cutoff).compute())
+
     nonperiodic_normalize = lambda x: x / auto_correlation(padder( mask_array() ))
 
     normalize = periodic_normalize if periodic_boundary else nonperiodic_normalize
