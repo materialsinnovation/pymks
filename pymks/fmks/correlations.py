@@ -18,8 +18,7 @@ from .func import sequence, make_da, star, dapad
 
 @make_da
 def cross_correlation(arr1, arr2):
-    """
-    Returns the cross-correlation of and input field with another field.
+    """Returns the non-normalized cross-correlation
 
     Args:
       arr1: the input field (n_samples,n_x,n_y)
@@ -36,10 +35,10 @@ def cross_correlation(arr1, arr2):
     >>> x_data = da.from_array(x_data, chunks=chunks)
     >>> y_data = 1 - x_data
     >>> f_data = cross_correlation(x_data, y_data)
-    >>> gg = np.asarray([[[ 2/9,  3/9,  2/9],
-    ...                   [ 3/9, 0,  3/9],
-    ...                   [ 2/9,  3/9,  2/9]]])
-    >>> assert np.allclose(f_data.compute(), gg)
+    >>> expected = np.asarray([[[ 2,  3,  2],
+    ...                         [ 3, 0,  3],
+    ...                         [ 2,  3,  2]]])
+    >>> assert np.allclose(f_data, expected)
     >>> da.random.seed(42)
     >>> shape = (10, 5, 5)
     >>> chunks = (2, 5, 5)
@@ -54,6 +53,7 @@ def cross_correlation(arr1, arr2):
     >>> f_data = cross_correlation(x_data, y_data)
     >>> print(f_data.chunks)
     ((2, 2, 1, 1, 2, 2), (5,), (5,))
+
     """
     faxes = lambda x: tuple(np.arange(x.ndim - 1) + 1)
 
@@ -69,8 +69,7 @@ def cross_correlation(arr1, arr2):
 
 @curry
 def auto_correlation(arr):
-    """
-    Returns auto-corrlation of and input field with itself.
+    """Returns the non-normalized auto-correlation
 
     Args:
       arr: the input field (n_samples,n_x,n_y)
@@ -85,10 +84,10 @@ def auto_correlation(arr):
     >>> chunks = x_data.shape
     >>> x_data = da.from_array(x_data, chunks=chunks)
     >>> f_data = auto_correlation(x_data)
-    >>> gg = [[[3/9, 2/9, 3/9],
-    ...        [2/9, 5/9, 2/9],
-    ...        [3/9, 2/9, 3/9]]]
-    >>> assert np.allclose(f_data.compute(), gg)
+    >>> expected = [[[3, 2, 3],
+    ...              [2, 5, 2],
+    ...              [3, 2, 3]]]
+    >>> assert np.allclose(f_data, expected)
     >>> shape = (7, 5, 5)
     >>> chunks = (2, 5, 5)
     >>> da.random.seed(42)
@@ -97,6 +96,7 @@ def auto_correlation(arr):
     >>> assert x_data.chunks == f_data.chunks
     >>> print(f_data.chunks)
     ((2, 2, 2, 1), (5,), (5,))
+
     """
     return cross_correlation(arr, arr)
 
@@ -150,7 +150,9 @@ def two_point_stats(arr1, arr2, mask=None, periodic_boundary=True, cutoff=None):
     Args:
       arr1: array used to calculate cross-correlations (n_samples,n_x,n_y)
       arr2: array used to calculate cross-correlations (n_samples,n_x,n_y)
-      mask: array specifying confidence of each pixel (n_samples,n_x,n_y). In range [0,1]. Requires and assumes periodic_boundary to be false.
+      mask: array specifying confidence of each pixel
+        (n_samples,n_x,n_y).  In range [0,1]. Requires and assumes
+        periodic_boundary to be false.
       periodic_boundary: whether to assume a periodic boundary (default is true)
       cutoff: the subarray of the 2 point stats to keep
 
@@ -166,18 +168,17 @@ def two_point_stats(arr1, arr2, mask=None, periodic_boundary=True, cutoff=None):
     """
     if mask is not None:
         assert (
-            da.max(mask).compute() <= 1.0 and
-            da.min(mask).compute() >= 0.0
+            da.max(mask).compute() <= 1.0 and da.min(mask).compute() >= 0.0
         ), "Mask must be in range [0,1]!"
 
         periodic_boundary = False
         arr1 = arr1 * mask
         arr2 = arr2 * mask
 
-        mask_array = lambda : mask
+        mask_array = lambda: mask
 
     else:
-        mask_array = lambda : np.ones_like(arr1)
+        mask_array = lambda: np.ones_like(arr1)
 
     cutoff_ = int((np.min(arr1.shape[1:]) - 1) / 2)
     if cutoff is None:
@@ -197,7 +198,7 @@ def two_point_stats(arr1, arr2, mask=None, periodic_boundary=True, cutoff=None):
 
     periodic_normalize = lambda x: x / arr1[0].size
 
-    nonperiodic_normalize = lambda x: x / auto_correlation(padder( mask_array() ))
+    nonperiodic_normalize = lambda x: x / auto_correlation(padder(mask_array()))
 
     normalize = periodic_normalize if periodic_boundary else nonperiodic_normalize
 
