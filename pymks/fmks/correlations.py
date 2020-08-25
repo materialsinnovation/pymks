@@ -150,7 +150,9 @@ def two_point_stats(arr1, arr2, mask=None, periodic_boundary=True, cutoff=None):
     Args:
       arr1: array used to calculate cross-correlations (n_samples,n_x,n_y)
       arr2: array used to calculate cross-correlations (n_samples,n_x,n_y)
-      mask: array specifying confidence of each pixel (n_samples,n_x,n_y). In range [0,1]. Requires and assumes periodic_boundary to be false.
+      mask: array specifying confidence of each pixel
+        (n_samples,n_x,n_y).  In range [0,1]. Requires and assumes
+        periodic_boundary to be false.
       periodic_boundary: whether to assume a periodic boundary (default is true)
       cutoff: the subarray of the 2 point stats to keep
 
@@ -166,18 +168,17 @@ def two_point_stats(arr1, arr2, mask=None, periodic_boundary=True, cutoff=None):
     """
     if mask is not None:
         assert (
-            da.max(mask).compute() <= 1.0 and
-            da.min(mask).compute() >= 0.0
+            da.max(mask).compute() <= 1.0 and da.min(mask).compute() >= 0.0
         ), "Mask must be in range [0,1]!"
 
         periodic_boundary = False
         arr1 = arr1 * mask
         arr2 = arr2 * mask
 
-        mask_array = lambda : mask
+        mask_array = lambda: mask
 
     else:
-        mask_array = lambda : np.ones_like(arr1)
+        mask_array = lambda: np.ones_like(arr1)
 
     cutoff_ = int((np.min(arr1.shape[1:]) - 1) / 2)
     if cutoff is None:
@@ -197,7 +198,7 @@ def two_point_stats(arr1, arr2, mask=None, periodic_boundary=True, cutoff=None):
 
     periodic_normalize = lambda x: x / arr1[0].size
 
-    nonperiodic_normalize = lambda x: x / auto_correlation(padder( mask_array() ))
+    nonperiodic_normalize = lambda x: x / auto_correlation(padder(mask_array()))
 
     normalize = periodic_normalize if periodic_boundary else nonperiodic_normalize
 
