@@ -273,11 +273,11 @@ class TwoPointCorrelation(BaseEstimator, TransformerMixin):
 
 
 class FlattenTransformer(BaseEstimator, TransformerMixin):
-    """Reshape data ready for the Principle Component Analysis
+    """Reshape data ready for a PCA.
 
     Two point correlation data need to be flatten before performing
-    Principle component Analysis.This class flattens the TwoPoint correlation
-    data for scikit learn pipeline
+    PCA. This class flattens the two point correlation data for use in
+    a Sklearn pipeline.
 
     >>> data = np.arange(50).reshape((2, 5, 5))
     >>> FlattenTransformer().transform(data).shape
@@ -290,7 +290,8 @@ class FlattenTransformer(BaseEstimator, TransformerMixin):
         """Transform the X data
 
         Args:
-            x_data: the data to be transformed
+          x_data: the data to be transformed
+
         """
         return flatten(x_data)
 

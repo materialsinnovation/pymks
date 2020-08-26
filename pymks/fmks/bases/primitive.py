@@ -145,13 +145,7 @@ def redundancy(ijk):
 
 
 class PrimitiveTransformer(BasisTransformer):
-    """Primiteive transformer for Sklearn pipelines
-
-    Attributes:
-      n_state: the number of local states
-      min_: the minimum local state
-      max_: the maximum local state
-      chunks: chunks size for state axis
+    """Primitive transformer for Sklearn pipelines
 
     >>> from toolz import pipe
     >>> assert pipe(
@@ -167,6 +161,13 @@ class PrimitiveTransformer(BasisTransformer):
 
     def __init__(self, n_state=2, min_=0.0, max_=1.0, chunks=None):
         """Instantiate a PrimitiveTransformer
+
+        Args:
+           n_state: the number of local states
+           min_: the minimum local state
+           max_: the maximum local state
+           chunks: chunks size for state axis
+
         """
         super().__init__(
             discretize, n_state=n_state, min_=min_, max_=max_, chunks=chunks

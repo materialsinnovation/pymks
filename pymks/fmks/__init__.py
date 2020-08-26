@@ -1,4 +1,4 @@
-"""fMKS - functional matierals knowledge system.
+"""fMKS - functional materials knowledge system.
 
 See https://github.com/wd15/fmks
 

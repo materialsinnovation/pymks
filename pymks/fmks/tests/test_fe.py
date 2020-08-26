@@ -4,7 +4,7 @@
 import pytest
 import numpy as np
 from toolz.curried import pipe, first, get
-from pymks.fmks.data.elastic_fe import solve
+from pymks.fmks.data.elastic_fe import solve_fe
 
 
 def test_3d():
@@ -19,7 +19,7 @@ def test_3d():
         5,
         lambda x: np.zeros((1, x, x, x), dtype=int),
         setone,
-        solve(elastic_modulus=(1.0, 10.0), poissons_ratio=(0.0, 0.0)),
+        solve_fe(elastic_modulus=(1.0, 10.0), poissons_ratio=(0.0, 0.0)),
         lambda x: np.allclose(
             [np.mean(x["strain"][0, ..., i]) for i in range(6)],
             [1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
@@ -36,7 +36,7 @@ def test_3d_bcs():
         return pipe(
             size,
             lambda x: np.random.randint(2, size=(1, x, x, x)),
-            solve(
+            solve_fe(
                 elastic_modulus=(10.0, 1.0),
                 poissons_ratio=(0.3, 0.3),
                 macro_strain=macro_strain,
@@ -58,7 +58,7 @@ def test_issue106():
     """
 
     def test(x_data):
-        solve(x_data, elastic_modulus=(1, 2, 3), poissons_ratio=(0.3, 0.3, 0.3))
+        solve_fe(x_data, elastic_modulus=(1, 2, 3), poissons_ratio=(0.3, 0.3, 0.3))
 
     size = 5
     test(np.zeros((1, size, size, size), dtype=int))

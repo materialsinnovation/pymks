@@ -148,7 +148,7 @@ def _check(x_data):
     return x_data
 
 
-def solve(x_data, n_steps=1, delta_x=0.25, delta_t=0.001, gamma=1.0):
+def solve_cahn_hilliard(x_data, n_steps=1, delta_x=0.25, delta_t=0.001, gamma=1.0):
     """Generate response for Cahn-Hilliard.
 
     Args:
@@ -160,7 +160,7 @@ def solve(x_data, n_steps=1, delta_x=0.25, delta_t=0.001, gamma=1.0):
 
     >>> import dask.array as da
     >>> x_data = 2 * da.random.random((1, 6, 6), chunks=(1, 6, 6)) - 1
-    >>> y_data = solve(x_data)
+    >>> y_data = solve_cahn_hilliard(x_data)
     >>> y_data.chunks
     ((1,), (6,), (6,))
 

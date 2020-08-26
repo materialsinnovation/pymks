@@ -105,12 +105,6 @@ def discretize(data, n_state=2, min_=0, max_=1, chunks=None):
 class LegendreTransformer(BasisTransformer):
     """Legendre transformer for Sklearn pipelines
 
-    Attributes:
-      n_state: the number of local states
-      min_: the minimum local state
-      max_: the maximum local state
-      chunks: chunks size for state axis
-
     >>> from toolz import pipe
     >>> data = da.from_array(np.array([[0, 0.5, 1]]), chunks=(1, 3))
     >>> pipe(
@@ -126,6 +120,12 @@ class LegendreTransformer(BasisTransformer):
 
     def __init__(self, n_state=2, min_=0.0, max_=1.0, chunks=None):
         """Instantiate a LegendreTransformer
+
+        Args:
+          n_state: the number of local states
+          min_: the minimum local state
+          max_: the maximum local state
+          chunks: chunks size for state axis
         """
         super().__init__(
             discretize, n_state=n_state, min_=min_, max_=max_, chunks=chunks
