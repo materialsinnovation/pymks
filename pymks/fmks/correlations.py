@@ -165,6 +165,17 @@ def two_point_stats(arr1, arr2, mask=None, periodic_boundary=True, cutoff=None):
     ... ).shape
     (2, 5)
 
+    Test masking
+
+    >>> array = np.array([[[1, 0 ,0], [0, 1, 1], [1, 1, 0]]])
+    >>> mask = np.array([[[1, 1, 1], [1, 1, 1], [1, 0, 0]]])
+    >>> norm_mask = np.array([[[2, 4, 3], [4, 7, 4], [3, 4, 2]]])
+    >>> expected = np.array([[[1, 0, 1], [1, 4, 1], [1, 0, 1]]]) / norm_mask
+    >>> assert np.allclose(
+    ...     two_point_stats(array, array, mask=mask),
+    ...     expected
+    ... )
+
     """
     if mask is not None:
         assert (
