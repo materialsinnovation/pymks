@@ -43,7 +43,7 @@ can be boiled down to data preprocessing step, followed by feature generation st
 and model construction step (including hyper parameter optimization). PyMKS, written in a functional 
 programming style and supporting distributed computation (multi-core, multi-threaded, cluster), provides 
 modular functionalities to address each of these data transformation steps, while maximally leveraging 
-the capabilities of the underlying computing environemnt.
+the capabilities of the underlying computing environment.
 
 
 PyMKS consists of tools to compute 2-point statistics, tools for both homogenization 
@@ -53,7 +53,7 @@ and a module for custom visualization of microstructures.
 
 To learn about PyMKS start with the [PyMKS examples](./index.ipynb), 
 especially the [introductory example](notebooks/intro.ipynb). 
-To learnmore about the methods consult the 
+To learn more about the methods consult the 
 [technical overview](http://pymks.org/en/latest/rst/notebooks/tech_overview.html) 
 for an introduction.
 
