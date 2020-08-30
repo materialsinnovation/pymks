@@ -28,19 +28,35 @@ alt="Travis CI">
 </a>
 
 
-The PyMKS framework is a set of machine learning tools for
-constructing process-structure-property models for materials science
-applications. It includes very fast models for both homogenization
-(scaling up), which uses spatial statistics, and localization (scaling
-down), which uses linkages adapted from Green's functions. Both of
-these techniques are fast because the derived models can be calibrated
-using convolutions in Fourier space.
+PyMKS is an open source, pythonic implementation of the methodologies 
+developed under the aegis of Materials Knowledge System (MKS) to build 
+salient process-structure-property linkages for materials science applications.
+PyMKS provides for efficient tools for obtaining a digital, uniform grid representation 
+of a materials internal structure in terms of its local states, and computing hierarchical 
+descriptors of the structure that can be used to build efficient machine 
+learning based mappings to the relevant response space.
 
-To learn about PyMKS start with the [PyMKS examples](./index.ipynb),
-especially the [introductory example](notebooks/intro.ipynb). To learn
-more about the methods consult the [technical
-overview](http://pymks.org/en/latest/rst/notebooks/tech_overview.html)
+
+The various materials data analytics workflows developed under the MKS paradigm confirm to 
+the data transformation pipeline architecture typical to most Data Science workflows. The workflows 
+can be boiled down to a data preprocessing step, followed by a feature generation step (fingerprinting), 
+and a model construction step (including hyper parameter optimization). PyMKS, written in a functional 
+programming style and supporting distributed computation (multi-core, multi-threaded, cluster), provides 
+modular functionalities to address each of these data transformation steps, while maximally leveraging 
+the capabilities of the underlying computing environment.
+
+
+PyMKS consists of tools to compute 2-point statistics, tools for both homogenization 
+and localization linkages, and tools for discretizing the microstructure. In addition, 
+PyMKS has modules for generating synthetic data sets using conventional numerical 
+simulations. 
+
+To learn about PyMKS start with the [PyMKS examples](./index.ipynb), 
+especially the [introductory example](notebooks/intro.ipynb). 
+To learn more about the methods consult the 
+[technical overview](http://pymks.org/en/latest/rst/notebooks/tech_overview.html) 
 for an introduction.
+
 
 The two principle objects that PyMKS provides are the
 `TwoPointCorrelation` transformer and the `LocalizationRegressor`
