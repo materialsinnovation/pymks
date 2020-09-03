@@ -166,28 +166,24 @@ def two_point_stats(arr1, arr2, mask=None, periodic_boundary=True, cutoff=None):
 
     Test masking
 
-    >>> array = np.array([[[1, 0 ,0], [0, 1, 1], [1, 1, 0]]])
-    >>> mask = np.array([[[1, 1, 1], [1, 1, 1], [1, 0, 0]]])
-    >>> norm_mask = np.array([[[2, 4, 3], [4, 7, 4], [3, 4, 2]]])
-    >>> expected = np.array([[[1, 0, 1], [1, 4, 1], [1, 0, 1]]]) / norm_mask
+    >>> array = da.array([[[1, 0 ,0], [0, 1, 1], [1, 1, 0]]])
+    >>> mask = da.array([[[1, 1, 1], [1, 1, 1], [1, 0, 0]]])
+    >>> norm_mask = da.array([[[2, 4, 3], [4, 7, 4], [3, 4, 2]]])
+    >>> expected = da.array([[[1, 0, 1], [1, 4, 1], [1, 0, 1]]]) / norm_mask
     >>> assert np.allclose(
-    ...     two_point_stats(array, array, mask=mask),
+    ...     two_point_stats(array, array, mask=mask, periodic_boundary=False),
     ...     expected
     ... )
 
+    The mask must be in the range 0 to 1.
+
+    >>> array = da.array([[[1, 0], [0, 1]]])
+    >>> mask =  da.array([[[2, 0], [0, 1]]])
+    >>> two_point_stats(array, array, mask)
+    Traceback (most recent call last):
+    ...
+    RuntimeError: Mask must be in range [0,1]
     """
-    if mask is not None:
-        assert (
-            da.max(mask).compute() <= 1.0 and da.min(mask).compute() >= 0.0
-        ), "Mask must be in range [0,1]!"
-
-        arr1 = arr1 * mask
-        arr2 = arr2 * mask
-
-        mask_array = lambda: mask
-
-    else:
-        mask_array = lambda: np.ones_like(arr1)
 
     cutoff_ = int((np.min(arr1.shape[1:]) - 1) / 2)
     if cutoff is None:
@@ -205,19 +201,27 @@ def two_point_stats(arr1, arr2, mask=None, periodic_boundary=True, cutoff=None):
 
     padder = identity if periodic_boundary else nonperiodic_padder
 
-    # The periodic normalization could always be the auto_correlation of the
-    # mask. But for the sake of efficiency, we specify the periodic normalization
-    # in the case there is no mask.
     if mask is not None:
-      periodic_normalize = lambda x: x / auto_correlation(mask_array())
+        if da.max(mask).compute() > 1.0 or da.min(mask).compute() < 0.0:
+            raise RuntimeError("Mask must be in range [0,1]")
+
+        mask_array = lambda arr: arr * mask
+
+        normalize = lambda x: x / auto_correlation(padder(mask))
     else:
-      periodic_normalize = lambda x: x / arr1[0].size
+        mask_array = identity
 
-    nonperiodic_normalize = lambda x: x / auto_correlation(padder(mask_array()))
-
-    normalize = periodic_normalize if periodic_boundary else nonperiodic_normalize
+        if periodic_boundary:
+            # The periodic normalization could always be the
+            # auto_correlation of the mask. But for the sake of
+            # efficiency, we specify the periodic normalization in the
+            # case there is no mask.
+            normalize = lambda x: x / arr1[0].size
+        else:
+            normalize = lambda x: x / auto_correlation(padder(np.ones_like(arr1)))
 
     return sequence(
+        map_(mask_array),
         map_(padder),
         list,
         star(cross_correlation),

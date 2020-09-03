@@ -36,7 +36,10 @@ def plot_microstructures(*arrs, titles=(), cmap=None, colorbar=True, figsize_wei
 
     """
     fig, axs = plt.subplots(
-        1, len(arrs), figsize=(figsize_weight * len(arrs), figsize_weight), constrained_layout=True
+        1,
+        len(arrs),
+        figsize=(figsize_weight * len(arrs), figsize_weight),
+        constrained_layout=True,
     )
     if len(arrs) == 1:
         axs = (axs,)
