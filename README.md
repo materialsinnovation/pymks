@@ -28,33 +28,33 @@ alt="Travis CI">
 </a>
 
 
-PyMKS is an open source, pythonic implementation of the methodologies 
-developed under the aegis of Materials Knowledge System (MKS) to build 
+PyMKS is an open source, pythonic implementation of the methodologies
+developed under the aegis of Materials Knowledge System (MKS) to build
 salient process-structure-property linkages for materials science applications.
-PyMKS provides for efficient tools for obtaining a digital, uniform grid representation 
-of a materials internal structure in terms of its local states, and computing hierarchical 
-descriptors of the structure that can be used to build efficient machine 
+PyMKS provides for efficient tools for obtaining a digital, uniform grid representation
+of a materials internal structure in terms of its local states, and computing hierarchical
+descriptors of the structure that can be used to build efficient machine
 learning based mappings to the relevant response space.
 
 
-The various materials data analytics workflows developed under the MKS paradigm confirm to 
-the data transformation pipeline architecture typical to most Data Science workflows. The workflows 
-can be boiled down to a data preprocessing step, followed by a feature generation step (fingerprinting), 
-and a model construction step (including hyper parameter optimization). PyMKS, written in a functional 
-programming style and supporting distributed computation (multi-core, multi-threaded, cluster), provides 
-modular functionalities to address each of these data transformation steps, while maximally leveraging 
+The various materials data analytics workflows developed under the MKS paradigm confirm to
+the data transformation pipeline architecture typical to most Data Science workflows. The workflows
+can be boiled down to a data preprocessing step, followed by a feature generation step (fingerprinting),
+and a model construction step (including hyper parameter optimization). PyMKS, written in a functional
+programming style and supporting distributed computation (multi-core, multi-threaded, cluster), provides
+modular functionalities to address each of these data transformation steps, while maximally leveraging
 the capabilities of the underlying computing environment.
 
 
-PyMKS consists of tools to compute 2-point statistics, tools for both homogenization 
-and localization linkages, and tools for discretizing the microstructure. In addition, 
-PyMKS has modules for generating synthetic data sets using conventional numerical 
-simulations. 
+PyMKS consists of tools to compute 2-point statistics, tools for both homogenization
+and localization linkages, and tools for discretizing the microstructure. In addition,
+PyMKS has modules for generating synthetic data sets using conventional numerical
+simulations.
 
-To learn about PyMKS start with the [PyMKS examples](./index.ipynb), 
-especially the [introductory example](notebooks/intro.ipynb). 
-To learn more about the methods consult the 
-[technical overview](http://pymks.org/en/latest/rst/notebooks/tech_overview.html) 
+To learn about PyMKS start with the [PyMKS examples](./index.ipynb),
+especially the [introductory example](notebooks/intro.ipynb).
+To learn more about the methods consult the
+[technical overview](http://pymks.org/en/latest/rst/notebooks/tech_overview.html)
 for an introduction.
 
 
@@ -78,29 +78,34 @@ tracker](https://github.com/materialsinnovation/pymks/issues).
 
 To install using [Conda][conda],
 
-    $ cd pymks
+    $ conda install -c conda-forge pymks
+
+or to create a development environment use,
+
     $ conda env create -f environment.yml
     $ conda activate pymks
-    $ python setup.py install
+    $ python setup.py develop
 
-### Nix
-
-[Nix](https://nixos.org/nix/) is a seamless way to install
-PyMKS. After [installing
-Nix](https://nixos.org/nix/manual/#chap-quick-start), run
-
-    $ nix-shell
-
-to drop into a shell with PyMKS and all its requirements available.
-
-#### Pip
+### Pip
 
 Install a minimal version of PyMKS with
 
     $ pip install pymks
 
 This is enough to run the tests, but not the examples. Some optional
-packages are not available via Pip.
+packages are not available via Pip. To create a development
+environment use,
+
+    $ pip install .
+
+### Nix
+
+Follow the [Nix installation
+guild](https://nixos.org/nix/manual/#chap-quick-start) and then run
+
+    $ nix-shell
+
+to drop into a shell with PyMKS and all its requirements available.
 
 ## Testing
 
