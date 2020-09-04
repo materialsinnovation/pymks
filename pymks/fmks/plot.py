@@ -26,7 +26,7 @@ def _colorbar(fig, axis, image):
     fig.colorbar(image, cax=axis)
 
 
-def plot_microstructures(*arrs, titles=(), cmap=None, colorbar=True):
+def plot_microstructures(*arrs, titles=(), cmap=None, colorbar=True, figsize_weight=4):
     """Plot a set of microstructures
 
     Args:
@@ -36,7 +36,10 @@ def plot_microstructures(*arrs, titles=(), cmap=None, colorbar=True):
 
     """
     fig, axs = plt.subplots(
-        1, len(arrs), figsize=(4 * len(arrs), 4), constrained_layout=True
+        1,
+        len(arrs),
+        figsize=(figsize_weight * len(arrs), figsize_weight),
+        constrained_layout=True,
     )
     if len(arrs) == 1:
         axs = (axs,)
