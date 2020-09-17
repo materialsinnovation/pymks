@@ -1,0 +1,27 @@
+[ETA ABS] Weighted fraction of polymer vertices: 0.500245
+[STATS] Number of polymer CCs: 6
+[STATS] Number of fullerene CCs 5
+[STATS] Number of polymer CCs conn to anode: 3
+[STATS] Number of fullerene CCs conn to cathode: 2
+[STATS] Number of vertices: 10201
+[STATS] Number of polymer vertices: 5103
+[STATS] Number of fullerene vertices: 5098
+[ETA ABS] Fraction of polymer vertices: 0.500245
+[ETA CT] Fraction of useful vertices - w/o islands: 0.168415
+[ETA CT] Fraction of polymer vertices conn to anode: 0.128552
+[ETA CT] Fraction of fullerene vertices conn to cathode: 0.208317
+[ETA DISS] Weighted fraction of polymer vertices in 10 distance to interface: 0.576531
+[ETA DISS] Number of interface 1st order edges: 848
+[STATS] Number of int edges with complementary paths: 0
+[ETA CT] Fraction of interface with complementary paths to cathode and anode: 0
+[STATS] Number of polymer int vertices with path to anode: 145
+[STATS] Number of fullerene int vertices with path to cathode: 202
+[ETA CT] Fraction of polymer vertices with straight rising paths (t=1): 0.919207
+[ETA CT] Fraction of fullerene vertices with straight rising paths (t=1): 0.145009
+
+ time check:
+Reading done: +0.167992s
+CC determined: +0.0474079s
+ALL performance indicators computed: +0.126185s
+----------------
+total: 0.341586s

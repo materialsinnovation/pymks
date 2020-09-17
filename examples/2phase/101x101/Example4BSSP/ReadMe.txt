@@ -1,0 +1,59 @@
+Code: 
+	GraSPI-2.0
+Example:
+	input: src_data/phasedataCH.0004.plt 
+			(BW morphology stored in plt file, where phase denotes donor/acceptor (0/1) )
+			(this files is the outcome of the thresholding of phi field from CHeq simulator)
+			(tool to perform thresholding in part of GraSPI, see tools folder)
+	input: src_data/phasedataCH.0004.txt 
+			BW morphology in row-wise array. This is the input for GraSPI
+			(GraSPI/tools folder contains the converter)
+	runMe.sh
+			this is the main script to generate the report.tex and report.pdf
+			it executes GraSPI (l:42) 
+
+				* graspi takes one file as a input: -a file.txt 
+					(-a switch tells to expect row-wise array in the file.txt)
+					(-s pixelsize tells what is the size of one voxel)
+					(see main.cpp for more switches or just execute graspi w/o any arguments)
+
+			    * it outputs several files (exact number depends on the options)
+					the outfile for two-phase morphology are: (l:94)
+					DistancesGreenToRedViaBlack.txt
+					DistancesGreenToBlueViaWhite.txt
+					DistancesBlackToRed.txt
+					DistancesWhiteToBlue.txt
+					DistancesBlackToGreen.txt
+					TortuosityBlackToRed.txt
+					TortuosityWhiteToBlue.txt
+					These files output the distance between any type of vertice and the target:
+					e.g. DistancesBlackToGreen.txt stores all distances between any donor/black/0 voxel and the interface/green.
+					this is the output of Dijkstra algorithm run on the graph. 
+
+					You may notice that distance may be something like 1e+280. 
+					This is basically infinity, or lack of connection. This is how boost in initializing the distance vector
+
+					Tortuosity files stores the postprocess distances to calculate the tortuosity, 
+					the ratio of shortest distance via the morphology to the shortest possible distance 
+					(note that anode/red is placed at the top, cathode/blue is placed at the bottom). 
+					The preferential charge flow is:
+					exciton to interface/green via donor/black
+					hole(+) to anode/red via donor/black
+					electrone(-) to cathode/blue via acceptor/white
+					
+				*   note that in l:42 standard output (cout/cerr) is redirected into the file 
+					(this it the code that does that: > $LOGS/graspi-tmp.$BASEFILENAME.log)
+					in this file you find basic scalar metrics
+					l:50-83 extract these basics stats
+
+				* l:102-122 construct the histogram files. There may be a better way to do it. 
+					I wanted to use gnuplot to plot histograms, hence I wrote my own scripts to post process distance files.
+
+				* l: 138+ automatic generation of the tex file to make the report. You can omit it. 
+
+	
+Finally, you may find some other functionality in the runMe.sh, these may be residual of other project, or are not explained in this file. What you have here should be enough to start. Do not hesitate to ask if you need anything else. 
+	
+
+
+NOTE: you may need to modify the paths to the software!!!!

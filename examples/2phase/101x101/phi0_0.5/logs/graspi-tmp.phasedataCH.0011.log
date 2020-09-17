@@ -1,0 +1,27 @@
+[ETA ABS] Weighted fraction of black vertices: 0.493285
+[STATS] Number of black CCs: 1
+[STATS] Number of white CCs 2
+[STATS] Number of black CCs conn to red: 0
+[STATS] Number of white CCs conn to blue: 1
+[STATS] Number of vertices: 10201
+[STATS] Number of black vertices: 5032
+[STATS] Number of white vertices: 5169
+[ETA ABS] Fraction of black vertices: 0.493285
+[ETA CT] Fraction of useful vertices - w/o islands: 0.0710715
+[ETA CT] Fraction of black vertices conn to red: 0
+[ETA CT] Fraction of white vertices conn to blue: 0.140259
+[ETA DISS] Weighted fraction of black vertices in 10 distance to green: 0.199691
+[ETA DISS] Number of green 1st order edges: 214
+[STATS] Number of int edges with complementary paths: 0
+[ETA CT] Fraction of interface with complementary paths to blue and red: 0
+[STATS] Number of black int vertices with path to red: 0
+[STATS] Number of white int vertices with path to blue: 113
+[ETA CT] Fraction of black vertices with straight rising paths (t=1): 0
+[ETA CT] Fraction of white vertices with straight rising paths (t=1): 1
+
+ time check:
+Reading done: +0.153577s
+CC determined: +0.048341s
+ALL performance indicators computed: +0.107201s
+----------------
+total: 0.30912s

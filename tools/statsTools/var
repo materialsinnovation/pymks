@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+    awk '{d=$1-m; ++n; m=m+(d/n); M2=M2+d*($1 - m);} END {print M2/(n-1)}'
+else
+    awk '{d=$1-m; ++n; m=m+(d/n); M2=M2+d*($1 - m);} END {print M2/(n-1)}' $@
+fi
