@@ -36,7 +36,10 @@ def get_real_positions(coords, cell):
 
 @curry
 def get_kdTree(coords, cell_dim, cutoff):
-    import MDAnalysis
+    try:
+        import MDAnalysis
+    except ImportError:
+        raise("you can install MDanalysis as -- pip install MDanalysis")
     
     tree = MDAnalysis.lib.pkdtree.PeriodicKDTree(box=cell_dim.astype(np.float32))
     tree.set_coords(coords.astype(np.float32), 
