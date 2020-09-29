@@ -86,7 +86,17 @@ def paircorr_from_twopoint(G, cutoff_r=None, interpolate_n=None):
     ...     [1, 0.45, 0.3],
     ...     [np.sqrt(2), 0.25, 0.2]
     ... ])
+    >>> pc_correct_cut = np.array([
+    ...     [0, 0.5, 0.6],
+    ...     [1, 0.45, 0.3]
+    ... ])
+    >>> pc_correct_interped = np.array([
+    ...     [0, 0.5, 0.6],
+    ...     [np.sqrt(2), 0.25, 0.2]
+    ... ])
     >>> assert np.allclose(paircorr_from_twopoint(C), pc_correct)
+    >>> assert np.allclose(paircorr_from_twopoint(C, cutoff_r=1.01), pc_correct_cut)
+    >>> assert np.allclose(paircorr_from_twopoint(C, interpolate_n=2), pc_correct_interped)
     '''
     faxes = lambda x: tuple(np.arange(x.ndim - 1) + 1)
 
