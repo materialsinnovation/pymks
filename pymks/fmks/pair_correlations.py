@@ -1,4 +1,5 @@
 import numpy as np
+import dask.array as da
 
 
 def dist_from_center(C, axes=None):
@@ -15,6 +16,7 @@ def dist_from_center(C, axes=None):
     Returns:
       Distances array of same shape as C.
 
+    >>> from pymks.fmks.correlations import auto_correlation
     >>> C = da.random.randint(0,2, [2,3,4])
     >>> D = dist_from_center(C, axes=[1,2])
     >>> tps = auto_correlation(C).compute()
@@ -46,66 +48,6 @@ def dist_from_center(C, axes=None):
     return np.broadcast_to(np.sqrt(D).reshape(new_shape), C.shape)
 
 
-def paircorr_from_twopoint_1sample(G, cutoff_r=None, interpolate_n=None):
-    '''
-    Computes the pair correlations from 2point statistics. Assumes that
-    each pixel is one unit for radius calculation. If interpolating, this
-    function uses linear interpolation. If another interpolation is desired,
-    don't specify this parameter and perform desired interpolation on output.
-
-    Args:
-      G: A centered 2point statistic array.
-      cutoff_r: Float. Return radii and probabilities beneath this value.
-        Values greater than 1 are used as an exact radius cutoff. Values
-        less than 1 are treated as a fraction of the maximum radius.
-      interpolate_n: Int. Specify the number of equally spaced radii that
-        the probabilities will be interpolated to.
-
-    Returns:
-      Pair Correlations Array (n, 2). paircorr[:,0] is the radius values.
-      paircorr[:,1] is the probabilities.
-
-
-
-    '''
-    D = dist_from_center(G)
-
-    D = D.ravel()
-    G = G.ravel()
-
-    ind_sort = np.argsort(D)
-
-    D = D[ind_sort]
-    G = G[ind_sort]
-
-    radii, ind_split = np.unique(D, return_index=True)
-
-    probs = np.array([np.average(arr) for arr in np.split(G, ind_split[1:])])
-
-    if cutoff_r is None:
-        pass
-
-    elif cutoff_r>1:
-        r_inds = radii <= cutoff_r
-
-        radii = radii[r_inds]
-        probs = probs[r_inds]
-
-    elif cutoff_r<1:
-        r_inds = radii <= (cutoff_r*radii[-1])
-
-        radii = radii[r_inds]
-        probs = probs[r_inds]
-
-    if interpolate_n:
-        radii_out = np.linspace(radii.min(), radii.max(), interpolate_n)
-        probs_out = np.interp(radii_out, radii, probs)
-
-        return np.stack([radii_out, probs_out], axis=1)
-    else:
-        return np.stack([radii, probs], axis=1)
-
-
 def paircorr_from_twopoint(G, cutoff_r=None, interpolate_n=None):
     '''
     Computes the pair correlations from 2point statistics. Assumes that
@@ -127,7 +69,24 @@ def paircorr_from_twopoint(G, cutoff_r=None, interpolate_n=None):
       paircorr[:,1] corresponds to the sample in G[0,...].
 
 
-
+    >>> C = np.array([
+    ...     [
+    ...         [0.2, 0.4, 0.3],
+    ...         [0.4, 0.5, 0.5],
+    ...         [0.2, 0.5, 0.3]
+    ...     ],
+    ...     [
+    ...         [0.1, 0.2, 0.3],
+    ...         [0.2, 0.6, 0.4],
+    ...         [0.1, 0.4, 0.3]
+    ...     ]
+    ... ])
+    >>> pc_correct = np.array([
+    ...     [0, 0.5, 0.6],
+    ...     [1, 0.45, 0.3],
+    ...     [np.sqrt(2), 0.25, 0.2]
+    ... ])
+    >>> assert np.allclose(paircorr_from_twopoint(C), pc_correct)
     '''
     faxes = lambda x: tuple(np.arange(x.ndim - 1) + 1)
 
