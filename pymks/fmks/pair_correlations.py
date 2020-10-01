@@ -96,9 +96,9 @@ def paircorr_from_twopoint(G, cutoff_r=None, interpolate_n=None):
     >>> assert np.allclose(paircorr_from_twopoint(C), pc_correct)
     >>> assert np.allclose(paircorr_from_twopoint(C, cutoff_r=1.01), pc_correct_cut)
     >>> assert np.allclose(paircorr_from_twopoint(C, cutoff_r=0.99), pc_correct_cut)
-    >>> assert np.allclose(paircorr_from_twopoint(C, interpolate_n=2), pc_correct_interped)
+    >>> assert np.allclose(paircorr_from_twopoint(C, interpolate_n=2),
+    ...     pc_correct_interped)
     """
-    faxes = lambda x: tuple(np.arange(x.ndim - 1) + 1)
 
     D = dist_from_center(G[0, ...])
 
@@ -138,6 +138,6 @@ def paircorr_from_twopoint(G, cutoff_r=None, interpolate_n=None):
         for i in range(probs.shape[1]):
             probs_out[:, i] = np.interp(radii_out, radii, probs[:, i])
 
-        return np.concatenate([radii_out.reshape(-1, 1), probs_out], axis=1)
+        return da.array(np.concatenate([radii_out.reshape(-1, 1), probs_out], axis=1))
     else:
-        return np.concatenate([radii.reshape(-1, 1), probs], axis=1)
+        return da.array(np.concatenate([radii.reshape(-1, 1), probs], axis=1))
