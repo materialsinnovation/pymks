@@ -3,7 +3,7 @@ import dask.array as da
 
 
 def dist_from_center(C, axes=None):
-    '''
+    """
     Calculate the distance from the center pixel of a
     centered array (like 2point statistics).
     Supports any number of dimensions.
@@ -22,7 +22,7 @@ def dist_from_center(C, axes=None):
     >>> tps = auto_correlation(C).compute()
     >>> assert len(np.argwhere(D==0)) == D.shape[0]
     >>> assert all(tps[D==0] == np.amax(tps, axis=(1,2)))
-    '''
+    """
 
     if axes is None:
         axes = set(range(C.ndim))
@@ -33,15 +33,14 @@ def dist_from_center(C, axes=None):
     # Build matrices of x, y, z, etc coordinates from center with meshgrid
     args = [
         np.linspace(
-            -(C.shape[i]//2),
-            C.shape[i]//2 + C.shape[i]%2 - 1,
-            C.shape[i]
+            -(C.shape[i] // 2), C.shape[i] // 2 + C.shape[i] % 2 - 1, C.shape[i]
         )
-        for i in range(0, C.ndim) if i in axes
+        for i in range(0, C.ndim)
+        if i in axes
     ]
 
     # Sum over the squared coordinates
-    D = sum([a**2 for a in np.meshgrid(*args, indexing='ij')])
+    D = sum([a ** 2 for a in np.meshgrid(*args, indexing="ij")])
 
     # Take square root for euclidean distance and reshape to appropriate
     # number of dimensions. Then broadcast to the shape of input.
@@ -49,7 +48,7 @@ def dist_from_center(C, axes=None):
 
 
 def paircorr_from_twopoint(G, cutoff_r=None, interpolate_n=None):
-    '''
+    """
     Computes the pair correlations from 2point statistics. Assumes that
     each pixel is one unit for radius calculation. If interpolating, this
     function uses linear interpolation. If another interpolation is desired,
@@ -98,10 +97,10 @@ def paircorr_from_twopoint(G, cutoff_r=None, interpolate_n=None):
     >>> assert np.allclose(paircorr_from_twopoint(C, cutoff_r=1.01), pc_correct_cut)
     >>> assert np.allclose(paircorr_from_twopoint(C, cutoff_r=0.99), pc_correct_cut)
     >>> assert np.allclose(paircorr_from_twopoint(C, interpolate_n=2), pc_correct_interped)
-    '''
+    """
     faxes = lambda x: tuple(np.arange(x.ndim - 1) + 1)
 
-    D = dist_from_center(G[0,...])
+    D = dist_from_center(G[0, ...])
 
     D = D.reshape(-1)
     G = G.reshape(G.shape[0], -1)
@@ -113,30 +112,32 @@ def paircorr_from_twopoint(G, cutoff_r=None, interpolate_n=None):
 
     radii, ind_split = np.unique(D, return_index=True)
 
-    probs = np.array([np.average(arr, axis=1) for arr in np.split(G, ind_split[1:], axis=1)])
+    probs = np.array(
+        [np.average(arr, axis=1) for arr in np.split(G, ind_split[1:], axis=1)]
+    )
 
     if cutoff_r is None:
         pass
 
-    elif cutoff_r>1:
+    elif cutoff_r > 1:
         r_inds = radii <= cutoff_r
 
         radii = radii[r_inds]
         probs = probs[r_inds, :]
 
-    elif cutoff_r<1:
-        r_inds = radii <= (cutoff_r*radii[-1])
+    elif cutoff_r < 1:
+        r_inds = radii <= (cutoff_r * radii[-1])
 
         radii = radii[r_inds]
         probs = probs[r_inds, :]
 
     if interpolate_n:
         radii_out = np.linspace(radii.min(), radii.max(), interpolate_n)
-        probs_out = np.zeros( (len(radii_out), probs.shape[1]) )
+        probs_out = np.zeros((len(radii_out), probs.shape[1]))
 
         for i in range(probs.shape[1]):
-            probs_out[:,i] = np.interp(radii_out, radii, probs[:,i])
+            probs_out[:, i] = np.interp(radii_out, radii, probs[:, i])
 
-        return np.concatenate([radii_out.reshape(-1,1), probs_out], axis=1)
+        return np.concatenate([radii_out.reshape(-1, 1), probs_out], axis=1)
     else:
-        return np.concatenate([radii.reshape(-1,1), probs], axis=1)
+        return np.concatenate([radii.reshape(-1, 1), probs], axis=1)
