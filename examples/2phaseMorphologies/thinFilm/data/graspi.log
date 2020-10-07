@@ -1,0 +1,18 @@
+[STATUS] 1/5
+[STATUS] Command line read 
+[STATUS] 2/5
+[STATUS] Graph constructed
+[STATUS] 3/5
+[STATUS] Connected components found
+[STATUS] 4/5
+[STATUS] Performance indicators identified
+[STATUS] 5/5
+[STATUS] Graph destructed
+[STATUS] GraSPI exits!
+
+ time check:
+Reading done: +0.174432s
+CC determined: +0.364854s
+ALL performance indicators computed: +0.220904s
+----------------
+total: 0.760211s

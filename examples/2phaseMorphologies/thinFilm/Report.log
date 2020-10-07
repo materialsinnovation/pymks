@@ -1,0 +1,694 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  6 OCT 2020 14:29
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**Report.tex
+(./Report.tex
+LaTeX2e <2015/01/01>
+Babel <3.9l> and hyphenation patterns for 79 languages loaded.
+(/usr/local/texlive/2015/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
+(/usr/local/texlive/2015/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/pslatex/pslatex.sty
+Package: pslatex 1996/07/24 v1.2 pslatex emulation (DPC)
+LaTeX Font Info:    Redeclaring symbol font `operators' on input line 65.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
+(Font)                  OT1/cmr/m/n --> OT1/ptmcm/m/n on input line 65.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/ptmcm/m/n on input line 65.
+LaTeX Font Info:    Redeclaring symbol font `letters' on input line 66.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `normal'
+(Font)                  OML/cmm/m/it --> OML/ptmcm/m/it on input line 66.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `bold'
+(Font)                  OML/cmm/b/it --> OML/ptmcm/m/it on input line 66.
+LaTeX Font Info:    Redeclaring symbol font `symbols' on input line 67.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `normal'
+(Font)                  OMS/cmsy/m/n --> OMS/pzccm/m/n on input line 67.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `bold'
+(Font)                  OMS/cmsy/b/n --> OMS/pzccm/m/n on input line 67.
+LaTeX Font Info:    Redeclaring symbol font `largesymbols' on input line 68.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `normal'
+(Font)                  OMX/cmex/m/n --> OMX/psycm/m/n on input line 68.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
+(Font)                  OMX/cmex/m/n --> OMX/psycm/m/n on input line 68.
+\symbold=\mathgroup4
+\symitalic=\mathgroup5
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 74.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
+(Font)                  OT1/cmr/bx/n --> OT1/ptm/bx/n on input line 74.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/ptm/bx/n on input line 74.
+LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 75.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
+(Font)                  OT1/cmr/m/it --> OT1/ptm/m/it on input line 75.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
+(Font)                  OT1/cmr/bx/it --> OT1/ptm/m/it on input line 75.
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\@emptytoks=\toks14
+\symAMSa=\mathgroup6
+\symAMSb=\mathgroup7
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+))
+(/usr/local/texlive/2015/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2014/10/28 v1.0g Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks15
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2014/10/28 v1.0p Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/latexconfig/graphics.cfg
+File: graphics.cfg 2010/04/23 v1.9 graphics configuration of TeX Live
+)
+Package graphics Info: Driver file: pdftex.def on input line 94.
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/pdftex-def/pdftex.def
+File: pdftex.def 2011/05/27 v0.06d Graphics/color for pdfTeX
+
+(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/infwarerr.sty
+Package: infwarerr 2010/04/08 v1.3 Providing info/warning/error messages (HO)
+)
+(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
+Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
+)
+\Gread@gobject=\count87
+))
+\Gin@req@height=\dimen103
+\Gin@req@width=\dimen104
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/oberdiek/grffile.sty
+Package: grffile 2012/04/05 v1.16 Extended file name support for graphics (HO)
+
+(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/ifpdf.sty
+Package: ifpdf 2011/01/30 v2.3 Provides the ifpdf switch (HO)
+Package ifpdf Info: pdfTeX in PDF mode is detected.
+)
+(/usr/local/texlive/2015/texmf-dist/tex/generic/ifxetex/ifxetex.sty
+Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/oberdiek/kvoptions.sty
+Package: kvoptions 2011/06/30 v3.11 Key value format for package options (HO)
+
+(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/kvsetkeys.sty
+Package: kvsetkeys 2012/04/25 v1.16 Key value parser (HO)
+
+(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/etexcmds.sty
+Package: etexcmds 2011/02/16 v1.5 Avoid name clashes with e-TeX commands (HO)
+
+(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package: ifluatex 2010/03/01 v1.3 Provides the ifluatex switch (HO)
+Package ifluatex Info: LuaTeX not detected.
+)
+Package etexcmds Info: Could not find \expanded.
+(etexcmds)             That can mean that you are not using pdfTeX 1.50 or
+(etexcmds)             that some package has redefined \expanded.
+(etexcmds)             In the latter case, load this package earlier.
+)))
+(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
+Package: pdftexcmds 2011/11/29 v0.20 Utility functions of pdfTeX for LuaTeX (HO
+)
+Package pdftexcmds Info: LuaTeX not detected.
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)
+Package grffile Info: Option `multidot' is set to `true'.
+Package grffile Info: Option `extendedchars' is set to `false'.
+Package grffile Info: Option `space' is set to `true'.
+Package grffile Info: \Gin@ii of package `graphicx' fixed on input line 486.
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/preprint/fullpage.sty
+Package: fullpage 1999/02/23 1.1 (PWD)
+\FP@margin=\skip43
+)
+No file Report.aux.
+\openout1 = `Report.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for OMS/pzccm/m/n on input line 8.
+LaTeX Font Info:    Try loading font information for OMS+pzccm on input line 8.
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/omspzccm.fd
+File: omspzccm.fd 2000/01/03 Fontinst v1.801 font definitions for OMS/pzccm.
+)
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+
+(/usr/local/texlive/2015/texmf-dist/tex/context/base/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count88
+\scratchdimen=\dimen105
+\scratchbox=\box26
+\nofMPsegments=\count89
+\nofMParguments=\count90
+\everyMPshowfont=\toks16
+\MPscratchCnt=\count91
+\MPscratchDim=\dimen106
+\MPnumerator=\count92
+\makeMPintoPDFobject=\count93
+\everyMPtoPDFconversion=\toks17
+) (/usr/local/texlive/2015/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
+Package: epstopdf-base 2010/02/09 v2.5 Base part for package epstopdf
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/oberdiek/grfext.sty
+Package: grfext 2010/08/19 v1.1 Manage graphics extensions (HO)
+
+(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/kvdefinekeys.sty
+Package: kvdefinekeys 2011/04/07 v1.3 Define keys (HO)
+))
+Package grfext Info: Graphics extension search list:
+(grfext)             [.png,.pdf,.jpg,.mps,.jpeg,.jbig2,.jb2,.PNG,.PDF,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 452.
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 9.
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+figs/data_0.528_3.8_000160.png, id=1, 853.1875pt x 225.84375pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/figs/data_0.528_3.8_000160.png Graphic file (type png)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/figs/data_0.528_3.8_000160.png>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/figs/data_0.528_3.8_000160.png used on input line 40.
+(pdftex.def)             Requested size: 164.41711pt x 43.5207pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 40--40
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 40--40
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 40--40
+
+ []
+
+LaTeX Font Info:    Try loading font information for OT1+ptmcm on input line 40
+.
+(/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/ot1ptmcm.fd
+File: ot1ptmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OT1/ptmcm.
+)
+LaTeX Font Info:    Try loading font information for OML+ptmcm on input line 40
+.
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/omlptmcm.fd
+File: omlptmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OML/ptmcm.
+)
+LaTeX Font Info:    Try loading font information for OMX+psycm on input line 40
+.
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/omxpsycm.fd
+File: omxpsycm.fd 2000/01/03 Fontinst v1.801 font definitions for OMX/psycm.
+)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <9> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 40.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 40.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <5> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 40.
+LaTeX Font Info:    Try loading font information for U+msa on input line 40.
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Try loading font information for U+msb on input line 40.
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+Underfull \hbox (badness 10000) in paragraph at lines 40--40
+
+ []
+
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 40.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 40.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 40.
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.528_3.8_000160.txtHistogramFullereneToCathode.pdf, id=2, 361.
+35pt x 290.08376pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.528_3.8_000160.txtHistogramFullereneToCathode.pdf Graphi
+c file (type pdf)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/histograms/data_0.528_3.8_000160.txtHistogramFullereneToCathode.pdf>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.528_3.8_000160.txtHistogramFullereneT
+oCathode.pdf used on input line 54.
+(pdftex.def)             Requested size: 140.92793pt x 113.1322pt.
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.528_3.8_000160.txtHistogramPolymerToAnode.pdf, id=3, 361.35pt
+ x 290.08376pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.528_3.8_000160.txtHistogramPolymerToAnode.pdf Graphic fi
+le (type pdf)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/histograms/data_0.528_3.8_000160.txtHistogramPolymerToAnode.pdf>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.528_3.8_000160.txtHistogramPolymerToA
+node.pdf used on input line 54.
+(pdftex.def)             Requested size: 140.92793pt x 113.1322pt.
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.528_3.8_000160.txtBothHistogramsUsefulDomains.pdf, id=4, 361.
+35pt x 290.08376pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.528_3.8_000160.txtBothHistogramsUsefulDomains.pdf Graphi
+c file (type pdf)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/histograms/data_0.528_3.8_000160.txtBothHistogramsUsefulDomains.pdf>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.528_3.8_000160.txtBothHistogramsUsefu
+lDomains.pdf used on input line 54.
+(pdftex.def)             Requested size: 140.92793pt x 113.1322pt.
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.528_3.8_000160.txtHistogramPolymerToInterface.pdf, id=5, 361.
+35pt x 290.08376pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.528_3.8_000160.txtHistogramPolymerToInterface.pdf Graphi
+c file (type pdf)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/histograms/data_0.528_3.8_000160.txtHistogramPolymerToInterface.pdf>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.528_3.8_000160.txtHistogramPolymerToI
+nterface.pdf used on input line 54.
+(pdftex.def)             Requested size: 140.92793pt x 113.1322pt.
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.528_3.8_000160.txtHistogramTortuosityPolymerToAnode.pdf, id=6
+, 361.35pt x 290.08376pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.528_3.8_000160.txtHistogramTortuosityPolymerToAnode.pdf 
+Graphic file (type pdf)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/histograms/data_0.528_3.8_000160.txtHistogramTortuosityPolymerToAnode.pdf>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.528_3.8_000160.txtHistogramTortuosity
+PolymerToAnode.pdf used on input line 54.
+(pdftex.def)             Requested size: 140.92793pt x 113.1322pt.
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.528_3.8_000160.txtHistogramTortuosityFullereneToCathode.pdf, 
+id=7, 361.35pt x 290.08376pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.528_3.8_000160.txtHistogramTortuosityFullereneToCathode.
+pdf Graphic file (type pdf)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/histograms/data_0.528_3.8_000160.txtHistogramTortuosityFullereneToCathode.p
+df>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.528_3.8_000160.txtHistogramTortuosity
+FullereneToCathode.pdf used on input line 54.
+(pdftex.def)             Requested size: 140.92793pt x 113.1322pt.
+
+Overfull \hbox (1.90002pt too wide) in paragraph at lines 54--54
+[]$[]$ $[]$
+ []
+
+
+Overfull \hbox (1.90002pt too wide) in paragraph at lines 54--54
+[]$ $[]$
+ []
+
+
+Overfull \hbox (1.90002pt too wide) in paragraph at lines 54--54
+[]$ $[]$ 
+ []
+
+[1
+
+{/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map} </Users/
+owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/figs/dat
+a_0.528_3.8_000160.png> </Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.528_3.8_000160.txtHistogramFullereneT
+oCathode.pdf> </Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorpholo
+gies/thinFilm/histograms/data_0.528_3.8_000160.txtHistogramPolymerToAnode.pdf> 
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.528_3.8_000160.txtBothHistogramsUsefulDomains.pdf> </Users/ow
+odo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/histograms
+/data_0.528_3.8_000160.txtHistogramPolymerToInterface.pdf> </Users/owodo/MINE/P
+ROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/histograms/data_0.52
+8_3.8_000160.txtHistogramTortuosityPolymerToAnode.pdf> </Users/owodo/MINE/PROJE
+CTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/histograms/data_0.528_3.
+8_000160.txtHistogramTortuosityFullereneToCathode.pdf>]
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+figs/data_0.5_2.6_000160.png, id=47, 853.1875pt x 225.84375pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/figs/data_0.5_2.6_000160.png Graphic file (type png)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/figs/data_0.5_2.6_000160.png>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/figs/data_0.5_2.6_000160.png used on input line 87.
+(pdftex.def)             Requested size: 164.41711pt x 43.5207pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
+
+ []
+
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.5_2.6_000160.txtHistogramFullereneToCathode.pdf, id=48, 361.3
+5pt x 290.08376pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.5_2.6_000160.txtHistogramFullereneToCathode.pdf Graphic 
+file (type pdf)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/histograms/data_0.5_2.6_000160.txtHistogramFullereneToCathode.pdf>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.5_2.6_000160.txtHistogramFullereneToC
+athode.pdf used on input line 101.
+(pdftex.def)             Requested size: 140.92793pt x 113.1322pt.
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.5_2.6_000160.txtHistogramPolymerToAnode.pdf, id=49, 361.35pt 
+x 290.08376pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.5_2.6_000160.txtHistogramPolymerToAnode.pdf Graphic file
+ (type pdf)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/histograms/data_0.5_2.6_000160.txtHistogramPolymerToAnode.pdf>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.5_2.6_000160.txtHistogramPolymerToAno
+de.pdf used on input line 101.
+(pdftex.def)             Requested size: 140.92793pt x 113.1322pt.
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.5_2.6_000160.txtBothHistogramsUsefulDomains.pdf, id=50, 361.3
+5pt x 290.08376pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.5_2.6_000160.txtBothHistogramsUsefulDomains.pdf Graphic 
+file (type pdf)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/histograms/data_0.5_2.6_000160.txtBothHistogramsUsefulDomains.pdf>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.5_2.6_000160.txtBothHistogramsUsefulD
+omains.pdf used on input line 101.
+(pdftex.def)             Requested size: 140.92793pt x 113.1322pt.
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.5_2.6_000160.txtHistogramPolymerToInterface.pdf, id=51, 361.3
+5pt x 290.08376pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.5_2.6_000160.txtHistogramPolymerToInterface.pdf Graphic 
+file (type pdf)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/histograms/data_0.5_2.6_000160.txtHistogramPolymerToInterface.pdf>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.5_2.6_000160.txtHistogramPolymerToInt
+erface.pdf used on input line 101.
+(pdftex.def)             Requested size: 140.92793pt x 113.1322pt.
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.5_2.6_000160.txtHistogramTortuosityPolymerToAnode.pdf, id=52,
+ 361.35pt x 290.08376pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.5_2.6_000160.txtHistogramTortuosityPolymerToAnode.pdf Gr
+aphic file (type pdf)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/histograms/data_0.5_2.6_000160.txtHistogramTortuosityPolymerToAnode.pdf>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.5_2.6_000160.txtHistogramTortuosityPo
+lymerToAnode.pdf used on input line 101.
+(pdftex.def)             Requested size: 140.92793pt x 113.1322pt.
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.5_2.6_000160.txtHistogramTortuosityFullereneToCathode.pdf, id
+=53, 361.35pt x 290.08376pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.5_2.6_000160.txtHistogramTortuosityFullereneToCathode.pd
+f Graphic file (type pdf)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/histograms/data_0.5_2.6_000160.txtHistogramTortuosityFullereneToCathode.pdf
+>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.5_2.6_000160.txtHistogramTortuosityFu
+llereneToCathode.pdf used on input line 101.
+(pdftex.def)             Requested size: 140.92793pt x 113.1322pt.
+
+Overfull \hbox (1.90002pt too wide) in paragraph at lines 101--101
+[]$[]$ $[]$
+ []
+
+
+Overfull \hbox (1.90002pt too wide) in paragraph at lines 101--101
+[]$ $[]$
+ []
+
+
+Overfull \hbox (1.90002pt too wide) in paragraph at lines 101--101
+[]$ $[]$ 
+ []
+
+[2 </Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFi
+lm/figs/data_0.5_2.6_000160.png> </Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/exam
+ples/2phaseMorphologies/thinFilm/histograms/data_0.5_2.6_000160.txtHistogramFul
+lereneToCathode.pdf> </Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseM
+orphologies/thinFilm/histograms/data_0.5_2.6_000160.txtHistogramPolymerToAnode.
+pdf> </Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.5_2.6_000160.txtBothHistogramsUsefulDomains.pdf> </Users
+/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/histogr
+ams/data_0.5_2.6_000160.txtHistogramPolymerToInterface.pdf> </Users/owodo/MINE/
+PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/histograms/data_0.5
+_2.6_000160.txtHistogramTortuosityPolymerToAnode.pdf> </Users/owodo/MINE/PROJEC
+TS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/histograms/data_0.5_2.6_0
+00160.txtHistogramTortuosityFullereneToCathode.pdf>]
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+figs/data_0.615_4.0_000160.png, id=87, 853.1875pt x 225.84375pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/figs/data_0.615_4.0_000160.png Graphic file (type png)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/figs/data_0.615_4.0_000160.png>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/figs/data_0.615_4.0_000160.png used on input line 134.
+(pdftex.def)             Requested size: 164.41711pt x 43.5207pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 134--134
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 134--134
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 134--134
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 134--134
+
+ []
+
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.615_4.0_000160.txtHistogramFullereneToCathode.pdf, id=88, 361
+.35pt x 290.08376pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.615_4.0_000160.txtHistogramFullereneToCathode.pdf Graphi
+c file (type pdf)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/histograms/data_0.615_4.0_000160.txtHistogramFullereneToCathode.pdf>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.615_4.0_000160.txtHistogramFullereneT
+oCathode.pdf used on input line 148.
+(pdftex.def)             Requested size: 140.92793pt x 113.1322pt.
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.615_4.0_000160.txtHistogramPolymerToAnode.pdf, id=89, 361.35p
+t x 290.08376pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.615_4.0_000160.txtHistogramPolymerToAnode.pdf Graphic fi
+le (type pdf)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/histograms/data_0.615_4.0_000160.txtHistogramPolymerToAnode.pdf>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.615_4.0_000160.txtHistogramPolymerToA
+node.pdf used on input line 148.
+(pdftex.def)             Requested size: 140.92793pt x 113.1322pt.
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.615_4.0_000160.txtBothHistogramsUsefulDomains.pdf, id=90, 361
+.35pt x 290.08376pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.615_4.0_000160.txtBothHistogramsUsefulDomains.pdf Graphi
+c file (type pdf)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/histograms/data_0.615_4.0_000160.txtBothHistogramsUsefulDomains.pdf>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.615_4.0_000160.txtBothHistogramsUsefu
+lDomains.pdf used on input line 148.
+(pdftex.def)             Requested size: 140.92793pt x 113.1322pt.
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.615_4.0_000160.txtHistogramPolymerToInterface.pdf, id=91, 361
+.35pt x 290.08376pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.615_4.0_000160.txtHistogramPolymerToInterface.pdf Graphi
+c file (type pdf)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/histograms/data_0.615_4.0_000160.txtHistogramPolymerToInterface.pdf>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.615_4.0_000160.txtHistogramPolymerToI
+nterface.pdf used on input line 148.
+(pdftex.def)             Requested size: 140.92793pt x 113.1322pt.
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.615_4.0_000160.txtHistogramTortuosityPolymerToAnode.pdf, id=9
+2, 361.35pt x 290.08376pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.615_4.0_000160.txtHistogramTortuosityPolymerToAnode.pdf 
+Graphic file (type pdf)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/histograms/data_0.615_4.0_000160.txtHistogramTortuosityPolymerToAnode.pdf>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.615_4.0_000160.txtHistogramTortuosity
+PolymerToAnode.pdf used on input line 148.
+(pdftex.def)             Requested size: 140.92793pt x 113.1322pt.
+
+</Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/
+histograms/data_0.615_4.0_000160.txtHistogramTortuosityFullereneToCathode.pdf, 
+id=93, 361.35pt x 290.08376pt>
+File: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thin
+Film/histograms/data_0.615_4.0_000160.txtHistogramTortuosityFullereneToCathode.
+pdf Graphic file (type pdf)
+
+<use /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinF
+ilm/histograms/data_0.615_4.0_000160.txtHistogramTortuosityFullereneToCathode.p
+df>
+Package pdftex.def Info: /Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2pha
+seMorphologies/thinFilm/histograms/data_0.615_4.0_000160.txtHistogramTortuosity
+FullereneToCathode.pdf used on input line 148.
+(pdftex.def)             Requested size: 140.92793pt x 113.1322pt.
+
+Overfull \hbox (1.90002pt too wide) in paragraph at lines 148--148
+[]$[]$ $[]$
+ []
+
+
+Overfull \hbox (1.90002pt too wide) in paragraph at lines 148--148
+[]$ $[]$
+ []
+
+
+Overfull \hbox (1.90002pt too wide) in paragraph at lines 148--148
+[]$ $[]$ 
+ []
+
+[3 </Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFi
+lm/figs/data_0.615_4.0_000160.png> </Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/ex
+amples/2phaseMorphologies/thinFilm/histograms/data_0.615_4.0_000160.txtHistogra
+mFullereneToCathode.pdf> </Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2ph
+aseMorphologies/thinFilm/histograms/data_0.615_4.0_000160.txtHistogramPolymerTo
+Anode.pdf> </Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologie
+s/thinFilm/histograms/data_0.615_4.0_000160.txtBothHistogramsUsefulDomains.pdf>
+ </Users/owodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm
+/histograms/data_0.615_4.0_000160.txtHistogramPolymerToInterface.pdf> </Users/o
+wodo/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/histogram
+s/data_0.615_4.0_000160.txtHistogramTortuosityPolymerToAnode.pdf> </Users/owodo
+/MINE/PROJECTS/GraSPI/GraSPI/examples/2phaseMorphologies/thinFilm/histograms/da
+ta_0.615_4.0_000160.txtHistogramTortuosityFullereneToCathode.pdf>]
+(./Report.aux) ) 
+Here is how much of TeX's memory you used:
+ 2255 strings out of 493089
+ 45181 string characters out of 6134842
+ 84052 words of memory out of 5000000
+ 5705 multiletter control sequences out of 15000+600000
+ 29303 words of font info for 72 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 36i,8n,32p,278b,199s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2015/texmf-dist/fonts/enc/dvips/base/8r.enc
+}</usr/local/texlive/2015/texmf-dist/fonts/type1/urw/symbol/usyr.pfb></usr/loca
+l/texlive/2015/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/
+2015/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2015/texmf
+-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Report.pdf (3 pages, 128369 bytes).
+PDF statistics:
+ 142 PDF objects out of 1000 (max. 8388607)
+ 93 compressed objects within 1 object stream
+ 0 named destinations out of 1000 (max. 500000)
+ 106 words of extra memory for PDF output out of 10000 (max. 10000000)
+
