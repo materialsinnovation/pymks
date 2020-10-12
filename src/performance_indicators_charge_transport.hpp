@@ -15,10 +15,12 @@
 #define PERFORMANCE_INDICATORS_CT_HPP
 
 #include "graspi_types.hpp"
+#include "graspi_descriptors.hpp"
 
 namespace graspi {
 
   std::pair<int,int> find_useful_cc(
+                    graspi::DESC& descriptors,
 				    graspi::graph_t* G,
 				    const vertex_colors_t& C,
 				    const vertex_ccs_t& vCC,
@@ -81,70 +83,111 @@ namespace graspi {
 	  }
 
       }
-      os << "[STATS] Number of black connected components: " << n_of_black_ccs << std::endl
-	 << "[STATS] Number of white connected components: " <<  n_of_white_ccs << std::endl;
+//      os << "[STATS] Number of black connected components: " << n_of_black_ccs << std::endl
+//	 << "[STATS] Number of white connected components: " <<  n_of_white_ccs << std::endl;
 
-      if( flag_n_phases == 3)
-	  os << "[STATS] Number of grey connected components: " << n_of_grey_ccs << std::endl;
+      descriptors.update_desc("STAT_CC_D",n_of_black_ccs);
+      descriptors.update_desc("STAT_CC_A",n_of_white_ccs);
+
+      
+      if( flag_n_phases == 3){
+//          os << "[STATS] Number of grey connected components: " << n_of_grey_ccs << std::endl;
+          descriptors.update_desc("STAT_CC_M",n_of_grey_ccs);
+      }
+
+//      os << "[STATS] Number of black connected components connected to top: "
+//	 << n_of_black_ccs_conn_to_top << std::endl
+//	 << "[STATS] Number of white connected components connected to bottom: "
+//	 << n_of_white_ccs_conn_to_bottom << std::endl;
+      
+      descriptors.update_desc("STAT_CC_D_An",n_of_black_ccs_conn_to_top);
+      descriptors.update_desc("STAT_CC_A_Ca",n_of_white_ccs_conn_to_bottom);
+
+      
+      if( flag_n_phases == 3){
+//	  os << "[STATS] Number of grey connected components connected to top: "
+//	     << n_of_grey_ccs_conn_to_top << std::endl
+//	     << "[STATS] Number of grey connected components connected to bottom: "
+//	     << n_of_grey_ccs_conn_to_bottom << std::endl
+//	     << "[STATS] Number of grey connected components connected to both: "
+//          << n_of_grey_ccs_conn_to_both << std::endl;
+          descriptors.update_desc("STAT_CC_M_An",n_of_grey_ccs_conn_to_top);
+          descriptors.update_desc("STAT_CC_M_Ca",n_of_grey_ccs_conn_to_bottom);
+          descriptors.update_desc("STAT_CC_M_AnCa",n_of_grey_ccs_conn_to_both);
+
+      }
+
+//     os << "[STATS] Number of vertices: "
+//	 << n_of_black_vertices + n_of_white_vertices << std::endl;
+      descriptors.update_desc("STAT_n",n_of_black_vertices + n_of_white_vertices);
 
 
-      os << "[STATS] Number of black connected components connected to top: "
-	 << n_of_black_ccs_conn_to_top << std::endl
-	 << "[STATS] Number of white connected components connected to bottom: "
-	 << n_of_white_ccs_conn_to_bottom << std::endl;
-      if( flag_n_phases == 3)
-	  os << "[STATS] Number of grey connected components connected to top: "
-	     << n_of_grey_ccs_conn_to_top << std::endl
-	     << "[STATS] Number of grey connected components connected to bottom: "
-	     << n_of_grey_ccs_conn_to_bottom << std::endl
-	     << "[STATS] Number of grey connected components connected to both: "
-	     << n_of_grey_ccs_conn_to_both << std::endl;
-
-      os << "[STATS] Number of vertices: "
-	 << n_of_black_vertices + n_of_white_vertices << std::endl;
-
-      os << "[STATS] Number of black vertices: "
-	 << n_of_black_vertices << std::endl
-	 << "[STATS] Number of white vertices: " 
-	 << n_of_white_vertices << std::endl;
-      if(flag_n_phases == 3)
-      os << "[STATS] Number of grey vertices: "
-	 << n_of_grey_vertices << std::endl;
-      os << "[F ABS] Fraction of black vertices: "
-	 << (double)n_of_black_vertices
-	  / (n_of_black_vertices+n_of_white_vertices+n_of_grey_vertices) << std::endl;
-      if(flag_n_phases == 3)
-	  os << "[F ABS] Fraction of grey vertices: "
-	     << (double)n_of_grey_vertices
-	      / (n_of_black_vertices+n_of_white_vertices+n_of_grey_vertices) << std::endl;
-
-
+//      os << "[STATS] Number of black vertices: "
+//	 << n_of_black_vertices << std::endl
+//	 << "[STATS] Number of white vertices: "
+//	 << n_of_white_vertices << std::endl;
+      
+      descriptors.update_desc("STAT_n_D",n_of_black_vertices);
+      descriptors.update_desc("STAT_n_A",n_of_white_vertices);
+      
+      
       if(flag_n_phases == 3){
-	  os << "[F CT] Fraction of black and grey vertices connected to top: "
-	     << (double)(n_of_black_vertices_conn_to_top+n_of_grey_vertices_conn_to_top)
-	      /(n_of_black_vertices+n_of_grey_vertices)
-	     << std::endl
-	     << "[F CT] Fraction of white and grey vertices connected to bottom: "
-	     << (double)(n_of_white_vertices_conn_to_bottom+n_of_grey_vertices_conn_to_bottom)
-	      /(n_of_white_vertices+n_of_grey_vertices)
-	     << std::endl;
-      }else{
+//      os << "[STATS] Number of grey vertices: " << n_of_grey_vertices << std::endl;
+          descriptors.update_desc("STAT_n_M",n_of_grey_vertices);
+      }
+      
+//      os << "[F ABS] Fraction of black vertices: "
+//	 << (double)n_of_black_vertices
+//	  / (n_of_black_vertices+n_of_white_vertices+n_of_grey_vertices) << std::endl;
 
-	  os << "[F CT] Fraction of useful vertices - w/o islands: " <<
-	      (double)( n_of_black_vertices_conn_to_top
-			+
-			n_of_white_vertices_conn_to_bottom
-			) / (n_of_black_vertices+n_of_white_vertices)
-	     << std::endl;
-	  os << "[F CT] Fraction of black vertices connected to top: "
-	     << (double)n_of_black_vertices_conn_to_top/n_of_black_vertices
-	     << std::endl
-	     << "[F CT] Fraction of white vertices connected to bottom: "
-	     << (double)n_of_white_vertices_conn_to_bottom/n_of_white_vertices
-	     << std::endl;
+      descriptors.update_desc("ABS_f_D",(double)n_of_black_vertices
+                              / (n_of_black_vertices+n_of_white_vertices+n_of_grey_vertices));
+
+      
+      if(flag_n_phases == 3)
+ //         os << "[F ABS] Fraction of grey vertices: "
+ //         << (double)n_of_grey_vertices
+ //         / (n_of_black_vertices+n_of_white_vertices+n_of_grey_vertices) << std::endl;
+          descriptors.update_desc("ABS_f_M",(double)n_of_grey_vertices
+                                           / (n_of_black_vertices+n_of_white_vertices+n_of_grey_vertices));
+      
+      if(flag_n_phases == 3){
+//         os << "[F CT] Fraction of black and grey vertices connected to top: "
+//          << (double)(n_of_black_vertices_conn_to_top+n_of_grey_vertices_conn_to_top)
+//          /(n_of_black_vertices+n_of_grey_vertices)
+//          << std::endl
+//          << "[F CT] Fraction of white and grey vertices connected to bottom: "
+//          << (double)(n_of_white_vertices_conn_to_bottom+n_of_grey_vertices_conn_to_bottom)
+//          /(n_of_white_vertices+n_of_grey_vertices)
+//          << std::endl;
+          descriptors.update_desc("CT_f_conn_DM_An",(double)(n_of_black_vertices_conn_to_top+n_of_grey_vertices_conn_to_top)
+                                            /(n_of_black_vertices+n_of_grey_vertices) );
+          descriptors.update_desc("CT_f_conn_AM_Ca",(double)(n_of_white_vertices_conn_to_bottom+n_of_grey_vertices_conn_to_bottom)
+                                            /(n_of_white_vertices+n_of_grey_vertices));
+          
+      }else{
+          
+//          os << "[F CT] Fraction of useful vertices - w/o islands: " <<
+//          (double)( n_of_black_vertices_conn_to_top
+//                   +
+//                   n_of_white_vertices_conn_to_bottom
+//                   ) / (n_of_black_vertices+n_of_white_vertices)
+//          << std::endl;
+//          os << "[F CT] Fraction of black vertices connected to top: "
+//          << (double)n_of_black_vertices_conn_to_top/n_of_black_vertices
+//          << std::endl
+//          << "[F CT] Fraction of white vertices connected to bottom: "
+//          << (double)n_of_white_vertices_conn_to_bottom/n_of_white_vertices
+//          << std::endl;
+          
+          descriptors.update_desc("CT_f_conn_D",(double)(n_of_black_vertices_conn_to_top+n_of_white_vertices_conn_to_bottom) / (n_of_black_vertices+n_of_white_vertices));
+          descriptors.update_desc("CT_f_conn_D_An",(double)n_of_black_vertices_conn_to_top/n_of_black_vertices);
+          descriptors.update_desc("CT_f_conn_A_Ca",(double)n_of_white_vertices_conn_to_bottom/n_of_white_vertices);
+
+          
       }
       return std::pair<int,int>(n_of_black_vertices_conn_to_top,
-				n_of_white_vertices_conn_to_bottom);
+                                n_of_white_vertices_conn_to_bottom);
   }
 
 

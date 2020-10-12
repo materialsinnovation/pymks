@@ -4,7 +4,7 @@ GraSPI is a tool for morphology analysis. The first application was in the field
 
 ## Small example
 
-TODO
+See documentaion 
 
 ## Major features 
 
@@ -12,11 +12,12 @@ GraSPI computes the set of descriptors/features that can used for data analytics
 
 ## Installation instructions 
 
-TODO
+GraSPI requires boost library. 
+To compile go to src file, you find there Makefile. If you install boost library in location that is not searchable, you need to explicity provide the path. 
 
-## Tutorial 
 
-TODO
+Type make all
+
 
 ## How to cite GraSPI
 

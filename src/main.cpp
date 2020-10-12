@@ -19,6 +19,18 @@
 #include "graph_io.hpp"
 #include "graph_cc.hpp"
 #include "performance_indicators.hpp"
+#include "graspi_descriptors.hpp"
+
+// Function: main
+// The main function that process the command line info, construct the graph and computes descriptors
+//
+// Parameters:
+//
+// command line
+//
+// Returns:
+//
+// the flag 0 means successful exection, -1 one of the steps failed
 
 int main(int argc, char** argv){
 
@@ -106,6 +118,7 @@ int main(int argc, char** argv){
     graspi::edge_map_t      m;
     graspi::edge_weights_t  edge_weights(m); //container storing edge weights
     graspi::ccs_t           ccs;            //container storing basic info of CCs
+    graspi::DESC          descriptors;    //container (vector) storing all descriptors
 
     time_check timer;
     timer.start();
@@ -182,20 +195,25 @@ int main(int argc, char** argv){
      *                                                                     *
      *                                                                     *
      **********************************************************************/
-    if(n_of_phases == 2)
-    all_perfomance_indicators_2phases( std::cout,
+    if(n_of_phases == 2){
+        descriptors.initiate_descriptors_2_phase();
+        all_perfomance_indicators_2phases( descriptors, std::cout,
+				       G, d_g,
+				       vertex_colors, d_a, edge_weights, edge_colors,
+				       vertex_ccs, ccs,
+				       pixelsize,
+                                      res_path);
+    }
+    if(n_of_phases == 3){
+        descriptors.initiate_descriptors_3_phase();
+
+        all_perfomance_indicators_3phases( descriptors, std::cout,
 				       G, d_g,
 				       vertex_colors, d_a, edge_weights, edge_colors,
 				       vertex_ccs, ccs,
 				       pixelsize,
 				       res_path);
-    if(n_of_phases == 3)
-    all_perfomance_indicators_3phases( std::cout,
-				       G, d_g,
-				       vertex_colors, d_a, edge_weights, edge_colors,
-				       vertex_ccs, ccs,
-				       pixelsize,
-				       res_path);
+    }
 
     //    all_perfomance_indicators( d_log,
     //			       G, d_g,
@@ -214,7 +232,6 @@ int main(int argc, char** argv){
      *                                                                     *
      **********************************************************************/
     timer.stop();
-    std::cout << std::endl << timer;
 
     if(!G) delete G;
 
@@ -222,6 +239,9 @@ int main(int argc, char** argv){
     d_log << "[STATUS] Graph destructed" << std::endl;
 
     d_log << "[STATUS] GraSPI exits!" << std::endl;
+
+    d_log << std::endl << timer;
+    
     d_log.close();
 
     return 0;

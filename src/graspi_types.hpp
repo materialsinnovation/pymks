@@ -52,7 +52,10 @@ namespace graspi {
   // cc type
   struct CC;
   typedef std::vector<CC> ccs_t;
-
+    
+  // descriptor type;
+    typedef std::pair<float,std::string> desc_t;
+    
   // descriptor dimension of graph vertices
   struct dim_g_t {
       unsigned int n_phases;           //number of phases (currently 2 or 3)

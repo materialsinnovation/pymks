@@ -155,6 +155,23 @@ namespace graspi{
       COLOR c_;
   }; // connect_relevant_meta_vertex
 
+    
+    // Predicate used to identify descriptor of a given name
+    class find_desc_of_name {
+    public:
+        find_desc_of_name():desc_(" "){}
+        find_desc_of_name(const std::string desc_name)
+        : desc_(desc_name){ }
+        
+        void set_desc(const std::string& desc){desc_=desc;}
+        
+        bool operator()(const std::pair<float,std::string>& p_desc) const {
+            return p_desc.second == desc_;
+        }
+        
+    private:
+        std::string desc_;
+    }; // class find_desc_of_name
 
 }//graspi-namespace
 
