@@ -25,6 +25,7 @@ from .fmks.data.multiphase import generate_multiphase
 from .fmks.correlations import FlattenTransformer
 from .fmks.correlations import TwoPointCorrelation
 from .fmks.data.checkerboard import generate_checkerboard
+from .fmks.pair_correlations import paircorr_from_twopoint
 
 try:
     import sfepy  # noqa: F401
@@ -105,4 +106,5 @@ __all__ = [
     "FlattenTransformer",
     "TwoPointCorrelation",
     "generate_checkerboard",
+    "paircorr_from_twopoint"
 ]
