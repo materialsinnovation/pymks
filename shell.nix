@@ -85,11 +85,11 @@ in
       export PYTHONPATH=$PYTHONPATH:$USER_SITE
       export PATH=$PATH:$PYTHONUSERBASE/bin
 
-      jupyter nbextension install --py widgetsnbextension --user
-      jupyter nbextension enable widgetsnbextension --user --py
-      pip install jupyter_contrib_nbextensions --user
-      jupyter contrib nbextension install --user
-      jupyter nbextension enable spellchecker/main
+      jupyter nbextension install --py widgetsnbextension --user > /dev/null 2>&1
+      jupyter nbextension enable widgetsnbextension --user --py > /dev/null 2>&1
+      pip install jupyter_contrib_nbextensions --user > /dev/null 2>&1
+      jupyter contrib nbextension install --user > /dev/null 2>&1
+      jupyter nbextension enable spellchecker/main > /dev/null 2>&1
 
       pip install --user Deprecated
 
