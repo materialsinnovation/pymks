@@ -151,7 +151,8 @@ def paircorr_from_twopoint(x_data, cutoff_r=None, interpolate_n=None):
     The pair correlation is defined as the conditional probability for
     the case of the magnitude vector, $||r||_2$, defined by $ g[ d ]$.
     $g$ is related to $f$ via the following
-    transformation. Consider the set, $ I[d] := \\{ f[r] \\; \\vert \\; ||r||_2 = d \\} $
+    transformation. Consider the set,
+    $ I[d] := \\{ f[r] \\; \\vert \\; ||r||_2 = d \\} $
     then
 
     $$ g[d] = \\frac{1}{ | I[ d ] | }  \\sum_{f \\in I[ d ]} f $$
@@ -240,7 +241,7 @@ def paircorr_from_twopoint(x_data, cutoff_r=None, interpolate_n=None):
 
     """
     func = np_paircorr(cutoff_r=cutoff_r, interpolate_n=interpolate_n)
-    ## Do one sample in serial to calculate the radii and probs shape
+    # Do one sample in serial to calculate the radii and probs shape
     probs, radii = func(x_data[:1].compute())
 
     return (
