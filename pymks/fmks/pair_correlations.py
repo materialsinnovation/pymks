@@ -181,6 +181,8 @@ def paircorr_from_twopoint(x_data, cutoff_r=None, interpolate_n=None):
 
     Test with only 2 samples of 3x3
 
+    >>> import dask.array as da
+
     >>> x_data = np.array([
     ...     [
     ...         [0.2, 0.4, 0.3],
