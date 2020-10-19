@@ -106,5 +106,5 @@ __all__ = [
     "FlattenTransformer",
     "TwoPointCorrelation",
     "generate_checkerboard",
-    "paircorr_from_twopoint"
+    "paircorr_from_twopoint",
 ]
