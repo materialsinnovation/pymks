@@ -73,9 +73,37 @@ jobs:
             python -c "import pymks; pymks.test()"
 
 
+  conda_forge:
+    docker:
+      - image: continuumio/miniconda3
+
+    working_directory: ~/repo-conda-forge-install
+
+    steps:
+
+      - checkout
+
+      - run:
+          name: Setup
+          command: |
+            conda create -n conda-forge python=3
+            source activate conda-forge
+            conda install -c conda-forge pymks
+            python setup.py develop
+
+      - run:
+          name: Test
+          no_output_timeout: 30m
+          command: |
+            set -e
+            source activate conda-forge
+            python -c "import pymks; pymks.test()"
+
+
 workflows:
   version: 2
   test:
     jobs:
       - conda_develop
       - pip_install
+      - conda_forge
