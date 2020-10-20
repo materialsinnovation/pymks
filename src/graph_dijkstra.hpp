@@ -16,6 +16,8 @@
 
 #include "graspi_types.hpp"
 #include <boost/graph/dijkstra_shortest_paths.hpp>
+#include <boost/graph/filtered_graph.hpp>
+
 
 namespace graspi {
 

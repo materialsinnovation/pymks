@@ -68,12 +68,12 @@ namespace graspi{
 #ifdef DEBUG
       std::cout << "Total number of connected components" << *it << std::endl;
 #endif
-      for (int i = 0; i < vCCs.size(); i++){
+      for (unsigned int  i = 0; i < vCCs.size(); i++){
 	  CCs[vCCs[i]].color = C[i];
 	  CCs[vCCs[i]].size++;
       }
 
-      int size_of_G = boost::num_vertices(*G);
+      unsigned int size_of_G = boost::num_vertices(*G);
 
       // determine all vertices connected to the bottom electrode
       std::set<int> comp_conn_to_electrode;
@@ -92,7 +92,7 @@ namespace graspi{
 #endif
 
       // pass info about connectivity to bottom electrode to data of components
-      for(int i = 0; i < CCs.size(); i++ ){
+      for(unsigned int  i = 0; i < CCs.size(); i++ ){
 	  if( comp_conn_to_electrode.find(i) != comp_conn_to_electrode.end() )
 	      CCs[i].if_connected_to_electrode += 1;
       }
@@ -118,7 +118,7 @@ namespace graspi{
 
 
       // pass info about connectivity to top electrode to data of components
-      for(int i = 0; i < CCs.size(); i++ ){
+      for(unsigned int  i = 0; i < CCs.size(); i++ ){
 	  if( comp_conn_to_electrode.find(i) != comp_conn_to_electrode.end() )
 	      CCs[i].if_connected_to_electrode += 2;
       }

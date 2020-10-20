@@ -66,7 +66,7 @@ namespace graspi {
       explicit dim_g_t(unsigned int n_phases = 2,
 		       unsigned int bulk = 0,
 		       unsigned int meta = 2)
-	  : n_bulk(bulk), n_meta_basic(2), n_phases(n_phases),n_meta_interfacial(1) {
+	  : n_phases(n_phases), n_bulk(bulk), n_meta_basic(2), n_meta_interfacial(1) {
 	  if(n_phases == 3) n_meta_interfacial = 3;
       }
 

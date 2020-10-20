@@ -20,6 +20,9 @@ bool graspi::build_graph(graph_t*& G, const dim_g_t& d_g,
 		 double pixelsize, bool if_per_on_size);
 
 void graspi::initlize_colors_meta_vertices( vertex_colors_t& C, const dim_g_t& d_g ){
+    
+//    std::cerr << "Test: " << C.size() << " " << d_g.n_bulk << std::endl;
+    
     C[d_g.n_bulk]   = BLUE;  // bottom electrode
     C[d_g.n_bulk+1] = RED;   // top electrode
     C[d_g.n_bulk+2] = GREEN; // meta vertex - I D/A
@@ -185,9 +188,9 @@ bool graspi::build_graph(graph_t*& G, const dim_g_t& d_g,
     if(d_a.nz > 1) ngbr_size = 26;
     std::pair<int,char>* ngbr = new std::pair<int,char> [ngbr_size];
 
-    for(int k = 0; k < d_a.nz; k++){
-	for(int j = 0; j < d_a.ny; j++){
-	    for(int i = 0; i < d_a.nx; i++){
+    for(unsigned int k = 0; k < d_a.nz; k++){
+	for(unsigned int j = 0; j < d_a.ny; j++){
+	    for(unsigned int i = 0; i < d_a.nx; i++){
 		generate_ngbr(i,j,k,d_a,ngbr,if_per_on_size);
 
 		int id = i + d_a.nx * ( j + d_a.ny * k );

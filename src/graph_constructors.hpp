@@ -55,9 +55,9 @@ namespace graspi {
       iss >> d_a.nx >> d_a.ny >> d_a.nz;
       if(d_a.nz == 0) d_a.nz = 1;
       d_g.n_bulk = d_a.nx * d_a.ny * d_a.nz;
-      int n_total =  d_g.n_total();
+      unsigned int n_total =  d_g.n_total();
       M.resize(n_total);
-      for(int i=0; i< d_g.n_bulk; i++){
+      for(unsigned int i=0; i< d_g.n_bulk; i++){
 	  if (!f) return false;
 	  f >> M[i];
       }

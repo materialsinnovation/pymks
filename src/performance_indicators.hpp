@@ -20,6 +20,9 @@
 #include "performance_indicators_charge_transport.hpp"
 #include "graspi_descriptors.hpp"
 
+#include <iostream>
+
+
 namespace graspi {
 
   inline double perfomance_indicator( graph_t* G,
@@ -53,7 +56,7 @@ namespace graspi {
       double black_tort_1
 	  = determine_tortuosity( C, d_a, pixelsize, distances, RED, BLACK);
 
-      for(int i=0; i<distances.size(); i++) distances[i] = 0;
+      for(unsigned int i=0; i<distances.size(); i++) distances[i] = 0;
       compute_shortest_distance_from_sourceC_to_targetC(BLUE,WHITE,
 							G, d_g, C, W,
 							distances, std::string(""));
@@ -64,6 +67,87 @@ namespace graspi {
 
       return F_ABS * F_DISS.first * F_CT;
   } // perfomance_indicator
+    
+    
+    inline void all_perfomance_indicators_2phases(
+                                                  graspi::DESC& descriptors,
+                                                  graph_t* G,
+                                                  const dim_g_t& d_g,
+                                                  const vertex_colors_t& C,
+                                                  const dim_a_t& d_a,
+                                                  const edge_weights_t& W,
+                                                  const edge_colors_t& L,
+                                                  const vertex_ccs_t& vCC,
+                                                  const ccs_t& CC,
+                                                  double pixelsize) {
+        
+        //*****************************************************************//
+        // Light absorption morphology descriptors:                        //
+        //*****************************************************************//
+        foo_w_abs wfoo_abs;
+        double F_ABS = wf_abs(C,d_a,wfoo_abs,pixelsize);
+        descriptors.update_desc("ABS_wf_D",F_ABS);
+        
+        std::pair<int,int> n_useful = find_useful_cc(descriptors, G, C, vCC, CC);
+//        int n_black_useful = n_useful.first;
+//        int n_white_useful = n_useful.second;
+        
+        double Ld = 10.0;
+        std::pair<double,double> F_DISS = wf_diss(G,d_g,C,W,vCC,CC,Ld,BLACK,GREEN);
+        
+        descriptors.update_desc("DISS_wf10_D",F_DISS.first);
+        descriptors.update_desc("DISS_f10_D",F_DISS.second);
+        
+        std::pair<int,int> int_path =
+        identify_complementary_paths_from_green(G,C,L,vCC,CC);
+        
+        descriptors.update_desc("STAT_e",int_path.first);
+        descriptors.update_desc("CT_e_conn",int_path.second);
+        double desc_tmp=((double)int_path.second)/((double)int_path.first);
+        descriptors.update_desc("CT_f_e_conn",desc_tmp);
+        
+        //*****************************************************************//
+        // Charge transport morphology descriptors:                        //
+        //*****************************************************************//
+        unsigned int n = boost::num_vertices(*G);
+        std::vector<float> distances(n);
+        std::set<int> id_blacks_conn_green_red;
+        std::set<int> id_whites_conn_green_blue;
+        
+        //identify_black_vertices_connected_directly_to_interface
+        identify_useful_triple_black_white_green( G, C, vCC, CC,
+                                                 id_blacks_conn_green_red,
+                                                 id_whites_conn_green_blue);
+        
+        descriptors.update_desc("CT_e_D_An",(float)id_blacks_conn_green_red.size());
+        descriptors.update_desc("CT_e_A_Ca",(float)id_whites_conn_green_blue.size());
+        
+        
+        // (1) determine the shorest distances from any black vertex to red and print to file
+        // (2) print to file only these distances corresponding to vertices adjacent to interface
+        // (3) compute tortuosity and print it
+        compute_shortest_distance_from_sourceC_to_targetC(RED,BLACK,
+                                                          G, d_g, C, W,
+                                                          distances);
+        double black_tort_1
+        = determine_tortuosity( C, d_a, pixelsize,distances,RED,BLACK);
+        
+        descriptors.update_desc("CT_f_D_tort1",black_tort_1);
+        
+        // repeat three above steps for distanced from any white to red
+        for(unsigned int i=0; i<distances.size(); i++) distances[i] = 0;
+        compute_shortest_distance_from_sourceC_to_targetC(BLUE,WHITE,
+                                                          G, d_g, C, W,
+                                                          distances);
+        double white_tort_1
+        = determine_tortuosity( C, d_a, pixelsize,distances, BLUE,WHITE);
+        descriptors.update_desc("CT_f_A_tort1",white_tort_1);
+        
+//        descriptors.print_descriptors_2_phase(std::cout);
+        
+        
+    } // perfomance_indicator_only_desc
+  
 
   inline void all_perfomance_indicators_2phases(
                          graspi::DESC& descriptors,
@@ -89,9 +173,9 @@ namespace graspi {
       descriptors.update_desc("ABS_wf_D",F_ABS);
       
 //      os << "[F ABS] Weighted fraction of black vertices: " << F_ABS << std::endl;
-      std::pair<int,int> n_useful = find_useful_cc(descriptors, G, C, vCC, CC, os);
-      int n_black_useful = n_useful.first;
-      int n_white_useful = n_useful.second;
+      std::pair<int,int> n_useful = find_useful_cc(descriptors, G, C, vCC, CC);
+//      int n_black_useful = n_useful.first;
+//      int n_white_useful = n_useful.second;
 
       double Ld = 10.0;
       filename = res_path + std::string("DistancesBlackToGreen.txt");
@@ -157,7 +241,7 @@ namespace graspi {
       descriptors.update_desc("CT_f_D_tort1",black_tort_1);
 
       // repeat three above steps for distanced from any white to red
-      for(int i=0; i<distances.size(); i++) distances[i] = 0;
+      for(unsigned int  i=0; i<distances.size(); i++) distances[i] = 0;
       filename = res_path + std::string("DistancesWhiteToBlue.txt");
       compute_shortest_distance_from_sourceC_to_targetC(BLUE,WHITE,
 							G, d_g, C, W,
@@ -204,9 +288,9 @@ namespace graspi {
       double F_ABS = wf_abs(C,d_a,wfoo_abs,pixelsize);
       os << "[F ABS] Weighted fraction of black vertices: "
 	 << F_ABS << std::endl;
-      std::pair<int,int> n_useful = find_useful_cc(descriptors, G, C, vCC, CC, os);
-      int n_black_useful = n_useful.first;
-      int n_white_useful = n_useful.second;
+      std::pair<int,int> n_useful = find_useful_cc(descriptors, G, C, vCC, CC); // , os
+//      int n_black_useful = n_useful.first;
+//      int n_white_useful = n_useful.second;
 
 
       //*****************************************************************//
@@ -283,7 +367,7 @@ namespace graspi {
 	 << " (t=1): " << black_tort_1 << std::endl;
 
       // repeat three above steps for distanced from any white to red
-      for(int i=0; i<distances.size(); i++) distances[i] = 0;
+      for(unsigned int  i=0; i<distances.size(); i++) distances[i] = 0;
       filename = res_path + std::string("DistancesWhiteToBlue.txt");
       compute_shortest_distance_from_sourceC_to_targetC(BLUE,WHITE,
 							G, d_g, C, W,
@@ -300,7 +384,7 @@ namespace graspi {
 	 << " (t=1): " <<  white_tort_1 << std::endl;
 
       // repeat three above steps for distanced from any grey to red
-      for(int i=0; i<distances.size(); i++) distances[i] = 0;
+      for(unsigned int  i=0; i<distances.size(); i++) distances[i] = 0;
       filename = res_path + std::string("DistancesGreyToRed.txt");
       compute_shortest_distance_from_sourceC_to_targetC(RED,GREY,
 							G, d_g, C, W,
@@ -314,7 +398,7 @@ namespace graspi {
 	 << " (t=1): " <<  grey_tort_1 << std::endl;
 
       // repeat three above steps for distanced from any grey to blue
-      for(int i=0; i<distances.size(); i++) distances[i] = 0;
+      for(unsigned int  i=0; i<distances.size(); i++) distances[i] = 0;
       filename = res_path + std::string("DistancesGreyToBlue.txt");
       compute_shortest_distance_from_sourceC_to_targetC(BLUE,GREY,
 							G, d_g, C, W,

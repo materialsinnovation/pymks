@@ -19,6 +19,9 @@
 
 #include "graspi_types.hpp"
 #include "graph_dijkstra.hpp"
+#include "graspi_predicates.hpp"
+#include <boost/graph/filtered_graph.hpp>
+
 
 namespace graspi {
 
@@ -34,7 +37,7 @@ namespace graspi {
   identify_n_vertices_within_distance( const std::vector<float>& d,
 				       double Ld){
       int n_Ld = 0;
-      for(int i = 0; i < d.size(); i++){
+      for(unsigned int i = 0; i < d.size(); i++){
 	  if( (d[i] < Ld) && (d[i] > 0) ) n_Ld++;
       }
       return n_Ld;
@@ -46,7 +49,7 @@ namespace graspi {
       double wn_Ld = 0;
       foo_w_diss wfoo;
 
-      for(int i = 0; i < d.size(); i++){
+      for(unsigned int i = 0; i < d.size(); i++){
 	  double d_i = d[i];
 	  double wd_i = wfoo(d_i);
 	  if( (d_i < Ld) && (d_i > 0) ) wn_Ld+= wd_i;
@@ -61,7 +64,7 @@ namespace graspi {
       int n_Ld = 0;
       foo_w_diss wfoo;
 
-      for(int i = 0; i < d.size(); i++){
+      for(unsigned int i = 0; i < d.size(); i++){
 	  double d_i = d[i];
 	  double wd_i = wfoo(d_i);
 	  if( (d_i < Ld) && (d_i > 0) ){
@@ -98,8 +101,8 @@ namespace graspi {
       foo_w_diss wfoo;
       std::ostringstream oss_out_d;
       std::ostringstream oss_out_wd;
-      for (int i = 0; i < d.size(); i++) {
-	  int c = C[i];
+      for (unsigned int i = 0; i < d.size(); i++) {
+	  unsigned int c = C[i];
 	  if (c == color) n_color++;
 	  if ( ( c == color )
 	       && ( fabs(d[i]) < std::numeric_limits<float>::max() )
@@ -161,8 +164,8 @@ namespace graspi {
       determine_shortest_distances( G, W, int_id, pred, d);
 
       foo_w_diss wfoo;
-      for (int i = 0; i < d.size(); i++) {
-	  int c = C[i];
+      for (unsigned int i = 0; i < d.size(); i++) {
+	  unsigned int c = C[i];
 	  if (c == color) n_color++;
       }
 

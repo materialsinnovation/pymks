@@ -58,7 +58,7 @@ namespace graspi{
       connect_color_green(const graph_t& G,
 			  const vertex_colors_t& C,
 			  COLOR color, COLOR green = GREEN)
-	  : G_(&G), vertex_colors_(&C), color_(color),green_(green) { }
+	  : green_(green), color_(color), G_(&G), vertex_colors_(&C)  { }
 
       bool operator()(const edge_descriptor_t& e) const {
 	  if ( ( ( (*vertex_colors_)[boost::source(e, *G_)] == green_ )

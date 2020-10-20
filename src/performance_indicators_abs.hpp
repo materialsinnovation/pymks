@@ -34,11 +34,11 @@ namespace graspi {
   inline double wf_abs(const vertex_colors_t& C, const dim_a_t& d_a, WFoo wf,
 		       double pixelsize){
       double w_abs = 0;
-      int total_n = d_a.nx * d_a.ny;
+      unsigned int total_n = d_a.nx * d_a.ny;
 
       if( (d_a.nz == 0) || (d_a.nz == 1) ){//2D
-	  for(int j = 0; j < d_a.ny; j++){
-	      for(int i = 0; i < d_a.nx; i++){
+	  for(unsigned int j = 0; j < d_a.ny; j++){
+	      for(unsigned int i = 0; i < d_a.nx; i++){
 		  int id = i + d_a.nx * j;
 		  if(C[id] == BLACK){
 		      double h_diff = (double)(d_a.ny-j)*pixelsize;
@@ -48,10 +48,10 @@ namespace graspi {
 	  }//j
       }else{//3D
 	  total_n *= d_a.nz;;
-	  for(int k = 0; k < d_a.nz; k++){
-	      for(int j = 0; j < d_a.ny; j++){
-		  for(int i = 0; i < d_a.nx; i++){
-		      int id = i + d_a.nx * ( j + d_a.ny * k);
+	  for(unsigned int k = 0; k < d_a.nz; k++){
+	      for(unsigned int j = 0; j < d_a.ny; j++){
+		  for(unsigned int i = 0; i < d_a.nx; i++){
+		      unsigned int id = i + d_a.nx * ( j + d_a.ny * k);
 		      if(C[id] == BLACK){
 			  double h_diff = (double)(d_a.nz-k)*pixelsize;
 			  w_abs += wf(h_diff);

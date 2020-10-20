@@ -24,8 +24,7 @@ namespace graspi {
 				    graspi::graph_t* G,
 				    const vertex_colors_t& C,
 				    const vertex_ccs_t& vCC,
-				    const ccs_t& CC,
-				    std::ostream& os){
+				    const ccs_t& CC){
 
       int n_of_white_ccs = 0;
       int n_of_grey_ccs = 0;
@@ -48,7 +47,7 @@ namespace graspi {
 
       int flag_n_phases = 2;
 
-      for(int i = 0; i < CC.size(); i++){
+      for(unsigned int i = 0; i < CC.size(); i++){
 	  if( CC[i].color == WHITE){
 	      n_of_white_ccs++;
 	      n_of_white_vertices += CC[i].size;
@@ -190,7 +189,9 @@ namespace graspi {
                                 n_of_white_vertices_conn_to_bottom);
   }
 
-
+    
+    
+    
   inline std::pair<int,int>
   identify_complementary_paths_from_green(
 					  graph_t* G,
@@ -250,7 +251,7 @@ namespace graspi {
 						    const vertex_colors_t& C,
 						    const edge_weights_t& W,
 						    std::vector<float>& d,
-						    const std::string& filename
+						    std::string filename = ""
 						    ){
       vertex_t source = d_g.id(sourceC);
       connect_same_color_and_relevant_meta_vertex pred(*G,C);
@@ -258,8 +259,8 @@ namespace graspi {
 
       if(filename.size() != 0){
 	  std::ostringstream oss_out;
-	  for (int i = 0; i < d.size(); i++) {
-	      int c = C[i];
+	  for (unsigned int i = 0; i < d.size(); i++) {
+	      unsigned int c = C[i];
 	      if ( ( c == targetC )
 		   && ( fabs(d[i]) < std::numeric_limits<float>::max() )
 		   ) {
@@ -274,6 +275,9 @@ namespace graspi {
       }
   }//compute_shortest_distance_from_black_to_red
 
+    
+    
+    
   inline void
   identify_useful_triple_black_white_green( graph_t* G,
 					    const vertex_colors_t& C,
@@ -321,7 +325,7 @@ namespace graspi {
       std::string filename("DistancesGreenToRedViaBlack.txt");
       std::ostringstream oss_g_r_b;
 
-      int black_int = id_blacks_conn_green_red.size();
+//      unsigned int black_int = id_blacks_conn_green_red.size();
       std::vector<float> d_green_to_red_via_black;
       std::set<int>::iterator iter(id_blacks_conn_green_red.begin());
       std::set<int>::iterator  end(id_blacks_conn_green_red.end());
@@ -391,8 +395,8 @@ namespace graspi {
       int total_n = d_a.nx * d_a.ny;
 
       if(	(d_a.nz == 0) || (d_a.nz == 1) ){//2D
-	  for(int j = 0; j < d_a.ny; j++){
-	      for(int i = 0; i < d_a.nx; i++){
+	  for(unsigned int j = 0; j < d_a.ny; j++){
+	      for(unsigned int i = 0; i < d_a.nx; i++){
 		  int id = i + d_a.nx * j;
 		  if(d[id]< 0.5*std::numeric_limits<float>::max()){
 		      if(vertex_colors[id] == c_target){
@@ -416,9 +420,9 @@ namespace graspi {
 	  }//j
       }else{//3D
 	  total_n *= d_a.nz;
-	  for(int k = 0; k < d_a.nz; k++){
-	      for(int j = 0; j < d_a.ny; j++){
-		  for(int i = 0; i < d_a.nx; i++){
+	  for(unsigned int k = 0; k < d_a.nz; k++){
+	      for(unsigned int j = 0; j < d_a.ny; j++){
+		  for(unsigned int i = 0; i < d_a.nx; i++){
 		      int id = i + d_a.nx * ( j + d_a.ny * k);
 		      if(d[id]< 0.5*std::numeric_limits<float>::max()){
 			  if(vertex_colors[id] == c_target){
@@ -484,8 +488,8 @@ namespace graspi {
       int total_n = d_a.nx * d_a.ny;
 
       if(	(d_a.nz == 0) || (d_a.nz == 1) ){//2D
-	  for(int j = 0; j < d_a.ny; j++){
-	      for(int i = 0; i < d_a.nx; i++){
+	  for(unsigned int j = 0; j < d_a.ny; j++){
+	      for(unsigned int i = 0; i < d_a.nx; i++){
 		  int id = i + d_a.nx * j;
 		  if(d[id]< 0.5*std::numeric_limits<float>::max()){
 		      if(vertex_colors[id] == c_target){
@@ -506,9 +510,9 @@ namespace graspi {
 	  }//j
       }else{//3D
 	  total_n *= d_a.nz;
-	  for(int k = 0; k < d_a.nz; k++){
-	      for(int j = 0; j < d_a.ny; j++){
-		  for(int i = 0; i < d_a.nx; i++){
+	  for(unsigned int k = 0; k < d_a.nz; k++){
+	      for(unsigned int j = 0; j < d_a.ny; j++){
+		  for(unsigned int i = 0; i < d_a.nx; i++){
 		      int id = i + d_a.nx * ( j + d_a.ny * k);
 		      if(d[id]< 0.5*std::numeric_limits<float>::max()){
 			  if(vertex_colors[id] == c_target){

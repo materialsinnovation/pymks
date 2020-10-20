@@ -53,11 +53,11 @@ namespace graspi {
             desc.push_back(p_desc);
             p_desc.first = -1;  p_desc.second = "DISS_f10_D";//fraction_of_black_vertices_in_10_distance_to_interface
             desc.push_back(p_desc);
-            p_desc.first = -1;  p_desc.second = "DISS_f2_D";// fraction_of_black_vertices_in_2_distance_to_interface
-            desc.push_back(p_desc);
+//            p_desc.first = -1;  p_desc.second = "DISS_f2_D";// fraction_of_black_vertices_in_2_distance_to_interface
+//           desc.push_back(p_desc);
 
-            p_desc.first = -1;  p_desc.second = "CT_f_conn";// fraction_of_useful_vertices_-_w/o_islands
-            desc.push_back(p_desc);
+//            p_desc.first = -1;  p_desc.second = "CT_f_conn";// fraction_of_useful_vertices_-_w/o_islands
+//            desc.push_back(p_desc);
             p_desc.first = -1;  p_desc.second = "CT_f_e_conn";//fraction_of_interface_with_complementary_paths_to_bottom_and_top
             desc.push_back(p_desc);
             p_desc.first = -1;  p_desc.second = "CT_f_conn_D_An";// fraction_of_black_vertices_connected_to_top
@@ -74,20 +74,20 @@ namespace graspi {
             desc.push_back(p_desc);
             p_desc.first = -1;  p_desc.second = "CT_f_A_tort1";//fraction_of_white_vertices_with_straight_rising_paths_(t=1)
             desc.push_back(p_desc);
-            p_desc.first = -1;  p_desc.second = "CT_wtort_D";// weighted_fraction_of_black_vertices_with_preferably_straight_rising_paths
-            desc.push_back(p_desc);
-            p_desc.first = -1;  p_desc.second = "CT_wtort_A";// weighted_fraction_of_white_vertices_with_preferably_straight_rising_paths
-            desc.push_back(p_desc);
-            p_desc.first = -1;  p_desc.second = "CT_n_A_adj_Ca";// number_of_white_vertices_in_direct_contact_with_blue
-            desc.push_back(p_desc);
-            p_desc.first = -1;  p_desc.second = "CT_n_D_adj_An";// number_of_black_vertices_in_direct_contact_with_red
-            desc.push_back(p_desc);
+//            p_desc.first = -1;  p_desc.second = "CT_wtort_D";// weighted_fraction_of_black_vertices_with_preferably_straight_rising_paths
+//            desc.push_back(p_desc);
+//            p_desc.first = -1;  p_desc.second = "CT_wtort_A";// weighted_fraction_of_white_vertices_with_preferably_straight_rising_paths
+//            desc.push_back(p_desc);
+//            p_desc.first = -1;  p_desc.second = "CT_n_A_adj_Ca";// number_of_white_vertices_in_direct_contact_with_blue
+//            desc.push_back(p_desc);
+//            p_desc.first = -1;  p_desc.second = "CT_n_D_adj_An";// number_of_black_vertices_in_direct_contact_with_red
+//            desc.push_back(p_desc);
             
         }
         
         void print_descriptors_2_phase(std::ostream& os){
 
-            for (int i=0; i< desc.size();i++){
+            for (unsigned int i=0; i< desc.size();i++){
                 if (fabs(desc[i].first +1 ) > 1e-10)
                     os << desc[i].second << " " << desc[i].first << std::endl;
             }
