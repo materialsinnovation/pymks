@@ -245,8 +245,10 @@ def correlations_multiple(data, correlations, periodic_boundary=True, cutoff=Non
 
     >>> data = np.arange(18).reshape(1, 3, 3, 2)
     >>> out = correlations_multiple(data, [[0, 1], [1, 1]])
-    >>> out
-    dask.array<stack, shape=(1, 3, 3, 2), dtype=float64, chunksize=(1, 3, 3, 1)>
+    >>> out.shape
+    (1, 3, 3, 2)
+    >>> out.chunks
+    ((1,), (3,), (3,), (2,))
     >>> answer = np.array([[[58, 62, 58], [94, 98, 94], [58, 62, 58]]]) + 1. / 3.
     >>> assert(out.compute()[...,0], answer)
     """
