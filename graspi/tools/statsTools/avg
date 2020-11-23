@@ -1,7 +1,0 @@
-#!/bin/bash
-
-if [ -z "$1" ]; then
-    awk '{sum+=$1; ++n;} END {print sum/n}'
-else
-    awk '{sum+=$1; ++n;} END {print sum/n}' $@
-fi

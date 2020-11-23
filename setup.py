@@ -8,7 +8,11 @@ See the documenation for details at https://pymks.org
 import warnings
 import os
 import subprocess
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, Extension
+import numpy
+from Cython.Build import cythonize
+from pathlib import Path
+
 
 
 def make_version(package_name):
@@ -73,12 +77,25 @@ def make_version(package_name):
     return version
 
 
-PACKAGE_NAME = "pymks"
+def package_name():
+    return "pymks"
+
+def graspi_path():
+    return "pymks/fmks/graspi"
+
+def graspi_extension():
+    return Extension(
+        name=graspi_path().replace('/', '.') + ".graspi",
+        sources=[os.path.join(graspi_path(), 'graspi.pyx')],
+        include_dirs=[numpy.get_include(), graspi_path(), "."],
+        extra_compile_args=["-std=c++11"],
+        language="c++",
+    )
 
 
 setup(
-    name=PACKAGE_NAME,
-    version=make_version(PACKAGE_NAME),
+    name=package_name(),
+    version=make_version(package_name()),
     description="Materials Knowledge Systems in Python (PyMKS)",
     author="Daniel Wheeler",
     author_email="daniel.wheeler2@gmail.com",
@@ -97,4 +114,9 @@ setup(
         "toolz",
     ],
     data_files=["setup.cfg"],
+    ext_modules=cythonize(
+        [graspi_extension()],
+        compiler_directives={"language_level": "3"},
+        include_path=[graspi_path()]
+    ),
 )
