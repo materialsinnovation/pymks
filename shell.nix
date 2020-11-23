@@ -36,7 +36,8 @@ in
   pypkgs.buildPythonPackage rec {
     pname = "pymks";
     version = "0.3.4.dev";
-    nativeBuildInputs =  with pypkgs; [
+
+    buildInputs =  with pypkgs; [
       sfepy
       nbval
       numpy
@@ -73,8 +74,10 @@ in
       pip
       pkgs.openssh
       zarr
+      pkgs.boost
     ];
     src=builtins.filterSource (path: type: type != "directory" || baseNameOf path != ".git") ./.;
+    doCheck=false;
     preShellHook = ''
 
       export OMPI_MCA_plm_rsh_agent=/usr/bin/ssh

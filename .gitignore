@@ -161,3 +161,6 @@ ENV/
 
 domain.vtk
 dask-worker-space
+
+# Graspi generated cpp file
+pymks/fmks/graspi/graspi.cpp
