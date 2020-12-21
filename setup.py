@@ -14,7 +14,6 @@ from Cython.Build import cythonize
 from pathlib import Path
 
 
-
 def make_version(package_name):
     """Generates a version number using `git describe`.
 
@@ -80,13 +79,18 @@ def make_version(package_name):
 def package_name():
     return "pymks"
 
+
 def graspi_path():
     return "pymks/fmks/graspi"
 
+
 def graspi_extension():
     return Extension(
-        name=graspi_path().replace('/', '.') + ".graspi",
-        sources=[os.path.join(graspi_path(), 'graspi.pyx')],
+        name=graspi_path().replace("/", ".") + ".graspi",
+        sources=[
+            os.path.join(graspi_path(), "graspi.pyx"),
+            os.path.join(graspi_path(), "graph_constructors.cpp"),
+        ],
         include_dirs=[numpy.get_include(), graspi_path(), "."],
         extra_compile_args=["-std=c++11"],
         language="c++",
@@ -117,6 +121,6 @@ setup(
     ext_modules=cythonize(
         [graspi_extension()],
         compiler_directives={"language_level": "3"},
-        include_path=[graspi_path()]
+        include_path=[graspi_path()],
     ),
 )
