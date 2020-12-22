@@ -11,4 +11,6 @@ nbsphinx==0.5.1
 m2r2
 Deprecated
 sphinx-jinja
+cython
+pandas
 # require pandoc which is a haskell package
