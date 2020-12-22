@@ -37,7 +37,7 @@ in
     pname = "pymks";
     version = "0.3.4.dev";
 
-    buildInputs =  with pypkgs; [
+    nativeBuildInputs =  with pypkgs; [
       sfepy
       nbval
       numpy
