@@ -26,6 +26,8 @@ from .fmks.correlations import FlattenTransformer
 from .fmks.correlations import TwoPointCorrelation
 from .fmks.data.checkerboard import generate_checkerboard
 from .fmks.pair_correlations import paircorr_from_twopoint
+from .fmks.graspi import graph_descriptors
+
 
 try:
     import sfepy  # noqa: F401
@@ -107,4 +109,5 @@ __all__ = [
     "TwoPointCorrelation",
     "generate_checkerboard",
     "paircorr_from_twopoint",
+    "graph_descriptors",
 ]
