@@ -7,6 +7,13 @@ import numba
 import numpy as np
 from toolz.curried import pipe, curry, compose
 
+try:
+    import MDAnalysis
+except ImportError:
+    print("For defect atom identification")
+    print("pip install MDAnalysis")
+    pass
+
 
 @curry
 def get_scaled_positions(coords, cell, pbc, wrap=True):
@@ -36,10 +43,7 @@ def get_real_positions(coords, cell):
 
 @curry
 def get_kdTree(coords, cell_dim, cutoff):
-    try:
-        import MDAnalysis
-    except ImportError:
-        raise("you can install MDanalysis as -- pip install MDanalysis")
+    import MDAnalysis
     
     tree = MDAnalysis.lib.pkdtree.PeriodicKDTree(box=cell_dim.astype(np.float32))
     tree.set_coords(coords.astype(np.float32), 
@@ -49,13 +53,18 @@ def get_kdTree(coords, cell_dim, cutoff):
 
 
 @curry
-def get_realStats(coords_all, coords_sub, indexes, r_stat, cell, pbc):
+def get_realStats(coords_all, coords_sub, r_stat, cutoff, cell, cell_dim, pbc,):
+    import MDAnalysis
     
+    tree = MDAnalysis.lib.pkdtree.PeriodicKDTree(box=cell_dim.astype(np.float32))
+    tree.set_coords(coords_all.astype(np.float32), 
+                    cutoff=np.float32(cutoff))
+
     frac_coords = get_scaled_positions(cell=cell, pbc=pbc, wrap=True)
     real_coords = get_real_positions(cell=cell)
     rescale = compose(real_coords, frac_coords)
     
-    return pipe(indexes, 
+    return pipe(tree.search_tree(coords_sub, radius=r_stat), 
                 lambda indxs: rescale(coords_all[indxs[:,1]] - coords_sub[indxs[:,0]] + cell.diagonal()/2), 
                 lambda crds: crds - cell.diagonal()/2)
 
