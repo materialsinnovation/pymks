@@ -283,7 +283,7 @@ def make_da(func):
             chunks = arr.chunks
         return func(rechunk(chunks, arr), *args, **kwargs)
 
-    return wrapper
+    return wraps(func)(wrapper)
 
 
 @curry
@@ -452,3 +452,58 @@ def deprecate(func, reason=None):
         return func(*args, **kwargs)
 
     return wrapper
+
+
+def dist_mesh(shape):
+    """Calculate a mesh of distances
+
+    Assume dx=1 and the center pixel is shifted to the left for odd
+    shaped axes.
+
+    Args:
+      shape: the shape of the domain
+
+    Returns:
+      an array of distances from the center
+
+    >>> assert np.allclose(
+    ...    dist_mesh((3, 2, 4)),
+    ...    np.sqrt(np.array(
+    ...     [[[6, 3, 2, 3],
+    ...       [5, 2, 1, 2]],
+    ...      [[5, 2, 1, 2],
+    ...       [4, 1, 0, 1]],
+    ...      [[6, 3, 2, 3],
+    ...       [5, 2, 1, 2]]]
+    ...     ))
+    ... )
+
+    >>> dist_mesh((3, 5, 4)).shape
+    (3, 5, 4)
+
+    """
+
+    center = lambda x: np.reshape(np.array(x) // 2, (len(x),) + (1,) * len(x))
+
+    return sequence(
+        fmap(lambda x: np.linspace(0, x - 1, x)),
+        lambda x: np.array(np.meshgrid(*x, indexing="ij")),
+        lambda x: x - center(x.shape[1:]),
+        lambda x: np.linalg.norm(x, axis=0),
+    )(shape)
+
+
+def sort_array(arr):
+    """Functional sort
+
+    Args:
+      arr: array to sort
+
+    Returns:
+      tuple of the sorted array and the index ordering
+
+    >>> sort_array(np.array([2, 1, 3]))
+    (array([1, 2, 3]), array([1, 0, 2]))
+
+    """
+    return sequence(np.argsort, lambda x: (arr[x], x))(arr)
