@@ -29,6 +29,8 @@ jobs:
             apt-get --yes install libglu1-mesa
             apt-get --yes install libgl1-mesa-glx
             apt-get --yes install libxrender1
+            apt-get --yes install build-essential
+            apt-get --yes install libboost-all-dev
 
       # only run select notebooks due to possible memory issues
       - run:
@@ -37,6 +39,7 @@ jobs:
           command: |
             set -e
             source activate pymks
+            export PYMKS_USE_BOOST=1
             python setup.py develop
             py.test pymks/fmks
             py.test notebooks/elasticity.ipynb
@@ -60,7 +63,7 @@ jobs:
       - run:
           name: Setup
           command: |
-            conda create -n pip-install python=3
+            conda create -y -n pip-install python=3
             source activate pip-install
             pip install .
 
@@ -86,9 +89,10 @@ jobs:
       - run:
           name: Setup
           command: |
-            conda create -n conda-forge python=3
+            conda create -y -n conda-forge python=3
             source activate conda-forge
-            conda install -c conda-forge pymks
+            conda install -y -c conda-forge pymks
+            conda install -y -c conda-forge cython
             python setup.py develop
 
       - run:
