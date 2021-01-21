@@ -19,3 +19,4 @@ dependencies:
   - graphviz
   - python-graphviz
   - Deprecated
+  - cython
