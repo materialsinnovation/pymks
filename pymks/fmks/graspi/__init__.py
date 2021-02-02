@@ -8,9 +8,69 @@ import numpy as np
 import pytest
 from toolz.curried import keymap
 
-from ..func import fmap, curry, pipe
+from ..func import fmap, curry, pipe, apply_dataframe_func, make_da_return
 
 
+@curry
+def graph_descriptors_np(data, delta_x=1.0, periodic_boundary=True):
+    """Numpy only version of graph_descriptors function
+
+    Args:
+      data: array of phases (n_samples, n_x, n_y), values must be 0 or 1
+      delta_x: pixel size
+      periodic_boundary: whether the boundaries are periodic
+
+    Returns:
+      A Pandas data frame with samples along rows and descriptors
+      along columns
+
+    """
+    # pylint: enable=line-too-long
+    columns = keymap(
+        lambda x: x.encode("UTF-8"),
+        dict(
+            STAT_n="n_vertices",
+            STAT_e="n_edges",
+            STAT_n_D="n_phase0",
+            STAT_n_A="n_phase1",
+            STAT_CC_D="n_phase0_connect",
+            STAT_CC_A="n_phase1_connect",
+            STAT_CC_D_An="n_phase0_connect_top",
+            STAT_CC_A_Ca="n_phase1_connect_bottom",
+            ABS_wf_D="w_frac_phase0",
+            ABS_f_D="frac_phase0",
+            DISS_wf10_D="w_frac_phase0_10_dist",
+            DISS_f10_D="fraction_phase0_10_dist",
+            DISS_f2_D="fraction_phase0_2_dist",
+            CT_f_conn_D="frac_useful",
+            CT_f_e_conn="inter_frac_bottom_and_top",
+            CT_f_conn_D_An="frac_phase0_top",
+            CT_f_conn_A_Ca="frac_phase1_bottom",
+            CT_e_conn="n_inter_paths",
+            CT_e_D_An="n_phase0_inter_top",
+            CT_e_A_Ca="n_phase1_inter_bottom",
+            CT_f_D_tort1="frac_phase0_rising",
+            CT_f_A_tort1="frac_phase1_rising",
+        ),
+    )
+    return pipe(
+        data,
+        fmap(
+            graph_descriptors_sample(
+                delta_x=delta_x, periodic_boundary=periodic_boundary
+            )
+        ),
+        list,
+        pandas.DataFrame,
+        lambda x: x.rename(columns=columns),
+        lambda x: x.apply(
+            lambda x: np.rint(x).astype(int) if x.name[:2] == "n_" else x
+        ),
+    )
+
+
+@make_da_return
+@curry
 def graph_descriptors(data, delta_x=1.0, periodic_boundary=True):
     # pylint: disable=line-too-long
     """Compute graph descriptors for multiple samples
@@ -56,7 +116,7 @@ def graph_descriptors(data, delta_x=1.0, periodic_boundary=True):
     n_phase{i}_connect        The number of connected components for phase {i}.
     n_phase{i}_connect_top    The number of connected components for phase {i} with the top of the domain in y-direction.
     n_phase{i}_connect_bottom The number of connected components for phase {i} with the top of the domain in y-direction.
-    weighted_frac_phase{i}    Weighted fraction of phase {i} vertices.
+    w_frac_phase{i}           Weighted fraction of phase {i} vertices.
     frac_phase{i}             Fraction of phase {i} vertices.
     w_frac_phase{i}_{j}_dist  Weighted fraction of phase {i} vertices within j nodes from an interface.
     frac_phase{i}_{j}_dist    Fraction of phase {i} vertices within {j} nodes from an interface.
@@ -78,9 +138,9 @@ def graph_descriptors(data, delta_x=1.0, periodic_boundary=True):
     >>> from io import StringIO
     >>> expected = pandas.read_csv(StringIO('''
     ... n_vertices,n_edges,n_phase0,n_phase1,n_phase0_connect,n_phase1_connect,n_phase0_connect_top,n_phase1_connect_bottom,weighted_frac_phase0,frac_phase0,weighted_frac_phase0_10_dist,fraction_phase0_10_dist,inter_frac_bottom_and_top,frac_phase0_top,frac_phase1_bottom,n_inter_paths,n_phase0_inter_top,n_phase1_inter_bottom,frac_phase0_rising,frac_phase1_rising
-    ... 9,6,3,6,1,1,0,1,0.3245655298233032,0.3333333432674408,0.9624541997909546,1.0,0.0,0.0,1.0,0,0,6,0.0,0.8333333134651184
-    ... 9,6,3,6,1,2,0,1,0.32673290371894836,0.3333333432674408,0.9624541997909546,1.0,0.0,0.0,0.5,0,0,3,0.0,1.0
-    ... 9,6,6,3,1,1,1,1,0.6534875631332397,0.6666666865348816,0.9624541997909546,1.0,1.0,1.0,1.0,6,6,3,1.0,1.0
+    ... 9,7,3,6,2,1,1,1,0.3256601095199585,0.3333333432674408,0.9624541997909546,1.0,0.4285714328289032,0.3333333432674408,1.0,3,1,6,1.0,0.6666666865348816
+    ... 9,6,3,6,1,1,1,1,0.3267437815666199,0.3333333432674408,0.9624541997909546,1.0,1.0,1.0,1.0,6,3,6,1.0,1.0
+    ... 9,6,6,3,2,1,1,0,0.6534984707832336,0.6666666865348816,0.9624541997909546,1.0,0.0,0.5,0.0,0,3,0,1.0,0.0
     ... '''))
 
     Construct the 3 samples each with 3x3 voxels
@@ -100,15 +160,27 @@ def graph_descriptors(data, delta_x=1.0, periodic_boundary=True):
 
     >>> actual
        n_vertices  n_edges  ...  frac_phase0_rising  frac_phase1_rising
-    0           9        6  ...                 0.0            0.833333
-    1           9        6  ...                 0.0            1.000000
-    2           9        6  ...                 1.0            1.000000
+    0           9        7  ...                 1.0            0.666667
+    1           9        6  ...                 1.0            1.000000
+    2           9        6  ...                 1.0            0.000000
     <BLANKLINE>
     [3 rows x 20 columns]
 
     Check that the actual values are equal to the expected values.
 
     >>> assert np.allclose(actual, expected)
+
+    Works with Dask arrays as well. When using Dask a Dask dataframe
+    will be returned.
+
+    >>> import dask.array as da
+    >>> out = graph_descriptors(da.from_array(data, chunks=(2, 3, 3)))
+    >>> out.get_partition(0).compute()
+       n_vertices  n_edges  ...  frac_phase0_rising  frac_phase1_rising
+    0           9        7  ...                 1.0            0.666667
+    1           9        6  ...                 1.0            1.000000
+    <BLANKLINE>
+    [2 rows x 20 columns]
 
     On examining the data for this simple test case there are a few
     obvious checks. Each sample has 9 vertices since there are 9
@@ -126,7 +198,7 @@ def graph_descriptors(data, delta_x=1.0, periodic_boundary=True):
 
     >>> actual.n_phase1_connect
     0    1
-    1    2
+    1    1
     2    1
     Name: n_phase1_connect, dtype: int64
 
@@ -135,53 +207,14 @@ def graph_descriptors(data, delta_x=1.0, periodic_boundary=True):
     interface edges that connect the top and bottom.
 
     >>> actual.n_inter_paths
-    0    0
-    1    0
-    2    6
+    0    3
+    1    6
+    2    0
     Name: n_inter_paths, dtype: int64
 
     """
-    # pylint: enable=line-too-long
-    columns = keymap(
-        lambda x: x.encode("UTF-8"),
-        dict(
-            STAT_n="n_vertices",
-            STAT_e="n_edges",
-            STAT_n_D="n_phase0",
-            STAT_n_A="n_phase1",
-            STAT_CC_D="n_phase0_connect",
-            STAT_CC_A="n_phase1_connect",
-            STAT_CC_D_An="n_phase0_connect_top",
-            STAT_CC_A_Ca="n_phase1_connect_bottom",
-            ABS_wf_D="weighted_frac_phase0",
-            ABS_f_D="frac_phase0",
-            DISS_wf10_D="weighted_frac_phase0_10_dist",
-            DISS_f10_D="fraction_phase0_10_dist",
-            DISS_f2_D="fraction_phase0_2_dist",
-            CT_f_conn_D="frac_useful",
-            CT_f_e_conn="inter_frac_bottom_and_top",
-            CT_f_conn_D_An="frac_phase0_top",
-            CT_f_conn_A_Ca="frac_phase1_bottom",
-            CT_e_conn="n_inter_paths",
-            CT_e_D_An="n_phase0_inter_top",
-            CT_e_A_Ca="n_phase1_inter_bottom",
-            CT_f_D_tort1="frac_phase0_rising",
-            CT_f_A_tort1="frac_phase1_rising",
-        ),
-    )
-    return pipe(
-        data,
-        fmap(
-            graph_descriptors_sample(
-                delta_x=delta_x, periodic_boundary=periodic_boundary
-            )
-        ),
-        list,
-        pandas.DataFrame,
-        lambda x: x.rename(columns=columns),
-        lambda x: x.apply(
-            lambda x: np.rint(x).astype(int) if x.name[:2] == "n_" else x
-        ),
+    return apply_dataframe_func(
+        graph_descriptors_np(delta_x=delta_x, periodic_boundary=periodic_boundary), data
     )
 
 
@@ -190,15 +223,17 @@ def graph_descriptors_sample(data, delta_x=1.0, periodic_boundary=True):
     """Calculate graspi graph descriptors for a single array
     """
     graspi = pytest.importorskip("pymks.fmks.graspi.graspi")
+
     compute = lambda x: graspi.compute_descriptors(
         x,
         *(data.shape + (3 - len(data.shape)) * (1,)),
         pixelS=delta_x,
         if_per=periodic_boundary
     )
+
     return pipe(
         data,
-        lambda x: x.astype(np.int32).flatten(),
+        lambda x: x.astype(np.int32).flatten(order="F"),
         compute,
         fmap(lambda x: x[::-1]),
         dict,
