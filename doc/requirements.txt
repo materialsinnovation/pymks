@@ -13,4 +13,5 @@ Deprecated
 sphinx-jinja
 cython
 pandas
+dask[dataframe]
 # require pandoc which is a haskell package
