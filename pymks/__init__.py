@@ -27,6 +27,8 @@ from .fmks.correlations import TwoPointCorrelation
 from .fmks.data.checkerboard import generate_checkerboard
 from .fmks.pair_correlations import paircorr_from_twopoint
 from .fmks.graspi import graph_descriptors
+from .fmks.graspi import GraphDescriptors
+from .fmks.graspi import GenericTransformer
 
 
 try:
@@ -53,7 +55,7 @@ from .mks_homogenization_model import MKSHomogenizationModel
 MKSRegressionModel = MKSLocalizationModel
 DiscreteIndicatorBasis = PrimitiveBasis
 ContinuousIndicatorBasis = PrimitiveBasis
-# the above will be deprecatec
+# the above will be deprecated
 
 
 def test():
@@ -110,4 +112,6 @@ __all__ = [
     "generate_checkerboard",
     "paircorr_from_twopoint",
     "graph_descriptors",
+    "GraphDescriptors",
+    "GenericTransformer",
 ]

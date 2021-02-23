@@ -7,6 +7,7 @@ import pandas
 import numpy as np
 import pytest
 from toolz.curried import keymap
+from sklearn.base import TransformerMixin, BaseEstimator
 
 from ..func import fmap, curry, pipe, apply_dataframe_func, make_da_return
 
@@ -104,6 +105,9 @@ def graph_descriptors(data, delta_x=1.0, periodic_boundary=True):
     of these descriptors characterizes the morphology in terms of hole
     electron pair generation and transport leading to device charge
     extraction.
+
+    To use `graph_descriptors` as part of a Sklearn pipeline, see
+    :class:`~pymks.GraphDescriptors`.
 
     The column descriptors are as follows.
 
@@ -238,3 +242,96 @@ def graph_descriptors_sample(data, delta_x=1.0, periodic_boundary=True):
         fmap(lambda x: x[::-1]),
         dict,
     )
+
+
+class GraphDescriptors(BaseEstimator, TransformerMixin):
+    """Calculate GraphDescriptors as part of a Sklearn pipeline
+
+    Wraps the :func:`~pymks.graph_descriptors` function
+
+    Test
+
+    >>> data = np.array([[[0, 1, 0],
+    ...                   [0, 1, 1],
+    ...                   [1, 1, 1]],
+    ...                  [[1, 1, 1],
+    ...                   [0, 0, 0],
+    ...                   [1, 1, 1]],
+    ...                  [[0, 1, 0],
+    ...                   [0, 1, 0],
+    ...                   [0, 1, 0]]])
+    >>> actual = GraphDescriptors().fit(data).transform(data)
+    >>> actual.shape
+    (3, 20)
+
+    See the :func:`~pymks.graph_descriptors` function for more
+    complete documentation.
+
+    """
+
+    def __init__(self, delta_x=1.0, periodic_boundary=True):
+        """Instantiate a GraphDescriptors transformer
+
+        Args:
+          delta_x: pixel size
+          periodic_boundary: whether the boundaries are periodic
+          columns: subset of columns to include
+
+        """
+        self.delta_x = delta_x
+        self.periodic_boundary = periodic_boundary
+
+    def transform(self, data):
+        """Transform the data
+
+        Args:
+          data: the data to be transformed
+
+        Returns:
+          the graph descriptors dataframe
+        """
+        return graph_descriptors(
+            data, delta_x=self.delta_x, periodic_boundary=self.periodic_boundary
+        )
+
+    def fit(self, *_):
+        """Only necessary to make pipelines work
+        """
+        return self
+
+
+class GenericTransformer(BaseEstimator, TransformerMixin):
+    """Make a generic transformer based on a function
+
+    >>> data = np.arange(4).reshape(2, 2)
+    >>> GenericTransformer(lambda x: x[:, 1:]).fit(data).transform(data).shape
+    (2, 1)
+    """
+
+    def __init__(self, func):
+        """Instantiate a GenericTransformer
+
+        Function should take a multi-dimensional array and return an
+        array with the same length in the sample axis (first axis).
+
+        Args:
+          func: transformer function
+
+        """
+        self.func = func
+
+    def fit(self, *_):
+        """Only necessary to make pipelines work
+        """
+        return self
+
+    def transform(self, data):
+        """Transform the data
+
+        Args:
+          data: the data to be transformed
+
+        Returns:
+          the transformed data
+        """
+        return self.func(data)
