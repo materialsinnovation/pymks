@@ -5,10 +5,13 @@
 See the documenation for details at https://pymks.org
 """
 
+import pathlib
 import warnings
 import os
 import subprocess
+
 from setuptools import setup, find_packages
+from setuptools.config import read_configuration
 
 
 def make_version(package_name):
@@ -73,28 +76,34 @@ def make_version(package_name):
     return version
 
 
-PACKAGE_NAME = "pymks"
+def get_setupcfg():
+    """Get the absolute path for setup.cfg
+    """
+    return pathlib.Path(__file__).parent.absolute() / "setup.cfg"
 
 
-setup(
-    name=PACKAGE_NAME,
-    version=make_version(PACKAGE_NAME),
-    description="Materials Knowledge Systems in Python (PyMKS)",
-    author="Daniel Wheeler",
-    author_email="daniel.wheeler2@gmail.com",
-    url="http://pymks.org",
-    packages=find_packages(),
-    package_data={"": ["tests/*.py"]},
-    install_requires=[
-        "pytest",
-        "numpy",
-        "dask",
-        "Deprecated",
-        "matplotlib",
-        "scikit-learn",
-        "pytest-cov",
-        "nbval",
-        "toolz",
-    ],
-    data_files=["setup.cfg"],
-)
+def get_configuration():
+    """Get contents of setup.cfg as a dict
+    """
+
+    return read_configuration(get_setupcfg())
+
+
+def get_name():
+    """Single location for name of package
+    """
+    return get_configuration()["metadata"]["name"]
+
+
+def setup_args():
+    """Get the setup arguments not configured in setup.cfg
+    """
+    return dict(
+        version=make_version(get_name()),
+        packages=find_packages(),
+        package_data={"": ["tests/*.py"]},
+        data_files=["setup.cfg"],
+    )
+
+
+setup(**setup_args())
