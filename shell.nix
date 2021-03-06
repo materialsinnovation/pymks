@@ -1,15 +1,16 @@
-# { pkgs ? (import (builtins.fetchTarball {
-#     url = "https://github.com/NixOS/nixpkgs/archive/19.09.tar.gz";
-#     sha256 = "0mhqhq21y5vrr1f30qd2bvydv4bbbslvyzclhw0kdxmkgg3z4c92";
-#   }) {}) }:
-{ pkgs ? (import (builtins.fetchTarball {
-    url = "https://github.com/NixOS/nixpkgs/archive/20.03-beta.tar.gz";
-    sha256 = "04g53i02hrdfa6kcla5h1q3j50mx39fchva7z7l32pk699nla4hi";
-  }) {}) }:
+#
+# $ nix-shell --pure --argstr tag 20.09
+#
+
+{
+  tag ? "20.03-beta",
+  withSfepy ? true
+}:
 
 let
+  pkgs = import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/${tag}.tar.gz") {};
   pypkgs = pkgs.python3Packages;
-  sfepy = pypkgs.sfepy.overridePythonAttrs (old: rec {
+  sfepy_ = pypkgs.sfepy.overridePythonAttrs (old: rec {
     name = "sfepy_${version}";
     version = "2019.4";
     src = builtins.fetchurl {
@@ -32,6 +33,7 @@ let
     rm tests/test_quadratures.py
     '';
   });
+  sfepy = if withSfepy then sfepy_ else null;
 in
   pypkgs.buildPythonPackage rec {
     pname = "pymks";
@@ -44,7 +46,6 @@ in
       pytest
       matplotlib
       sympy
-      cython
       jupyter
       pytestcov
       nbval
@@ -59,7 +60,6 @@ in
       pyfftw
       scikitlearn
       dask-ml
-      pandas
       dask-glm
       multipledispatch
       pkgs.graphviz
@@ -74,7 +74,9 @@ in
       pkgs.openssh
       zarr
     ];
-    src=builtins.filterSource (path: type: type != "directory" || baseNameOf path != ".git") ./.;
+    src = builtins.filterSource (path: type: type != "directory" || baseNameOf path != ".git") ./.;
+    doCheck = false;
+
     preShellHook = ''
 
       export OMPI_MCA_plm_rsh_agent=/usr/bin/ssh
