@@ -26,6 +26,8 @@ from .fmks.correlations import FlattenTransformer
 from .fmks.correlations import TwoPointCorrelation
 from .fmks.data.checkerboard import generate_checkerboard
 from .fmks.pair_correlations import paircorr_from_twopoint
+from .fmks import GenericTransformer
+
 
 try:
     import sfepy  # noqa: F401
@@ -51,7 +53,7 @@ from .mks_homogenization_model import MKSHomogenizationModel
 MKSRegressionModel = MKSLocalizationModel
 DiscreteIndicatorBasis = PrimitiveBasis
 ContinuousIndicatorBasis = PrimitiveBasis
-# the above will be deprecatec
+# the above will be deprecated
 
 
 def test():
@@ -107,4 +109,5 @@ __all__ = [
     "TwoPointCorrelation",
     "generate_checkerboard",
     "paircorr_from_twopoint",
+    "GenericTransformer",
 ]
