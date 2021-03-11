@@ -30,7 +30,7 @@ def plot_microstructures(*arrs, titles=(), cmap=None, colorbar=True, figsize_wei
     """Plot a set of microstructures
 
     Args:
-      *arrs: any number of 2D arrays to plot
+      arrs: any number of 2D arrays to plot
       titles: a sequence of titles with len(*arrs)
       cmap: any matplotlib colormap
 

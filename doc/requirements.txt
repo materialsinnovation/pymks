@@ -1,14 +1,14 @@
 sphinx
-sphinx_bootstrap_theme
 pytest
 numpy
 toolz
 dask
 matplotlib
 scikit-learn
-mock
 nbsphinx==0.5.1
 m2r2
 Deprecated
 sphinx-jinja
+alabaster
+IPython
 # require pandoc which is a haskell package
