@@ -4,7 +4,7 @@
 import pytest
 import numpy as np
 from toolz.curried import pipe, first, get
-from pymks.fmks.data.elastic_fe import solve_fe
+from pymks.fmks.data import solve_fe
 
 
 def test_3d():
