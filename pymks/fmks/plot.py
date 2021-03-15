@@ -7,11 +7,15 @@ from .func import curry, fmap
 
 @curry
 def _plot_ax(axis, arrs, titles, cmap):
+    if hasattr(axis.get_subplotspec(), "colspan"):
+        col_num = axis.get_subplotspec().colspan.start  # pragma: no cover
+    else:
+        col_num = axis.colNum  # pragma: no cover
     axis.set_xticks(())
     axis.set_yticks(())
-    axis.set_title(titles[axis.colNum])
+    axis.set_title(titles[col_num])
     return axis.imshow(
-        arrs[axis.colNum],
+        arrs[col_num],
         interpolation="none",
         vmin=numpy.min(numpy.vstack(arrs)),
         vmax=numpy.max(numpy.vstack(arrs)),
