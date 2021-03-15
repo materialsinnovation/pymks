@@ -3,7 +3,7 @@
 
 import numpy as np
 import dask.array as da
-from toolz.curried import curry, pipe
+from toolz.curried import pipe
 from toolz.curried import map as fmap
 from scipy.ndimage.fourier import fourier_gaussian
 from ..func import (
@@ -14,6 +14,7 @@ from ..func import (
     zero_pad,
     sequence,
     map_blocks,
+    curry,
 )
 
 
