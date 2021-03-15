@@ -8,12 +8,12 @@ Note that input microstrucure should be 4 dimensional array.
 where X=[n_sample,x,y.n_basis]
 """
 import numpy as np
-from toolz.curried import pipe, curry
+from toolz.curried import pipe
 from toolz.curried import map as map_, identity
 from sklearn.base import TransformerMixin, BaseEstimator
 import dask.array as da
 from .func import dafftshift, dafftn, daifftn, daconj, flatten
-from .func import sequence, make_da, star, dapad
+from .func import sequence, make_da, star, dapad, curry
 
 
 @make_da
@@ -145,7 +145,20 @@ def center_slice(x_data, cutoff):
 
 @curry
 def two_point_stats(arr1, arr2, mask=None, periodic_boundary=True, cutoff=None):
-    """Calculate the 2-points stats for two arrays
+    r"""Calculate the 2-points stats for two arrays
+
+    The discretized two point statistics are given by
+
+    $$ f[r \\; \\vert \\; l, l'] = \\frac{1}{S} \\sum_s m[s, l] m[s + r, l'] $$
+
+    where $ f[r \\; \\vert \\; l, l'] $ is the conditional probability
+    of finding the local states $l$ and $l'$ at a distance and
+    orientation away from each other defined by the vector $r$. `See
+    this paper for more details on the
+    notation. <https://doi.org/10.1007/s40192-017-0089-0>`_
+
+    To use `two_point_stats` as part of a Scikit-learn pipeline, see
+    :class:`~pymks.TwoPointCorrelation`.
 
     Args:
       arr1: array used to calculate cross-correlations (n_samples,n_x,n_y)
@@ -183,6 +196,7 @@ def two_point_stats(arr1, arr2, mask=None, periodic_boundary=True, cutoff=None):
     Traceback (most recent call last):
     ...
     RuntimeError: Mask must be in range [0,1]
+
     """
 
     cutoff_ = int((np.min(arr1.shape[1:]) - 1) / 2)
@@ -272,7 +286,12 @@ def correlations_multiple(data, correlations, periodic_boundary=True, cutoff=Non
 
 
 class TwoPointCorrelation(BaseEstimator, TransformerMixin):
-    """Calculate the 2-point stats for two arrays
+    """Calculate the 2-point stats for two arrays as part of Scikit-learn
+    pipeline.
+
+    Wraps the :func:`~pymks.two_point_stats` function. See that for
+    more complete documentation.
+
     """
 
     def __init__(self, periodic_boundary=True, cutoff=None, correlations=None):
