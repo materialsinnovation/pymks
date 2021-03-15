@@ -6,7 +6,7 @@ API
 
 .. jinja::
 
-   {% set functions = ['plot_microstructures', 'generate_delta', 'generate_multiphase', 'generate_checkerboard', 'solve_cahn_hilliard', 'solve_fe', 'coeff_to_real', 'paircorr_from_twopoint'] | sort %}
+   {% set functions = ['plot_microstructures', 'generate_delta', 'generate_multiphase', 'generate_checkerboard', 'solve_cahn_hilliard', 'solve_fe', 'coeff_to_real', 'paircorr_from_twopoint', 'two_point_stats'] | sort %}
 
    {% set classes = ['PrimitiveTransformer', 'LegendreTransformer', 'TwoPointCorrelation', 'FlattenTransformer', 'LocalizationRegressor', 'ReshapeTransformer', 'GenericTransformer'] | sort %}
 
