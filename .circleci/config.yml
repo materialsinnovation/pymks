@@ -42,7 +42,6 @@ jobs:
             py.test pymks/fmks
             py.test notebooks/elasticity.ipynb
             py.test notebooks/filter.ipynb
-            py.test notebooks/intro.ipynb
             py.test notebooks/multiphase.ipynb
             py.test notebooks/checkerboard.ipynb
             py.test notebooks/fiber.ipynb
