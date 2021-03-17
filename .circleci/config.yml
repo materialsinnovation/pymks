@@ -39,7 +39,6 @@ jobs:
             source activate pymks
             python setup.py develop
             py.test pymks/fmks
-            py.test notebooks/elasticity.ipynb
             py.test notebooks/filter.ipynb
             py.test notebooks/intro.ipynb
             py.test notebooks/multiphase.ipynb
