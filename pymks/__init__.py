@@ -29,7 +29,7 @@ from .fmks.correlations import TwoPointCorrelation
 from .fmks.data.checkerboard import generate_checkerboard
 from .fmks.pair_correlations import paircorr_from_twopoint
 from .fmks import GenericTransformer
-from .fmks.correlations import two_point_stats
+from .fmks.correlations import two_point_stats, correlations_multiple
 
 
 try:
@@ -96,4 +96,5 @@ __all__ = [
     "paircorr_from_twopoint",
     "GenericTransformer",
     "two_point_stats",
+    "correlations_multiple",
 ]
