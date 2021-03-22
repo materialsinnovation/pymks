@@ -30,21 +30,8 @@ from .fmks.data.checkerboard import generate_checkerboard
 from .fmks.pair_correlations import paircorr_from_twopoint
 from .fmks import GenericTransformer
 from .fmks.correlations import two_point_stats, correlations_multiple
+from .fmks.data import solve_fe
 
-
-try:
-    import sfepy  # noqa: F401
-except ImportError:
-
-    def solve_fe(*_, **__):
-        """Dummy funcion when sfepy unavailable
-        """
-        # pylint: disable=redefined-outer-name, import-outside-toplevel, unused-import
-        import sfepy  # noqa: F401, F811
-
-
-else:
-    from .fmks.data.elastic_fe import solve_fe
 
 # the following will be deprecated
 from .mks_localization_model import MKSLocalizationModel
@@ -59,14 +46,20 @@ ContinuousIndicatorBasis = PrimitiveBasis
 # the above will be deprecated
 
 
-def test():
-    r"""
-    Run all the doctests available.
+def test(*args):
+    r"""Run all the module tests.
+
+    Equivalent to running ``py.test pymks`` in the base of
+    PyMKS. Allows an installed version of PyMKS to be tested.
+
+    Args:
+      *args: add arguments to pytest
+
     """
     import pytest  # pylint: disable=import-outside-toplevel
 
     path = os.path.join(os.path.split(__file__)[0], "fmks")
-    pytest.main(args=[path, "--doctest-modules", "-r s"])
+    pytest.main(args=[path, "--doctest-modules", "-r s"] + list(args))
 
 
 __version__ = get_versions()["version"]

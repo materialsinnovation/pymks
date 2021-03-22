@@ -40,9 +40,7 @@ jobs:
             source activate pymks
             python setup.py develop
             py.test pymks/fmks
-            py.test notebooks/elasticity.ipynb
             py.test notebooks/filter.ipynb
-            py.test notebooks/intro.ipynb
             py.test notebooks/multiphase.ipynb
             py.test notebooks/checkerboard.ipynb
             py.test notebooks/fiber.ipynb
@@ -71,7 +69,7 @@ jobs:
           command: |
             set -e
             source activate pip-install
-            python -c "import pymks; pymks.test()"
+            python -c "import pymks; pymks.test('--ignore', 'pymks/fmks/tests/test_fe.py')"
 
 
   conda_forge:
