@@ -45,7 +45,7 @@ simulations.
 To learn about PyMKS start with the [PyMKS examples](./index.ipynb),
 especially the [introductory example](notebooks/intro.ipynb).
 To learn more about the methods consult the
-[technical overview](http://pymks.org/en/latest/rst/notebooks/tech_overview.html)
+[technical overview](http://pymks.org/en/stable/rst/notebooks/tech_overview.html)
 for an introduction.
 
 
@@ -97,6 +97,21 @@ guild](https://nixos.org/nix/manual/#chap-quick-start) and then run
     $ nix-shell
 
 to drop into a shell with PyMKS and all its requirements available.
+
+## Optional Packages
+
+Packages that are optional when using PyMKS.
+
+### Sfepy
+
+[Sfepy](http://sfepy.org/doc-devel/index.html) is a python based
+finite element solver. It's useful for generating data for PyMKS to
+use for machine learning tasks. It's used in quite a few tests, but it
+isn't strictly necessary to use PyMKS.  Sfepy will automatically
+install when using Nix or Conda, but not when using Pip. See the
+[Sfepy installation
+instructions](http://sfepy.org/doc-devel/installation.html) to install
+in your environment.
 
 ## Testing
 

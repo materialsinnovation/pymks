@@ -30,6 +30,7 @@ from .fmks.data.checkerboard import generate_checkerboard
 from .fmks.pair_correlations import paircorr_from_twopoint
 from .fmks.data import solve_fe
 from .fmks.correlations import two_point_stats
+from .fmks import GenericTransformer
 
 
 # the following will be deprecated
@@ -45,14 +46,20 @@ ContinuousIndicatorBasis = PrimitiveBasis
 # the above will be deprecated
 
 
-def test():
-    r"""
-    Run all the doctests available.
+def test(*args):
+    r"""Run all the module tests.
+
+    Equivalent to running ``py.test pymks`` in the base of
+    PyMKS. Allows an installed version of PyMKS to be tested.
+
+    Args:
+      *args: add arguments to pytest
+
     """
     import pytest  # pylint: disable=import-outside-toplevel
 
     path = os.path.join(os.path.split(__file__)[0], "fmks")
-    pytest.main(args=[path, "--doctest-modules", "-r s"])
+    pytest.main(args=[path, "--doctest-modules", "-r s"] + list(args))
 
 
 __version__ = get_versions()["version"]
@@ -80,5 +87,6 @@ __all__ = [
     "TwoPointCorrelation",
     "generate_checkerboard",
     "paircorr_from_twopoint",
+    "GenericTransformer",
     "two_point_stats",
 ]

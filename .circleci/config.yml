@@ -29,6 +29,7 @@ jobs:
             apt-get --yes install libglu1-mesa
             apt-get --yes install libgl1-mesa-glx
             apt-get --yes install libxrender1
+            apt-get --yes install build-essential
 
       # only run select notebooks due to possible memory issues
       - run:
@@ -40,7 +41,6 @@ jobs:
             python setup.py develop
             py.test pymks/fmks
             py.test notebooks/filter.ipynb
-            py.test notebooks/intro.ipynb
             py.test notebooks/multiphase.ipynb
             py.test notebooks/checkerboard.ipynb
             py.test notebooks/fiber.ipynb
@@ -59,7 +59,7 @@ jobs:
       - run:
           name: Setup
           command: |
-            conda create -n pip-install python=3
+            conda create -y -n pip-install python=3
             source activate pip-install
             pip install .
 
@@ -69,7 +69,7 @@ jobs:
           command: |
             set -e
             source activate pip-install
-            python -c "import pymks; pymks.test()"
+            python -c "import pymks; pymks.test('--ignore', 'pymks/fmks/tests/test_fe.py')"
 
 
   conda_forge:
@@ -85,9 +85,10 @@ jobs:
       - run:
           name: Setup
           command: |
-            conda create -n conda-forge python=3
+            conda create -y -n conda-forge python=3
             source activate conda-forge
-            conda install -c conda-forge pymks
+            conda install -y -c conda-forge pymks
+            conda install -y -c conda-forge cython
             python setup.py develop
 
       - run:
