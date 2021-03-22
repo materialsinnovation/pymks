@@ -70,7 +70,7 @@ jobs:
           command: |
             set -e
             source activate pip-install
-            python -c "import pymks; pymks.test()"
+            python -c "import pymks; pymks.test('--ignore', 'pymks/fmks/tests/test_fe.py')"
 
 
   conda_forge:
