@@ -28,23 +28,10 @@ from .fmks.correlations import FlattenTransformer
 from .fmks.correlations import TwoPointCorrelation
 from .fmks.data.checkerboard import generate_checkerboard
 from .fmks.pair_correlations import paircorr_from_twopoint
-from .fmks import GenericTransformer
+from .fmks.data import solve_fe
 from .fmks.correlations import two_point_stats
+from .fmks import GenericTransformer
 
-
-try:
-    import sfepy  # noqa: F401
-except ImportError:
-
-    def solve_fe(*_, **__):
-        """Dummy funcion when sfepy unavailable
-        """
-        # pylint: disable=redefined-outer-name, import-outside-toplevel, unused-import
-        import sfepy  # noqa: F401, F811
-
-
-else:
-    from .fmks.data.elastic_fe import solve_fe
 
 # the following will be deprecated
 from .mks_localization_model import MKSLocalizationModel

@@ -9,7 +9,7 @@ from pymks.fmks.localization import fit
 from pymks.fmks.bases.primitive import PrimitiveTransformer
 from pymks.fmks.localization import LocalizationRegressor
 from pymks.fmks.data.delta import generate_delta
-from pymks.fmks.data.elastic_fe import solve_fe
+from pymks.fmks.data import solve_fe
 
 
 def _get_x():

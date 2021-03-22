@@ -1,14 +1,5 @@
-<p align="center">
-<img src="https://raw.githubusercontent.com/materialsinnovation/pymks/master/doc/pymks_logo.ico"
-     height="60"
-     alt="PyMKS logo"
-     class="inline">
-</p>
 
-<h1> <p align="center"><sup><strong>
-PyMKS &ndash; The Materials Knowledge System in Python
-</strong></sup></p>
-</h1>
+# PyMKS Overview
 
 <a href="https://travis-ci.org/materialsinnovation/pymks" target="_blank">
 <img src="https://api.travis-ci.org/materialsinnovation/pymks.svg"
