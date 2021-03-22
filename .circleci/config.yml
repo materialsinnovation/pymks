@@ -39,7 +39,7 @@ jobs:
             set -e
             source activate pymks
             python setup.py develop
-            py.test pymks/fmks
+            py.test pymks/fmks --ignore pymks/fmks/tests/test_fe.py
             py.test notebooks/filter.ipynb
             py.test notebooks/multiphase.ipynb
             py.test notebooks/checkerboard.ipynb
@@ -97,7 +97,7 @@ jobs:
           command: |
             set -e
             source activate conda-forge
-            python -c "import pymks; pymks.test()"
+            python -c "import pymks; pymks.test('--ignore', 'pymks/fmks/tests/test_fe.py')"
 
 
 workflows:
