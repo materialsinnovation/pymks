@@ -7,7 +7,7 @@ import numpy as np
 import dask.array as da
 from dask import delayed
 import toolz.curried
-from toolz.curried import iterate, compose, pipe, get, flip
+from toolz.curried import iterate, compose, pipe, get, flip, identity
 from toolz.curried import map as fmap
 import deprecated
 
@@ -282,6 +282,44 @@ def make_da(func):
         else:
             chunks = arr.chunks
         return func(rechunk(chunks, arr), *args, **kwargs)
+
+    return wraps(func)(wrapper)
+
+
+def make_da_return(func):
+    """Decorator to allow functions that only take Dask arrays to take
+    Numpy arrays, but then return a Numpy array if given a Numpy array
+
+    Args:
+      func: the function to be decorated
+
+    Returns:
+      the decorated function
+
+    >>> @make_da_return
+    ... def my_func(darr):
+    ...     return da.from_array(
+    ...         np.array(darr) + 1,
+    ...         chunks=darr.chunks
+    ...     )
+
+    >>> my_func(np.arange(10))
+    array([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10])
+
+    >>> my_func(da.arange(10, chunks=(2,)))
+    dask.array<array, shape=(10,), dtype=int64, chunksize=(2,), chunktype=numpy.ndarray>
+
+    """
+
+    def wrapper(arr, *args, **kwargs):
+        isnd = lambda x: isinstance(x, np.ndarray)
+        compute = lambda x: x.compute()
+        return pipe(
+            arr,
+            rechunk(arr.shape if isnd(arr) else arr.chunks),
+            lambda x: func(x, *args, **kwargs),
+            (compute if isnd(arr) else identity),
+        )
 
     return wraps(func)(wrapper)
 

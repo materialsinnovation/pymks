@@ -1,9 +1,5 @@
-try:
-    import sfepy
-except ImportError:
-    import pytest
-    pytest.importorskip('sfepy')
-    raise
+import pytest
+sfepy = pytest.importorskip('sfepy')
 
 import numpy as np
 from sfepy.base.goptions import goptions
