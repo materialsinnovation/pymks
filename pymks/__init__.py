@@ -59,14 +59,20 @@ ContinuousIndicatorBasis = PrimitiveBasis
 # the above will be deprecated
 
 
-def test():
-    r"""
-    Run all the doctests available.
+def test(*args):
+    r"""Run all the module tests.
+
+    Equivalent to running ``py.test pymks`` in the base of
+    PyMKS. Allows an installed version of PyMKS to be tested.
+
+    Args:
+      *args: add arguments to pytest
+
     """
     import pytest  # pylint: disable=import-outside-toplevel
 
     path = os.path.join(os.path.split(__file__)[0], "fmks")
-    pytest.main(args=[path, "--doctest-modules", "-r s"])
+    pytest.main(args=[path, "--doctest-modules", "-r s"] + list(args))
 
 
 __version__ = get_versions()["version"]
