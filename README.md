@@ -71,11 +71,13 @@ To install using [Conda][conda],
 
     $ conda install -c conda-forge pymks
 
-or to create a development environment use,
+To create a development environment clone this repository and run
 
     $ conda env create -f environment.yml
     $ conda activate pymks
     $ python setup.py develop
+
+in the base directory.
 
 ### Pip
 
@@ -85,18 +87,31 @@ Install a minimal version of PyMKS with
 
 This is enough to run the tests, but not the examples. Some optional
 packages are not available via Pip. To create a development
-environment use,
+environment clone this repository and run
 
     $ pip install .
+
+in the base directory.
 
 ### Nix
 
 Follow the [Nix installation
 guild](https://nixos.org/nix/manual/#chap-quick-start) and then run
 
+    $ export NIX_VERSION=20.09
+    $ export PYMKS_VERSION=0.4.1
+    $ nix-shell \
+        -I nixpkgs=https://github.com/NixOS/nixpkgs/archive/${NIX_VERSION}.tar.gz \
+        -I pymks=https://github.com/materialsinnovation/pymks/archive/${PYMKS_VERSION}.tar.gz \
+        -E 'with (import <nixpkgs> {}); mkShell { buildInputs = [ (python3Packages.callPackage <pymks> { }) ]; }'
+
+to drop into a shell with PyMKS and all its requirements available. To
+create a development environment with Nix clone this repository and
+run
+
     $ nix-shell
 
-to drop into a shell with PyMKS and all its requirements available.
+in the base directory.
 
 ## Optional Packages
 
