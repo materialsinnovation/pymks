@@ -5,10 +5,11 @@ toolz
 dask
 matplotlib
 scikit-learn
-nbsphinx==0.5.1
+nbsphinx
 m2r2
 Deprecated
 sphinx-jinja
 alabaster
 IPython
+importlib-metadata==3.10.1
 # require pandoc which is a haskell package

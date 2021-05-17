@@ -114,8 +114,8 @@ def np_generate(grain_size, volume_fraction, percent_variance, x_blur):
 
 @curry
 def generate_multiphase(
-    shape, grain_size, volume_fraction, chunks=-1, percent_variance=0.0
-):
+    shape, grain_size, volume_fraction, chunks=-1, percent_variance=0.0, seed=None
+):  # pylint: disable=too-many-arguments
     """Constructs microstructures for an arbitrary number of phases
     given the size of the domain, and relative grain size.
 
@@ -126,6 +126,7 @@ def generate_multiphase(
       chunks (int): chunks_size of the first
       percent_variance (float): the percent variance for each value of
         volume_fraction
+      seed (int): set the seed value, default is no seed
 
     Returns:
       A dask array of random-multiphase microstructures
@@ -136,19 +137,40 @@ def generate_multiphase(
     >>> x_tru = np.array([[[0, 0, 0],
     ...                    [0, 1, 0],
     ...                    [1, 1, 1]]])
-    >>> da.random.seed(10)
+
     >>> x = generate_multiphase(
     ...     shape=(1, 3, 3),
     ...     grain_size=(1, 1),
-    ...     volume_fraction=(0.5, 0.5)
+    ...     volume_fraction=(0.5, 0.5),
+    ...     seed=10
     ... )
     >>> print(x.shape)
     (1, 3, 3)
-    >>> print(x.chunks)
-    ((1,), (3,), (3,))
+
     >>> assert np.allclose(x, x_tru)
 
+    If `chunks` is not set a Numpy array is returned.
+
+    >>> type(x)
+    <class 'numpy.ndarray'>
+
+    If `chunks` is defined a Dask array is returned.
+
+    >>> x = generate_multiphase(
+    ...     shape=(2, 3, 3),
+    ...     grain_size=(1, 1),
+    ...     volume_fraction=(0.5, 0.5),
+    ...     chunks=1
+    ... )
+
+    >>> print(x.chunks)
+    ((1, 1), (3,), (3,))
+
     """
+
+    if seed is not None:
+        da.random.seed(seed)
+        np.random.seed(seed)
 
     if len(grain_size) + 1 != len(shape):
         raise RuntimeError("`shape` should be of length `len(grain_size) + 1`")
@@ -156,8 +178,11 @@ def generate_multiphase(
     if not np.allclose(np.sum(volume_fraction), 1):
         raise RuntimeError("The terms in the volume fraction list should sum to 1")
 
-    return map_blocks(
-        np_generate(grain_size, volume_fraction, percent_variance),
-        da.random.random(shape, chunks=(chunks,) + shape[1:]),
-        dtype=np.int64,
+    return pipe(
+        map_blocks(
+            np_generate(grain_size, volume_fraction, percent_variance),
+            da.random.random(shape, chunks=(chunks,) + shape[1:]),
+            dtype=np.int64,
+        ),
+        lambda x: x if chunks > 0 else x.compute(),
     )
