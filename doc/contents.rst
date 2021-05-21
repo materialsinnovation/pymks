@@ -1,6 +1,6 @@
 .. raw:: html
 
-    <meta http-equiv="refresh" content="0; URL='./rst/README.html'" />
+   <meta http-equiv="refresh" content="0; URL='./rst/README.html'" />
 
 .. pymks documentation master file, created by
    sphinx-quickstart on Thu Mar 22 15:47:53 2012.
@@ -8,9 +8,11 @@
    contain the root `toctree` directive.
 
 .. toctree::
-   :hidden:
-   :maxdepth: 0
+   :maxdepth: 4
    :glob:
+   :hidden:
 
-   rst/*.ipynb
-   rst/notebooks/*.ipynb
+   rst/README.md
+   EXAMPLES.rst
+   API.rst
+   THEORY.rst

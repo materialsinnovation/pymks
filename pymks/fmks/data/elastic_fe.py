@@ -12,7 +12,7 @@ n_x, n_y, n_z).
 >>> X = np.zeros((1, 3, 3), dtype=int)
 >>> X[0, :, 1] = 1
 
->>> strain = solve_fe(
+>>> strain = _solve_fe(
 ...     X,
 ...     elastic_modulus=(1.0, 10.0),
 ...     poissons_ratio=(0., 0.),
@@ -43,7 +43,7 @@ left/right periodic offset and the top/bottom periodicity.
 ...                [1, 0, 0, 1]]])
 >>> n_samples, N, N = X.shape
 >>> macro_strain = 0.1
->>> displacement = solve_fe(
+>>> displacement = _solve_fe(
 ...     X,
 ...     elastic_modulus=(10.0, 1.0),
 ...     poissons_ratio=(0.3, 0.3),
@@ -80,7 +80,7 @@ The module also works with Dask arrays,
 >>> print(X.shape)
 (2, 4, 4)
 >>> x_data = da.from_array(X, chunks=(1, 4, 4))
->>> out = solve_fe(x_data,
+>>> out = _solve_fe(x_data,
 ...             elastic_modulus=(10.0, 1.0),
 ...             poissons_ratio=(0.3, 0.3),
 ...             macro_strain=macro_strain)['displacement']
@@ -145,23 +145,7 @@ warnings.simplefilter("ignore", category=FutureWarning)
 
 
 @curry
-def solve_fe(x_data, elastic_modulus, poissons_ratio, macro_strain=1.0, delta_x=1.0):
-    """Solve the elasticity problem
-
-    Args:
-      x_data: microstructure with shape (n_samples, n_x, ...)
-      elastic_modulus: the elastic modulus in each phase
-      poissons_ration: the poissons ratio for each phase
-      macro_strain: the macro strain
-      delta_x: the grid spacing
-
-    Returns:
-      a dictionary of strain, displacement and stress with stress and
-      strain of shape (n_samples, n_x, ..., 3) and displacement shape
-      of (n_samples, n_x + 1, ..., 2)
-
-    """
-
+def _solve_fe(x_data, elastic_modulus, poissons_ratio, macro_strain=1.0, delta_x=1.0):
     def solve_one_sample(property_array):
         return pipe(
             get_fields(property_array.shape[:-1], delta_x),

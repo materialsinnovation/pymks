@@ -8,12 +8,24 @@ Note that input microstrucure should be 4 dimensional array.
 where X=[n_sample,x,y.n_basis]
 """
 import numpy as np
-from toolz.curried import pipe, curry
+from toolz.curried import pipe
 from toolz.curried import map as map_, identity
 from sklearn.base import TransformerMixin, BaseEstimator
 import dask.array as da
-from .func import dafftshift, dafftn, daifftn, daconj, flatten
-from .func import sequence, make_da, star, dapad
+from .func import (
+    sequence,
+    make_da,
+    star,
+    dapad,
+    curry,
+    make_da_return,
+    make_da_return2,
+    dafftshift,
+    dafftn,
+    daifftn,
+    daconj,
+    flatten,
+)
 
 
 @make_da
@@ -47,7 +59,9 @@ def cross_correlation(arr1, arr2):
     >>> f_data = cross_correlation(x_data, y_data)
     >>> assert x_data.chunks == f_data.chunks
     >>> shape = (10, 5, 5)
-    >>> # When the two input fields have different chunkings
+
+    When the two input fields have different chunkings
+
     >>> x_data = da.random.random(shape, chunks=(2,5,5))
     >>> y_data = da.random.random(shape, chunks=(5,5,5))
     >>> f_data = cross_correlation(x_data, y_data)
@@ -144,25 +158,64 @@ def center_slice(x_data, cutoff):
 
 
 @curry
-def two_point_stats(arr1, arr2, mask=None, periodic_boundary=True, cutoff=None):
-    """Calculate the 2-points stats for two arrays
+@make_da_return2
+def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None, mask=None):
+    r"""Calculate the 2-points stats for two arrays
+
+    The discretized two point statistics are given by
+
+    $$ f[r \\; \\vert \\; l, l'] = \\frac{1}{S} \\sum_s m[s, l] m[s + r, l'] $$
+
+    where $ f[r \\; \\vert \\; l, l'] $ is the conditional probability
+    of finding the local states $l$ and $l'$ at a distance and
+    orientation away from each other defined by the vector $r$. `See
+    this paper for more details on the
+    notation. <https://doi.org/10.1007/s40192-017-0089-0>`_
+
+    The array ``arr1[i]`` (state :math:`l`) is correlated with
+    ``arr2[i]`` (state :math:`l'`) for each sample ``i``. Both arrays
+    must have the same number of samples and nominal states (integer
+    value) or continuous variables.
+
+    To calculate multiple different correlations for each sample, see
+    :func:`~pymks.correlations_multiple`.
+
+    To use ``two_point_stats`` as part of a Scikit-learn pipeline, see
+    :class:`~pymks.TwoPointCorrelation`.
 
     Args:
-      arr1: array used to calculate cross-correlations (n_samples,n_x,n_y)
-      arr2: array used to calculate cross-correlations (n_samples,n_x,n_y)
-      mask: array specifying confidence in the measurement at a pixel
-        (n_samples,n_x,n_y).  In range [0,1].
-      periodic_boundary: whether to assume a periodic boundary (default is true)
+      arr1: array used to calculate cross-correlations, shape
+        ``(n_samples,n_x,n_y)``
+      arr2: array used to calculate cross-correlations, shape
+        ``(n_samples,n_x,n_y)``
+      periodic_boundary: whether to assume a periodic boundary
+        (default is ``True``)
       cutoff: the subarray of the 2 point stats to keep
+      mask: array specifying confidence in the measurement at a pixel,
+        shape ``(n_samples,n_x,n_y)``. In range [0,1].
 
     Returns:
       the snipped 2-points stats
 
-    >>> two_point_stats(
+    If both arrays are Dask arrays then a Dask array is returned.
+
+    >>> out = two_point_stats(
     ...     da.from_array(np.arange(10).reshape(2, 5), chunks=(2, 5)),
     ...     da.from_array(np.arange(10).reshape(2, 5), chunks=(2, 5)),
-    ... ).shape
+    ... )
+    >>> out.chunks
+    ((2,), (5,))
+    >>> out.shape
     (2, 5)
+
+    If either of the arrays are Numpy then a Numpy array is returned.
+
+    >>> two_point_stats(
+    ...     np.arange(10).reshape(2, 5),
+    ...     np.arange(10).reshape(2, 5),
+    ... )
+    array([[ 3.,  4.,  6.,  4.,  3.],
+           [48., 49., 51., 49., 48.]])
 
     Test masking
 
@@ -179,10 +232,11 @@ def two_point_stats(arr1, arr2, mask=None, periodic_boundary=True, cutoff=None):
 
     >>> array = da.array([[[1, 0], [0, 1]]])
     >>> mask =  da.array([[[2, 0], [0, 1]]])
-    >>> two_point_stats(array, array, mask)
+    >>> two_point_stats(array, array, mask=mask)
     Traceback (most recent call last):
     ...
     RuntimeError: Mask must be in range [0,1]
+
     """
 
     cutoff_ = int((np.min(arr1.shape[1:]) - 1) / 2)
@@ -230,27 +284,59 @@ def two_point_stats(arr1, arr2, mask=None, periodic_boundary=True, cutoff=None):
     )([arr1, arr2])
 
 
-@make_da
+@make_da_return
 def correlations_multiple(data, correlations, periodic_boundary=True, cutoff=None):
-    """Calculate 2-point stats for a multiple auto/cross correlation
+    r"""Calculate 2-point stats for a multiple auto/cross correlation
+
+    The discretized two point statistics are given by
+
+    $$ f[r \\; \\vert \\; l, l'] = \\frac{1}{S} \\sum_s m[s, l] m[s + r, l'] $$
+
+    where $ f[r \\; \\vert \\; l, l'] $ is the conditional probability
+    of finding the local states $l$ and $l'$ at a distance and
+    orientation away from each other defined by the vector $r$. `See
+    this paper for more details on the
+    notation. <https://doi.org/10.1007/s40192-017-0089-0>`_
+
+    The correlations are calulated based on pairs given in
+    ``correlations`` for each sample.
+
+    To calculate a single correlation for two arrays, see
+    :func:`~pymks.two_point_stats`.
+
+    To use ``correlations_multiple`` as part of a Scikit-learn
+    pipeline, see :class:`~pymks.TwoPointCorrelation`.
 
     Args:
-      data: the discretized data (n_samples,n_x,n_y,n_correlation)
-      correlation_pair: the correlation pairs
-      periodic_boundary: whether to assume a periodic boudnary (default is true)
+      data: the discretized data with shape ``(n_samples, n_x, n_y, n_state)``
+      correlations: the correlation pairs, ``[[i0, j0], [i1, j1], ...]``
+      periodic_boundary: whether to assume a periodic boundary (default is true)
       cutoff: the subarray of the 2 point stats to keep
 
     Returns:
       the 2-points stats array
 
+    If ``data`` is a Numpy array then ``correlations_multiple`` will
+    return a Numpy array.
+
     >>> data = np.arange(18).reshape(1, 3, 3, 2)
+    >>> out_np = correlations_multiple(data, [[0, 1], [1, 1]])
+    >>> out_np.shape
+    (1, 3, 3, 2)
+    >>> answer = np.array([[[58, 62, 58], [94, 98, 94], [58, 62, 58]]]) + 2. / 3.
+    >>> assert np.allclose(out_np[..., 0], answer)
+
+    However, if ``data`` is a Dask array then a Dask array is
+    returned.
+
+    >>> data = da.from_array(data, chunks=(1, 3, 3, 2))
     >>> out = correlations_multiple(data, [[0, 1], [1, 1]])
     >>> out.shape
     (1, 3, 3, 2)
     >>> out.chunks
     ((1,), (3,), (3,), (2,))
-    >>> answer = np.array([[[58, 62, 58], [94, 98, 94], [58, 62, 58]]]) + 1. / 3.
-    >>> assert(out.compute()[...,0], answer)
+    >>> assert np.allclose(out[..., 0], answer)
+
     """
 
     return pipe(
@@ -272,17 +358,22 @@ def correlations_multiple(data, correlations, periodic_boundary=True, cutoff=Non
 
 
 class TwoPointCorrelation(BaseEstimator, TransformerMixin):
-    """Calculate the 2-point stats for two arrays
+    """Calculate the 2-point stats for two arrays as part of Scikit-learn
+    pipeline.
+
+    Wraps the :func:`~pymks.correlations_multiple` function. See that
+    for more complete documentation.
+
     """
 
-    def __init__(self, periodic_boundary=True, cutoff=None, correlations=None):
-        """Instantiate a TwoPointCorrelation
+    def __init__(self, correlations=None, periodic_boundary=True, cutoff=None):
+        """
 
         Args:
-          periodic_boundary: whether the boundary conditions are periodic
-          cutoff: cutoff radius of interest for the 2PtStatistics field
-          correlations1: an index
-          correlations2: an index
+          correlations: the correlation pairs
+          periodic_boundary: whether to assume a periodic boundary (default is true)
+          cutoff: the subarray of the 2 point stats to keep
+
 
         """
 

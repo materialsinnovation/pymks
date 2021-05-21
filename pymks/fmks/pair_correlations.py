@@ -140,25 +140,29 @@ def paircorr_from_twopoint(x_data, cutoff_r=None, interpolate_n=None):
 
     The discretized two point statistics are given by
 
-    $$ f[r \\; \\vert \\; l, l'] = \\frac{1}{S} \\sum_s m[s, l] m[s + r, l'] $$
+    .. math::
 
-    where $ f[r \\; \\vert \\; l, l'] $ is the conditional probability of
-    finding the local states $l$ and $l'$ at a distance and
-    orientation away from each other defined by the vector $r$. `See
-    this paper for more details on the
+       f[r \; \vert \; l, l'] = \frac{1}{S} \sum_s m[s, l] m[s + r, l']
+
+    where :math:`f[r \; \vert \; l, l']` is the conditional
+    probability of finding the local states :math:`l` and math:`l'` at
+    a distance and orientation away from each other defined by the
+    vector :math:`r`. `See this paper for more details on the
     notation. <https://doi.org/10.1007/s40192-017-0089-0>`_
 
     The pair correlation is defined as the conditional probability for
-    the case of the magnitude vector, $||r||_2$, defined by $ g[ d ]$.
-    $g$ is related to $f$ via the following
+    the case of the magnitude vector, :math:`||r||_2`, defined by :math:`g[d]`.
+    :math:`g` is related to :math:`f` via the following
     transformation. Consider the set,
-    $ I[d] := \\{ f[r] \\; \\vert \\; ||r||_2 = d \\} $
+    :math:`I[d] := \{ f[r] \; \vert \; ||r||_2 = d \}`
     then
 
-    $$ g[d] = \\frac{1}{ | I[ d ] | }  \\sum_{f \\in I[ d ]} f $$
+    .. math::
 
-    The $d$ are radii from the center pixel of the domain. They are
-    automatially calculated if ``interpolate_n`` is ``None``.
+       g[d] = \frac{1}{ | I[ d ] | }  \sum_{f \in I[ d ]} f
+
+    The :math:`d` are radii from the center pixel of the domain. They
+    are automatially calculated if ``interpolate_n`` is ``None``.
 
     It's assumed that ``x_data`` is a valid set of two point statistics
     calculated from the PyMKS correlations module.

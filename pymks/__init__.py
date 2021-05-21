@@ -13,6 +13,8 @@ except ImportError:
 
 import os
 
+from ._version import get_versions
+
 from .fmks.data.cahn_hilliard import solve_cahn_hilliard
 from .fmks.plot import plot_microstructures
 from .fmks.bases.primitive import PrimitiveTransformer
@@ -26,20 +28,10 @@ from .fmks.correlations import FlattenTransformer
 from .fmks.correlations import TwoPointCorrelation
 from .fmks.data.checkerboard import generate_checkerboard
 from .fmks.pair_correlations import paircorr_from_twopoint
+from .fmks import GenericTransformer
+from .fmks.correlations import two_point_stats, correlations_multiple
+from .fmks.data import solve_fe
 
-try:
-    import sfepy  # noqa: F401
-except ImportError:
-
-    def solve_fe(*_, **__):
-        """Dummy funcion when sfepy unavailable
-        """
-        # pylint: disable=redefined-outer-name, import-outside-toplevel, unused-import
-        import sfepy  # noqa: F401, F811
-
-
-else:
-    from .fmks.data.elastic_fe import solve_fe
 
 # the following will be deprecated
 from .mks_localization_model import MKSLocalizationModel
@@ -51,39 +43,27 @@ from .mks_homogenization_model import MKSHomogenizationModel
 MKSRegressionModel = MKSLocalizationModel
 DiscreteIndicatorBasis = PrimitiveBasis
 ContinuousIndicatorBasis = PrimitiveBasis
-# the above will be deprecatec
+# the above will be deprecated
 
 
-def test():
-    r"""
-    Run all the doctests available.
+def test(*args):
+    r"""Run all the module tests.
+
+    Equivalent to running ``py.test pymks`` in the base of
+    PyMKS. Allows an installed version of PyMKS to be tested.
+
+    Args:
+      *args: add arguments to pytest
+
     """
     import pytest  # pylint: disable=import-outside-toplevel
 
     path = os.path.join(os.path.split(__file__)[0], "fmks")
-    pytest.main(args=[path, "--doctest-modules", "-r s"])
+    pytest.main(args=[path, "--doctest-modules", "-r s"] + list(args))
 
 
-def get_version():
-    """Get the version of the code from egg_info.
-
-    Returns:
-      the package version number
-    """
-    # pylint: disable=import-outside-toplevel
-    from pkg_resources import get_distribution, DistributionNotFound
-
-    try:
-        version = get_distribution(
-            __name__.split(".")[0]
-        ).version  # pylint: disable=no-member
-    except DistributionNotFound:  # pragma: no cover
-        version = "unknown, try running `python setup.py egg_info`"
-
-    return version
-
-
-__version__ = get_version()
+__version__ = get_versions()["version"]
+del get_versions
 
 __all__ = [
     "__version__",
@@ -107,4 +87,7 @@ __all__ = [
     "TwoPointCorrelation",
     "generate_checkerboard",
     "paircorr_from_twopoint",
+    "GenericTransformer",
+    "two_point_stats",
+    "correlations_multiple",
 ]
