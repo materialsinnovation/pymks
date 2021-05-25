@@ -5,18 +5,25 @@
 {
   tag ? "20.09",
   withSfepy ? true,
+  withGraspi ? true,
+  graspiVersion ? "59f6a8a2e1ca7c8744a4e37701b919131efb2f45"
 }:
 let
   pkgs = import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/${tag}.tar.gz") {};
   pypkgs = pkgs.python3Packages;
-  pymks = pypkgs.callPackage ./default.nix { sfepy=(if withSfepy then pypkgs.sfepy else null); };
-  linting = with pypkgs; [ black pylint flake8 ];
+  pymks = pypkgs.callPackage ./default.nix {
+    sfepy=(if withSfepy then pypkgs.sfepy else null);
+    graspi=(if withGraspi then graspi else null);
+  };
+  extra = with pypkgs; [ black pylint flake8 ipywidgets ];
+  graspisrc = builtins.fetchTarball "https://github.com/owodolab/graspi/archive/${graspiVersion}.tar.gz";
+  graspi = pypkgs.callPackage "${graspisrc}/default.nix" {};
 in
   (pymks.overridePythonAttrs (old: rec {
 
     propagatedBuildInputs = old.propagatedBuildInputs;
 
-    nativeBuildInputs = propagatedBuildInputs ++ linting;
+    nativeBuildInputs = propagatedBuildInputs ++ extra;
 
     postShellHook = ''
       export OMPI_MCA_plm_rsh_agent=${pkgs.openssh}/bin/ssh
