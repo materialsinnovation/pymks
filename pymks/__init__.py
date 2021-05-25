@@ -92,5 +92,5 @@ __all__ = [
     "two_point_stats",
     "correlations_multiple",
     "graph_descriptors",
-    "GraphDescriptors"
+    "GraphDescriptors",
 ]
