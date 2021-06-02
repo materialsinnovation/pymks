@@ -15,6 +15,10 @@
 , graphviz
 , pygraphviz
 , pyfftw
+, ase
+, scikitimage
+, pytorch
+, paraview
 }:
 buildPythonPackage rec {
   pname = "pymks";
@@ -35,6 +39,10 @@ buildPythonPackage rec {
     graphviz
     pygraphviz
     pyfftw
+    ase
+    scikitimage
+    pytorch
+    paraview
   ];
 
   checkInputs = [
