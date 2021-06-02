@@ -4,7 +4,7 @@
 import ase
 import numpy as np
 from .helpers import *
-from toolz.curried import curry, pipe
+from toolz.curried import curry, pipe, merge
 
 
 @curry
@@ -46,7 +46,29 @@ def AtomCenters(coords, box, len_pixel):
     return atom_centers
 
 
-def grid_maker(atom, atomic_radii=None, len_pixel=10, full=False, fft=False):
+def generate_grids(ase_atom, atomic_radii=None, n_pixel=10, extend_boundary_atoms=False, use_fft_method=False):
+    """Generate voxalized representation corresponding to pore volume and
+    the atomic species.
+
+    Args:
+      atom: an ASE atom object
+      atomic_radii
+      n_pixel: number of pixels per unit length
+      extend_boundary_atoms: whether to have boundary atoms cutoff at
+        the boundary
+      use_fft_method: whether to use the FFT method of the EDT method
+        for generating the atom volumes
+
+    Returns:
+      A dictionary with keys of "pore" and atom type and values of
+      binary numpy arrays. The arrays represent whether the atom type
+      or pore exists in each voxel. Each voxel can only occupy one of the
+      states returned.
+
+    """
+
+    atom = ase_atom
+    len_pixel = n_pixel
 
     dgnls = atom.cell.diagonal()
     if np.any(dgnls == 0):
@@ -71,13 +93,13 @@ def grid_maker(atom, atomic_radii=None, len_pixel=10, full=False, fft=False):
     scaler = np.asarray([len_pixel * (2 * max_r+1)] * 3)
 
     spheres = {}
-    if fft:
+    if use_fft_method:
         for symbol in atomic_radii:
             spheres[symbol] = sphere(atomic_radii[symbol] * len_pixel)
-        generator = generator_fft(box_dim=box_dim, len_pixel=len_pixel, full=full, scaler=scaler)
+        generator = generator_fft(box_dim=box_dim, len_pixel=len_pixel, full=extend_boundary_atoms, scaler=scaler)
     else:
         spheres = atomic_radii.copy()
-        generator = generator_edt(box_dim=box_dim, len_pixel=len_pixel, full=full, scaler=scaler)
+        generator = generator_edt(box_dim=box_dim, len_pixel=len_pixel, full=extend_boundary_atoms, scaler=scaler)
 
     S = None
     S_list = []
@@ -92,7 +114,8 @@ def grid_maker(atom, atomic_radii=None, len_pixel=10, full=False, fft=False):
             S += S_list[-1]
 
     S = (S < 1e-2) * 1
-    return S, S_list, box_dim
+
+    return merge(dict(pores=S), dict(zip(syms, S_list)))
 
 @curry
 def generator_edt(indxs, atom_r, box_dim, len_pixel, full=False, scaler=0.0):
