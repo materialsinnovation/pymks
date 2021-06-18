@@ -115,7 +115,7 @@ def generate_grids(ase_atom, atomic_radii=None, n_pixel=10, extend_boundary_atom
 
     S = (S < 1e-2) * 1
 
-    return merge(dict(pores=S), dict(zip(syms, S_list)))
+    return merge(dict(pores=S, n_pixel=n_pixel), dict(zip(syms, S_list)))
 
 @curry
 def generator_edt(indxs, atom_r, box_dim, len_pixel, full=False, scaler=0.0):
