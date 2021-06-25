@@ -1,0 +1,75 @@
+data_-IRY
+
+#**************************************************************************
+#
+# CIF taken from the IZA-SC Database of Zeolite Structures
+# Ch. Baerlocher and L.B. McCusker
+# Database of Zeolite Structures: http://www.iza-structure.org/databases/ 
+#
+# The atom coordinates and the cell parameters were optimized with DLS76
+# assuming a pure SiO2 composition.
+#
+#**************************************************************************
+
+_cell_length_a                  15.9499(0)
+_cell_length_b                  15.9499(0)
+_cell_length_c                  31.0796(0)
+_cell_angle_alpha               90.0000(0)
+_cell_angle_beta                90.0000(0)
+_cell_angle_gamma              120.0000(0)
+
+_symmetry_space_group_name_H-M     'P 63/m 2/m 2/c'
+_symmetry_Int_Tables_number         194
+_symmetry_cell_setting             hexagonal
+
+
+loop_
+_symmetry_equiv_pos_as_xyz
+'+x,+y,+z'
+'-y,+x-y,+z'
+'-x+y,-x,+z'
+'-x,-y,1/2+z'
+'+y,-x+y,1/2+z'
+'+x-y,+x,1/2+z'
+'+y,+x,1/2+z'
+'+x-y,-y,1/2+z'
+'-x,-x+y,1/2+z'
+'-y,-x,+z'
+'-x+y,+y,+z'
+'+x,+x-y,+z'
+'-x,-y,-z'
+'+y,-x+y,-z'
+'+x-y,+x,-z'
+'+x,+y,1/2-z'
+'-y,+x-y,1/2-z'
+'-x+y,-x,1/2-z'
+'-y,-x,1/2-z'
+'-x+y,+y,1/2-z'
+'+x,+x-y,1/2-z'
+'+y,+x,-z'
+'+x-y,-y,-z'
+'-x,-x+y,-z'
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+    T1    Si 	 0.4746    0.3335    0.0319
+    T2    Si 	 0.3711    0.4369    0.0640
+    T3    Si 	 0.2253    0.4507    0.1149
+    T4    Si 	 0.2721    0.5443    0.2018
+    T5    Si 	 0.3333    0.6667    0.0765
+    O1    O      0.4407    0.3305    0.9829
+    O2    O      0.5880    0.4120    0.0363
+    O3    O      0.4566    0.2283    0.0455
+    O4    O      0.4131    0.3637    0.0629
+    O5    O      0.4566    0.5434    0.0771
+    O6    O      0.2825    0.3979    0.0977
+    O7    O      0.2295    0.4589    0.1667
+    O8    O      0.3877    0.6123    0.1961
+    O9    O      0.2505    0.5011    0.2500
+   O10    O      0.2787    0.5573    0.0942
+   O11    O      0.3333    0.6667    0.0247
+

@@ -10,7 +10,7 @@ let
   pkgs = import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/${tag}.tar.gz") {};
   pypkgs = pkgs.python3Packages;
   pymks = pypkgs.callPackage ./default.nix { sfepy=(if withSfepy then pypkgs.sfepy else null); };
-  linting = with pypkgs; [ black pylint flake8 ];
+  linting = with pypkgs; [ black pylint flake8 ipywidgets ];
 in
   (pymks.overridePythonAttrs (old: rec {
 

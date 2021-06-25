@@ -1,0 +1,84 @@
+data_SFW
+
+#**************************************************************************
+#
+# CIF taken from the IZA-SC Database of Zeolite Structures
+# Ch. Baerlocher and L.B. McCusker
+# Database of Zeolite Structures: http://www.iza-structure.org/databases/ 
+#
+# The atom coordinates and the cell parameters were optimized with DLS76
+# assuming a pure SiO2 composition.
+#
+#**************************************************************************
+
+
+_cell_length_a    13.68061
+_cell_length_b    13.68061
+_cell_length_c    44.16007
+_cell_angle_alpha   90.00000
+_cell_angle_beta    90.00000
+_cell_angle_gamma  120.00000
+
+_symmetry_space_group_name_H-M     'R -3 2/m'
+_symmetry_Int_Tables_number         166
+_symmetry_cell_setting             trigonal
+
+loop_
+  _symmetry_equiv_pos_as_xyz
+X,Y,Z
+-Y,X-Y,Z
+-X+Y,-X,Z
+-Y,-X,Z
+X,X-Y,Z
+-X+Y,Y,Z
+-X,-Y,-Z
+Y,-X+Y,-Z
+X-Y,X,-Z
+Y,X,-Z
+-X,-X+Y,-Z
+X-Y,-Y,-Z
+X+1/3,Y+2/3,Z+2/3
+-Y+1/3,X-Y+2/3,Z+2/3
+-X+Y+1/3,-X+2/3,Z+2/3
+-Y+1/3,-X+2/3,Z+2/3
+X+1/3,X-Y+2/3,Z+2/3
+-X+Y+1/3,Y+2/3,Z+2/3
+-X+1/3,-Y+2/3,-Z+2/3
+Y+1/3,-X+Y+2/3,-Z+2/3
+X-Y+1/3,X+2/3,-Z+2/3
+Y+1/3,X+2/3,-Z+2/3
+-X+1/3,-X+Y+2/3,-Z+2/3
+X-Y+1/3,-Y+2/3,-Z+2/3
+X+2/3,Y+1/3,Z+1/3
+-Y+2/3,X-Y+1/3,Z+1/3
+-X+Y+2/3,-X+1/3,Z+1/3
+-Y+2/3,-X+1/3,Z+1/3
+X+2/3,X-Y+1/3,Z+1/3
+-X+Y+2/3,Y+1/3,Z+1/3
+-X+2/3,-Y+1/3,-Z+1/3
+Y+2/3,-X+Y+1/3,-Z+1/3
+X-Y+2/3,X+1/3,-Z+1/3
+Y+2/3,X+1/3,-Z+1/3
+-X+2/3,-X+Y+1/3,-Z+1/3
+X-Y+2/3,-Y+1/3,-Z+1/3
+
+
+loop_
+  _atom_site_label
+  _atom_site_type_symbol
+  _atom_site_fract_x
+  _atom_site_fract_y
+  _atom_site_fract_z
+T1   Si  0.99969   0.22528   0.25735 
+T2   Si  0.99972   0.22597   0.18682 
+T3   Si  0.99965   0.22571   0.03506 
+O1   O   0.00003   0.25545   0.22211 
+O2   O   0.12110   0.24220   0.26651 
+O3   O   0.90374   0.09626   0.26333 
+O4   O   0.97422   0.30796   0.27755 
+O5   O   0.90191   0.09809   0.18042 
+O6   O   0.97795   0.31128   0.16667 
+O7   O   0.12008   0.24016   0.17774 
+O8   O   0.00000   0.25796   0.00000 
+O9   O   0.12095   0.24190   0.04398 
+O10  O   0.90353   0.09647   0.04064 
