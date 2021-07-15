@@ -6,6 +6,7 @@ from functools import wraps
 import numpy as np
 import dask.array as da
 from dask import delayed
+import dask.dataframe as ddf
 import toolz.curried
 from toolz.curried import iterate, compose, pipe, get, flip, identity
 from toolz.curried import map as fmap
@@ -588,3 +589,21 @@ def sort_array(arr):
 
     """
     return sequence(np.argsort, lambda x: (arr[x], x))(arr)
+
+
+def apply_dataframe_func(func, data):
+    """Daskerize a function that takes an array and returns a dataframe
+
+    >>> import pandas
+
+    >>> def func(x):
+    ...     return pandas.DataFrame(x)
+
+    >>> x = np.random.random((10, 4))
+
+    >>> df = apply_dataframe_func(func, da.from_array(x, chunks=(2, 4)))
+    >>> df.get_partition(0).compute().shape
+    (2, 4)
+
+    """
+    return pipe(data.blocks, fmap(delayed(func)), list, ddf.from_delayed)

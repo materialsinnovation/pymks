@@ -31,6 +31,7 @@ from .fmks.pair_correlations import paircorr_from_twopoint
 from .fmks import GenericTransformer
 from .fmks.correlations import two_point_stats, correlations_multiple
 from .fmks.data import solve_fe
+from .fmks.graspi import graph_descriptors, GraphDescriptors
 
 
 # the following will be deprecated
@@ -90,4 +91,6 @@ __all__ = [
     "GenericTransformer",
     "two_point_stats",
     "correlations_multiple",
+    "graph_descriptors",
+    "GraphDescriptors",
 ]
