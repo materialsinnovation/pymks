@@ -163,7 +163,6 @@ def graph_descriptors(data, delta_x=1.0, periodic_boundary=True):
     ...                   [0, 1, 0],
     ...                   [0, 1, 0]]])
     >>> actual = graph_descriptors(data)
-    >>> actual.to_csv('out.csv')
 
     ``graph_descriptors`` returns a data frame.
 
