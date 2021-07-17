@@ -6,17 +6,20 @@ from .func import curry, fmap
 
 
 @curry
-def _plot_ax(axis, arrs, titles, cmap):
+def _plot_ax(axis, arrs, titles, cmap, showticks):
     if hasattr(axis.get_subplotspec(), "colspan"):
         col_num = axis.get_subplotspec().colspan.start  # pragma: no cover
     else:
         col_num = axis.colNum  # pragma: no cover
-    axis.set_xticks(())
-    axis.set_yticks(())
+    if not showticks:
+        axis.set_xticks(())
+        axis.set_yticks(())
     axis.set_title(titles[col_num])
+    extent_ = lambda dim: (-arrs[col_num].shape[dim] / 2, arrs[col_num].shape[dim] / 2)
     return axis.imshow(
         arrs[col_num],
         interpolation="none",
+        extent=extent_(1) + extent_(0),
         vmin=numpy.min(numpy.vstack(arrs)),
         vmax=numpy.max(numpy.vstack(arrs)),
         cmap=cmap,
@@ -30,7 +33,9 @@ def _colorbar(fig, axis, image):
     fig.colorbar(image, cax=axis)
 
 
-def plot_microstructures(*arrs, titles=(), cmap=None, colorbar=True, figsize_weight=4):
+def plot_microstructures(
+    *arrs, titles=(), cmap=None, colorbar=True, showticks=False, figsize_weight=4
+):
     """Plot a set of microstructures
 
     Args:
@@ -51,7 +56,9 @@ def plot_microstructures(*arrs, titles=(), cmap=None, colorbar=True, figsize_wei
         titles = (titles,)
     if len(titles) < len(arrs):
         titles = titles + ("",) * (len(arrs) - len(titles))
-    plots = list(fmap(_plot_ax(arrs=arrs, titles=titles, cmap=cmap), axs))
+    plots = list(
+        fmap(_plot_ax(arrs=arrs, titles=titles, cmap=cmap, showticks=showticks), axs)
+    )
     if colorbar:
         _colorbar(
             fig, fig.add_axes([1.0, 0.05, 0.05, 0.9]), plots[0],

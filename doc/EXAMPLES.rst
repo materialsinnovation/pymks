@@ -12,6 +12,7 @@ Start with the following notebooks if you are new to PyMKS.
    :maxdepth: 2
 
    rst/notebooks/intro.ipynb
+   rst/notebooks/intro_parallel.ipynb
    rst/notebooks/checkerboard.ipynb
 
 Homogenization
