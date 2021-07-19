@@ -23,6 +23,7 @@ Homogenization
 
    rst/notebooks/stress.ipynb
    rst/notebooks/fiber.ipynb
+   rst/notebooks/graph-descriptors.ipynb
 
 Localization
 ------------

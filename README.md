@@ -42,14 +42,16 @@ and localization linkages, and tools for discretizing the microstructure. In add
 PyMKS has modules for generating synthetic data sets using conventional numerical
 simulations.
 
-To learn about PyMKS start with the [PyMKS examples](./index.ipynb),
-especially the [introductory example](notebooks/intro.ipynb).  To
-learn more about the methods consult the [technical
-overview](http://pymks.org/en/stable/rst/notebooks/tech_overview.html)
+To learn about PyMKS start with the [PyMKS
+examples](http://pymks.org/en/stable/EXAMPLES.rst), especially the
+[introductory example](notebooks/intro.ipynb). To learn more about the
+methods consult the [technical overview](notebooks/tech_overview.html)
 for an introduction.
 
 The two principle objects that PyMKS provides are the
-`TwoPointCorrelation` transformer and the `LocalizationRegressor`
+[`TwoPointCorrelation`](http://pymks.org/en/stable/API.html#pymks.TwoPointCorrelation)
+transformer and the
+[`LocalizationRegressor`](http://pymks.org/en/stable/API.html#pymks.LocalizationRegressor)
 which provide the homogenization and localization functionality. The
 objects provided by PyMKS all work as either transformers or
 regressors in a Scikit-Learn pipeline and use both Numpy and Dask

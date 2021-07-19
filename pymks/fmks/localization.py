@@ -239,14 +239,43 @@ def _ini_axes(arr):
 
 @curry
 def coeff_to_real(coeff, new_shape=None):
-    """Convert the coefficents to real space
+    r"""Convert the coefficients to real space
+
+    Convert the :class:`pymks.LocalizationRegressor` coefficiencts to
+    real space. The coefficiencts are calculated in Fourier space, but
+    best viewed in real space. If the Fourier coefficients are defined
+    as :math:`\beta\left[l, k\right]` then the real space coefficients
+    are calculated using,
+
+    .. math::
+
+       \alpha \left[l, r\right] = \frac{1}{N} \sum_{k=0}^{N-1} \beta\left[l, k\right] e^{i \frac{2 \pi}{N} k r} e^{i \pi}
+
+    where :math:`l` is the local state and :math:`r` is the spatial
+    index from :math:`0` to :math:`N-1`.  The :math:`e^{i \pi}` term
+    is a shift applied to place the 0 coefficient at the center of the
+    domain for viewing purposes.
 
     Args:
-      coeff: the coefficient in Fourier space
-      new_shape: the shape of the coefficients in real space
+      coeff: the localization coefficients in Fourier space as a Dask
+        array `(n_x, n_y, n_state)`
+      new_shape: shape of the output to either shorten or pad with
+        zeros
 
     Returns:
       the coefficients in real space
+
+    A spike at :math:`k=1` should result in a cosine function on the
+    real axis.
+
+    >>> N = 100
+    >>> fcoeff = np.zeros((N, 1))
+    >>> fcoeff[1] = N
+    >>> x = np.linspace(0, 1, N + 1)[:-1]
+    >>> assert np.allclose(
+    ...     coeff_to_real(da.from_array(fcoeff)).real.compute(),
+    ...     np.cos(2 * np.pi * x + np.pi)[:, None]
+    ... )
 
     """
     return pipe(
