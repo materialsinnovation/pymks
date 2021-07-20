@@ -26,8 +26,8 @@ def generate_checkerboard(size, square_shape=(1,)):
     """Generate a 2-phase checkerboard microstructure
 
     Args:
-      size: the size of the domain `(n_x, n_y)`
-      square_shape: the shape of each subdomain `(n_x, n_y)`
+      size (tuple): the size of the domain ``(n_x, n_y)``
+      square_shape (tuple): the shape of each subdomain ``(n_x, n_y)``
 
     Returns:
       a microstructure of shape `(1,) + shape` (extra sample axis)

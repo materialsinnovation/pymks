@@ -27,18 +27,40 @@ def _npgenerate(n_phases, shape):
 def generate_delta(n_phases, shape, chunks=()):
     """Generate a delta microstructure
 
+    A delta microstructure has a 1 at the center and 0 everywhere else
+    for each phase. This is used to calibrate linear elasticity models
+    that only require delta microstructures for calibration.
+
     Args:
-      n_phases: number of phases
-      shape: the shape of the microstructure
-      chunks: how to chunk the sample axis
+      n_phases (int): number of phases
+      shape (tuple): the shape of the microstructure, ``(n_x, n_y)``
+      chunks (tuple): how to chunk the sample axis ``(n_chunk,)``
 
     Returns:
       a dask array of delta microstructures
 
-    >>> a = generate_delta(5, (3, 4), chunks=(5,))
-    >>> a.shape
+    If `n_phases=5` for example, this requires 20 microstructures as
+    each phase pairing requies 2 microstructure arrays.
+
+    >>> arr = generate_delta(5, (3, 4), chunks=(5,))
+    >>> arr.shape
     (20, 3, 4)
-    >>> a.chunks
+    >>> arr.chunks
     ((5, 5, 5, 5), (3,), (4,))
+    >>> print(arr[0].compute())
+    [[0 0 0 0]
+     [0 0 1 0]
+     [0 0 0 0]]
+
+    `generate_delta` requires at least 2 phases
+
+    >>> arr = generate_delta(2, (3, 3))
+    >>> arr.shape
+    (2, 3, 3)
+    >>> print(arr[0].compute())
+    [[0 0 0]
+     [0 1 0]
+     [0 0 0]]
+
     """
     return da.from_array(_npgenerate(n_phases, shape), chunks=(chunks or (-1,)) + shape)

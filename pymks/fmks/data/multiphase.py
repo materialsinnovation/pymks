@@ -120,10 +120,11 @@ def generate_multiphase(
     given the size of the domain, and relative grain size.
 
     Args:
-      shape (tuple): (n_sample, n_x, n_y, n_z)
-      grain_size (tuple): size of the grain size in the microstructure
-      volume_fraction (tuple): the percent volume fraction for each phase
-      chunks (int): chunks_size of the first
+      shape (tuple): shape of the domain ``(n_sample, n_x, n_y)``
+      grain_size (tuple): typical expected grain size ``(n_x, n_y)``
+      volume_fraction (tuple): the percent volume fraction for each
+        phase, which must sum to 1
+      chunks (int): chunks_size of the sample index
       percent_variance (float): the percent variance for each value of
         volume_fraction
       seed (int): set the seed value, default is no seed
@@ -134,24 +135,24 @@ def generate_multiphase(
 
     Example:
 
-    >>> x_tru = np.array([[[0, 0, 0],
-    ...                    [0, 1, 0],
-    ...                    [1, 1, 1]]])
+    >>> x_expected = np.array([[[0, 0, 0],
+    ...                         [0, 1, 0],
+    ...                         [1, 1, 1]]])
 
-    >>> x = generate_multiphase(
+    >>> x_actual = generate_multiphase(
     ...     shape=(1, 3, 3),
     ...     grain_size=(1, 1),
     ...     volume_fraction=(0.5, 0.5),
     ...     seed=10
     ... )
-    >>> print(x.shape)
+    >>> print(x_actual.shape)
     (1, 3, 3)
 
-    >>> assert np.allclose(x, x_tru)
+    >>> assert np.allclose(x_actual, x_expected)
 
     If `chunks` is not set a Numpy array is returned.
 
-    >>> type(x)
+    >>> type(x_actual)
     <class 'numpy.ndarray'>
 
     If `chunks` is defined a Dask array is returned.

@@ -36,12 +36,27 @@ def _colorbar(fig, axis, image):
 def plot_microstructures(
     *arrs, titles=(), cmap=None, colorbar=True, showticks=False, figsize_weight=4
 ):
-    """Plot a set of microstructures
+    """Plot a set of microstructures side-by-side
 
     Args:
       arrs: any number of 2D arrays to plot
       titles: a sequence of titles with len(*arrs)
       cmap: any matplotlib colormap
+
+    >>> import numpy as np
+    >>> np.random.seed(1)
+    >>> x_data = np.random.random((2, 10, 10))
+    >>> fig = plot_microstructures(
+    ...     x_data[0],
+    ...     x_data[1],
+    ...     titles=['array 0', 'array 1'],
+    ...     cmap='twilight'
+    ... )
+    >>> fig.show()  #doctest: +SKIP
+
+    .. image:: plot_microstructures.png
+       :width: 400
+
 
     """
     fig, axs = plt.subplots(
@@ -63,3 +78,4 @@ def plot_microstructures(
         _colorbar(
             fig, fig.add_axes([1.0, 0.05, 0.05, 0.9]), plots[0],
         )
+    return fig

@@ -257,9 +257,9 @@ def coeff_to_real(coeff, new_shape=None):
     domain for viewing purposes.
 
     Args:
-      coeff: the localization coefficients in Fourier space as a Dask
+      coeff (array): the localization coefficients in Fourier space as a Dask
         array `(n_x, n_y, n_state)`
-      new_shape: shape of the output to either shorten or pad with
+      new_shape (tuple): shape of the output to either shorten or pad with
         zeros
 
     Returns:
