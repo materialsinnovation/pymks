@@ -56,6 +56,12 @@ def test(*args):
     Args:
       *args: add arguments to pytest
 
+    To test an installed version of PyMKS use
+
+    .. code-block:: bash
+
+       $ python -c "import pymks; pymks.test()"
+
     """
     import pytest  # pylint: disable=import-outside-toplevel
 
