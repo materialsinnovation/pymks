@@ -1,4 +1,3 @@
-
 # PyMKS Overview
 
 <a href="https://travis-ci.org/materialsinnovation/pymks" target="_blank">
@@ -18,24 +17,25 @@ alt="Travis CI">
 <img src="https://circleci.com/gh/materialsinnovation/pymks.svg?style=shield" alt="Circle CI" height="18">
 </a>
 
-
 PyMKS is an open source, pythonic implementation of the methodologies
 developed under the aegis of Materials Knowledge System (MKS) to build
-salient process-structure-property linkages for materials science applications.
-PyMKS provides for efficient tools for obtaining a digital, uniform grid representation
-of a materials internal structure in terms of its local states, and computing hierarchical
-descriptors of the structure that can be used to build efficient machine
-learning based mappings to the relevant response space.
+salient process-structure-property linkages for materials science
+applications.  PyMKS provides for efficient tools for obtaining a
+digital, uniform grid representation of a materials internal structure
+in terms of its local states, and computing hierarchical descriptors
+of the structure that can be used to build efficient machine learning
+based mappings to the relevant response space.
 
-
-The various materials data analytics workflows developed under the MKS paradigm confirm to
-the data transformation pipeline architecture typical to most Data Science workflows. The workflows
-can be boiled down to a data preprocessing step, followed by a feature generation step (fingerprinting),
-and a model construction step (including hyper parameter optimization). PyMKS, written in a functional
-programming style and supporting distributed computation (multi-core, multi-threaded, cluster), provides
-modular functionalities to address each of these data transformation steps, while maximally leveraging
+The various materials data analytics workflows developed under the MKS
+paradigm confirm to the data transformation pipeline architecture
+typical to most Data Science workflows. The workflows can be boiled
+down to a data preprocessing step, followed by a feature generation
+step (fingerprinting), and a model construction step (including hyper
+parameter optimization). PyMKS, written in a functional programming
+style and supporting distributed computation (multi-core,
+multi-threaded, cluster), provides modular functionalities to address
+each of these data transformation steps, while maximally leveraging
 the capabilities of the underlying computing environment.
-
 
 PyMKS consists of tools to compute 2-point statistics, tools for both homogenization
 and localization linkages, and tools for discretizing the microstructure. In addition,
@@ -113,6 +113,20 @@ run
 
 in the base directory.
 
+### Docker
+
+PyMKS has a docker image avilable via
+[docker.io](https://hub.docker.com/repository/docker/wd15/pymks). Assuming
+that you have a working version of Docker, use
+
+    $ docker pull docker.io/wd15/pymks
+    $ docker run -i -t -p 8888:8888 wd15/fipy:latest
+    # jupyter notebook --ip 0.0.0.0 --no-browser
+
+The PyMKS example notebooks are available inside the image after
+opening the Jupyter notebook from http://127.0.0.1:8888. See
+[DOCKER.md](./DOCKER.md) for more details.
+
 ## Optional Packages
 
 Packages that are optional when using PyMKS.
@@ -127,6 +141,16 @@ install when using Nix or Conda, but not when using Pip. See the
 [Sfepy installation
 instructions](http://sfepy.org/doc-devel/installation.html) to install
 in your environment.
+
+### GraSPI
+
+GraSPI is a C++ library with a Python interface for creating materials
+descriptors using graph theory. See the [API
+documentation](http://pymks.org/en/stable/API.html#pymks.graph_descriptors)
+for more details. Currently, only the Nix installation builds with
+GraSPI by default To switch off GraSPI when using Nix use,
+
+    $ nix-shell --arg withGraspi false
 
 ## Testing
 
