@@ -164,12 +164,14 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None, mask=None):
 
     The discretized two point statistics are given by
 
-    $$ f[r \\; \\vert \\; l, l'] = \\frac{1}{S} \\sum_s m[s, l] m[s + r, l'] $$
+    .. math::
 
-    where $ f[r \\; \\vert \\; l, l'] $ is the conditional probability
-    of finding the local states $l$ and $l'$ at a distance and
-    orientation away from each other defined by the vector $r$. `See
-    this paper for more details on the
+       f[r \; \vert \; l, l'] = \frac{1}{S} \sum_s m[s, l] m[s + r, l']
+
+    where :math:`f[r \; \vert \; l, l']` is the conditional
+    probability of finding the local states :math:`l` and :math:`l` at
+    a distance and orientation away from each other defined by the
+    vector :math:`r`. `See this paper for more details on the
     notation. <https://doi.org/10.1007/s40192-017-0089-0>`_
 
     The array ``arr1[i]`` (state :math:`l`) is correlated with
@@ -290,12 +292,14 @@ def correlations_multiple(data, correlations, periodic_boundary=True, cutoff=Non
 
     The discretized two point statistics are given by
 
-    $$ f[r \\; \\vert \\; l, l'] = \\frac{1}{S} \\sum_s m[s, l] m[s + r, l'] $$
+    .. math::
 
-    where $ f[r \\; \\vert \\; l, l'] $ is the conditional probability
-    of finding the local states $l$ and $l'$ at a distance and
-    orientation away from each other defined by the vector $r$. `See
-    this paper for more details on the
+       f[r \; \vert \; l, l'] = \frac{1}{S} \sum_s m[s, l] m[s + r, l']
+
+    where :math:`f[r \; \vert \; l, l']` is the conditional
+    probability of finding the local states :math:`l` and :math:`l'`
+    at a distance and orientation away from each other defined by the
+    vector :math:`r`. `See this paper for more details on the
     notation. <https://doi.org/10.1007/s40192-017-0089-0>`_
 
     The correlations are calulated based on pairs given in

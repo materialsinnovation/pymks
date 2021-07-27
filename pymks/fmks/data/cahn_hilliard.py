@@ -149,20 +149,53 @@ def _check(x_data):
 
 
 def solve_cahn_hilliard(x_data, n_steps=1, delta_x=0.25, delta_t=0.001, gamma=1.0):
-    """Generate response for Cahn-Hilliard.
+    r"""Solve the Cahn-Hilliard equation.
+
+    Solve the `Cahn-Hilliard equation
+    <https://en.wikipedia.org/wiki/Cahn-Hilliard_equation>`_ for
+    multiple samples in arbitrary dimensions. The concentration varies
+    from -1 to 1. The equation is given by
+
+    .. math::
+
+       \dot{\phi} = \nabla^2 \left( \phi^3 - \phi \right) - \gamma \nabla^4 \phi
+
+    The discretiztion scheme used here is from `Chang and Rutenberg
+    <http://dx.doi.org/10.1103/PhysRevE.72.055701>`_. The scheme is a
+    semi-implicit discretization in time and is given by
+
+    .. math::
+
+       \phi_{t+\Delta t}
+       + \left(1 - a_1\right) \Delta t \nabla^2 \phi_{t+\Delta t}
+       + \left(1 - a_2\right) \Delta t \gamma \nabla^4 \phi_{t+\Delta t}
+       = \phi_t
+       - \Delta t \nabla^2 \left(a_1 \phi_t + a_2
+          \gamma \nabla^2 \phi_t - \phi_t^3 \right)
+
+    where :math:`a_1=3` and :math:`a_2=0`.
 
     Args:
-      x_data: dask array chunked along the sample axis
+      x_data: dask array chunked along the sample axis ``(n_sample, n_x, n_y)``
       n_steps: number of time steps used
-      delta_x: the grid spacing
-      delta_t: the time step size
-      gamma: Cahn-Hilliard parameter
+      delta_x: the grid spacing, :math:`\Delta x`
+      delta_t: the time step size, :math:`\Delta t`
+      gamma: Cahn-Hilliard parameter, :math:`\gamma`
 
     >>> import dask.array as da
-    >>> x_data = 2 * da.random.random((1, 6, 6), chunks=(1, 6, 6)) - 1
+    >>> da.random.seed(99)
+    >>> x_data = 2 * da.random.random((1, 100, 100), chunks=(1, 100, 100)) - 1
     >>> y_data = solve_cahn_hilliard(x_data)
     >>> y_data.chunks
-    ((1,), (6,), (6,))
+    ((1,), (100,), (100,))
+
+    >>> y_data = solve_cahn_hilliard(x_data, n_steps=10000)  #doctest: +SKIP
+    >>> from pymks import plot_microstructures
+    >>> fig = plot_microstructures(x_data[0], y_data[0])
+    >>> fig.show()  #doctest: +SKIP
+
+    .. image:: cahn-hilliard.png
+       :width: 400
 
     """
     return map_blocks(

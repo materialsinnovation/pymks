@@ -17,9 +17,9 @@ def graph_descriptors_np(data, delta_x=1.0, periodic_boundary=True):
     """Numpy only version of graph_descriptors function
 
     Args:
-      data: array of phases (n_samples, n_x, n_y), values must be 0 or 1
-      delta_x: pixel size
-      periodic_boundary: whether the boundaries are periodic
+      data (array): array of phases ``(n_samples, n_x, n_y)``, values must be 0 or 1
+      delta_x (float): pixel size
+      periodic_boundary (bool): whether the boundaries are periodic
 
     Returns:
       A Pandas data frame with samples along rows and descriptors
