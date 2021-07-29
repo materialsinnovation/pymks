@@ -3,7 +3,7 @@
 #
 
 {
-  tag ? "20.09",
+  tag ? "21.05",
   withSfepy ? true,
   withGraspi ? true,
   graspiVersion ? "59f6a8a2e1ca7c8744a4e37701b919131efb2f45"
@@ -23,7 +23,7 @@ in
 
     propagatedBuildInputs = old.propagatedBuildInputs;
 
-    nativeBuildInputs = propagatedBuildInputs ++ extra;
+    nativeBuildInputs = propagatedBuildInputs ++ extra ++ [ pymks ];
 
     postShellHook = ''
       export OMPI_MCA_plm_rsh_agent=${pkgs.openssh}/bin/ssh
