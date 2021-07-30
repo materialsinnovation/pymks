@@ -99,8 +99,8 @@ in the base directory.
 Follow the [Nix installation
 guild](https://nixos.org/nix/manual/#chap-quick-start) and then run
 
-    $ export NIX_VERSION=20.09
-    $ export PYMKS_VERSION=0.4.1
+    $ export NIX_VERSION=21.05
+    $ export PYMKS_VERSION=0.4.2
     $ nix-shell \
         -I nixpkgs=https://github.com/NixOS/nixpkgs/archive/${NIX_VERSION}.tar.gz \
         -I pymks=https://github.com/materialsinnovation/pymks/archive/${PYMKS_VERSION}.tar.gz \
