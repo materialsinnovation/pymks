@@ -17,7 +17,7 @@ alt="Travis CI">
 <img src="https://circleci.com/gh/materialsinnovation/pymks.svg?style=shield" alt="Circle CI" height="18">
 </a>
 
-PyMKS is an open source, pythonic implementation of the methodologies
+PyMKS is an open source, Pythonic implementation of the methodologies
 developed under the aegis of Materials Knowledge System (MKS) to build
 salient process-structure-property linkages for materials science
 applications.  PyMKS provides for efficient tools for obtaining a
@@ -49,9 +49,9 @@ methods consult the [technical overview](notebooks/tech_overview.html)
 for an introduction.
 
 The two principle objects that PyMKS provides are the
-[`TwoPointCorrelation`](http://pymks.org/en/stable/API.html#pymks.TwoPointCorrelation)
+`[TwoPointCorrelation](http://pymks.org/en/stable/API.html#pymks.TwoPointCorrelation)`
 transformer and the
-[`LocalizationRegressor`](http://pymks.org/en/stable/API.html#pymks.LocalizationRegressor)
+`[LocalizationRegressor](http://pymks.org/en/stable/API.html#pymks.LocalizationRegressor)`
 which provide the homogenization and localization functionality. The
 objects provided by PyMKS all work as either transformers or
 regressors in a Scikit-Learn pipeline and use both Numpy and Dask
@@ -97,7 +97,7 @@ in the base directory.
 ### Nix
 
 Follow the [Nix installation
-guild](https://nixos.org/nix/manual/#chap-quick-start) and then run
+guide](https://nixos.org/nix/manual/#chap-quick-start) and then run
 
     $ export NIX_VERSION=21.05
     $ export PYMKS_VERSION=0.4.1

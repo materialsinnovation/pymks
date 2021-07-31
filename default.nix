@@ -19,7 +19,7 @@
 }:
 buildPythonPackage rec {
   pname = "pymks";
-  version = "0.4.dev";
+  version = "0.4.2";
 
   src = builtins.filterSource (path: type: type != "directory" || baseNameOf path != ".git") ./.;
 
