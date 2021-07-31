@@ -49,9 +49,9 @@ methods consult the [technical overview](notebooks/tech_overview.html)
 for an introduction.
 
 The two principle objects that PyMKS provides are the
-`[TwoPointCorrelation](http://pymks.org/en/stable/API.html#pymks.TwoPointCorrelation)`
+[TwoPointCorrelation](http://pymks.org/en/stable/API.html#pymks.TwoPointCorrelation)
 transformer and the
-`[LocalizationRegressor](http://pymks.org/en/stable/API.html#pymks.LocalizationRegressor)`
+[LocalizationRegressor](http://pymks.org/en/stable/API.html#pymks.LocalizationRegressor)
 which provide the homogenization and localization functionality. The
 objects provided by PyMKS all work as either transformers or
 regressors in a Scikit-Learn pipeline and use both Numpy and Dask
