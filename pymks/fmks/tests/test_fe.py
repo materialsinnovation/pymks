@@ -8,8 +8,7 @@ from pymks.fmks.data import solve_fe
 
 
 def test_3d():
-    """Test FE in 3D
-    """
+    """Test FE in 3D"""
 
     def setone(arr):
         arr[0, :, (arr.shape[0] - 1) // 2] = 1.0
@@ -28,8 +27,7 @@ def test_3d():
 
 
 def test_3d_bcs():
-    """Test FE in 3D different macro strain
-    """
+    """Test FE in 3D different macro strain"""
     np.random.seed(8)
 
     def testing(size, macro_strain):
@@ -54,8 +52,7 @@ def test_3d_bcs():
 
 
 def test_issue106():
-    """Test for missing phases
-    """
+    """Test for missing phases"""
 
     def test(x_data):
         solve_fe(x_data, elastic_modulus=(1, 2, 3), poissons_ratio=(0.3, 0.3, 0.3))

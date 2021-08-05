@@ -229,8 +229,7 @@ def graph_descriptors(data, delta_x=1.0, periodic_boundary=True):
 
 @curry
 def graph_descriptors_sample(data, delta_x=1.0, periodic_boundary=True):
-    """Calculate graspi graph descriptors for a single array
-    """
+    """Calculate graspi graph descriptors for a single array"""
     graspi = pytest.importorskip("graspi")
 
     compute = lambda x: graspi.compute_descriptors(
@@ -300,8 +299,7 @@ class GraphDescriptors(BaseEstimator, TransformerMixin):
         )
 
     def fit(self, *_):
-        """Only necessary to make pipelines work
-        """
+        """Only necessary to make pipelines work"""
         return self
 
 
@@ -326,8 +324,7 @@ class GenericTransformer(BaseEstimator, TransformerMixin):
         self.func = func
 
     def fit(self, *_):
-        """Only necessary to make pipelines work
-        """
+        """Only necessary to make pipelines work"""
         return self
 
     def transform(self, data):

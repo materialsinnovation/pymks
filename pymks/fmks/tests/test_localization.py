@@ -17,8 +17,7 @@ def _get_x():
 
 
 def test():
-    """Very simple example.
-    """
+    """Very simple example."""
     assert np.allclose(
         fit(
             _get_x(),
@@ -31,8 +30,7 @@ def test():
 
 
 def test_setting_kernel():
-    """Test resetting the coeffs after coeff resize.
-    """
+    """Test resetting the coeffs after coeff resize."""
 
     x_data = generate_delta(n_phases=2, shape=(21, 21)).persist()
 

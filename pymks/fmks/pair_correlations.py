@@ -116,9 +116,7 @@ def interpolate(interpolate_n, probs, radii):
 
 @curry
 def np_paircorr(x_data, cutoff_r=None, interpolate_n=None):
-    """Numpy only version of `paircorr_from_twopoint`
-
-    """
+    """Numpy only version of `paircorr_from_twopoint`"""
     return sequence(
         calc_radii,
         lambda x: (calc_probs(x_data, x[2], x[1]), x[0]),

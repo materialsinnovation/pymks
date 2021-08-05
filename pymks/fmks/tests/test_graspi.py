@@ -8,8 +8,7 @@ GRASPI = pytest.importorskip("graspi")
 
 
 def test_compute_descriptors():
-    """Test the main cython function in Graspi.
-    """
+    """Test the main cython function in Graspi."""
     morph = np.array([1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0], dtype=np.int32)
     expected = [
         (12.0, b"STAT_n"),

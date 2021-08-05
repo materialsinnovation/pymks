@@ -24,8 +24,7 @@ class BasisTransformer(BaseEstimator, TransformerMixin):
     # pylint: disable=too-many-arguments
 
     def __init__(self, discretize, n_state=2, min_=0.0, max_=1.0, chunks=None):
-        """Instantiate a PrimitiveTransformer
-        """
+        """Instantiate a PrimitiveTransformer"""
         self.discretize = discretize
         self.n_state = n_state
         self.min_ = min_
@@ -50,6 +49,5 @@ class BasisTransformer(BaseEstimator, TransformerMixin):
         )
 
     def fit(self, *_):
-        """Only necessary to make pipelines work
-        """
+        """Only necessary to make pipelines work"""
         return self

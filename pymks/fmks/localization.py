@@ -277,7 +277,7 @@ def coeff_to_real(coeff, new_shape=None):
     ...     np.cos(2 * np.pi * x + np.pi)[:, None]
     ... )
 
-    """
+    """  # pylint: disable=line-too-long; # noqa: #501
     return pipe(
         coeff,
         daifftn(axes=_ini_axes(coeff), s=new_shape),
@@ -406,8 +406,7 @@ class ReshapeTransformer(BaseEstimator, TransformerMixin):
         return reshape(x_data, self.shape)
 
     def fit(self, *_):
-        """Only necessary to make pipelines work
-        """
+        """Only necessary to make pipelines work"""
         return self
 
 

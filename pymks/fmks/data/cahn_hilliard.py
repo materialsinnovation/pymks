@@ -112,7 +112,6 @@ def np_solve(x_data, delta_x=0.25, delta_t=0.001, gamma=1.0):
 
     Returns:
       an updated microsturcture
-n
 
     Raises:
       RuntimeError if domain is not square

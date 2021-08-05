@@ -8,7 +8,7 @@ from pymks.fmks.bases import legendre as leg
 
 def polyval(x_data):
     """
-        Evaluate Legendre expansion for given input.
+    Evaluate Legendre expansion for given input.
     """
     x_data = 4 * x_data - 1
     polys = np.array((np.ones_like(x_data), x_data, (3.0 * x_data ** 2 - 1.0) / 2.0))
@@ -18,9 +18,9 @@ def polyval(x_data):
 
 def test_1():
     """
-        This test compares output using fmks Legendre
-        discretization utility to independantly evaluated
-        polynomial expansion results.
+    This test compares output using fmks Legendre
+    discretization utility to independantly evaluated
+    polynomial expansion results.
     """
 
     data = da.from_array(np.array([[0.25, 0.1], [0.5, 0.25]]), chunks=(2, 2))

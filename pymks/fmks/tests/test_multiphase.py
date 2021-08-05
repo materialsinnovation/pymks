@@ -11,9 +11,7 @@ from pymks.datasets.microstructure_generator import MicrostructureGenerator
 
 
 def test_chunking():
-    """Test that the generated microstructue is chunked correctly
-
-    """
+    """Test that the generated microstructue is chunked correctly"""
 
     data = generate_multiphase(
         shape=(5, 11, 11),
@@ -27,8 +25,7 @@ def test_chunking():
 
 
 def test_2d():
-    """Regression test for microstructure phases
-    """
+    """Regression test for microstructure phases"""
     data = generate_multiphase(
         shape=(1, 4, 4), grain_size=(4, 4), volume_fraction=(0.5, 0.5), seed=10
     )
@@ -36,8 +33,7 @@ def test_2d():
 
 
 def test_1d():
-    """Test that 1D works
-    """
+    """Test that 1D works"""
     data = generate_multiphase(
         shape=(1, 10), grain_size=(4,), volume_fraction=(0.5, 0.5), seed=10
     )
@@ -56,8 +52,7 @@ def test_grain_size():
 
 
 def test_volume_fraction():
-    """Test incoherent volume_fraction
-    """
+    """Test incoherent volume_fraction"""
     with pytest.raises(RuntimeError) as excinfo:
         generate_multiphase(
             shape=(1, 10), grain_size=(2,), volume_fraction=(0.4, 0.4, 0.4), seed=10
