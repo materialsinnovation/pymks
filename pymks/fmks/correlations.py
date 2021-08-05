@@ -3,7 +3,7 @@ For computing auto and cross corelations under assumption
 of  periodic or  non-periodic boundary conditions using discreete fourier
 transform.
 
-
+7
 Note that input microstrucure should be 4 dimensional array.
 where X=[n_sample,x,y.n_basis]
 """
@@ -148,6 +148,9 @@ def center_slice(x_data, cutoff):
         lambda x: x_data.shape[1:][x] // 2, lambda x: slice(x - cutoff, x + cutoff + 1)
     )
 
+    if cutoff is None:
+        return x_data
+
     return pipe(
         range(len(x_data.shape) - 1),
         map_(make_slice),
@@ -226,7 +229,7 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None, mask=None):
     >>> norm_mask = da.array([[[2, 4, 3], [4, 7, 4], [3, 4, 2]]])
     >>> expected = da.array([[[1, 0, 1], [1, 4, 1], [1, 0, 1]]]) / norm_mask
     >>> assert np.allclose(
-    ...     two_point_stats(array, array, mask=mask, periodic_boundary=False),
+    ...     two_point_stats(array, array, mask=mask, periodic_boundary=False)[:, 1:-1, 1:-1],
     ...     expected
     ... )
 
@@ -239,16 +242,14 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None, mask=None):
     ...
     RuntimeError: Mask must be in range [0,1]
 
-    """
+    """  # noqa: #501
 
-    cutoff_ = int((np.min(arr1.shape[1:]) - 1) / 2)
-    if cutoff is None:
-        cutoff = cutoff_
-    cutoff = min(cutoff, cutoff_)
+    n_is_even = 1 - np.min(arr1.shape[1:]) % 2
+    padding = np.min(arr1.shape[1:]) // 2
 
     nonperiodic_padder = sequence(
         dapad(
-            pad_width=[(0, 0)] + [(cutoff, cutoff)] * (arr1.ndim - 1),
+            pad_width=[(0, 0)] + [(padding, padding + n_is_even)] * (arr1.ndim - 1),
             mode="constant",
             constant_values=0,
         ),
@@ -272,7 +273,14 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None, mask=None):
             # auto_correlation of the mask. But for the sake of
             # efficiency, we specify the periodic normalization in the
             # case there is no mask.
-            normalize = lambda x: x / arr1[0].size
+            normalize = sequence(
+                lambda x: x / arr1[0].size,
+                dapad(
+                    pad_width=[(0, 0)] + [(0, 0 + n_is_even)] * (arr1.ndim - 1),
+                    mode="wrap",
+                ),
+                lambda x: da.rechunk(x, (x.chunks[0],) + x.shape[1:]),
+            )
         else:
             normalize = lambda x: x / auto_correlation(padder(np.ones_like(arr1)))
 
@@ -402,8 +410,7 @@ class TwoPointCorrelation(BaseEstimator, TransformerMixin):
         )
 
     def fit(self, *_):
-        """Only necessary to make pipelines work
-        """
+        """Only necessary to make pipelines work"""
         return self
 
 
@@ -431,6 +438,5 @@ class FlattenTransformer(BaseEstimator, TransformerMixin):
         return flatten(x_data)
 
     def fit(self, *_):
-        """Only necessary to make pipelines work
-        """
+        """Only necessary to make pipelines work"""
         return self
