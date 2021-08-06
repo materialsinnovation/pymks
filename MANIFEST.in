@@ -1,2 +1,3 @@
 include versioneer.py
 include pymks/_version.py
+include LICENSE.md
