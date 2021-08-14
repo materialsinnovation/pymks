@@ -59,6 +59,10 @@ arrays for out-of-memory, distributed or parallel computations. The
 out-of-memory computations are still in an experimental stage as of
 version 0.4 and some issues still need to be resolved.
 
+This effort has been supported with grants from NIST and the Vannevar Bush Fellowship to Professor Kalidindi at Georgia Tech.
+
+
+
 ## Feedback
 
 Please submit questions and issues on the [GitHub issue
