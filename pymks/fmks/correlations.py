@@ -3,7 +3,7 @@ For computing auto and cross corelations under assumption
 of  periodic or  non-periodic boundary conditions using discreete fourier
 transform.
 
-
+7
 Note that input microstrucure should be 4 dimensional array.
 where X=[n_sample,x,y.n_basis]
 """
@@ -140,17 +140,39 @@ def center_slice(x_data, cutoff):
     ...
     RuntimeError: Data should be greater than 1D
 
+    ``center_slice`` can take a tuple of values
+
+    >>> center_slice(np.arange(9).reshape(1, 3, 3), (1, 0)).shape
+    (1, 3, 1)
+
+    ``cutoff`` must have the correct shape
+
+    >>> center_slice(np.arange(9).reshape(1, 3, 3), (1,)).shape
+    Traceback (most recent call last):
+    ...
+    RuntimeError: cutoff should have length (x_data.ndim - 1)
+
     """
     if x_data.ndim <= 1:
         raise RuntimeError("Data should be greater than 1D")
 
-    make_slice = sequence(
-        lambda x: x_data.shape[1:][x] // 2, lambda x: slice(x - cutoff, x + cutoff + 1)
-    )
+    if cutoff is None:
+        return x_data
+
+    if isinstance(cutoff, int):
+        cutoff = (cutoff,) * (x_data.ndim - 1)
+
+    if x_data.ndim != len(cutoff) + 1:
+        raise RuntimeError("cutoff should have length (x_data.ndim - 1)")
 
     return pipe(
         range(len(x_data.shape) - 1),
-        map_(make_slice),
+        map_(
+            lambda x: slice(
+                x_data.shape[1:][x] // 2 - cutoff[x],
+                x_data.shape[1:][x] // 2 + cutoff[x] + 1,
+            )
+        ),
         tuple,
         lambda x: (slice(len(x_data)),) + x,
         lambda x: x_data[x],
@@ -226,7 +248,7 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None, mask=None):
     >>> norm_mask = da.array([[[2, 4, 3], [4, 7, 4], [3, 4, 2]]])
     >>> expected = da.array([[[1, 0, 1], [1, 4, 1], [1, 0, 1]]]) / norm_mask
     >>> assert np.allclose(
-    ...     two_point_stats(array, array, mask=mask, periodic_boundary=False),
+    ...     two_point_stats(array, array, mask=mask, periodic_boundary=False)[:, 1:-1, 1:-1],
     ...     expected
     ... )
 
@@ -239,16 +261,14 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None, mask=None):
     ...
     RuntimeError: Mask must be in range [0,1]
 
-    """
+    """  # noqa: #501
 
-    cutoff_ = int((np.min(arr1.shape[1:]) - 1) / 2)
-    if cutoff is None:
-        cutoff = cutoff_
-    cutoff = min(cutoff, cutoff_)
+    n_is_even = 1 - np.array(arr1.shape[1:]) % 2
+    padding = np.array(arr1.shape[1:]) // 2
 
     nonperiodic_padder = sequence(
         dapad(
-            pad_width=[(0, 0)] + [(cutoff, cutoff)] * (arr1.ndim - 1),
+            pad_width=[(0, 0)] + list(zip(padding, padding + n_is_even)),
             mode="constant",
             constant_values=0,
         ),
@@ -272,7 +292,14 @@ def two_point_stats(arr1, arr2, periodic_boundary=True, cutoff=None, mask=None):
             # auto_correlation of the mask. But for the sake of
             # efficiency, we specify the periodic normalization in the
             # case there is no mask.
-            normalize = lambda x: x / arr1[0].size
+            normalize = sequence(
+                lambda x: x / arr1[0].size,
+                dapad(
+                    pad_width=[(0, 0)] + list(zip(0 * n_is_even, n_is_even)),
+                    mode="wrap",
+                ),
+                lambda x: da.rechunk(x, (x.chunks[0],) + x.shape[1:]),
+            )
         else:
             normalize = lambda x: x / auto_correlation(padder(np.ones_like(arr1)))
 
@@ -368,6 +395,17 @@ class TwoPointCorrelation(BaseEstimator, TransformerMixin):
     Wraps the :func:`~pymks.correlations_multiple` function. See that
     for more complete documentation.
 
+    ``TwoPointCorrelation`` works with non-square arrays
+
+    >>> from sklearn.pipeline import Pipeline
+    >>> from pymks import PrimitiveTransformer
+    >>> data = np.random.randint(0, 2, size=10).reshape(1, 5, 2)
+    >>> Pipeline([
+    ...     ('discretize', PrimitiveTransformer(n_state=2, min_=0.0, max_=1.0)),
+    ...     ('correlations', TwoPointCorrelation())
+    ... ]).transform(data).compute().shape
+    (1, 5, 3, 2)
+
     """
 
     def __init__(self, correlations=None, periodic_boundary=True, cutoff=None):
@@ -402,8 +440,7 @@ class TwoPointCorrelation(BaseEstimator, TransformerMixin):
         )
 
     def fit(self, *_):
-        """Only necessary to make pipelines work
-        """
+        """Only necessary to make pipelines work"""
         return self
 
 
@@ -431,6 +468,5 @@ class FlattenTransformer(BaseEstimator, TransformerMixin):
         return flatten(x_data)
 
     def fit(self, *_):
-        """Only necessary to make pipelines work
-        """
+        """Only necessary to make pipelines work"""
         return self

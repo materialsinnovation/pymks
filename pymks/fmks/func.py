@@ -210,8 +210,7 @@ def apply_dict_func(func, data, shape_dict):
 
 @curry
 def debug(stmt, data):  # pragma: no cover
-    """Helpful debug function
-    """
+    """Helpful debug function"""
     print(stmt)
     print(data)
     return data

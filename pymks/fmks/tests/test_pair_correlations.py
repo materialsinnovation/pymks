@@ -7,16 +7,14 @@ from pymks.fmks import correlations
 
 
 def get_array():
-    """Get array for tests
-    """
+    """Get array for tests"""
     return da.from_array(
         np.array([[[1, 0, 0], [0, 1, 1], [1, 1, 0]], [[0, 0, 1], [1, 0, 0], [0, 0, 1]]])
     )
 
 
 def get_mask():
-    """Get mask for tests
-    """
+    """Get mask for tests"""
     mask = np.ones((2, 3, 3))
     mask[:, 2, 1:] = 0
     return da.from_array(mask)
@@ -139,26 +137,20 @@ def test_non_periodic():
 
     array = get_array()
     # Auto-Correlation
-    correct = (correct_nonperiodic_auto / norm_nonperiodic).round(3).astype(np.float64)
-    tested = (
-        correlations.two_point_stats(array, array, periodic_boundary=False)
-        .compute()
-        .round(3)
-        .astype(np.float64)
+    assert np.allclose(
+        correlations.two_point_stats(array, array, periodic_boundary=False)[
+            :, 1:-1, 1:-1
+        ],
+        correct_nonperiodic_auto / norm_nonperiodic,
     )
-
-    assert (correct == tested).all()
 
     # Cross-Correlation
-    correct = (correct_nonperiodic_cross / norm_nonperiodic).round(3).astype(np.float64)
-    tested = (
-        correlations.two_point_stats(array, 1 - array, periodic_boundary=False)
-        .compute()
-        .round(3)
-        .astype(np.float64)
+    assert np.allclose(
+        correlations.two_point_stats(array, 1 - array, periodic_boundary=False)[
+            :, 1:-1, 1:-1
+        ],
+        correct_nonperiodic_cross / norm_nonperiodic,
     )
-
-    assert (correct == tested).all()
 
 
 def test_non_periodic_masking():
@@ -183,34 +175,20 @@ def test_non_periodic_masking():
     mask = get_mask()
 
     # Auto-Correlation
-    correct = (
-        (correct_nonperiodic_mask_auto / norm_nonperiodic_mask)
-        .round(3)
-        .astype(np.float64)
+    np.allclose(
+        correlations.two_point_stats(array, array, mask=mask, periodic_boundary=False)[
+            :, 1:-1, 1:-1
+        ],
+        correct_nonperiodic_mask_auto / norm_nonperiodic_mask,
     )
-    tested = (
-        correlations.two_point_stats(array, array, mask=mask, periodic_boundary=False)
-        .compute()
-        .round(3)
-        .astype(np.float64)
-    )
-    assert (correct == tested).all()
 
     # Cross-Correlation
-    correct = (
-        (correct_nonperiodic_mask_cross / norm_nonperiodic_mask)
-        .round(3)
-        .astype(np.float64)
-    )
-    tested = (
+    np.allclose(
         correlations.two_point_stats(
             array, 1 - array, mask=mask, periodic_boundary=False
-        )
-        .compute()
-        .round(3)
-        .astype(np.float64)
+        )[:, 1:-1, 1:-1],
+        correct_nonperiodic_mask_cross / norm_nonperiodic_mask,
     )
-    assert (correct == tested).all()
 
 
 def test_different_sized_arrays():

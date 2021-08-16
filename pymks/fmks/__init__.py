@@ -69,8 +69,7 @@ class GenericTransformer(BaseEstimator, TransformerMixin):
         self.func = func
 
     def fit(self, *_):
-        """Only necessary to make pipelines work
-        """
+        """Only necessary to make pipelines work"""
         return self
 
     def transform(self, data):

@@ -27,8 +27,7 @@ def _plot_ax(axis, arrs, titles, cmap, showticks):
 
 
 def _colorbar(fig, axis, image):
-    """Generate a colorbar
-    """
+    """Generate a colorbar"""
     axis.yaxis.set_offset_position("right")
     fig.colorbar(image, cax=axis)
 
@@ -76,6 +75,9 @@ def plot_microstructures(
     )
     if colorbar:
         _colorbar(
-            fig, fig.add_axes([1.0, 0.05, 0.05, 0.9]), plots[0],
+            fig,
+            fig.add_axes([1.0, 0.05, 0.05, 0.9]),
+            plots[0],
         )
+    plt.close()
     return fig

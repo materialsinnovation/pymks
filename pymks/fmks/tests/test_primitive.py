@@ -50,8 +50,7 @@ def test_error():
 
 
 def test_many_local_states():
-    """Test with many local states
-    """
+    """Test with many local states"""
 
     def _x_data():
         np.random.seed(3)

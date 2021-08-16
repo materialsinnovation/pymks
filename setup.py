@@ -13,27 +13,23 @@ import versioneer
 
 
 def get_setupcfg():
-    """Get the absolute path for setup.cfg
-    """
+    """Get the absolute path for setup.cfg"""
     return pathlib.Path(__file__).parent.absolute() / "setup.cfg"
 
 
 def get_configuration():
-    """Get contents of setup.cfg as a dict
-    """
+    """Get contents of setup.cfg as a dict"""
 
     return read_configuration(get_setupcfg())
 
 
 def get_name():
-    """Single location for name of package
-    """
+    """Single location for name of package"""
     return get_configuration()["metadata"]["name"]
 
 
 def setup_args():
-    """Get the setup arguments not configured in setup.cfg
-    """
+    """Get the setup arguments not configured in setup.cfg"""
     return dict(
         packages=find_packages(),
         package_data={"": ["tests/*.py"]},

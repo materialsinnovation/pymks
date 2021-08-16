@@ -70,6 +70,5 @@ def _compare(n_sample, n_space, n_state, chunk):
 
 
 def test():
-    """Test a simple filter example.
-    """
+    """Test a simple filter example."""
     assert _compare(400, 81, 2, 400)
