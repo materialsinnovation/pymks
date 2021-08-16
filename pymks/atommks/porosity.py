@@ -41,16 +41,40 @@ def is_connected(S):
             return True
 
 @curry
-def get_pld(s, lo=0.5, hi=9.5, tol=0.1):
-    """
-    returns PLD
-    input: EDT of the porous structure, and low and high range for PLD
+def get_pld(data, lo=0.5, hi=9.5, tol=0.1):
+    """Calculate the pore length diameter (PLD).
+
+    The PLD signifies the largest structure that can pass through a
+    connected pore structure. The ``lo`` and ``hi`` values are guesses
+    for the PLD to help the solution converge. The ``tol`` value is
+    the tolerance to search to find the PLD. The maximum number of
+    iterations is approximately ``(hi - lo) / tol``. Typically the
+    number of iterations is less that this.
+
+    Args:
+      data: the Euclidean distance of the pore strcuture from nearest
+        atoms.
+      lo: the minimum PLD value to check for
+      hi: the maximum PDL value to check for
+      tol: the resolution of the PLD values
+
+    Set up a test with a 6x6x6 array with a 2x2 tube through it in the
+    z-direction. The value of PLD should be 2 in this case.
+
+    >>> pore_data = np.zeros((6, 6, 6))
+    >>> pore_data[2:4, 2:4, :] = 1
+    >>> assert np.allclose(
+    ...    get_pld(calc_euclidean_distance(pore_data), tol=0.01),
+    ...    2.0,
+    ...    atol=0.01
+    ... )
+
     """
     computed = False
     mid = (lo + hi) * 0.5
     while not computed:
-        S_mod = np.zeros(s.shape)
-        S_mod[s >= mid] = 1
+        S_mod = np.zeros(data.shape)
+        S_mod[data >= mid] = 1
         if is_connected(S_mod):
             lo = mid
         else:
@@ -65,21 +89,116 @@ def get_pld(s, lo=0.5, hi=9.5, tol=0.1):
 
 
 @curry
-def get_lcd(s, len_pixel=10):
+def get_lcd(data):
+    """Calculate the largest cavity distance (LCD).
+
+    The LCD signifies the largest cavity in the pore structure (the
+    radial size of the largest cavity).
+
+    Args:
+      data: the Euclidean distance of the pore strcuture from nearest
+        atoms
+
+    >>> data = np.array([[0,  4, 0], [1, 3, 1], [0, 1, 0]])
+    >>> get_lcd(data)
+    8
+
     """
-    returns LCD
-    input: EDT of the porous structure
+    return 2 * data.max()
+
+
+def calc_pore_metrics(data, lo=0.5, hi=9.5, tol=0.1, axis=-1, n_pixel=1):
+    """Calulate the pore metrics.
+
+    The pore metrics consist of the pore limiting diameter (PLD) and the
+    largest cavity diameter (LCD).
+
+    The PLD signifies the largest structure that can pass through a
+    connected pore structure. The ``lo`` and ``hi`` values are guesses
+    for the PLD to help the solution converge. The ``tol`` value is
+    the tolerance to search to find the PLD. The maximum number of
+    iterations is approximately ``(hi - lo) / tol``. Typically the
+    number of iterations is less that this.
+
+    The LCD signifies the largest cavity in the pore structure (the
+    radial size of the largest cavity).
+
+    Args:
+      data: the two-phase microstructure (either 0 or 1) in any dimension
+      lo: the minimum PLD value to check for
+      hi: the maximum PDL value to check for
+      tol: the resolution of the PLD values
+      axis: the traversal direction of the probe molecule
+      n_pixel: number of pixels per unit length
+
+    Returns:
+      a dictionary with ``pld`` and ``lcd`` keys
+
+    >>> data = np.zeros((3, 3, 3))
+    >>> data[1, 1] = 1
+    >>> assert(np.allclose(
+    ...     calc_pore_metrics(data, tol=0.01)['pld'],
+    ...     2.0,
+    ...     atol=0.01
+    ... ))
+
     """
-    return 2 * s.max()
+    if axis == -1 or axis == (data.ndim - 1):
+        data_rotate = data
+    else:
+        data_rotate = np.rot90(data, axes=(axis, -1))
+
+    dist = calc_euclidean_distance(
+        np.pad(
+            data_rotate,
+            ((1, 1), (1, 1), (0, 0)),
+            'constant',
+            constant_values=0
+        ),
+        n_pixel=n_pixel
+    )
+
+    return dict(
+        pld=get_pld(dist, lo, hi, tol),
+        lcd=get_lcd(dist)
+    )
+
+
 
 @curry
-def dgrid(s, len_pixel):
+def calc_euclidean_distance(data, n_pixel=1):
+    """Calculate the Euclidean distance from one phase to another
+
+    Given a two phase microstructure labeled 1 and 0, calculate the
+    distance of each of the 1-voxels from the nearest
+    0-voxels. Returns 0 for 0-voxels and a float value indicating the
+    distance at 1-voxels.
+
+    Args:
+      data: the two-phase microstructure (either 0 or 1) in any dimension
+      n_pixel: number of pixels per unit length
+
+    Works with only zeros
+
+    >>> one_phase = np.array([[0, 0], [0, 0]])
+    >>> calc_euclidean_distance(one_phase)
+    array([[0., 0.],
+           [0., 0.]])
+
+    Simple test case
+
+    >>> two_phase = np.ones((3, 3))
+    >>> two_phase[1, 1] = 0
+    >>> assert(np.allclose(
+    ...     calc_euclidean_distance(two_phase),
+    ...     [[np.sqrt(2), 1, np.sqrt(2)],
+    ...      [1, 0, 1],
+    ...      [np.sqrt(2), 1, np.sqrt(2)]]
+    ... ))
+
+
     """
-        args:
-        s: 3D volume
-        len_pixel: resolution
-    """
-    return transform_edt(s.astype(np.uint8)) / len_pixel
+    return transform_edt(data.astype(np.uint8)) / n_pixel
 
 
 
