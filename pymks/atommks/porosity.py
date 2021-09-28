@@ -14,31 +14,66 @@ from skimage.morphology import skeletonize_3d as sklz
 
 erasure = curry(remove_small_objects)
 
-@curry
-def accessibleRegion(S, atomH, r_h, overlap=0.01):
-    vol = np.count_nonzero(atomH)
-    S_mod = imfilter(x_data=(S < 1e-6),
-                     f_data = padder(atomH, np.array(S.shape))) / vol
-    S_mod = S_mod < overlap
-    return S_mod
-
-
-@curry
-def return_labelled(x_data):
-    S_l, n_count = measurements.label(x_data)
+def return_labelled(data):
+    S_l, n_count = measurements.label(data)
     top = list(np.unique(S_l[:,:,0]))[1:]
     bot = list(np.unique(S_l[:,:,-1]))[1:]
     m = list(set(top).intersection(bot))
     return S_l, n_count, m
 
+def is_connected(data):
+    S_l, n_count, m = return_labelled(data)
+    if len(m) is 0:
+        return False
+    else:
+        return True
 
 @curry
-def is_connected(S):
-        S_l, n_count, m = return_labelled(S)
-        if len(m) is 0:
-            return False
-        else:
-            return True
+def calc_euclidean_distance(data, n_pixel=1):
+    """Calculate the Euclidean distance from one phase to another
+
+    Given a two phase microstructure labeled 1 and 0, calculate the
+    distance of each of the 1-voxels from the nearest
+    0-voxels. Returns 0 for 0-voxels and a float value indicating the
+    distance at 1-voxels.
+
+    Args:
+      data: the two-phase microstructure (either 0 or 1) in any dimension
+      n_pixel: number of pixels per unit length
+
+    Works with only zeros
+
+    >>> one_phase = np.array([[0, 0], [0, 0]])
+    >>> calc_euclidean_distance(one_phase)
+    array([[0., 0.],
+           [0., 0.]])
+
+    Simple test case
+
+    >>> two_phase = np.ones((3, 3))
+    >>> two_phase[1, 1] = 0
+    >>> assert(np.allclose(
+    ...     calc_euclidean_distance(two_phase),
+    ...     [[np.sqrt(2), 1, np.sqrt(2)],
+    ...      [1, 0, 1],
+    ...      [np.sqrt(2), 1, np.sqrt(2)]]
+    ... ))
+
+    """
+    return transform_edt(data.astype(np.uint8)) / n_pixel
+
+@curry
+def calc_accessible_pore(dist=None, r_probe=0.5, r_min=2.5, n_pixel=10):
+    """
+    From distance grid matrix generate accessible pore region
+    removing small, unconnected regions(r_min sized)
+    """
+
+    return pipe(dist,
+               lambda s: (s > r_probe) * 1,
+               lambda s: return_labelled(s)[0],
+               erasure(min_size = 4/3 * np.pi * (r_min * n_pixel)**3),
+    )
 
 @curry
 def get_pld(data, lo=0.5, hi=9.5, tol=0.1):
@@ -87,8 +122,6 @@ def get_pld(data, lo=0.5, hi=9.5, tol=0.1):
 
     return pld
 
-
-@curry
 def get_lcd(data):
     """Calculate the largest cavity distance (LCD).
 
@@ -106,8 +139,25 @@ def get_lcd(data):
     """
     return 2 * data.max()
 
+def get_asa(data, r_probe=0.5, n_pixel=10):
+    """
+    Calculate the accessible surface area (asa).
+    """
+    data = calc_accessible_pore(data, r_probe=r_probe, n_pixel=n_pixel)
+    w = [[[1,1,1],[1,1,1],[1,1,1]],
+         [[1,1,1],[1,1,1],[1,1,1]],
+         [[1,1,1],[1,1,1],[1,1,1]]]
+    data_blur = scipy.signal.fftconvolve(data, w, mode="same") > 1e-6
+    return (np.count_nonzero(data_blur) - np.count_nonzero(data)) * (1 / n_pixel)**2
 
-def calc_pore_metrics(data, lo=0.5, hi=9.5, tol=0.1, axis=-1, n_pixel=1):
+def get_av(data, r_probe=0.5, n_pixel=10):
+    """
+    Calculate the accessible volume (av)
+    """
+    data = calc_accessible_pore(data, r_probe=r_probe, n_pixel=n_pixel)
+    return np.count_nonzero(data) * (1/n_pixel)**3
+
+def calc_pore_metrics(data, lo=0.5, hi=9.5, tol=0.1, axis=-1, r_probe=0.5, n_pixel=1):
     """Calulate the pore metrics.
 
     The pore metrics consist of the pore limiting diameter (PLD) and the
@@ -126,7 +176,7 @@ def calc_pore_metrics(data, lo=0.5, hi=9.5, tol=0.1, axis=-1, n_pixel=1):
     Args:
       data: the two-phase microstructure (either 0 or 1) in any dimension
       lo: the minimum PLD value to check for
-      hi: the maximum PDL value to check for
+      hi: the maximum PLD value to check for
       tol: the resolution of the PLD values
       axis: the traversal direction of the probe molecule
       n_pixel: number of pixels per unit length
@@ -156,81 +206,22 @@ def calc_pore_metrics(data, lo=0.5, hi=9.5, tol=0.1, axis=-1, n_pixel=1):
             constant_values=0
         ),
         n_pixel=n_pixel
-    )
+    )[1:-1, 1:-1, :]
 
     return dict(
         pld=get_pld(dist, lo, hi, tol),
-        lcd=get_lcd(dist)
+        lcd=get_lcd(dist), 
+        asa=get_asa(dist, r_probe=r_probe, n_pixel=n_pixel), 
+        av=get_av(dist, r_probe=r_probe, n_pixel=n_pixel)
     )
 
-
-
 @curry
-def calc_euclidean_distance(data, n_pixel=1):
-    """Calculate the Euclidean distance from one phase to another
-
-    Given a two phase microstructure labeled 1 and 0, calculate the
-    distance of each of the 1-voxels from the nearest
-    0-voxels. Returns 0 for 0-voxels and a float value indicating the
-    distance at 1-voxels.
-
-    Args:
-      data: the two-phase microstructure (either 0 or 1) in any dimension
-      n_pixel: number of pixels per unit length
-
-    Works with only zeros
-
-    >>> one_phase = np.array([[0, 0], [0, 0]])
-    >>> calc_euclidean_distance(one_phase)
-    array([[0., 0.],
-           [0., 0.]])
-
-    Simple test case
-
-    >>> two_phase = np.ones((3, 3))
-    >>> two_phase[1, 1] = 0
-    >>> assert(np.allclose(
-    ...     calc_euclidean_distance(two_phase),
-    ...     [[np.sqrt(2), 1, np.sqrt(2)],
-    ...      [1, 0, 1],
-    ...      [np.sqrt(2), 1, np.sqrt(2)]]
-    ... ))
-
-
-    """
-    return transform_edt(data.astype(np.uint8)) / n_pixel
-
-
-
-def get_asa(S, len_pixel=10):
-    S = (S > 0) * 1
-    w = [[[1,1,1],[1,1,1],[1,1,1]],
-         [[1,1,1],[1,1,1],[1,1,1]],
-         [[1,1,1],[1,1,1],[1,1,1]]]
-    S1 = scipy.signal.fftconvolve(S, w, mode="same") > 1e-6
-    return (np.count_nonzero(S1) - np.count_nonzero(S)) * (1 / len_pixel)**2
-
-
-@curry
-def gen_cleanPore(S=None, r_probe=0.5, r_min=2.5, len_pixel=10):
-    """From distance grid matrix generate accessible pore region
-    removing small, unconnected regions(r_min sized)"""
-
-    erase = erasure(min_size = 4/3 * np.pi * (r_min * len_pixel)**3)
-    S_1 = pipe(S,
-               lambda s: (s > r_probe) * 1,
-               lambda s: return_labelled(s)[0],
-               erase,)
-    return S_1
-
-
-@curry
-def gen_medialAxis(S):
-    return pipe(S,
+def calc_medial_axis(data):
+    return pipe(data,
                 lambda s: s.astype(np.uint8),
                 lambda s: sklz(s))
 
-def get_pathLength(path, coords):
+def calc_path_length(path, coords):
     l = 0.0
     coord0 = coords[path[0]]
     for i, idx in enumerate(path[1:]):
@@ -254,21 +245,13 @@ def pred_search(pred, path, idx0):
     return path, done
 
 @curry
-def gen_throughPath(S, depth):
+def calc_shortest_paths(S, depth):
     coords = np.concatenate([np.where(S>0)], axis=1).T
-    i=0
     bot = []
     top = []
-
-    tort = []
-    l = S.shape[2]
-
-    S_1 = np.zeros(S.shape, dtype=np.uint8)
-
     for i in range(depth):
         bot = bot + list(np.where(coords[:,2] == i)[0])
         top = top + list(np.where(coords[:,2] == (S.shape[2]-1-i))[0])
-
     tree = cKDTree(coords)
     dok_mat = tree.sparse_distance_matrix(tree, max_distance=2, p=2.0)
     dist_mat, pred = dijkstra(dok_mat,
@@ -276,17 +259,56 @@ def gen_throughPath(S, depth):
                               indices=top,
                               return_predecessors=True,
                               unweighted=True)
-
+    torts_list = []
+    indxs_list = []    
+    S_1 = np.zeros(S.shape, dtype=np.uint8)
     for index, idx0 in enumerate(top):
         pred0 = pred[index,:]
         for idx in bot:
             path = [idx,]
-
             path, done = pred_search(pred0, path, idx0)
-
             if done:
-                dx, dy, dz = [coords[path][:,idim] for idim in range(3)]
+                indxs_list.append([coords[path][:,idim] for idim in range(3)])
+                dx, dy, dz = indxs_list[-1]
                 S_1[dx, dy, dz] += 1
-                tort.append(get_pathLength(path, coords)/ l)
+                torts_list.append(calc_path_length(path, coords) / S.shape[2])
 
-    return (S_1 > 0)*1, tort
+    return S_1, torts_list, indxs_list
+
+def calc_diffusion_paths(data, axis=-1, r_probe=0.5, n_pixel=10):
+    """
+    Calulate the path metrics.
+    """
+    if axis == -1 or axis == (data.ndim - 1):
+        data_rotate = data
+    else:
+        data_rotate = np.rot90(data, axes=(axis, -1))
+    
+    dists = calc_euclidean_distance(
+        np.pad(
+            data_rotate,
+            ((1, 1), (1, 1), (0, 0)),
+            'constant',
+            constant_values=0
+        ),
+        n_pixel=n_pixel
+    )[1:-1, 1:-1, :]
+
+    pore = calc_accessible_pore(dists, 
+        r_probe=r_probe, 
+        r_min=2.5, 
+        n_pixel=n_pixel
+    )
+
+    paths, torts_lst, indxs_lst = pipe(
+        pore, 
+        lambda x: np.pad(x, 
+                        pad_width=((0,0),(0,0),(n_pixel, n_pixel)), 
+                        mode = "constant", 
+                        constant_values=1
+                    ),  
+        lambda x: calc_medial_axis(x)[:,:,n_pixel:-n_pixel], 
+        calc_shortest_paths(depth=1)
+    )
+
+    return dists, paths, torts_lst, indxs_lst
