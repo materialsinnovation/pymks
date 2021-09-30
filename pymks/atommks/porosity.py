@@ -71,8 +71,8 @@ def calc_accessible_pore(dist=None, r_probe=0.5, r_min=2.5, n_pixel=10):
 
     return pipe(dist,
                lambda s: (s > r_probe) * 1,
-               lambda s: return_labelled(s)[0],
-               erasure(min_size = 4/3 * np.pi * (r_min * n_pixel)**3),
+            #    lambda s: return_labelled(s)[0],
+            #    erasure(min_size = 4/3 * np.pi * (r_min * n_pixel)**3),
     )
 
 @curry

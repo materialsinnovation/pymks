@@ -20,18 +20,26 @@ def calc_func_over_list(func, inputs_list, n_workers):
     if n_workers == 1:
         return [func(item) for item in inputs_list]
     else:
-        return process_map(func, inputs_list, max_workers=n_workers)
+        with Pool(n_workers) as pool:
+            out = pool.map(func, inputs_list)
+        return out
+        # return process_map(func, inputs_list, max_workers=n_workers)
+
+
+def calc_path_distance_for_tuple(t):
+    return calc_path_distance(t[0]["psv"], t[1]["psv"])
 
 
 def calc_path_distances_matrix(paths1, paths2=None, n_workers=1):
+
     if paths2 is not  None:
-        out = calc_func_over_list(func=lambda t: calc_path_distance(*t), 
+        out = calc_func_over_list(func=calc_path_distance_for_tuple, 
                                   inputs_list=list(product(paths1, paths2)), 
                                   n_workers=n_workers)
         return np.reshape(out, (len(paths1), len(paths2)))
     else:
         l = len(paths1)
-        out = calc_func_over_list(func=lambda t: calc_path_distance(*t), 
+        out = calc_func_over_list(func=calc_path_distance_for_tuple, 
                                   inputs_list=list(combinations(paths1, r=2)), 
                                   n_workers=n_workers)
         mat = np.zeros([l]*2)
@@ -42,17 +50,15 @@ def calc_path_distances_matrix(paths1, paths2=None, n_workers=1):
 
 
 @curry
-def get_canonical_paths_prll(paths, n_workers=1):
+def calc_canonical_paths(paths, n_workers=1, threshold=10.):
     canonical_paths = []
     if len(paths) > 1:
-        out = process_map(dtw_distance_tuple, 
-                          list(product(paths, paths)), 
-                          max_workers=n_workers)
-        data_matrix = np.reshape(out, (len(paths), len(paths)))
+
+        distance_matrix = calc_path_distances_matrix(paths,  n_workers=n_workers)
         model = AgglomerativeClustering(affinity='precomputed', 
                                         n_clusters=None, 
                                         linkage='complete', 
-                                        distance_threshold=10.).fit(data_matrix)
+                                        distance_threshold=threshold).fit(distance_matrix)
         found = set()
         for i, l in enumerate(model.labels_):
             if l not in found:
@@ -64,41 +70,62 @@ def get_canonical_paths_prll(paths, n_workers=1):
 
 
 if __name__=="__main__":
-    
-    for cif_ix, cif in enumerate(cif_shortlist):
+    import torch
+    # from multiprocessing import Pool
+    # from os import getpid
 
-        fname = flist[ciflist.index(cif)]
+    # def double(i):
+    #     print("I'm process", getpid())
+    #     return i * 2
 
-        path = loader(fname)
+    # with Pool(4) as pool:
+    #     result = pool.map(double, [1, 2, 3, 4, 5])
+    #     print(result)
 
-        dists = path["dist_list"]
+    # paths = torch.load("paths.pth")
+    # inputs_list = list(combinations(paths[:10], r=2))
+    # def func(t):
+    #     return calc_path_distance(*t)
+    # with Pool(4) as pool:
+    #     result = pool.map(func, inputs_list)
 
-        torts = path["torts"]
-
-        dists_dict = defaultdict(list)
-        for ix, t in enumerate(torts):
-            dists_dict[int(np.ceil(t*10))].append(dists[ix])
-        dists_dict = OrderedDict(sorted(dists_dict.items()))
-
-        print(cif_ix, fname, len(dists))
+    # import pdb; pdb.set_trace()
 
 
+    # for cif_ix, cif in enumerate(cif_shortlist):
 
-        strt = time.time()
-        if cif not in paths_canonical:
+    #     fname = flist[ciflist.index(cif)]
 
-            if len(dists) < 50000:
+    #     path = loader(fname)
 
-                out = process_map(get_canonical_paths, 
-                                  [dists_dict[k] for k in dists_dict], 
-                                  max_workers=14)
-                paths_canonical[cif] = get_canonical_paths_prll(n_workers=14)(list(itertools.chain(*out))) 
+    #     dists = path["dist_list"]
 
-                print(f"elpsd: {time.time()-strt} s, {len(paths_canonical[cif])}")
+    #     torts = path["torts"]
 
-    #             saver(f"paths_canonical_LEVff-[1,1,0]-L-0.235821_0-U-0.758686_0-ss-19.309257903.pkl", paths_canonical)
-        else:
-            print(f"elpsd: {time.time()-strt} s, skipped, {cif}")
+    #     dists_dict = defaultdict(list)
+    #     for ix, t in enumerate(torts):
+    #         dists_dict[int(np.ceil(t*10))].append(dists[ix])
+    #     dists_dict = OrderedDict(sorted(dists_dict.items()))
+
+    #     print(cif_ix, fname, len(dists))
+
+
+
+    #     strt = time.time()
+    #     if cif not in paths_canonical:
+
+    #         if len(dists) < 50000:
+
+    #             out = process_map(get_canonical_paths, 
+    #                               [dists_dict[k] for k in dists_dict], 
+    #                               max_workers=14)
+    #             paths_canonical[cif] = get_canonical_paths_prll(n_workers=14)(list(itertools.chain(*out))) 
+
+    #             print(f"elpsd: {time.time()-strt} s, {len(paths_canonical[cif])}")
+
+    # #             saver(f"paths_canonical_LEVff-[1,1,0]-L-0.235821_0-U-0.758686_0-ss-19.309257903.pkl", paths_canonical)
+    #     else:
+    #         print(f"elpsd: {time.time()-strt} s, skipped, {cif}")
     
 #     flist = sorted(glob.glob("likely-min/*.pkl"))
     
