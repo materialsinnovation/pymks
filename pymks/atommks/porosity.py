@@ -4,13 +4,19 @@
 import numba
 import scipy
 import numpy as np
+from tqdm import tqdm
 from .helpers import *
 from scipy.spatial import cKDTree
 from toolz.curried import pipe, curry
+from collections import defaultdict, OrderedDict
+
 from scipy.ndimage import measurements
 from scipy.sparse.csgraph import dijkstra
 from skimage.morphology import remove_small_objects
 from skimage.morphology import skeletonize_3d as sklz
+
+from .canonical_paths import calc_path_distance, calc_path_distances_matrix, calc_canonical_paths
+
 
 erasure = curry(remove_small_objects)
 
@@ -208,7 +214,7 @@ def calc_pore_metrics(data, lo=0.5, hi=9.5, tol=0.1, axis=-1, r_probe=0.5, n_pix
         n_pixel=n_pixel
     )[1:-1, 1:-1, :]
 
-    return dict(
+    return dist, dict(
         pld=get_pld(dist, lo, hi, tol),
         lcd=get_lcd(dist), 
         asa=get_asa(dist, r_probe=r_probe, n_pixel=n_pixel), 
@@ -272,43 +278,39 @@ def calc_shortest_paths(S, depth):
                 dx, dy, dz = indxs_list[-1]
                 S_1[dx, dy, dz] += 1
                 torts_list.append(calc_path_length(path, coords) / S.shape[2])
-
     return S_1, torts_list, indxs_list
 
-def calc_diffusion_paths(data, axis=-1, r_probe=0.5, n_pixel=10):
+def calc_diffusion_paths(dists, axis=-1, r_probe=0.5, n_pixel=10, n_workers=12):
     """
     Calulate the path metrics.
     """
-    if axis == -1 or axis == (data.ndim - 1):
-        data_rotate = data
-    else:
-        data_rotate = np.rot90(data, axes=(axis, -1))
     
-    dists = calc_euclidean_distance(
-        np.pad(
-            data_rotate,
-            ((1, 1), (1, 1), (0, 0)),
-            'constant',
-            constant_values=0
-        ),
-        n_pixel=n_pixel
-    )[1:-1, 1:-1, :]
-
-    pore = calc_accessible_pore(dists, 
-        r_probe=r_probe, 
-        r_min=2.5, 
-        n_pixel=n_pixel
-    )
-
     paths, torts_lst, indxs_lst = pipe(
-        pore, 
+        dists,
+        lambda x: (x > r_probe) * 1,
         lambda x: np.pad(x, 
-                        pad_width=((0,0),(0,0),(n_pixel, n_pixel)), 
+                        pad_width=((0, 0),(0, 0),(n_pixel, n_pixel)), 
                         mode = "constant", 
                         constant_values=1
                     ),  
         lambda x: calc_medial_axis(x)[:,:,n_pixel:-n_pixel], 
         calc_shortest_paths(depth=1)
     )
+    
+    dlist = [dists[indxs] for indxs in indxs_lst]
+    plds = [dists[indxs].min()*2 for indxs in indxs_lst]    
+      
+    dists_dict = defaultdict(list)
+    
+    for ix, (p, t) in enumerate(zip(plds, torts_lst)):
+        dists_dict[(int(np.ceil(p*n_pixel)), int(np.ceil(t*n_pixel)))].append({"psv": dlist[ix], "indxs":indxs_lst[ix], "pld": p, "tort":t})
+    dists_dict = OrderedDict(sorted(dists_dict.items()))
 
-    return dists, paths, torts_lst, indxs_lst
+    canonical_dists_dict = {}
+    for ix, (k, p) in tqdm(enumerate(dists_dict.items())):
+        if len(p) > 2500:
+            canonical_dists_dict[k] = p
+        else:
+            canonical_dists_dict[k] = calc_canonical_paths(p, n_workers=n_workers)
+    
+    return dists_dict, canonical_dists_dict
