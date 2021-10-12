@@ -20,12 +20,14 @@ from .canonical_paths import calc_path_distance, calc_path_distances_matrix, cal
 
 erasure = curry(remove_small_objects)
 
+
 def return_labelled(data):
     S_l, n_count = measurements.label(data)
     top = list(np.unique(S_l[:,:,0]))[1:]
     bot = list(np.unique(S_l[:,:,-1]))[1:]
     m = list(set(top).intersection(bot))
     return S_l, n_count, m
+
 
 def is_connected(data):
     S_l, n_count, m = return_labelled(data)
@@ -34,6 +36,7 @@ def is_connected(data):
     else:
         return True
 
+    
 @curry
 def calc_euclidean_distance(data, n_pixel=1):
     """Calculate the Euclidean distance from one phase to another
@@ -68,6 +71,7 @@ def calc_euclidean_distance(data, n_pixel=1):
     """
     return transform_edt(data.astype(np.uint8)) / n_pixel
 
+
 @curry
 def calc_accessible_pore(dist=None, r_probe=0.5, r_min=2.5, n_pixel=10):
     """
@@ -80,6 +84,7 @@ def calc_accessible_pore(dist=None, r_probe=0.5, r_min=2.5, n_pixel=10):
             #    lambda s: return_labelled(s)[0],
             #    erasure(min_size = 4/3 * np.pi * (r_min * n_pixel)**3),
     )
+
 
 @curry
 def get_pld(data, lo=0.5, hi=9.5, tol=0.1):
@@ -128,6 +133,7 @@ def get_pld(data, lo=0.5, hi=9.5, tol=0.1):
 
     return pld
 
+
 def get_lcd(data):
     """Calculate the largest cavity distance (LCD).
 
@@ -145,6 +151,7 @@ def get_lcd(data):
     """
     return 2 * data.max()
 
+
 def get_asa(data, r_probe=0.5, n_pixel=10):
     """
     Calculate the accessible surface area (asa).
@@ -156,12 +163,14 @@ def get_asa(data, r_probe=0.5, n_pixel=10):
     data_blur = scipy.signal.fftconvolve(data, w, mode="same") > 1e-6
     return (np.count_nonzero(data_blur) - np.count_nonzero(data)) * (1 / n_pixel)**2
 
+
 def get_av(data, r_probe=0.5, n_pixel=10):
     """
     Calculate the accessible volume (av)
     """
     data = calc_accessible_pore(data, r_probe=r_probe, n_pixel=n_pixel)
     return np.count_nonzero(data) * (1/n_pixel)**3
+
 
 def calc_pore_metrics(data, lo=0.5, hi=9.5, tol=0.1, axis=-1, r_probe=0.5, n_pixel=1):
     """Calulate the pore metrics.
@@ -221,11 +230,13 @@ def calc_pore_metrics(data, lo=0.5, hi=9.5, tol=0.1, axis=-1, r_probe=0.5, n_pix
         av=get_av(dist, r_probe=r_probe, n_pixel=n_pixel)
     )
 
+
 @curry
 def calc_medial_axis(data):
     return pipe(data,
                 lambda s: s.astype(np.uint8),
                 lambda s: sklz(s))
+
 
 def calc_path_length(path, coords):
     l = 0.0
@@ -235,6 +246,7 @@ def calc_path_length(path, coords):
         l = l + np.sqrt(np.sum((coord - coord0)**2))
         coord0 = coord
     return l
+
 
 @numba.njit
 def pred_search(pred, path, idx0):
@@ -249,6 +261,7 @@ def pred_search(pred, path, idx0):
         if idx == idx0:
             done = True
     return path, done
+
 
 @curry
 def calc_shortest_paths(S, depth):
@@ -279,6 +292,7 @@ def calc_shortest_paths(S, depth):
                 S_1[dx, dy, dz] += 1
                 torts_list.append(calc_path_length(path, coords) / S.shape[2])
     return S_1, torts_list, indxs_list
+
 
 def calc_diffusion_paths(dists, axis=-1, r_probe=0.5, n_pixel=10, n_workers=12):
     """
