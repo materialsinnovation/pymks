@@ -1,7 +1,7 @@
 """
 @author: ashanker9@gatech.edu
 """
-import numba
+import scipy
 import pickle
 import numpy as np
 from toolz.curried import curry, pipe
@@ -96,23 +96,6 @@ def padder(inp, shape, const_val=0):
     ls = np.floor((shape - inp.shape) / 2).astype(int)
     hs = np.ceil((shape - inp.shape) / 2).astype(int)
     return np.pad(inp, ((ls[0], hs[0]), (ls[1], hs[1]), (ls[2], hs[2])), 'constant', constant_values=const_val)
-
-
-# @curry
-# def return_slice(x_data, cutoff):
-
-#     s  = (np.asarray(x_data.shape) // 2 + 1).astype(int)
-#     cutoff = (np.asarray(cutoff) // 2 + 1).astype(int)
-
-#     if x_data.ndim == 2:
-#         return x_data[(s[0] - cutoff[0]):(s[0] + cutoff[0] + 1),
-#                       (s[1] - cutoff[1]):(s[1] + cutoff[1] + 1)]
-#     elif x_data.ndim ==3:
-#         return x_data[(s[0] - cutoff[0]):(s[0] + cutoff[0] + 1),
-#                       (s[1] - cutoff[1]):(s[1] + cutoff[1] + 1),
-#                       (s[2] - cutoff[2]):(s[2] + cutoff[2] + 1)]
-#     else:
-#         print('Incorrect Number of Dimensions!')
         
      
 @curry
@@ -155,8 +138,23 @@ def write2vtk(matrix, fname="zeo.vtk"):
             line = " ".join(v)
             f.write(line+"\n")
 
-### ******* New code added to support rdf signal smoothening ********
 
+def generate_tubular_paths(data, size=5):
+    
+    data = np.pad(
+            data,
+            [(size, size)]*3,
+            'constant',
+            constant_values=0
+    )
+    
+    return scipy.ndimage.filters.convolve(data, 
+                                          np.ones((size,)*3), 
+                                          mode="constant", 
+                                          cval=0)[size:-size,size:-size,size:-size]
+
+
+### ******* New code added to support rdf signal smoothening ********
 @curry
 def epanechnikov_fn(u, h):
     p = 0.75*(5**(-0.5))*(1 - (u**2)/(5*h**2))/h
@@ -185,8 +183,8 @@ def convolve_kernel(kernel_arr, sig):
     density = np.fft.ifftn(h1.conj() * h2).real
     return density
 
-## General purpose helpers
 
+## General purpose helpers
 @curry
 def save_file(fname, obj):
     """

@@ -38,7 +38,7 @@ def is_connected(data):
 
     
 @curry
-def calc_euclidean_distance(data, n_pixel=1):
+def calc_euclidean_distance(data, n_pixel=1, axis=-1):
     """Calculate the Euclidean distance from one phase to another
 
     Given a two phase microstructure labeled 1 and 0, calculate the
@@ -69,7 +69,21 @@ def calc_euclidean_distance(data, n_pixel=1):
     ... ))
 
     """
-    return transform_edt(data.astype(np.uint8)) / n_pixel
+    
+    
+    if axis == -1 or axis == (data.ndim - 1):
+        data = data
+    else:
+        data = np.rot90(data, axes=(axis, -1))
+
+    data =  np.pad(
+        data, 
+        ((1, 1), (1, 1), (0, 0)), 
+        'constant', 
+        constant_values=0
+    )
+    
+    return transform_edt(data.astype(np.uint8))[1:-1, 1:-1, :] / n_pixel
 
 
 @curry
@@ -172,11 +186,12 @@ def get_av(data, r_probe=0.5, n_pixel=10):
     return np.count_nonzero(data) * (1/n_pixel)**3
 
 
-def calc_pore_metrics(data, lo=0.5, hi=9.5, tol=0.1, axis=-1, r_probe=0.5, n_pixel=1):
+def calc_pore_metrics(dist, lo=0.5, hi=9.5, tol=0.1, axis=-1, r_probe=0.5, n_pixel=1):
     """Calulate the pore metrics.
 
-    The pore metrics consist of the pore limiting diameter (PLD) and the
-    largest cavity diameter (LCD).
+    The pore metrics consist of the pore limiting diameter (PLD), the
+    largest cavity diameter (LCD), the accessible surface area (ASA) 
+    and the accessible volume (AV).
 
     The PLD signifies the largest structure that can pass through a
     connected pore structure. The ``lo`` and ``hi`` values are guesses
@@ -187,6 +202,12 @@ def calc_pore_metrics(data, lo=0.5, hi=9.5, tol=0.1, axis=-1, r_probe=0.5, n_pix
 
     The LCD signifies the largest cavity in the pore structure (the
     radial size of the largest cavity).
+    
+    The ASA for is the combined internal surface area of all cavities that 
+    can be accessed by a foreign molecule. 
+    
+    The AV is the combined volume of all cavities that can be accessed by 
+    a foreign molecule.
 
     Args:
       data: the two-phase microstructure (either 0 or 1) in any dimension
@@ -197,33 +218,20 @@ def calc_pore_metrics(data, lo=0.5, hi=9.5, tol=0.1, axis=-1, r_probe=0.5, n_pix
       n_pixel: number of pixels per unit length
 
     Returns:
-      a dictionary with ``pld`` and ``lcd`` keys
+      a tuple with the first item being the distance grid and the second item 
+      being a dictionary with ``pld``, ``lcd``, ``asa`` and ``av`` keys
 
     >>> data = np.zeros((3, 3, 3))
     >>> data[1, 1] = 1
     >>> assert(np.allclose(
-    ...     calc_pore_metrics(data, tol=0.01)['pld'],
+    ...     calc_pore_metrics(data, tol=0.01)[1]['pld'],
     ...     2.0,
     ...     atol=0.01
     ... ))
 
     """
-    if axis == -1 or axis == (data.ndim - 1):
-        data_rotate = data
-    else:
-        data_rotate = np.rot90(data, axes=(axis, -1))
 
-    dist = calc_euclidean_distance(
-        np.pad(
-            data_rotate,
-            ((1, 1), (1, 1), (0, 0)),
-            'constant',
-            constant_values=0
-        ),
-        n_pixel=n_pixel
-    )[1:-1, 1:-1, :]
-
-    return dist, dict(
+    return dict(
         pld=get_pld(dist, lo, hi, tol),
         lcd=get_lcd(dist), 
         asa=get_asa(dist, r_probe=r_probe, n_pixel=n_pixel), 
@@ -294,7 +302,7 @@ def calc_shortest_paths(S, depth):
     return S_1, torts_list, indxs_list
 
 
-def calc_diffusion_paths(dists, axis=-1, r_probe=0.5, n_pixel=10, n_workers=12):
+def calc_diffusion_paths(dists, r_probe=0.5, n_pixel=10, n_workers=12):
     """
     Calulate the path metrics.
     """
