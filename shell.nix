@@ -23,7 +23,7 @@ in
 
     propagatedBuildInputs = old.propagatedBuildInputs;
 
-    nativeBuildInputs = propagatedBuildInputs ++ extra ++ [ pymks ];
+    nativeBuildInputs = propagatedBuildInputs ++ extra;
 
     postShellHook = ''
       export OMPI_MCA_plm_rsh_agent=${pkgs.openssh}/bin/ssh
@@ -31,7 +31,7 @@ in
       SOURCE_DATE_EPOCH=$(date +%s)
       export PYTHONUSERBASE=$PWD/.local
       export USER_SITE=`python -c "import site; print(site.USER_SITE)"`
-      export PYTHONPATH=$PYTHONPATH:$USER_SITE
+      export PYTHONPATH=$PYTHONPATH:$USER_SITE:$(pwd)
       export PATH=$PATH:$PYTHONUSERBASE/bin
 
       jupyter nbextension install --py widgetsnbextension --user > /dev/null 2>&1
