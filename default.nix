@@ -15,8 +15,9 @@
 , graphviz
 , pygraphviz
 , pyfftw
-, graspi
+, graspi ? null
 }:
+
 buildPythonPackage rec {
   pname = "pymks";
   version = "0.4.2";
