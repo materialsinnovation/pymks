@@ -103,12 +103,15 @@ in the base directory.
 Follow the [Nix installation
 guide](https://nixos.org/nix/manual/#chap-quick-start) and then run
 
-    $ export NIX_VERSION=21.05
-    $ export PYMKS_VERSION=0.4.1
-    $ nix-shell \
-        -I nixpkgs=https://github.com/NixOS/nixpkgs/archive/${NIX_VERSION}.tar.gz \
-        -I pymks=https://github.com/materialsinnovation/pymks/archive/${PYMKS_VERSION}.tar.gz \
-        -E 'with (import <nixpkgs> {}); mkShell { buildInputs = [ (python3Packages.callPackage <pymks> { }) ]; }'
+    $ export NIXPKGS=https://github.com/NixOS/nixpkgs/archive/21.05.tar.gz
+    $ export PYMKS=https://github.com/materialsinnovation/pymks/archive/refs/tags/v0.4.1.tar.gz
+    $ nix-shell -I nixpkgs=${NIXPKGS} -I pymks=${PYMKS} -p 'python3Packages.callPackage <pymks> { graspi = null; }'
+
+to build without GraSPI. To include GraSPI in the build use
+
+    $ export GRASPI=https://github.com/owodolab/graspi/archive/59f6a8a2e1ca7c8744a4e37701b919131efb2f45.tar.gz
+    $ nix-shell -I nixpkgs=${NIXPKGS} -I pymks=${PYMKS} -I graspi=${graspi} \
+          -p 'let cp = python3Packages.callPackage; in cp <pymks> { graspi = cp <graspi> { }; }'
 
 to drop into a shell with PyMKS and all its requirements available. To
 create a development environment with Nix clone this repository and

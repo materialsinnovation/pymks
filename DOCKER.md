@@ -23,7 +23,7 @@ Run the tests.
 
 ## Use PyMKS in a Jupyter notebook
 
-    $ docker run -i -t -p 8888:8888 wd15/fipy:latest
+    $ docker run -i -t -p 8888:8888 wd15/pymks:latest
     # jupyter notebook --ip 0.0.0.0 --no-browser
 
 The PyMKS example notebooks are availabe inside the image after
