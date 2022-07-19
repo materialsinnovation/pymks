@@ -1,7 +1,7 @@
 name: Test Nix Build
 on: [push, pull_request]
 jobs:
-  pygraspi-nix-test:
+  nix-test:
     runs-on: ubuntu-latest
     defaults:
       run:
