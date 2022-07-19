@@ -12,4 +12,5 @@ sphinx-jinja
 alabaster
 IPython
 importlib-metadata==3.10.1
+cython
 # require pandoc which is a haskell package
