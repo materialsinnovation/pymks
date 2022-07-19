@@ -35,7 +35,7 @@ def get_version() -> str:
 
     try:
         # pylint: disable=no-member
-        version = get_distribution(__name__.split(".")[0]).version
+        version = get_distribution(__name__.split(".", maxsplit=1)[0]).version
     except DistributionNotFound:  # pragma: no cover
         version = "unknown, try running `python setup.py egg_info`"
 

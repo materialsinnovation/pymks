@@ -87,7 +87,7 @@ def _explicit(gamma, ksq, param_a1=3.0, param_a2=0.0):
 
 def _f_response(x_data, delta_t, gamma, ksq):
     fx_data = lambda: fftn(x_data, axes=_axes(x_data))
-    fx3_data = lambda: fftn(x_data ** 3, axes=_axes(x_data))
+    fx3_data = lambda: fftn(x_data**3, axes=_axes(x_data))
     implicit = lambda: (1 - gamma * ksq) - _explicit(gamma, ksq)
     delta_t_ksq = lambda: delta_t * ksq
     numerator = (
