@@ -296,7 +296,7 @@ def _check(n_phases, n_phases_other, x_data):
     if not issubclass(x_data.dtype.type, np.integer):
         raise TypeError("X must be an integer array")
     if np.max(x_data) >= n_phases or np.min(x_data) < 0:
-        raise RuntimeError("X must be between 0 and {N}.".format(N=n_phases - 1))
+        raise RuntimeError(f"X must be between 0 and {n_phases - 1}.")
     if not 3 <= len(x_data.shape) <= 4:
         raise RuntimeError("the shape of x_data is incorrect")
 
@@ -453,8 +453,8 @@ def get_region_func(max_x, dim_string, domain, name_minmax):
         subdomain_func(max_x=max_x, **{dim_string + "_points": (name_minmax[1],)}),
         lambda x: Function(dim_string + name_minmax[0], x),
         lambda x: domain.create_region(
-            "region_{0}_{1}".format(dim_string, name_minmax[0]),
-            "vertices by {0}".format(x.name),
+            f"region_{dim_string}_{name_minmax[0]}",
+            f"vertices by {x.name}",
             "facet",
             functions=Functions([x]),
         ),
@@ -481,7 +481,7 @@ def get_bc(max_x_func, domain, dim, bc_dict_func):
     return pipe(
         domain.get_mesh_bounding_box(),
         lambda x: PeriodicBC(
-            "periodic_{0}".format(dim_dict(0)),
+            f"periodic_{dim_dict(0)}",
             list(
                 map_(
                     get_region_func(max_x_func(x), dim_dict(0), domain),
@@ -489,9 +489,9 @@ def get_bc(max_x_func, domain, dim, bc_dict_func):
                 )
             ),
             bc_dict_func(x),
-            match="match_{0}_plane".format(dim_dict(0)),
+            match=f"match_{dim_dict(0)}_plane",
         ),
-        lambda x: (x, Function("match_{0}_plane".format(dim_dict(0)), dim_dict(1))),
+        lambda x: (x, Function(f"match_{dim_dict(0)}_plane", dim_dict(1))),
     )
 
 
@@ -511,7 +511,7 @@ def get_periodic_bc_yz(domain, dim):
         lambda _: None,
         domain,
         dim,
-        lambda x: merge({"u.1": "u.1"}, {"u.2": "u.2"} if x.shape[1] == 3 else dict()),
+        lambda x: merge({"u.1": "u.1"}, {"u.2": "u.2"} if x.shape[1] == 3 else {}),
     )
 
 
@@ -571,7 +571,7 @@ def get_shift_or_fixed_bcs(domain, points_dict_f, name, x_points_f):
 
     def func(min_xyz, max_xyz):
         return pipe(
-            dict(z_points=(max_xyz[2], min_xyz[2])) if len(min_xyz) == 3 else dict(),
+            dict(z_points=(max_xyz[2], min_xyz[2])) if len(min_xyz) == 3 else {},
             lambda x: subdomain_func(
                 x_points=x_points_f(min_xyz, max_xyz),
                 y_points=(max_xyz[1], min_xyz[1]),
@@ -620,7 +620,7 @@ def get_displacement_bcs(domain, macro_strain):
             get_shift_or_fixed_bcs(
                 domain,
                 lambda min_, max_: merge(
-                    {"u.0": 0.0, "u.1": 0.0}, {"u.2": 0.0} if len(min_) == 3 else dict()
+                    {"u.0": 0.0, "u.1": 0.0}, {"u.2": 0.0} if len(min_) == 3 else {}
                 ),
                 "fix",
                 lambda min_, max_: (min_[0],),
@@ -732,6 +732,7 @@ def get_stress_strain_data(problem, shape, name):
             args=dict(stress="m.D, u", strain="u")[name],
             name=name,
         ),
+        # pylint: disable=consider-using-f-string
         lambda x: "ev_cauchy_{name}.{dims}.region_all({args})".format(**x),
         lambda x: problem.evaluate(x, mode="el_avg", copy_materials=False),
         np.squeeze,
@@ -749,8 +750,15 @@ def get_displacement(vec, shape):
     Returns:
       displacement field
     """
+    as_dict = (
+        lambda x: x.create_output()
+        if hasattr(x, "create_output")
+        else x.create_output_dict()
+    )
     return pipe(
-        vec.create_output_dict()["u"].data,
+        vec,
+        as_dict,
+        lambda x: x["u"].data,
         lambda x: np.reshape(x, (tuple(x + 1 for x in shape) + x.shape[-1:])),
     )
 
