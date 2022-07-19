@@ -11,8 +11,7 @@
 let
   pkgs = import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/${tag}.tar.gz") {};
   pypkgs = pkgs.python3Packages;
-
- sfepy = pypkgs.sfepy.overridePythonAttrs (old: rec {
+  sfepy = pypkgs.sfepy.overridePythonAttrs (old: rec {
     version = "2022.1";
     src = pkgs.fetchFromGitHub {
       owner = "sfepy";
@@ -21,7 +20,6 @@ let
       sha256 = "sha256-OayULh/dGI5sEynYMc+JLwUd67zEGdIGEKo6CTOdZS8=";
     };
   });
-
   pymks = pypkgs.callPackage ./default.nix {
     sfepy=(if withSfepy then sfepy else null);
     graspi=(if withGraspi then graspi else null);
@@ -29,12 +27,17 @@ let
   extra = with pypkgs; [ black pylint flake8 ipywidgets ];
   graspisrc = builtins.fetchTarball "https://github.com/owodolab/graspi/archive/${graspiVersion}.tar.gz";
   graspi = pypkgs.callPackage "${graspisrc}/default.nix" {};
+  nixes_src = builtins.fetchTarball "https://github.com/wd15/nixes/archive/9a757526887dfd56c6665290b902f93c422fd6b1.zip";
+  jupyter_extra = pypkgs.callPackage "${nixes_src}/jupyter/default.nix" {
+    jupyterlab=(if pkgs.stdenv.isDarwin then pypkgs.jupyter else pypkgs.jupyterlab);
+  };
+
 in
   (pymks.overridePythonAttrs (old: rec {
 
     propagatedBuildInputs = old.propagatedBuildInputs;
 
-    nativeBuildInputs = propagatedBuildInputs ++ extra;
+    nativeBuildInputs = propagatedBuildInputs ++ extra ++ [ jupyter_extra ];
 
     postShellHook = ''
       export OMPI_MCA_plm_rsh_agent=${pkgs.openssh}/bin/ssh
@@ -45,10 +48,5 @@ in
       export PYTHONPATH=$PYTHONPATH:$USER_SITE:$(pwd)
       export PATH=$PATH:$PYTHONUSERBASE/bin
 
-      jupyter nbextension install --py widgetsnbextension --user > /dev/null 2>&1
-      jupyter nbextension enable widgetsnbextension --user --py > /dev/null 2>&1
-      pip install jupyter_contrib_nbextensions --user > /dev/null 2>&1
-      jupyter contrib nbextension install --user > /dev/null 2>&1
-      jupyter nbextension enable spellchecker/main > /dev/null 2>&1
     '';
   }))
