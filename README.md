@@ -7,7 +7,7 @@ alt="Travis CI">
 <a href="https://github.com/materialsinnovation/pymks/blob/master/LICENSE.md">
 <img src="https://img.shields.io/badge/license-mit-blue.svg" alt="License" height="18">
 </a>
-<a href="http://pymks.readthedocs.io/en/latest/?badge=latest">
+<a href="http://pymks.readthedocs.io/en/stable/?badge=latest">
 <img src="https://readthedocs.org/projects/pymks/badge/?version=latest" alt="Documentation Status" height="18">
 </a>
 <a href="https://pypi.python.org/pypi/pymks">
