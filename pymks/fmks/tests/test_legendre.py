@@ -11,7 +11,7 @@ def polyval(x_data):
     Evaluate Legendre expansion for given input.
     """
     x_data = 4 * x_data - 1
-    polys = np.array((np.ones_like(x_data), x_data, (3.0 * x_data ** 2 - 1.0) / 2.0))
+    polys = np.array((np.ones_like(x_data), x_data, (3.0 * x_data**2 - 1.0) / 2.0))
     temp = (2.0 * np.arange(3)[:, None, None] + 1.0) / 2.0 * polys
     return np.rollaxis(temp, 0, 3)
 

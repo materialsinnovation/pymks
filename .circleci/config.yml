@@ -14,7 +14,8 @@ jobs:
       - run:
           name: Create env and install dependencies
           command: |
-            conda env create -f environment.yml
+            conda install mamba -n base -c conda-forge
+            mamba env create -f environment.yml
             source activate pymks
 
       - run:

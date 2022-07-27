@@ -8,8 +8,10 @@ scikit-learn
 nbsphinx
 m2r2
 Deprecated
-sphinx-jinja
+sphinx-jinja==1.4.0
 alabaster
 IPython
 importlib-metadata==3.10.1
+cython
+pandas==1.3.5
 # require pandoc which is a haskell package
