@@ -174,7 +174,6 @@ publication.
 
 [conda]: https://docs.conda.io/en/latest/
 [EXAMPLES]: https://pymks.readthedocs.io/en/stable/EXAMPLES.html
-https://pymks.readthedocs.io/en/stable/EXAMPLES.html
 [TwoPointCorrelation]: http://pymks.readthedocs.io/en/stable/API.html#pymks.TwoPointCorrelation
 [LocalizationRegressor]: http://pymks.readthedocs.io/en/stable/API.html#pymks.LocalizationRegressor
 [GRAPH]: http://pymks.readthedocs.io/en/stable/API.html#pymks.graph_descriptors
