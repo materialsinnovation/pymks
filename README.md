@@ -44,7 +44,7 @@ simulations.
 
 To learn about PyMKS start with the [PyMKS examples][EXAMPLES], especially the
 [introductory example](notebooks/intro.ipynb). To learn more about the
-methods consult the [technical overview](notebooks/tech_overview.html)
+methods consult the [technical overview](notebooks/tech_overview.ipynb)
 for an introduction.
 
 The two principle objects that PyMKS provides are the
