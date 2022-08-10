@@ -7,7 +7,7 @@ alt="Travis CI">
 <a href="https://github.com/materialsinnovation/pymks/blob/master/LICENSE.md">
 <img src="https://img.shields.io/badge/license-mit-blue.svg" alt="License" height="18">
 </a>
-<a href="http://pymks.readthedocs.io/en/stable/?badge=latest">
+<a href="http://pymks.readthedocs.io/">
 <img src="https://readthedocs.org/projects/pymks/badge/?version=latest" alt="Documentation Status" height="18">
 </a>
 <a href="https://pypi.python.org/pypi/pymks">
@@ -42,16 +42,15 @@ and localization linkages, and tools for discretizing the microstructure. In add
 PyMKS has modules for generating synthetic data sets using conventional numerical
 simulations.
 
-To learn about PyMKS start with the [PyMKS
-examples](http://pymks.org/en/stable/EXAMPLES.rst), especially the
+To learn about PyMKS start with the [PyMKS examples][EXAMPLES], especially the
 [introductory example](notebooks/intro.ipynb). To learn more about the
 methods consult the [technical overview](notebooks/tech_overview.html)
 for an introduction.
 
 The two principle objects that PyMKS provides are the
-[TwoPointCorrelation](http://pymks.org/en/stable/API.html#pymks.TwoPointCorrelation)
+[TwoPointCorrelation][TwoPointCorrelation]
 transformer and the
-[LocalizationRegressor](http://pymks.org/en/stable/API.html#pymks.LocalizationRegressor)
+[LocalizationRegressor][LocalizationRegressor]
 which provide the homogenization and localization functionality. The
 objects provided by PyMKS all work as either transformers or
 regressors in a Scikit-Learn pipeline and use both Numpy and Dask
@@ -150,8 +149,7 @@ in your environment.
 ### GraSPI
 
 GraSPI is a C++ library with a Python interface for creating materials
-descriptors using graph theory. See the [API
-documentation](http://pymks.org/en/stable/API.html#pymks.graph_descriptors)
+descriptors using graph theory. See the [API documentation][GRAPH]
 for more details. Currently, only the Nix installation builds with
 GraSPI by default To switch off GraSPI when using Nix use,
 
@@ -172,5 +170,12 @@ publication.
    Systems in Python—a Data Science Framework for Accelerated
    Development of Hierarchical Materials. Integr Mater Manuf Innov 6,
    36–53 (2017). https://doi.org/10.1007/s40192-017-0089-0
+   
 
 [conda]: https://docs.conda.io/en/latest/
+[EXAMPLES]: https://pymks.readthedocs.io/en/stable/EXAMPLES.html
+https://pymks.readthedocs.io/en/stable/EXAMPLES.html
+[TwoPointCorrelation]: http://pymks.readthedocs.io/en/stable/API.html#pymks.TwoPointCorrelation
+[LocalizationRegressor]: http://pymks.readthedocs.io/en/stable/API.html#pymks.LocalizationRegressor
+[GRAPH]: http://pymks.readthedocs.io/en/stable/API.html#pymks.graph_descriptors
+
