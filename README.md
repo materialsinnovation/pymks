@@ -106,8 +106,8 @@ guide](https://nixos.org/nix/manual/#chap-quick-start) and then run
     $ export PYMKS_VERSION=0.4.1
     $ nix-shell \
         -I nixpkgs=https://github.com/NixOS/nixpkgs/archive/${NIX_VERSION}.tar.gz \
-        -I pymks=https://github.com/materialsinnovation/pymks/archive/${PYMKS_VERSION}.tar.gz \
-        -E 'with (import <nixpkgs> {}); mkShell { buildInputs = [ (python3Packages.callPackage <pymks> { }) ]; }'
+        -I pymks=https://github.com/materialsinnovation/pymks/archive/tags/refs/v${PYMKS_VERSION}.tar.gz \
+        -E 'with (import <nixpkgs> {}); mkShell { buildInputs = [ (python3Packages.callPackage <pymks> { graspi = null; }) ]; }'
 
 to drop into a shell with PyMKS and all its requirements available. To
 create a development environment with Nix clone this repository and
